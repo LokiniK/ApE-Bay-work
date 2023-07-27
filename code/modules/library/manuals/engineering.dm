@@ -23,7 +23,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body>
+				<body><meta charset='utf-8'>
 
 				<h1>Cyborgs for Dummies</h1>
 
@@ -314,7 +314,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body>
+				<body><meta charset='utf-8'>
 
 				<h1>Experienced User's Guide</h1>
 
@@ -379,7 +379,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body>
+				<body><meta charset='utf-8'>
 				<h1>Singularity Safety in Special Circumstances</h1>
 
 				<h2>Power outage</h2>
@@ -431,7 +431,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body>
+				<body><meta charset='utf-8'>
 				<center>
 				<br>
 				<span style='font-size: 12px;'><b>Weyland-Yutani - Building Better Worlds</b></span>
@@ -505,7 +505,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body>
+				<body><meta charset='utf-8'>
 
 				<h1><a name="Contents">Contents</a></h1>
 				<ol>
@@ -613,7 +613,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body>
+				<body><meta charset='utf-8'>
 
 				<h1><a name="Foreword">EVA Gear and You: Not Spending All Day Inside</a></h1>
 				<I>Or: How not to suffocate because there's a hole in your shoes</I><BR>

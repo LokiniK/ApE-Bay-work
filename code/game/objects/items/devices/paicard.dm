@@ -125,7 +125,7 @@
 					}
 				</style>
 			</head>
-			<body>
+			<body><meta charset='utf-8'>
 	"}
 
 	if(pai)

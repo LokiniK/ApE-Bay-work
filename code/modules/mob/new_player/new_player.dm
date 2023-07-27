@@ -30,6 +30,7 @@
 	if (!force && !SScharacter_setup.initialized)
 		return
 	var/list/output = list()
+	output += "<head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'></head>"
 	output += "<div align='center'>"
 	if (config.wiki_url || config.rules_url || config.lore_url)
 		var/player_age = client?.player_age
@@ -291,7 +292,7 @@
 /mob/new_player/proc/LateChoices()
 	var/name = client.prefs.real_name
 
-	var/list/header = list("<html><body><center>")
+	var/list/header = list("<html><body><meta charset='utf-8'><center>")
 	header += "<b>Welcome, [name].<br></b>"
 	header += "Round Duration: [roundduration2text()]<br>"
 

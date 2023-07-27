@@ -16,7 +16,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body>
+				<body><meta charset='utf-8'>
 
 				<H1>How to Clone People</H1>
 				So there are 50 dead people lying on the floor, chairs are spinning like no tomorrow and you haven't the foggiest idea of what to do? Not to worry!
@@ -111,7 +111,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body>
+				<body><meta charset='utf-8'>
 				<br>
 				<h1>The Oath</h1>
 

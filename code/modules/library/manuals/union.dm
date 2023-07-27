@@ -3,7 +3,7 @@
 	title = "Union Charter of Workplace Rights"
 	author = "Expeditionary Corps Organisation Corporate Union"
 	dat = {"<head><title>Expeditionary Corps Organisation Union Charter of Workplace Rights</title></head>
-	<body>
+	<body><meta charset='utf-8'>
 	<h2>0. Summary</h2>
 	<hr>
 	<p>As a union representative, you are required to uphold the interests of contracted workers on your station or vessel. You are empowered to inspect workplaces and instigate cessation of contracted work when on green alert, with diminishing powers during a state of emergency. You do not have authority or jurisdiction over government or military workers, or any workers who are not card-carrying signatories to this Charter.</p>

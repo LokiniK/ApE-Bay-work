@@ -188,7 +188,7 @@ var/global/datum/paiController/paiController			// Global handler for pAI candida
 			"}
 
 	dat += {"
-	<body>
+	<body><meta charset='utf-8'>
 		<b><span style="font-size: 3px">pAI Personality Configuration</span></b>
 		<p class="top">Please configure your pAI personality's options. Remember, what you enter here could determine whether or not the user requesting a personality chooses you!</p>
 
@@ -254,7 +254,7 @@ var/global/datum/paiController/paiController			// Global handler for pAI candida
 			</table><br>
 			"}
 	dat += {"
-	<body>
+	<body><meta charset='utf-8'>
 	"}
 
 	show_browser(M, dat, "window=paiRecruit;size=580x580;")
@@ -336,7 +336,7 @@ var/global/datum/paiController/paiController			// Global handler for pAI candida
 					}
 				</style>
 			</head>
-			<body>
+			<body><meta charset='utf-8'>
 				<b>[SPAN_SIZE("3px", "pAI Availability List")]</b><br><br>
 	"}
 	dat += "<p>Displaying available AI personalities from central database... If there are no entries, or if a suitable entry is not listed, check again later as more personalities may be added.</p>"

@@ -64,8 +64,8 @@ SUBSYSTEM_DEF(goals)
 	var/list/result = list()
 	for (var/flag in departments)
 		var/datum/department/department = departments[flag]
-		result += "<b>[department.name] had the following shift goals:</b>"
+		result += "<b>У [department.name] были следующие цели:</b>"
 		result += department.summarize_goals(show_success = TRUE)
 	if (length(result))
 		return "<br>[jointext(result, "<br>")]"
-	return "<br><b>There were no departmental goals this round.</b>"
+	return "<br><b>В этом раунде у департаментов не было целей.</b>"

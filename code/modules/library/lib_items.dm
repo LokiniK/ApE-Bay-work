@@ -275,7 +275,7 @@
 			<html>
 				<head>
 				</head>
-				<body>
+				<body><meta charset='utf-8'>
 					<iframe width='100%' height='100%' src="[url]&printable=yes&remove_links=1" frameborder="0" id="main_frame"></iframe>
 				</body>
 			</html>

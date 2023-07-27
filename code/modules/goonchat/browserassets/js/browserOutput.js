@@ -991,7 +991,7 @@ $(function() {
 			type: 'GET',
 			url: 'browserOutput_white.css',
 			success: function(styleData) {
-				var blob = new Blob(['<head><title>Chat Log</title><style>', styleData, '</style></head><body>', $messages.html(), '</body>']);
+				var blob = new Blob(['<head><title>Chat Log</title><style>', styleData, '</style></head><body><meta charset='utf-8'>', $messages.html(), '</body>']);
 
 				var fname = 'SS13 Chat Log';
 				var date = new Date(), month = date.getMonth(), day = date.getDay(), hours = date.getHours(), mins = date.getMinutes(), secs = date.getSeconds();

@@ -163,7 +163,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body>
+				<body><meta charset='utf-8'>
 
 				<h1>Introduction</h1>
 				Terraforms Industrial is happy to see you as our customer! Please read this guide before using and operating with your custom PSOS - Planetary Shield Orbital Statiion.

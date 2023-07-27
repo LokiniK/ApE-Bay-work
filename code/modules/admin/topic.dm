@@ -631,7 +631,7 @@
 		jobs += "</tr></table>"
 
 	// Finalize and display.
-		body = "<body>[jobs]</body>"
+		body = "<body><meta charset='utf-8'>[jobs]</body>"
 		dat = "<tt>[header][body]</tt>"
 		show_browser(usr, dat, "window=jobban2;size=800x490")
 		return

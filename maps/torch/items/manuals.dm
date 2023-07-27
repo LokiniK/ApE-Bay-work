@@ -12,7 +12,7 @@
 		<html><head>
 		</head>
 
-		<body>
+		<body><meta charset='utf-8'>
 		<iframe width='100%' height='97%' src="[config.wiki_url]/index.php?title=Sol_Central_Government_Law" frameborder="0" id="main_frame"></iframe>
 		</body>
 
@@ -35,7 +35,7 @@
 		<html><head>
 		</head>
 
-		<body>
+		<body><meta charset='utf-8'>
 		<iframe width='100%' height='97%' src="[config.wiki_url]/index.php?title=Sol_Code_of_Uniform_Justice" frameborder="0" id="main_frame"></iframe>
 		</body>
 
@@ -57,7 +57,7 @@
 		<html><head>
 		</head>
 
-		<body>
+		<body><meta charset='utf-8'>
 		<iframe width='100%' height='97%' src="[config.wiki_url]/index.php?title=Standard_Operating_Procedure" frameborder="0" id="main_frame"></iframe>
 		</body>
 
