@@ -7,7 +7,7 @@
 
 	selected_image = image(icon('icons/misc/buildmode.dmi'), loc = src, icon_state = "ai_sel")
 
-/mob/living/examine(mob/user, distance, infix, suffix)
+/mob/living/examine(mob/user, distance, is_adjacent, infix, suffix)
 	. = ..()
 	if (admin_paralyzed)
 		to_chat(user, SPAN_DEBUG("OOC: They have been paralyzed by staff. Please avoid interacting with them unless cleared to do so by staff."))
@@ -198,6 +198,12 @@ default behaviour is:
 		var/obj/item/device/gps/G = locate() in src
 		if(istype(G))
 			stat("Coordinates:", "[G.fetch_coordinates()]")
+		var/obj/item/clothing/under/U = locate() in src
+		if (istype(U))
+			var/obj/item/clothing/accessory/wristwatch/W = locate() in U.accessories
+			if (istype(W))
+				stat("Local Time:", "[stationtime2text()]")
+				stat("Local Date:", "[stationdate2text()]")
 
 		if(evacuation_controller)
 			var/eta_status = evacuation_controller.get_status_panel_eta()
@@ -575,7 +581,7 @@ default behaviour is:
 			if (prob(75))
 				if(istype(G))
 					M.visible_message(SPAN_WARNING("[G.affecting] has been pulled from [G.assailant]'s grip by [src]!"), SPAN_WARNING("[G.affecting] has been pulled from your grip by [src]!"))
-					qdel(G)
+					G.current_grab.let_go(G)
 		if (!length(M.grabbed_by))
 			M.handle_pull_damage(src)
 

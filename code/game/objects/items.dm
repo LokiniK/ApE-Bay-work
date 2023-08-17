@@ -1,6 +1,6 @@
 /obj/item
 	name = "item"
-	icon = 'icons/obj/items.dmi'
+	icon = 'icons/obj/unused.dmi'
 	w_class = ITEM_SIZE_NORMAL
 	mouse_drag_pointer = MOUSE_ACTIVE_POINTER
 	blocks_emissive = EMISSIVE_BLOCK_GENERIC
@@ -172,7 +172,7 @@
 			if (prob(5))
 				qdel(src)
 
-/obj/item/examine(mob/user, distance)
+/obj/item/examine(mob/user, distance, is_adjacent)
 	var/size
 	switch(src.w_class)
 		if(ITEM_SIZE_TINY)
@@ -209,7 +209,7 @@
 			desc_comp += "[SPAN_DANGER("No extractable materials detected.")]<BR>"
 		desc_comp += "*--------*"
 
-	return ..(user, distance, "", desc_comp)
+	return ..(user, distance, is_adjacent, "", desc_comp)
 
 /obj/item/attack_hand(mob/user as mob)
 	if (!user) return

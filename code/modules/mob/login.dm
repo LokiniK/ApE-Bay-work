@@ -76,7 +76,8 @@
 
 	next_move = 1
 	set_sight(sight|SEE_SELF)
-	..()
+
+	client.statobj = src
 
 	my_client = client
 	logout_time = null
@@ -103,6 +104,10 @@
 
 	if(machine)
 		machine.on_user_login(src)
+
+	if (SScharacter_setup.initialized && SSchat.initialized && !isnull(client.chatOutput))
+		if(client.get_preference_value(/datum/client_preference/goonchat) == GLOB.PREF_YES)
+			client.chatOutput.start()
 
 	//set macro to normal incase it was overriden (like cyborg currently does)
 	winset(src, null, "mainwindow.macro=macro hotkey_toggle.is-checked=false input.focus=true input.background-color=#d3b5b5")

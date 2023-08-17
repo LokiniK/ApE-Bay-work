@@ -30,7 +30,6 @@
 	if (!force && !SScharacter_setup.initialized)
 		return
 	var/list/output = list()
-	output += "<head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'></head>"
 	output += "<div align='center'>"
 	if (config.wiki_url || config.rules_url || config.lore_url)
 		var/player_age = client?.player_age
@@ -235,6 +234,11 @@
 		to_chat(src, alert("[job.title] is not available. Please try another."))
 		return 0
 
+	if (!check_occupation_set(job))
+		var/choice = alert("You do not have [job.title] set as your occupation, are you sure you want to join as this role?", "Occupation Mismatch", "Yes", "No")
+		if (choice != "Yes")
+			return FALSE
+
 	SSjobs.assign_role(src, job.title, 1)
 
 	var/mob/living/character = create_character(spawn_turf)	//creates the human and transfers vars and mind
@@ -292,7 +296,7 @@
 /mob/new_player/proc/LateChoices()
 	var/name = client.prefs.real_name
 
-	var/list/header = list("<html><body><meta charset='utf-8'><center>")
+	var/list/header = list("<html><body><center>")
 	header += "<b>Welcome, [name].<br></b>"
 	header += "Round Duration: [roundduration2text()]<br>"
 
@@ -487,3 +491,18 @@
 	var/singleton/audio/track/track = GLOB.using_map.get_lobby_track(GLOB.using_map.lobby_track.type)
 	sound_to(src, track.get_sound())
 	to_chat(src, track.get_info())
+
+/mob/new_player/proc/check_occupation_set(datum/job/job)
+	if (!job)
+		return FALSE
+
+	if (job.title == client.prefs.job_high)
+		return TRUE
+
+	if (job.title in client.prefs.job_medium)
+		return TRUE
+
+	if (job.title in client.prefs.job_low)
+		return TRUE
+
+	return FALSE

@@ -1,6 +1,6 @@
 /obj/machinery/computer/mining
 	name = "ore processing console"
-	icon = 'icons/obj/machines/mining_machines.dmi'
+	icon = 'icons/obj/machines/mining/mining_machines.dmi'
 	icon_state = "console"
 	machine_name = "mineral processing console"
 	machine_desc = "Used to configure and operate a linked ore processor, and capable of processing minerals in a variety of fashions."
@@ -9,6 +9,9 @@
 /obj/machinery/computer/mining/interface_interact(mob/user)
 	interact(user)
 	return TRUE
+
+/obj/machinery/computer/mining/on_update_icon()
+	return //we don't want this to fetch any overlays that it shouldn't
 
 /obj/machinery/computer/mining/interact(mob/user)
 	if (!connected)

@@ -1,7 +1,7 @@
 // Base type, do not use.
 /obj/structure/lift
 	name = "turbolift control component"
-	icon = 'icons/obj/turbolift.dmi'
+	icon = 'icons/obj/structures/turbolift.dmi'
 	anchored = TRUE
 	density = FALSE
 	layer = ABOVE_OBJ_LAYER
@@ -106,7 +106,7 @@
 		return
 
 	var/dat = list()
-	dat += "<html><body><meta charset='utf-8'><hr><b>Lift panel</b><hr>"
+	dat += "<html><body><hr><b>Lift panel</b><hr>"
 
 	//the floors list stores levels in order of increasing Z
 	//therefore, to display upper levels at the top of the menu and

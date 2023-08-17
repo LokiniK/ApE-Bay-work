@@ -104,13 +104,13 @@
 #define CUSTOM_ITEM_SYNTH_CONFIG "config/custom_sprites.txt"
 #endif
 #ifndef CUSTOM_ITEM_OBJ
-#define CUSTOM_ITEM_OBJ 'icons/obj/custom_items_obj.dmi'
+#define CUSTOM_ITEM_OBJ 'icons/obj/unused.dmi'
 #endif
 #ifndef CUSTOM_ITEM_MOB
-#define CUSTOM_ITEM_MOB 'icons/mob/custom_items_mob.dmi'
+#define CUSTOM_ITEM_MOB 'icons/obj/unused.dmi'
 #endif
 #ifndef CUSTOM_ITEM_SYNTH
-#define CUSTOM_ITEM_SYNTH 'icons/mob/custom_synthetic.dmi'
+#define CUSTOM_ITEM_SYNTH 'icons/obj/unused.dmi'
 #endif
 
 #define WALL_CAN_OPEN 1
@@ -135,6 +135,7 @@
 #define PROGRAM_TABLET        FLAG(2)
 #define PROGRAM_TELESCREEN    FLAG(3)
 #define PROGRAM_PDA           FLAG(4)
+#define PROGRAM_NO_KILL       FLAG(5) //Not included in PROGRAM_ALL
 #define PROGRAM_ALL ( PROGRAM_CONSOLE | PROGRAM_LAPTOP | PROGRAM_TABLET | PROGRAM_TELESCREEN | PROGRAM_PDA )
 
 #define PROGRAM_STATE_KILLED 0

@@ -30,18 +30,19 @@
 /datum/grab/normal/on_hit_help(obj/item/grab/normal/G)
 	var/obj/item/organ/external/O = G.get_targeted_organ()
 	if(O)
-		return O.inspect(G.assailant)
+		O.inspect(G.assailant)
+		return TRUE
+	else return FALSE
 
 /datum/grab/normal/on_hit_disarm(obj/item/grab/G)
 	var/mob/living/carbon/human/affecting = G.affecting
 	var/mob/living/carbon/human/assailant = G.assailant
 
-	if(!G.attacking && !affecting.lying)
-
-		affecting.visible_message(SPAN_NOTICE("[assailant] is trying to pin [affecting] to the ground!"))
+	if (!G.attacking && !affecting.lying)
+		affecting.visible_message(SPAN_NOTICE("\The [assailant] is trying to pin \the [affecting] to the ground!"))
 		G.attacking = 1
 
-		if(do_after(assailant, action_cooldown - 1, affecting, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
+		if (do_after(assailant, action_cooldown - 1, affecting, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS) && assailant.use_sanity_check(affecting, G))
 			G.attacking = 0
 			G.action_used()
 			affecting.Weaken(2)
@@ -51,9 +52,9 @@
 		else
 			affecting.visible_message(SPAN_NOTICE("[assailant] fails to pin [affecting] to the ground."))
 			G.attacking = 0
-			return 0
+			return TRUE
 	else
-		return 0
+		return FALSE
 
 
 /datum/grab/normal/on_hit_grab(obj/item/grab/G)
@@ -61,20 +62,21 @@
 	var/mob/living/carbon/human/assailant = G.assailant
 	var/mob/living/carbon/human/affecting = G.affecting
 
-	if(!assailant.skill_check(SKILL_COMBAT, SKILL_TRAINED))
-		return
+	if (!assailant.skill_check(SKILL_COMBAT, SKILL_TRAINED))
+		to_chat(assailant, SPAN_NOTICE("You don't know how to do a jointlock!"))
+		return FALSE
 
 	if(!O)
 		to_chat(assailant, SPAN_WARNING("[affecting] is missing that body part!"))
-		return 0
+		return FALSE
 
-	assailant.visible_message(SPAN_CLASS("danger", "[assailant] begins to [pick("bend", "twist")] [affecting]'s [O.name] into a jointlock!"))
+	assailant.visible_message(SPAN_CLASS("danger", "\The [assailant] begins to [pick("bend", "twist")] \the [affecting]'s [O.name] into a jointlock!"))
 	G.attacking = 1
 
-	if(do_after(assailant, action_cooldown - 1, affecting, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
+	if (do_after(assailant, action_cooldown - 1, affecting, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS) && assailant.use_sanity_check(affecting, G))
 		if (!G.has_hold_on_organ(O))
 			to_chat(assailant, SPAN_WARNING("You must keep a hold on your target to jointlock!"))
-			return
+			return TRUE
 
 
 		G.attacking = 0
@@ -88,7 +90,7 @@
 
 		affecting.visible_message(SPAN_NOTICE("[assailant] fails to jointlock [affecting]'s [O.name]."))
 		G.attacking = 0
-		return 0
+		return TRUE
 
 
 /datum/grab/normal/on_hit_harm(obj/item/grab/G)
@@ -96,23 +98,24 @@
 	var/mob/living/carbon/human/assailant = G.assailant
 	var/mob/living/carbon/human/affecting = G.affecting
 
-	if(!assailant.skill_check(SKILL_COMBAT, SKILL_TRAINED))
-		return
+	if (!assailant.skill_check(SKILL_COMBAT, SKILL_TRAINED))
+		to_chat(assailant, SPAN_NOTICE("You don't know how to dislocate a joint!"))
+		return FALSE
 
-	if(!O)
-		to_chat(assailant, SPAN_WARNING("[affecting] is missing that body part!"))
-		return 0
+	if (!O)
+		to_chat(assailant, SPAN_WARNING("\The [affecting] is missing that body part!"))
+		return FALSE
 
-	if(!O.dislocated)
+	if (!O.dislocated)
 
-		assailant.visible_message(SPAN_WARNING("[assailant] begins to dislocate [affecting]'s [O.joint]!"))
+		assailant.visible_message(SPAN_WARNING("\The [assailant] begins to dislocate \the [affecting]'s [O.joint]!"))
 		G.attacking = 1
 
-		if(do_after(assailant, action_cooldown - 1, affecting, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
+		if (do_after(assailant, action_cooldown - 1, affecting, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS) && assailant.use_sanity_check(affecting, G))
 
 			if (!G.has_hold_on_organ(O))
 				to_chat(assailant, SPAN_WARNING("You must keep a hold on your target to dislocate!"))
-				return
+				return TRUE
 
 			G.attacking = 0
 			G.action_used()
@@ -125,14 +128,14 @@
 
 			affecting.visible_message(SPAN_NOTICE("[assailant] fails to dislocate [affecting]'s [O.joint]."))
 			G.attacking = 0
-			return 0
+			return TRUE
 
 	else if (O.dislocated > 0)
 		to_chat(assailant, SPAN_WARNING("[affecting]'s [O.joint] is already dislocated!"))
-		return 0
+		return FALSE
 	else
 		to_chat(assailant, SPAN_WARNING("You can't dislocate [affecting]'s [O.joint]!"))
-		return 0
+		return FALSE
 
 /datum/grab/normal/resolve_openhand_attack(obj/item/grab/G)
 	if(G.assailant.a_intent != I_HELP)

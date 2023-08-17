@@ -575,9 +575,9 @@
 // Elevator areas.
 /area/turbolift/torch_top
 	name = "lift (bridge)"
-	lift_floor_label = "Мостик"
-	lift_floor_name = "Мостик"
-	lift_announce_str = "Прибытие на Палубу Командования: Мостик. Комната Для Встреч. Оффисы командования. Auxiliary Hangar. Auxiliary EVA."
+	lift_floor_label = "Bridge"
+	lift_floor_name = "Bridge"
+	lift_announce_str = "Arriving at Command Deck: Bridge. Meeting Room. Command Offices. Auxiliary Hangar. Auxiliary EVA."
 
 /area/turbolift/torch_fourth
 	name = "lift (first deck)"

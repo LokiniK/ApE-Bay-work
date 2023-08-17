@@ -12,7 +12,7 @@
 		<html><head>
 		</head>
 
-		<body><meta charset='utf-8'>
+		<body>
 		<iframe width='100%' height='97%' src="[config.wiki_url]/index.php?title=Sol_Central_Government_Law" frameborder="0" id="main_frame"></iframe>
 		</body>
 
@@ -35,7 +35,7 @@
 		<html><head>
 		</head>
 
-		<body><meta charset='utf-8'>
+		<body>
 		<iframe width='100%' height='97%' src="[config.wiki_url]/index.php?title=Sol_Code_of_Uniform_Justice" frameborder="0" id="main_frame"></iframe>
 		</body>
 
@@ -57,7 +57,7 @@
 		<html><head>
 		</head>
 
-		<body><meta charset='utf-8'>
+		<body>
 		<iframe width='100%' height='97%' src="[config.wiki_url]/index.php?title=Standard_Operating_Procedure" frameborder="0" id="main_frame"></iframe>
 		</body>
 
@@ -74,8 +74,7 @@
 	..()
 	return INITIALIZE_HINT_LATELOAD
 
-/obj/item/folder/envelope/captain/LateInitialize()
-	..()
+/obj/item/folder/envelope/captain/LateInitialize(mapload)
 	var/obj/effect/overmap/visitable/torch = map_sectors["[z]"]
 	var/memo = {"
 	<tt><center><b>[SPAN_COLOR("red", "SECRET - CODE WORDS: TORCH")]</b>

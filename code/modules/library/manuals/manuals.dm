@@ -16,7 +16,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body><meta charset='utf-8'>
+				<body>
 
 				<h1>Food for Dummies</h1>
 				Here is a guide on basic food recipes and also how to not poison your customers accidentally.
@@ -75,7 +75,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body><meta charset='utf-8'>
+				<body>
 
 				<h1>Drinks for Dummies</h1>
 				Here's a guide for some basic drinks.
@@ -129,7 +129,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body><meta charset='utf-8'>
+				<body>
 				<h1>Detective Work</h1>
 
 				Between your bouts of self-narration and drinking whiskey on the rocks, you might get a case or two to solve.<br>
@@ -172,7 +172,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body><meta charset='utf-8'>
+				<body>
 				<h1>Nuclear Explosives 101</h1>
 				Hello and thank you for choosing the Syndicate for your nuclear information needs. Today's crash course will deal with the operation of a Nuclear Fission Device.<br><br>
 
@@ -223,7 +223,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body><meta charset='utf-8'>
+				<body>
 				<h1>Psychonetics</h1>
 
 				<p>This seems to be a dry, longwinded reference text for the form of strange mental powers called psionics. The author spends way too much time trying to advertise his cult, though.</p>

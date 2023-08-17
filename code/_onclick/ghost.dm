@@ -40,7 +40,7 @@
 			AltClickOn(target_turf)
 		return
 	if(modifiers["shift"])
-		examinate(A)
+		examinate(src, A)
 		return
 	A.attack_ghost(src)
 
@@ -55,7 +55,7 @@
 	if(!istype(user))
 		return
 	if(user.client && user.client.inquisitive_ghost)
-		user.examinate(src)
+		examinate(user, src)
 	return
 
 

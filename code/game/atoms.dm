@@ -32,32 +32,27 @@
 	/// Stores overlays managed by update_overlays() to prevent removing overlays that were not added by the same proc
 	var/list/managed_overlays
 
+
 /atom/New(loc, ...)
-	SHOULD_CALL_PARENT(TRUE) // Ensures atoms don't unintentionally skip initialization by not calling parent in New()
-
-	//atom creation method that preloads variables at creation
-	if(GLOB.use_preloader && (src.type == GLOB._preloader.target_path))//in case the instanciated atom is creating other atoms in New()
+	SHOULD_CALL_PARENT(TRUE)
+	if (GLOB.use_preloader && type == GLOB._preloader.target_path)
 		GLOB._preloader.load(src)
-
-	var/do_initialize = SSatoms.atom_init_stage
-	var/list/created = SSatoms.created_atoms
-	if(do_initialize > INITIALIZATION_INSSATOMS_LATE)
-		args[1] = do_initialize == INITIALIZATION_INNEW_MAPLOAD
-		if(SSatoms.InitAtom(src, args))
-			//we were deleted
+	var/atom_init_stage = SSatoms.atom_init_stage
+	var/list/init_queue = SSatoms.init_queue
+	if (atom_init_stage > INITIALIZATION_INSSATOMS_LATE)
+		args[1] = atom_init_stage == INITIALIZATION_INNEW_MAPLOAD
+		if (SSatoms.InitAtom(src, args))
 			return
-	else if(created)
-
+	else if (init_queue)
 		var/list/argument_list
-		if(length(args) > 1)
+		if (length(args) > 1)
 			argument_list = args.Copy(2)
-		if(argument_list || do_initialize == INITIALIZATION_INSSATOMS_LATE)
-			created[src] = argument_list
-
-	if(atom_flags & ATOM_FLAG_CLIMBABLE)
+		if (argument_list || atom_init_stage == INITIALIZATION_INSSATOMS_LATE)
+			init_queue[src] = argument_list
+	if (atom_flags & ATOM_FLAG_CLIMBABLE)
 		verbs += /atom/proc/climb_on
-
 	..()
+
 
 /**
  * Initialization handler for atoms. It is preferred to use this over `New()`.
@@ -100,11 +95,15 @@
 	return INITIALIZE_HINT_NORMAL
 
 /**
- * Late initialization handler. Called after the `Initialize()` chain for any atoms that returned `INITIALIZE_HINT_LATELOAD`. Primarily used for atoms that rely on initialized values from other atoms.
+ * Late initialization handler.
+ * Called after the `Initialize()` chain for any atoms that returned `INITIALIZE_HINT_LATELOAD`.
+ * Primarily used for atoms that rely on initialized values from other atoms.
  *
  * **Parameters**:
  * - `mapload` - Whether or not the initialization was called while the map was being loaded.
  * - All parameters except `loc` are passed directly from `New()`.
+ *
+ * Has no return value.
  */
 /atom/proc/LateInitialize(mapload, ...)
 	return
@@ -363,12 +362,14 @@
  * **Parameters**:
  * - `user` - The mob performing the examine.
  * - `distance` - The distance in tiles from `user` to `src`.
+ * - `is_adjacent` - Whether `user` is adjacent to `src`.
  * - `infix` String - String that is appended immediately after the atom's name.
  * - `suffix` String - Additional string appended after the atom's name and infix.
  *
- * Returns boolean.
+ * Returns boolean - The caller always expects TRUE
+ *  This is used rather than SHOULD_CALL_PARENT as it enforces that subtypes of a type that explicitly returns still call parent
  */
-/atom/proc/examine(mob/user, distance, infix = "", suffix = "")
+/atom/proc/examine(mob/user, distance, is_adjacent, infix = "", suffix = "")
 	//This reformat names to get a/an properly working on item descriptions when they are bloody
 	var/f_name = "\a [src][infix]."
 	if(blood_color && !istype(src, /obj/effect/decal))
@@ -388,6 +389,13 @@
 	else if (distance <= 1 && IsHeatSource())
 		to_chat(user, SPAN_WARNING("It's hot to the touch."))
 
+	return TRUE
+
+/// Works same as /atom/proc/Examine(), only this output comes immediately after any and all made by /atom/proc/Examine()
+/atom/proc/LateExamine(mob/user, distance, is_adjacent)
+	SHOULD_NOT_SLEEP(TRUE)
+
+	user.ForensicsExamination(src, distance)
 	return TRUE
 
 /**

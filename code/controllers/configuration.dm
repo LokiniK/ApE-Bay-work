@@ -247,9 +247,6 @@
 
 	var/static/no_click_cooldown = FALSE
 
-	/// optional runtime configuration of http://www.byond.com/docs/ref/#/atom/movable/var/glide_size
-	var/static/glide_size
-
 	/// Modifier for ticks between moves while running
 	var/static/run_delay = 2
 
@@ -434,7 +431,7 @@
 
 	var/static/run_empty_levels = FALSE
 
-	var/static/deletion_starts_paused = FALSE
+	var/static/deletion_starts_paused = TRUE
 
 
 /datum/configuration/New()
@@ -887,8 +884,6 @@
 				walk_delay = value
 			if ("creep_delay")
 				creep_delay = value
-			if ("glide_size")
-				glide_size = value
 			if ("minimum_sprint_cost")
 				minimum_sprint_cost = value
 			if ("skill_sprint_cost_range")

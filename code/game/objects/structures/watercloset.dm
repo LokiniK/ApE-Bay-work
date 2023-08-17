@@ -106,7 +106,7 @@
 /obj/structure/hygiene/toilet
 	name = "toilet"
 	desc = "The HT-451, a torque rotation-based, waste disposal unit for small matter. This one seems remarkably clean."
-	icon = 'icons/obj/watercloset.dmi'
+	icon = 'icons/obj/structures/toilets.dmi'
 	icon_state = "toilet00"
 	density = FALSE
 	anchored = TRUE
@@ -245,7 +245,7 @@
 /obj/structure/hygiene/urinal
 	name = "urinal"
 	desc = "The HU-452, an experimental urinal."
-	icon = 'icons/obj/watercloset.dmi'
+	icon = 'icons/obj/structures/toilets.dmi'
 	icon_state = "urinal"
 	density = FALSE
 	anchored = TRUE
@@ -274,7 +274,7 @@
 /obj/structure/hygiene/shower
 	name = "shower"
 	desc = "The HS-451. Installed in the 2200s by the Hygiene Division."
-	icon = 'icons/obj/watercloset.dmi'
+	icon = 'icons/obj/showers.dmi'
 	icon_state = "shower"
 	density = FALSE
 	anchored = TRUE
@@ -288,16 +288,31 @@
 	var/watertemp = "normal"	//freezing, normal, or boiling
 	var/is_washing = 0
 	var/list/temperature_settings = list("normal" = 310, "boiling" = T0C+100, "freezing" = T0C)
+	var/working_sound = 'sound/machines/shower.ogg'
+	var/datum/sound_token/sound_token
+	var/sound_id
 
 /obj/structure/hygiene/shower/New()
 	..()
 	create_reagents(50)
 
+/obj/structure/hygiene/shower/proc/update_sound()
+	if(!working_sound)
+		return
+	if(!sound_id)
+		sound_id = "[type]_[sequential_id(/obj/structure/hygiene/shower)]"
+	if(on)
+		var/volume = 20
+		if(!sound_token)
+			sound_token = GLOB.sound_player.PlayLoopingSound(src, sound_id, working_sound, volume = volume, range = 10)
+		sound_token.SetVolume(volume)
+	else if(sound_token)
+		QDEL_NULL(sound_token)
 //add heat controls? when emagged, you can freeze to death in it?
 
 /obj/effect/mist
 	name = "mist"
-	icon = 'icons/obj/watercloset.dmi'
+	icon = 'icons/obj/showers.dmi'
 	icon_state = "mist"
 	layer = MOB_LAYER + 1
 	anchored = TRUE
@@ -306,6 +321,7 @@
 /obj/structure/hygiene/shower/attack_hand(mob/M)
 	on = !on
 	update_icon()
+	update_sound()
 	if(on)
 		if (M.loc == loc)
 			wash(M)
@@ -353,7 +369,7 @@
 		mymist = null
 
 	if(on)
-		overlays += image('icons/obj/watercloset.dmi', src, "water", MOB_LAYER + 1, dir)
+		overlays += image('icons/obj/showers.dmi', src, "water", MOB_LAYER + 1, dir)
 		if(temperature_settings[watertemp] < T20C)
 			return //no mist for cold water
 		if(!ismist)
@@ -425,13 +441,13 @@
 /obj/item/bikehorn/rubberducky
 	name = "rubber ducky"
 	desc = "Rubber ducky you're so fine, you make bathtime lots of fuuun. Rubber ducky I'm awfully fooooond of yooooouuuu~"	//thanks doohl
-	icon = 'icons/obj/watercloset.dmi'
+	icon = 'icons/obj/toy.dmi'
 	icon_state = "rubberducky"
 	item_state = "rubberducky"
 
 /obj/structure/hygiene/sink
 	name = "sink"
-	icon = 'icons/obj/watercloset.dmi'
+	icon = 'icons/obj/sinks.dmi'
 	icon_state = "sink"
 	desc = "A sink used for washing one's hands and face."
 	anchored = TRUE
@@ -599,7 +615,7 @@
 
 /obj/item/taperoll/bog
 	name = "toilet paper roll"
-	icon = 'icons/obj/watercloset.dmi'
+	icon = 'icons/obj/bog.dmi'
 	desc = "A unbranded roll of standard issue two ply toilet paper. Refined from carefully rendered down sea shells due to SolGov's 'Abuse Of The Trees Act'."
 	tape_type = /obj/item/tape/bog
 	icon_state = "bogroll"
@@ -648,12 +664,12 @@
 /obj/item/paper/crumpled/bog
 	name = "sheet of toilet paper"
 	desc = "A single sheet of toilet paper. Two ply."
-	icon = 'icons/obj/watercloset.dmi'
+	icon = 'icons/obj/bog.dmi'
 	icon_state = "bogroll_sheet"
 
 /obj/structure/hygiene/faucet
 	name = "faucet"
-	icon = 'icons/obj/watercloset.dmi'
+	icon = 'icons/obj/structures/faucets.dmi'
 	icon_state = "faucet"
 	desc = "An outlet for liquids. Water you waiting for?"
 	anchored = TRUE
@@ -700,7 +716,7 @@
 /obj/item/faucet
 	name = "faucet"
 	desc = "An outlet for liquids. Water you waiting for?"
-	icon = 'icons/obj/watercloset.dmi'
+	icon = 'icons/obj/structures/faucets.dmi'
 	icon_state = "faucet-item"
 	obj_flags = OBJ_FLAG_ROTATABLE
 	var/constructed_type = /obj/structure/hygiene/faucet

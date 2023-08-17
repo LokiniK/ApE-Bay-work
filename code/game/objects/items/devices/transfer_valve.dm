@@ -1,7 +1,7 @@
 /obj/item/device/transfer_valve
 	name = "tank transfer valve"
 	desc = "A small, versatile valve with dual-headed heat-resistant pipes. This mechanism is the standard size for coupling with portable gas tanks."
-	icon = 'icons/obj/assemblies.dmi'
+	icon = 'icons/obj/assemblies/assemblies.dmi'
 	icon_state = "valve_1"
 	var/obj/item/tank/tank_one
 	var/obj/item/tank/tank_two
@@ -24,18 +24,22 @@
 /obj/item/device/transfer_valve/use_tool(obj/item/tool, mob/user, list/click_params)
 	// Assembly - Attach device
 	if (isassembly(tool))
+		var/obj/item/device/assembly/assembly = tool
 		if (armed)
 			USE_FEEDBACK_FAILURE("\The [src] is armed and cannot be modified.")
 			return TRUE
 		if (attached_device)
 			USE_FEEDBACK_FAILURE("\The [src] already has \a [attached_device] attached.")
 			return TRUE
+		if (assembly.secured)
+			USE_FEEDBACK_FAILURE("\The [tool] isn't ready to be attached.")
+			return TRUE
 		if (!user.unEquip(tool, src))
 			FEEDBACK_UNEQUIP_FAILURE(user, tool)
 			return TRUE
 		attached_device = tool
 		attached_device.holder = src
-		attached_device.toggle_secure()
+		attached_device.set_secure(TRUE)
 		attacher = user
 		SSnano.update_uis(src)
 		GLOB.bombers += "[key_name(user)] attach \a [tool] to a transfer valve."

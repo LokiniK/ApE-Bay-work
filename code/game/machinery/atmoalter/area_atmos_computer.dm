@@ -45,7 +45,7 @@
 				a.red:active { color:#ff0000; }
 			</style>
 		</head>
-		<body><meta charset='utf-8'>
+		<body>
 			<center><h1>Area Air Control</h1></center>
 			<span style="color: red">[status]</span><br>
 			<a href="?src=\ref[src];scan=1">Scan</a>

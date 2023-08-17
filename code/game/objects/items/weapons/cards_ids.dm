@@ -14,7 +14,7 @@
 /obj/item/card
 	name = "card"
 	desc = "Does card things."
-	icon = 'icons/obj/card.dmi'
+	icon = 'icons/obj/tools/card.dmi'
 	w_class = ITEM_SIZE_TINY
 	slot_flags = SLOT_EARS
 
@@ -110,7 +110,7 @@
 
 /obj/item/card/data/on_update_icon()
 	overlays.Cut()
-	var/image/detail_overlay = image('icons/obj/card.dmi', src,"[icon_state]-color")
+	var/image/detail_overlay = image('icons/obj/tools/card.dmi', src,"[icon_state]-color")
 	detail_overlay.color = detail_color
 	overlays += detail_overlay
 
@@ -251,7 +251,7 @@ var/global/const/NO_EMAG_ACT = -50
 /obj/item/card/id/OnTopic(mob/user, list/href_list)
 	if(href_list["look_at_id"])
 		if(istype(user))
-			user.examinate(src)
+			examinate(user, src)
 			return TOPIC_HANDLED
 
 /obj/item/card/id/examine(mob/user, distance)

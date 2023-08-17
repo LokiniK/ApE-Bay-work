@@ -12,7 +12,7 @@ var/global/message_delay = 0 // To make sure restarting the recentmessages list 
 
 /obj/machinery/telecomms/broadcaster
 	name = "subspace broadcaster"
-	icon = 'icons/obj/stationobjs.dmi'
+	icon = 'icons/obj/machines/telecomms.dmi'
 	icon_state = "broadcaster"
 	desc = "A dish-shaped machine used to broadcast processed subspace signals."
 	density = TRUE
@@ -115,7 +115,7 @@ var/global/message_delay = 0 // To make sure restarting the recentmessages list 
 
 /obj/machinery/telecomms/allinone
 	name = "telecommunications mainframe"
-	icon = 'icons/obj/stationobjs.dmi'
+	icon = 'icons/obj/machines/telecomms.dmi'
 	icon_state = "comm_server"
 	desc = "A compact machine used for portable subspace telecommuniations processing."
 	density = TRUE
@@ -274,10 +274,10 @@ var/global/message_delay = 0 // To make sure restarting the recentmessages list 
 **/
 
 /proc/Broadcast_Message(datum/radio_frequency/connection, mob/M,
-						var/vmask, var/vmessage, var/obj/item/device/radio/radio,
-						var/message, var/name, var/job, var/realname, var/vname,
-						var/data, var/compression, var/list/level, var/freq, var/verbage = "says", var/datum/language/speaking = null,
-						var/channel_tag, var/channel_color)
+						vmask, vmessage, obj/item/device/radio/radio,
+						message, name, job, realname, vname,
+						data, compression, list/level, freq, verbage = "says", datum/language/speaking = null,
+						channel_tag, channel_color)
 
 
   /* ###### Prepare the radio connection ###### */

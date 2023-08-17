@@ -9,6 +9,7 @@ SUBSYSTEM_DEF(icon_update)
 
 /datum/controller/subsystem/icon_update/Recover()
 	LIST_RESIZE(queue, 0)
+	queue = list()
 
 
 /datum/controller/subsystem/icon_update/UpdateStat(time)
@@ -22,14 +23,12 @@ SUBSYSTEM_DEF(icon_update)
 
 
 /datum/controller/subsystem/icon_update/fire(resumed, no_mc_tick)
-	if (!length(queue))
-		suspend()
-		return
+	var/atom/atom
 	var/list/params
-	var/cut_until = 1
-	for (var/atom/atom as anything in queue)
-		++cut_until
-		if (!atom)
+	var/queue_length = length(queue)
+	for (var/i = 1 to queue_length)
+		atom = queue[i]
+		if (QDELETED(atom))
 			continue
 		params = queue[atom]
 		if (islist(params))
@@ -37,11 +36,14 @@ SUBSYSTEM_DEF(icon_update)
 		else
 			atom.update_icon()
 		if (no_mc_tick)
+			if (i % 100)
+				continue
 			CHECK_TICK
 		else if (MC_TICK_CHECK)
-			queue.Cut(1, cut_until)
+			queue.Cut(1, i + 1)
 			return
-	queue.Cut()
+	if (queue_length)
+		queue.Cut(1, queue_length + 1)
 	suspend()
 
 
@@ -53,3 +55,8 @@ SUBSYSTEM_DEF(icon_update)
 	SSicon_update.queue[src] = length(args) ? args : TRUE
 	if (SSicon_update.suspended)
 		SSicon_update.wake()
+
+
+/hook/game_ready/proc/FlushIconUpdateQueue()
+	SSicon_update.fire(FALSE, TRUE)
+	return TRUE

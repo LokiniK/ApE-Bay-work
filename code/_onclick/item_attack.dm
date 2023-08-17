@@ -148,7 +148,7 @@ avoid code duplication. This includes items that may sometimes act as a standard
 		return FALSE
 
 
-/turf/can_use_item(obj/item/tool, mob/living/user, click_params)
+/turf/simulated/floor/can_use_item(obj/item/tool, mob/living/user, click_params)
 	. = ..()
 	if (!.)
 		return
@@ -274,6 +274,52 @@ avoid code duplication. This includes items that may sometimes act as a standard
 	return FALSE
 
 
+/mob/living/use_weapon(obj/item/weapon, mob/living/user, list/click_params)
+	if (weapon.force > 0 && get_max_health() && !HAS_FLAGS(weapon.item_flags, ITEM_FLAG_NO_BLUDGEON))
+		user.setClickCooldown(user.get_attack_speed(weapon))
+		user.do_attack_animation(src)
+		if (!aura_check(AURA_TYPE_WEAPON, weapon, user))
+			return TRUE
+		var/damage_flags = weapon.damage_flags()
+		if (!can_damage_health(weapon.force, weapon.damtype, damage_flags))
+			playsound(src, weapon.hitsound, 50, TRUE)
+			user.visible_message(
+				SPAN_WARNING("\The [user] hits \the [src] with \a [weapon], but it bounces off!"),
+				SPAN_WARNING("You hit \the [src] with \the [weapon], but it bounces off!"),
+				exclude_mobs = list(src)
+			)
+			show_message(
+				SPAN_WARNING("\The [user] hits you with \a [weapon], but it bounces off!"),
+				VISIBLE_MESSAGE,
+				SPAN_WARNING("You feel something bounce off you harmlessly.")
+			)
+			return TRUE
+
+		var/hit_zone = resolve_item_attack(weapon, user, user.zone_sel? user.zone_sel.selecting : ran_zone())
+		if (!hit_zone)
+			return TRUE
+
+		if (!weapon.no_attack_log)
+			admin_attack_log(
+				user,
+				src,
+				"Attacked using \a [weapon] (DAMTYE: [uppertext(weapon.damtype)])",
+				"Was attacked with \a [weapon] (DAMTYE: [uppertext(weapon.damtype)])",
+				"used \a [weapon] (DAMTYE: [uppertext(weapon.damtype)]) to attack"
+			)
+
+		var/datum/attack_result/result = hit_zone
+		if (istype(result))
+			if (result.hit_zone)
+				var/mob/living/victim = result.attackee ? result.attackee : src
+				weapon.apply_hit_effect(victim, user, result.hit_zone)
+				return TRUE
+		if (hit_zone)
+			weapon.apply_hit_effect(src, user, hit_zone)
+		return TRUE
+	return ..()
+
+
 /**
  * Interaction handler for using an item on this atom with a non-harm intent, or if `use_weapon()` did not resolve an
  * action. Generally, this is for any standard interactions with items.
@@ -387,7 +433,7 @@ avoid code duplication. This includes items that may sometimes act as a standard
 		return FALSE
 	if (!no_attack_log)
 		admin_attack_log(user, subject, "Attacked using \a [src] (DAMTYE: [uppertext(damtype)])", "Was attacked with \a [src] (DAMTYE: [uppertext(damtype)])", "used \a [src] (DAMTYE: [uppertext(damtype)]) to attack")
-	user.setClickCooldown(attack_cooldown + w_class)
+	user.setClickCooldown(user.get_attack_speed(src))
 	if (animate)
 		user.do_attack_animation(subject)
 	if (!subject.aura_check(AURA_TYPE_WEAPON, src, user))
@@ -415,7 +461,7 @@ avoid code duplication. This includes items that may sometimes act as a standard
  */
 /obj/item/proc/apply_hit_effect(mob/living/target, mob/living/user, hit_zone)
 	if (hitsound)
-		playsound(loc, hitsound, 50, TRUE, -1)
+		playsound(loc, hitsound, 75, TRUE)
 	var/power = force
 	if (MUTATION_HULK in user.mutations)
 		power *= 2
@@ -438,7 +484,7 @@ avoid code duplication. This includes items that may sometimes act as a standard
 /mob/living/get_attack_speed(obj/item/item)
 	var/speed = base_attack_cooldown
 	if (istype(item))
-		speed = item.attack_cooldown
+		speed = item.attack_cooldown + item.w_class
 	return speed
 
 

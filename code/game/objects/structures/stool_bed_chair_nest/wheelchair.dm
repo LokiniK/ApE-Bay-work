@@ -3,11 +3,20 @@
 	desc = "Now we're getting somewhere."
 	icon_state = "wheelchair"
 	anchored = FALSE
-	movement_handlers = list(/datum/movement_handler/deny_multiz, /datum/movement_handler/delay = list(2), /datum/movement_handler/move_relay_self)
 	bed_flags = BED_FLAG_CANNOT_BE_DISMANTLED | BED_FLAG_CANNOT_BE_PADDED
 	var/driving = 0
 	var/mob/living/pulling = null
 	var/bloodiness
+
+
+/obj/structure/bed/chair/wheelchair/Initialize()
+	. = ..()
+	movement_handlers = list(
+		/datum/movement_handler/deny_multiz,
+		/datum/movement_handler/delay = list(config.walk_delay),
+		/datum/movement_handler/move_relay_self
+	)
+
 
 /obj/structure/bed/chair/wheelchair/on_update_icon()
 	return
@@ -15,7 +24,7 @@
 /obj/structure/bed/chair/wheelchair/set_dir()
 	..()
 	overlays.Cut()
-	var/image/O = image(icon = 'icons/obj/furniture.dmi', icon_state = "w_overlay", dir = src.dir)
+	var/image/O = image(icon = 'icons/obj/structures/furniture.dmi', icon_state = "w_overlay", dir = src.dir)
 	O.layer = ABOVE_HUMAN_LAYER
 	overlays += O
 	if(buckled_mob)

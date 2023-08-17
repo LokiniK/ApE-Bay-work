@@ -23,7 +23,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body><meta charset='utf-8'>
+				<body>
 				<h3>Growing a Diona</h3>
 
 				Growing a Diona is easy!
@@ -61,7 +61,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body><meta charset='utf-8'>
+				<body>
 
 				<h1>Science For Dummies</h1>
 				So you want to further SCIENCE? Good man/woman/thing! However, SCIENCE is a complicated process even though it's quite easy. For the most part, it's a three step process:
@@ -127,7 +127,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body><meta charset='utf-8'>
+				<body>
 
 				<h1><a name="Contents">Contents</a></h1>
 				<ol>
@@ -240,7 +240,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body><meta charset='utf-8'>
+				<body>
 
 				<h1><a name="Contents">Contents</a></h1>
 				<ol>
@@ -311,7 +311,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body><meta charset='utf-8'>
+				<body>
 				<br>
 				It's perhaps one of the most exciting times to be alive, with the recent breakthroughs in understanding and categorisation of things we may one day no longer call
 				'anomalies,' but rather 'infrequent or rare occurrences of certain celestial weather or phenomena.' Perhaps a little more long winded, but no less eloquent all the
@@ -336,7 +336,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body><meta charset='utf-8'>
+				<body>
 				<br>
 				In today's high tech research fields, leaps and bounds are being made every day. Whether it's great strides forward in our understanding of the physical universe
 				or the operation of some fancy new piece of equipment, it seems like all the cool fields are producing new toys to play with, leaving doddery old fields such as
@@ -363,7 +363,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body><meta charset='utf-8'>
+				<body>
 
 				<h1><a name="Contents">Contents</a></h1>
 				<ol>
@@ -441,7 +441,7 @@
 				body {font-size: 13px; font-family: Verdana;}
 				</style>
 				</head>
-				<body><meta charset='utf-8'>
+				<body>
 
 				<h1><a name="Contents">Contents</a></h1>
 				<ol>

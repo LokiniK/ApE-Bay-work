@@ -1,15 +1,15 @@
 /obj/structure/closet/secure_closet/guncabinet
 	name = "gun cabinet"
 	req_access = list(access_armory)
-	icon = 'icons/obj/guncabinet.dmi'
+	icon = 'icons/obj/structures/guncabinet.dmi'
 	closet_appearance = null
 
 /obj/structure/closet/secure_closet/guncabinet/Initialize()
 	. = ..()
 	update_icon()
 
-/obj/structure/closet/secure_closet/guncabinet/LateInitialize(mapload, ...)
-	. = ..()
+/obj/structure/closet/secure_closet/guncabinet/LateInitialize(mapload)
+	..()
 	update_icon()
 
 /obj/structure/closet/secure_closet/guncabinet/toggle()
@@ -54,4 +54,3 @@
 				overlays += icon(src.icon,"locked")
 			else
 				overlays += icon(src.icon,"open")
-

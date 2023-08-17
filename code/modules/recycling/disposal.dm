@@ -125,7 +125,7 @@ GLOBAL_LIST_EMPTY(diversion_junctions)
 					GM.client.eye = src
 				GM.forceMove(src)
 				usr.visible_message(SPAN_DANGER("\The [GM] has been placed in the [src] by \the [user]."))
-				qdel(G)
+				GM.remove_grabs_and_pulls()
 				admin_attack_log(usr, GM, "Placed the victim into \the [src].", "Was placed into \the [src] by the attacker.", "stuffed \the [src] with")
 		return
 
@@ -250,7 +250,7 @@ GLOBAL_LIST_EMPTY(diversion_junctions)
 		return
 
 	var/ai = isAI(user)
-	var/dat = "<head><title>Waste Disposal Unit</title></head><body><meta charset='utf-8'><TT><B>Waste Disposal Unit</B><HR>"
+	var/dat = "<head><title>Waste Disposal Unit</title></head><body><TT><B>Waste Disposal Unit</B><HR>"
 
 	if(!ai)  // AI can't pull flush handle
 		if(flush)
@@ -506,7 +506,7 @@ GLOBAL_LIST_EMPTY(diversion_junctions)
 /obj/machinery/disposal_switch
 	name = "disposal switch"
 	desc = "A disposal control switch."
-	icon = 'icons/obj/recycling.dmi'
+	icon = 'icons/obj/machines/recycling.dmi'
 	icon_state = "switch-off"
 	layer = ABOVE_OBJ_LAYER
 	var/on = 0
@@ -551,7 +551,7 @@ GLOBAL_LIST_EMPTY(diversion_junctions)
 /obj/item/disposal_switch_construct
 	name = "disposal switch assembly"
 	desc = "A disposal control switch assembly."
-	icon = 'icons/obj/recycling.dmi'
+	icon = 'icons/obj/machines/recycling.dmi'
 	icon_state = "switch-off"
 	w_class = ITEM_SIZE_LARGE
 	var/id_tag

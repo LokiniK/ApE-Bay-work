@@ -1684,7 +1684,7 @@ $.widget("ui.draggable", $.ui.mouse, {
 		try {
 
 			// Support: IE9, IE10
-			// If the <body><meta charset='utf-8'> is blurred, IE will switch windows, see #9520
+			// If the <body> is blurred, IE will switch windows, see #9520
 			if ( document.activeElement && document.activeElement.nodeName.toLowerCase() !== "body" ) {
 
 				// Blur any element that currently has focus, see #4261

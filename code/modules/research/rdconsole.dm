@@ -160,7 +160,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		playsound(src.loc, 'sound/effects/sparks4.ogg', 75, 1)
 		emagged = TRUE
 		req_access.Cut()
-		to_chat(user, SPAN_NOTICE("You you disable the security protocols."))
+		to_chat(user, SPAN_NOTICE("You disable the security protocols."))
 		return 1
 
 /obj/machinery/computer/rdconsole/CanUseTopic(mob/user, datum/topic_state/state, href_list)
@@ -481,7 +481,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 	linked_destroy.busy = TRUE
 	if (!quick_deconstruct)
 		screen = 0.1
-	flick("d_analyzer_process", linked_destroy)
+	linked_destroy.icon_state = "d_analyzer_process"
 	addtimer(new Callback(src, .proc/finish_deconstruct, W), 24)
 
 /obj/machinery/computer/rdconsole/proc/finish_deconstruct(weakref/W)

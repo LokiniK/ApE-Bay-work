@@ -53,6 +53,9 @@
 	to_chat(user, "A grab on \the [affecting]'s [O.name].")
 
 /obj/item/grab/Process()
+	if (!use_sanity_check(affecting))
+		current_grab.let_go(src)
+		return
 	current_grab.process(src)
 
 /obj/item/grab/attack_self(mob/user)
@@ -65,18 +68,14 @@
 		else
 			upgrade()
 
-/obj/item/grab/attack(mob/M, mob/living/user)
-
-	// Relying on BYOND proc ordering isn't working, so go go ugly workaround.
-	if(ishuman(user) && affecting == M)
-		var/mob/living/carbon/human/H = user
-		if(H.check_psi_grab(src))
-			return
-	// End workaround
-
-	current_grab.hit_with_grab(src)
 
 /obj/item/grab/resolve_attackby(atom/A, mob/user, click_params)
+	// Relying on BYOND proc ordering isn't working, so go go ugly workaround.
+	if (ishuman(user) && affecting == A)
+		var/mob/living/carbon/human/H = user
+		if (H.check_psi_grab(src))
+			return TRUE
+	// End workaround
 	if (QDELETED(src) || !assailant)
 		return TRUE
 	if (A.use_grab(src, user, click_params))
@@ -85,7 +84,9 @@
 		if (current_grab.downgrade_on_action)
 			downgrade()
 		return TRUE
-	return ..()
+	if(current_grab.hit_with_grab(src)) //If there is no use_grab override or if it returns FALSE; then will behave according to intent.
+		return TRUE
+	return ..() //To cover for legacy behavior. Should not reach here normally. Have all grabs be handled by use_grab or hit_with_grab.
 
 /obj/item/grab/dropped()
 	..()
@@ -220,11 +221,14 @@
 /obj/item/grab/proc/leave_forensic_traces()
 	if (!affecting)
 		return
+
 	var/obj/item/clothing/C = affecting.get_covering_equipped_item_by_zone(target_zone)
 	if(istype(C))
 		C.leave_evidence(assailant)
 		if(prob(50))
 			C.ironed_state = WRINKLES_WRINKLY
+	else
+		affecting.add_fingerprint(assailant) //If no clothing; add fingerprint to mob proper.
 
 /obj/item/grab/proc/upgrade(bypass_cooldown = FALSE)
 	if(!check_upgrade_cooldown() && !bypass_cooldown)
@@ -348,8 +352,8 @@
 /obj/item/grab/proc/use_sanity_check(atom/target, flags = SANITY_CHECK_DEFAULT)
 	if (QDELETED(src) || QDELETED(assailant))
 		return FALSE
-	// Sanity check the grab itself
-	if (!assailant.use_sanity_check(target, src, flags))
+	// Sanity check the grab itself, allowing hand swapping
+	if (!assailant.use_sanity_check(target, src, flags & ~SANITY_CHECK_TOOL_IN_HAND))
 		return FALSE
 	// Sanity check the victim
 	if (!assailant.use_sanity_check(target, affecting, flags))

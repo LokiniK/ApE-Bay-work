@@ -1,11 +1,11 @@
 /obj/item/device/radio
-	icon = 'icons/obj/radio.dmi'
+	icon = 'icons/obj/machines/radio.dmi'
 	name = "shortwave radio"
 	suffix = "\[3\]"
 	icon_state = "walkietalkie"
 	item_state = "walkietalkie"
 
-	var/on = 1 // 0 for off
+	var/on = FALSE
 	var/last_transmission
 	var/frequency = PUB_FREQ //common chat
 	var/default_frequency
@@ -13,10 +13,10 @@
 	var/canhear_range = 3 // the range which mobs can hear this radio from
 	var/datum/wires/radio/wires = null
 	var/b_stat = 0
-	var/broadcasting = 0
-	var/listening = 1
+	var/broadcasting = FALSE
+	var/listening = TRUE
 	var/list/channels = list() //see communications.dm for full list. First channel is a "default" for :h
-	var/subspace_transmission = 0
+	var/subspace_transmission = FALSE
 	var/syndie = 0//Holder to see if it's a syndicate encrypted radio
 	var/intercept = 0 //can intercept other channels
 	obj_flags = OBJ_FLAG_CONDUCTIBLE
@@ -39,9 +39,16 @@
 
 	var/intercom_handling = FALSE
 
+
 /obj/item/device/radio/hailing
 	name = "shortwave radio (Hailing)"
 	frequency = HAIL_FREQ
+
+
+/obj/item/device/radio/infinite
+	on = TRUE
+	power_usage = 0
+
 
 /obj/item/device/radio/proc/set_frequency(new_frequency)
 	radio_controller.remove_object(src, frequency)
@@ -53,7 +60,6 @@
 	wires = new(src)
 	if(ispath(cell))
 		cell = new cell(src)
-		on = FALSE // start powered off
 	internal_channels = GLOB.using_map.default_internal_channels()
 	GLOB.listening_objects += src
 
@@ -109,14 +115,15 @@
 /obj/item/device/radio/ui_interact(mob/user, ui_key = "main", datum/nanoui/ui = null, force_open = 1, datum/nanoui/master_ui = null, datum/topic_state/state = GLOB.default_state)
 	var/data[0]
 
-	data["power"] = on
+	if (power_usage > 0)
+		data["power"] = on
 	data["mic_status"] = broadcasting
 	data["speaker"] = listening
 	data["freq"] = format_frequency(frequency)
 	data["default_freq"] = format_frequency(default_frequency)
 	data["rawfreq"] = num2text(frequency)
 	var/obj/item/cell/has_cell = get_cell()
-	if(has_cell)
+	if(has_cell && power_usage > 0)
 		var/charge = round(has_cell.percent())
 		data["charge"] = charge ? "[charge]%" : "NONE"
 	data["mic_cut"] = (wires.IsIndexCut(WIRE_TRANSMIT) || wires.IsIndexCut(WIRE_SIGNAL))
@@ -674,8 +681,7 @@
 	. = ..()
 	return INITIALIZE_HINT_LATELOAD
 
-/obj/item/device/radio/born/LateInitialize()
-	. = ..()
+/obj/item/device/radio/borg/LateInitialize(mapload)
 	recalculateChannels()
 
 /obj/item/device/radio/borg/Destroy()
@@ -876,6 +882,7 @@
 	power_usage = 0
 	channels=list("Engineering" = 1, "Security" = 1, "Medical" = 1, "Command" = 1, "Common" = 1, "Science" = 1, "Supply" = 1, "Service" = 1, "Exploration" = 1)
 	cell = null
+	on = TRUE
 
 /obj/item/device/radio/announcer/Destroy()
 	SHOULD_CALL_PARENT(FALSE)
@@ -891,7 +898,7 @@
 
 /obj/item/device/radio/phone
 	broadcasting = 0
-	icon = 'icons/obj/items.dmi'
+	icon = 'icons/obj/machines/radio.dmi'
 	icon_state = "red_phone"
 	randpixel = 0
 	listening = 1

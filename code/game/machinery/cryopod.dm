@@ -11,7 +11,7 @@
 /obj/machinery/computer/cryopod
 	name = "cryogenic oversight console"
 	desc = "An interface between crew and the cryogenic storage oversight systems."
-	icon = 'icons/obj/Cryogenic2.dmi'
+	icon = 'icons/obj/machines/medical/bodyscanner.dmi'
 	icon_state = "cellconsole"
 	density = FALSE
 	interact_offline = 1
@@ -29,12 +29,15 @@
 /obj/machinery/computer/cryopod/robot
 	name = "robotic storage console"
 	desc = "An interface between crew and the robotic storage systems."
-	icon = 'icons/obj/robot_storage.dmi'
+	icon = 'icons/obj/machines/robot_storage.dmi'
 	icon_state = "console"
 
 	storage_type = "cyborgs"
 	storage_name = "Robotic Storage Control"
 	allow_items = 0
+
+/obj/machinery/computer/cryopod/robot/on_update_icon()
+	return
 
 /obj/machinery/computer/cryopod/interface_interact(mob/user)
 	interact(user)
@@ -126,7 +129,7 @@
 
 	name = "cryogenic feed"
 	desc = "A bewildering tangle of machinery and pipes."
-	icon = 'icons/obj/Cryogenic2.dmi'
+	icon = 'icons/obj/machines/medical/cryogenic_legacy.dmi'
 	icon_state = "cryo_rear"
 	anchored = TRUE
 	dir = WEST
@@ -135,7 +138,7 @@
 /obj/machinery/cryopod
 	name = "cryogenic freezer"
 	desc = "A man-sized pod for entering suspended animation."
-	icon = 'icons/obj/Cryogenic2.dmi'
+	icon = 'icons/obj/machines/medical/bodyscanner.dmi'
 	icon_state = "body_scanner_0"
 	density = TRUE
 	anchored = TRUE
@@ -180,7 +183,7 @@
 /obj/machinery/cryopod/robot
 	name = "robotic storage unit"
 	desc = "A storage unit for robots."
-	icon = 'icons/obj/robot_storage.dmi'
+	icon = 'icons/obj/machines/robot_storage.dmi'
 	icon_state = "pod_0"
 	base_icon_state = "pod_0"
 	occupied_icon_state = "pod_1"
@@ -286,9 +289,9 @@
 
 	return 1
 
-/obj/machinery/cryopod/examine(mob/user)
+/obj/machinery/cryopod/examine(mob/user, distance, is_adjacent)
 	. = ..()
-	if (occupant && user.Adjacent(src))
+	if (occupant && is_adjacent)
 		occupant.examine(arglist(args))
 
 //Lifted from Unity stasis.dm and refactored.
@@ -451,33 +454,16 @@
 	log_and_message_admins("placed [target == user ? "themself" : key_name_admin(target)] into \a [src]")
 	target.remove_grabs_and_pulls()
 
-/obj/machinery/cryopod/proc/user_can_move_target_inside(mob/target, mob/user)
-	if (!user.use_sanity_check(src, target))
-		return FALSE
-	if (!istype(target))
-		to_chat(user, SPAN_WARNING("\The [src] cannot handle such a lifeform!"))
-		return FALSE
-	if (user.incapacitated() || !istype(user))
-		return FALSE
-	if (!target.simulated)
-		return FALSE
+/obj/machinery/cryopod/user_can_move_target_inside(mob/target, mob/user)
 	if (occupant)
 		to_chat(user, SPAN_WARNING("\The [src] is already occupied!"))
 		return FALSE
-	if (target.buckled)
-		to_chat(user, SPAN_WARNING("Unbuckle [user == target ? "yourself" : "\the [target]"] before attempting to [user == target ? "enter \the [src]" : "move them"]."))
+	if (!check_occupant_allowed(target))
 		return FALSE
-	for (var/obj/item/grab/grab in target.grabbed_by)
-		if (grab.assailant == user || grab.assailant == target)
-			continue
-		to_chat(user, SPAN_WARNING("\The [target] is being grabbed by [grab.assailant] and can't be placed in \the [src]."))
-		return FALSE
-	return TRUE
+	return ..()
 
 /obj/machinery/cryopod/MouseDrop_T(mob/target, mob/user)
 	if (!CanMouseDrop(target, user) || !ismob(target))
-		return
-	if (!check_occupant_allowed(target))
 		return
 	if (!user_can_move_target_inside(target, user))
 		return
@@ -488,6 +474,7 @@
 /obj/machinery/cryopod/use_grab(obj/item/grab/grab, list/click_params) //Grab is deleted at the level of attempt_enter if all checks are passed.
 	MouseDrop_T(grab.affecting, grab.assailant)
 	return TRUE
+
 /obj/machinery/cryopod/verb/eject()
 	set name = "Eject Pod"
 	set category = "Object"
@@ -588,7 +575,7 @@
 /obj/structure/broken_cryo
 	name = "broken cryo sleeper"
 	desc = "Whoever was inside isn't going to wake up now. It looks like you could pry it open with a crowbar."
-	icon = 'icons/obj/Cryogenic2.dmi'
+	icon = 'icons/obj/machines/medical/bodyscanner.dmi'
 	icon_state = "broken_cryo"
 	anchored = TRUE
 	density = TRUE

@@ -533,7 +533,7 @@ SUBSYSTEM_DEF(jobs)
 	to_chat(H, FONT_LARGE("<B>You are [job.total_positions == 1 ? "the" : "a"] [alt_title ? alt_title : rank].</B>"))
 
 	if(job.supervisors)
-		to_chat(H, "<b>Как [alt_title ? alt_title : rank] вы отвечаете перед [job.supervisors]. Непредвиденные обстоятельства могут изменить это.</b>")
+		to_chat(H, "<b>As the [alt_title ? alt_title : rank] you answer directly to [job.supervisors]. Special circumstances may change this.</b>")
 
 	to_chat(H, "<b>To speak on your department's radio channel use :h. For the use of other channels, examine your headset.</b>")
 
