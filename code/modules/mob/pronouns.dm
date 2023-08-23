@@ -36,10 +36,6 @@
 	s    = "s"
 	es   = "es"
 
-/datum/pronouns/he_they
-	key  = PRONOUNS_HE_THEY
-	formal_term = "He/They"
-	types = list(PRONOUNS_HE_HIM, PRONOUNS_THEY_THEM)
 
 /datum/pronouns/she_her
 	key  = PRONOUNS_SHE_HER
@@ -54,27 +50,6 @@
 	is   = "is"
 	does = "does"
 	self = "herself"
-	s    = "s"
-	es   = "es"
-
-/datum/pronouns/she_they
-	key  = PRONOUNS_SHE_THEY
-	formal_term = "She/They"
-	types = list(PRONOUNS_SHE_HER, PRONOUNS_THEY_THEM)
-
-/datum/pronouns/it_its
-	key = PRONOUNS_IT_ITS
-	formal_term = "It/Its"
-
-	He   = "It"
-	he   = "it"
-	His  = "Its"
-	his  = "its"
-	him  = "it"
-	has  = "has"
-	is   = "is"
-	does = "does"
-	self = "itself"
 	s    = "s"
 	es   = "es"
 

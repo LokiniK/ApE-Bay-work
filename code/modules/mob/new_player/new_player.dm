@@ -31,17 +31,6 @@
 		return
 	var/list/output = list()
 	output += "<div align='center'>"
-	if (config.wiki_url || config.rules_url || config.lore_url)
-		var/player_age = client?.player_age
-		if (isnum(player_age) && player_age < 7)
-			output += "<b>Welcome! Please check out these links:</b><br>"
-		if (config.wiki_url)
-			output += "<a href='byond://?src=\ref[src];show_wiki=1'>Wiki</a>"
-		if (config.rules_url)
-			output += "<a href='byond://?src=\ref[src];show_rules=1'>Rules</a>"
-		if (config.lore_url)
-			output += "<a href='byond://?src=\ref[src];show_lore=1'>Lore</a>"
-	output += "<hr>"
 	if (GAME_STATE > RUNLEVEL_LOBBY)
 		output += "<a href='byond://?src=\ref[src];manifest=1'>Manifest</a>"
 	output += "<a href='byond://?src=\ref[src];show_preferences=1'>Options</a>"
