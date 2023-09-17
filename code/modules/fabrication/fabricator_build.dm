@@ -1,4 +1,4 @@
-/obj/machinery/fabricator/proc/update_current_build(spend_time)
+/obj/machinery/fabricator/proc/update_current_build(var/spend_time)
 
 	if(!istype(currently_building) || !is_functioning())
 		return
@@ -12,7 +12,8 @@
 	if(ispath(currently_building.target_recipe.path, /obj/item/stack))
 		new currently_building.target_recipe.path(get_turf(src), amount = currently_building.multiplier)
 	else
-		new currently_building.target_recipe.path(get_turf(src))
+		var/atom/A = new currently_building.target_recipe.path(get_turf(src)) //inf, was: new currently_building.target_recipe.path(get_turf(src))
+		A.Created()//inf
 	QDEL_NULL(currently_building)
 	get_next_build()
 	update_icon()
@@ -39,7 +40,7 @@
 		stop_building()
 	updateUsrDialog()
 
-/obj/machinery/fabricator/proc/try_queue_build(datum/fabricator_recipe/recipe, multiplier)
+/obj/machinery/fabricator/proc/try_queue_build(var/datum/fabricator_recipe/recipe, var/multiplier)
 
 	// Do some basic sanity checking.
 	if(!is_functioning() || !istype(recipe) || !(recipe in SSfabrication.get_recipes(fabricator_class)))

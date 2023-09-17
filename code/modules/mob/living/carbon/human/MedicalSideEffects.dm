@@ -24,35 +24,44 @@
 	for(var/R in cures)
 		if(H.reagents.has_reagent(R))
 			if (cure_message)
-				to_chat(H, SPAN_NOTICE("[cure_message]"))
+				to_chat(H, "<span class='notice'>[cure_message]</span>")
 			return 1
 	return 0
 
 
 // MOB HELPERS
 // ===========
-/mob/proc/add_side_effect(name, strength = 0)
-	return
-
-
 /mob/living/carbon/human/var/list/datum/medical_effect/side_effects = list()
-
+/mob/proc/add_side_effect(name, strength = 0)
 /mob/living/carbon/human/add_side_effect(name, strength = 0)
-	for(var/datum/medical_effect/M in side_effects)
+	for(var/datum/medical_effect/M in src.side_effects)
 		if(M.name == name)
 			M.strength = max(M.strength, 10)
 			M.start = life_tick
 			return
-	var/T = GLOB.side_effects[name]
+
+/*original
+	var/T = side_effects[name]
 	if (!T)
 		return
+
 	var/datum/medical_effect/M = new T
 	if(M.name == name)
 		M.strength = strength
 		M.start = life_tick
-		GLOB.side_effects += M
-
-
+		side_effects += M
+/original*/
+//[INF]
+	var/list/L = typesof(/datum/medical_effect)-/datum/medical_effect
+	for(var/T in L)
+		var/datum/medical_effect/M = new T
+		if(M.name == name)
+			M.strength = strength
+			M.start = life_tick
+			side_effects += M
+			break
+	return
+//[INF]
 /mob/living/carbon/human/proc/handle_medical_side_effects()
 	//Going to handle those things only every few ticks.
 	if(life_tick % 15 != 0)
@@ -65,21 +74,20 @@
 			src.add_side_effect(M.name)
 
 	// One full cycle(in terms of strength) every 10 minutes
-	for (var/datum/medical_effect/M in GLOB.side_effects)
+	for (var/datum/medical_effect/M in side_effects)
 		if (!M) continue
 		var/strength_percent = sin((life_tick - M.start) / 2)
 
 		// Only do anything if the effect is currently strong enough
 		if(strength_percent >= 0.4)
 			if (M.cure(src) || M.strength > 50)
-				GLOB.side_effects -= M
+				side_effects -= M
 				M = null
 			else
 				if(life_tick % 45 == 0)
 					M.on_life(src, strength_percent*M.strength)
 				// Effect slowly growing stronger
 				M.strength+=0.08
-
 
 // HEADACHE
 // ========
@@ -90,15 +98,21 @@
 	cure_message = "Your head stops throbbing..."
 
 /datum/medical_effect/headache/on_life(mob/living/carbon/human/H, strength)
-	var/obj/item/organ/external/head/head = H.get_organ("head")
-	if(istype(head))
+	var/obj/item/organ/external/head/head = H.get_organ(BP_HEAD) //INF WAS H.get_organ("head")
+	if(head) //INF WAS if(istype(head))
 		switch(strength)
 			if(1 to 10)
-				H.custom_pain("You feel a light pain in your head.",0, affecting = head)
+				H.custom_pain("You feel a light pain in your head.", 5, affecting = head) //INF, WAS 0
 			if(11 to 30)
-				H.custom_pain("You feel a throbbing pain in your head!",1, affecting = head)
+				H.custom_pain("You feel a throbbing pain in your head!", 15, affecting = head) //INF, WAS 1
+				H.eye_blurry += rand(3,6) //INF
+				H.stamina -= rand(10,20) //INF
+				shake_camera(H, 7, 0.5) //INF
 			if(31 to INFINITY)
-				H.custom_pain("You feel an excrutiating pain in your head!",1, affecting = head)
+				H.custom_pain("You feel an excrutiating pain in your head!", 40, affecting = head) //INF, WAS 1
+				H.eye_blurry += rand(10,20) //INF
+				H.stamina -= rand(20,35) //INF
+				shake_camera(H, 7, 1) //INF
 
 // BAD STOMACH
 // ===========
@@ -109,13 +123,15 @@
 	cure_message = "Your stomach feels a little better now..."
 
 /datum/medical_effect/bad_stomach/on_life(mob/living/carbon/human/H, strength)
-	switch(strength)
-		if(1 to 10)
-			H.custom_pain("You feel a bit light around the stomach.",0)
-		if(11 to 30)
-			H.custom_pain("Your stomach hurts.",0)
-		if(31 to INFINITY)
-			H.custom_pain("You feel sick.",1)
+	var/obj/item/organ/external/head/groin = H.get_organ(BP_GROIN) //INF
+	if(groin) //INF
+		switch(strength)
+			if(1 to 10)
+				H.custom_pain("You feel a bit light around the stomach.", 10, affecting = groin) //INF, WAS H.custom_pain("You feel a bit light around the stomach.", 0)
+			if(11 to 30)
+				H.custom_pain("Your stomach hurts.", 20, affecting = groin) //INF, WAS H.custom_pain("Your stomach hurts.", 0)
+			if(31 to INFINITY)
+				H.custom_pain("You feel sick.", 30, affecting = groin) //INF, WAS H.custom_pain("You feel sick.", 1)
 
 // CRAMPS
 // ======
@@ -128,27 +144,30 @@
 /datum/medical_effect/cramps/on_life(mob/living/carbon/human/H, strength)
 	switch(strength)
 		if(1 to 10)
-			H.custom_pain("The muscles in your body hurt a little.",0)
+			H.custom_pain("The muscles in your body hurt a little.", 20) //INF, WAS 0
 		if(11 to 30)
-			H.custom_pain("The muscles in your body cramp up painfully.",0)
+			H.custom_pain("The muscles in your body cramp up painfully.", 30) //INF, WAS 0
+			shake_camera(H, 4, 0.5) //INF
 		if(31 to INFINITY)
 			H.visible_message("<B>\The [src]</B> flinches as all the muscles in their body cramp up.")
-			H.custom_pain("There's pain all over your body.",1)
+			H.custom_pain("There's pain all over your body.", 70) //INF, WAS 1
+			shake_camera(H, 10, 1) //INF
 
 // ITCH
 // ====
 /datum/medical_effect/itch
 	name = "Itch"
-	triggers = list(/datum/reagent/drugs/hextro = 10)
+	triggers = list(/datum/reagent/space_drugs = 10)
 	cures = list(/datum/reagent/inaprovaline)
 	cure_message = "The itching stops..."
 
 /datum/medical_effect/itch/on_life(mob/living/carbon/human/H, strength)
 	switch(strength)
 		if(1 to 10)
-			H.custom_pain("You feel a slight itch.",0)
+			H.custom_pain("You feel a slight itch.", 10) //INF, WAS 10
 		if(11 to 30)
-			H.custom_pain("You want to scratch your itch badly.",0)
+			H.custom_pain("You want to scratch your itch badly.", 15) //INF, WAS 10
 		if(31 to INFINITY)
 			H.visible_message("<B>\The [src]</B> shivers slightly.")
-			H.custom_pain("This itch makes it really hard to concentrate.",1)
+			H.custom_pain("This itch makes it really hard to concentrate.", 20) //INF, WAS 1
+			shake_camera(H, 20, 4) //INF

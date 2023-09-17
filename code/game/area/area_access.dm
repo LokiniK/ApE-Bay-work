@@ -1,11 +1,9 @@
-/// List (`string (access_*)`). Access requirements for the area. Used for autosetting access on doors, etc.
-/area/var/list/req_access = list()
-/// Boolean. Whether or not the area is considered 'secure'. Unsecure areas will have doors between them use access diff; secure ones use union.
-/area/var/secure = TRUE
+/area
+	var/list/req_access = list()
+	var/secure = TRUE    // unsecure areas will have doors between them use access diff; secure ones use union.
 
 // Given two areas, find the minimal req_access needed such that (return value) + (area access) >= (other area access) and vice versa
 /proc/req_access_diff(area/first, area/second)
-	RETURN_TYPE(/list)
 	if(!length(first.req_access))
 		return second.req_access.Copy()
 	if(!length(second.req_access))
@@ -18,9 +16,11 @@
 
 // Given two areas, find the minimal req_access needed such that req_access >= (area access) + (other area access)
 /proc/req_access_union(area/first, area/second)
-	RETURN_TYPE(/list)
 	if(!length(first.req_access))
-		return second.req_access.Copy()
+		if(!length(second.req_access))
+			return list()
+		else
+			return second.req_access.Copy()
 	if(!length(second.req_access))
 		return first.req_access.Copy()
 	. = first.req_access.Copy()
@@ -30,7 +30,6 @@
 // Comes up with the minimal thing to add to the first argument so that the new list guarantees that the access requirement in the second argument is satisfied.
 // Second argument is a number access code or list thereof (like an entry in req_access); the typecasting is false.
 /proc/get_minimal_requirement(list/req_access, list/requirement)
-	RETURN_TYPE(/list)
 	if(!requirement)
 		return
 	if(!islist(requirement))
@@ -52,4 +51,4 @@
 /proc/add_access_requirement(list/req_access, requirement)
 	var/minimal = get_minimal_requirement(req_access, requirement)
 	if(minimal)
-		req_access[LIST_PRE_INC(req_access)] = minimal
+		req_access[++req_access.len] = minimal

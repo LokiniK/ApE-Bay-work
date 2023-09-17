@@ -2,18 +2,19 @@
 	name = "clutter"
 	desc = "Someone should clean that up."
 	gender = PLURAL
-	icon = 'icons/obj/materials/shards.dmi'
+	icon = 'icons/obj/objects.dmi'
 	icon_state = "shards"
+	persistent = TRUE
 
 /obj/effect/decal/cleanable/ash
 	name = "ashes"
 	desc = "Ashes to ashes, dust to dust, and into space."
 	gender = PLURAL
-	icon = 'icons/obj/ash.dmi'
+	icon = 'icons/obj/objects.dmi'
 	icon_state = "ash"
 
-/obj/effect/decal/cleanable/ash/attack_hand(mob/user)
-	to_chat(user, SPAN_NOTICE("[src] sifts through your fingers."))
+/obj/effect/decal/cleanable/ash/attack_hand(var/mob/user)
+	to_chat(user, "<span class='notice'>[src] sifts through your fingers.</span>")
 	var/turf/simulated/floor/F = get_turf(src)
 	if (istype(F))
 		F.dirt += 4
@@ -21,7 +22,7 @@
 
 /obj/effect/decal/cleanable/greenglow/Initialize()
 	. = ..()
-	QDEL_IN(src, 2 MINUTES)
+	addtimer(CALLBACK(src, /datum/proc/qdel_self), 2 MINUTES)
 
 /obj/effect/decal/cleanable/dirt
 	name = "dirt"
@@ -48,7 +49,6 @@
 	icon = 'icons/effects/effects.dmi'
 	icon_state = "greenglow"
 	persistent = TRUE
-	generic_filth = TRUE
 
 /obj/effect/decal/cleanable/cobweb
 	name = "cobweb"
@@ -60,10 +60,8 @@
 /obj/effect/decal/cleanable/molten_item
 	name = "gooey grey mass"
 	desc = "It looks like a melted... something."
-	icon = 'icons/obj/chemical_storage.dmi'
+	icon = 'icons/obj/chemical.dmi'
 	icon_state = "molten"
-	persistent = TRUE
-	generic_filth = TRUE
 
 /obj/effect/decal/cleanable/cobweb2
 	name = "cobweb"
@@ -88,7 +86,9 @@
 	atom_flags |= ATOM_FLAG_OPEN_CONTAINER
 	create_reagents(30, src)
 	if(prob(75))
-		SetTransform(rotation = pick(90, 180, 270))
+		var/matrix/M = matrix()
+		M.Turn(pick(90, 180, 270))
+		transform = M
 
 /obj/effect/decal/cleanable/vomit/on_update_icon()
 	. = ..()

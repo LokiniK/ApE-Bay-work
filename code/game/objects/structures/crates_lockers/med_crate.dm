@@ -1,7 +1,7 @@
 /obj/structure/closet/crate/med_crate/trauma
-	name = "trauma crate"
+	name = "\improper Trauma crate"
 	desc = "A crate with trauma equipment."
-	closet_appearance = /singleton/closet_appearance/crate/medical/trauma
+	icon_state = "traumaold"
 
 /obj/structure/closet/crate/med_crate/trauma/WillContain()
 	return list(
@@ -13,9 +13,9 @@
 		)
 
 /obj/structure/closet/crate/med_crate/burn
-	name = "burn crate"
+	name = "\improper Burn crate"
 	desc = "A crate with burn equipment."
-	closet_appearance = /singleton/closet_appearance/crate/medical
+	icon_state = "burnold"
 
 /obj/structure/closet/crate/med_crate/burn/WillContain()
 	return list(
@@ -27,9 +27,9 @@
 	)
 
 /obj/structure/closet/crate/med_crate/oxyloss
-	name = "low oxygen crate"
+	name = "\improper Low oxygen crate"
 	desc = "A crate with low oxygen equipment."
-	closet_appearance = /singleton/closet_appearance/crate/medical/oxygen
+	icon_state = "oxyold"
 
 /obj/structure/closet/crate/med_crate/oxyloss/WillContain()
 	return list(
@@ -38,9 +38,9 @@
 		/obj/item/storage/pill_bottle/inaprovaline
 	)
 /obj/structure/closet/crate/med_crate/toxin
-	name = "toxin crate"
+	name = "\improper Toxin crate"
 	desc = "A crate with toxin equipment."
-	closet_appearance = /singleton/closet_appearance/crate/medical/toxins
+	icon_state = "toxold"
 
 /obj/structure/closet/crate/med_crate/toxin/WillContain()
 	return list(

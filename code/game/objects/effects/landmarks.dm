@@ -5,7 +5,7 @@
 	anchored = TRUE
 	unacidable = TRUE
 	simulated = FALSE
-	invisibility = INVISIBILITY_ABSTRACT
+	invisibility = 101
 	var/delete_me = 0
 
 /obj/effect/landmark/New()
@@ -83,7 +83,7 @@
 	icon = 'icons/mob/screen1.dmi'
 	icon_state = "x"
 	anchored = TRUE
-	invisibility = INVISIBILITY_ABSTRACT
+	invisibility = 101
 
 /obj/effect/landmark/start/New()
 	..()
@@ -92,9 +92,9 @@
 
 //Costume spawner landmarks
 /obj/effect/landmark/costume/New() //costume spawner, selects a random subclass and disappears
-	SHOULD_CALL_PARENT(FALSE) // TODO: Replace this entire set of New() overrides with Initialize() and qdel hints
+
 	var/list/options = typesof(/obj/effect/landmark/costume)
-	var/PICK= options[rand(1,length(options))]
+	var/PICK= options[rand(1,options.len)]
 	new PICK(src.loc)
 	delete_me = 1
 
@@ -119,7 +119,7 @@
 	new /obj/item/clothing/under/gimmick/rank/captain/suit(src.loc)
 	new /obj/item/clothing/head/flatcap(src.loc)
 	new /obj/item/clothing/suit/storage/toggle/labcoat/mad(src.loc)
-	new /obj/item/clothing/glasses/green(src.loc)
+	new /obj/item/clothing/glasses/prescription/gglasses(src.loc)
 	delete_me = 1
 
 /obj/effect/landmark/costume/elpresidente/New()
@@ -135,14 +135,14 @@
 	delete_me = 1
 
 /obj/effect/landmark/costume/maid/New()
-	new /obj/item/clothing/under/skirt(src.loc)
+	new /obj/item/clothing/under/blackskirt(src.loc)
 	var/CHOICE = pick( /obj/item/clothing/head/beret , /obj/item/clothing/head/rabbitears )
 	new CHOICE(src.loc)
 	new /obj/item/clothing/glasses/blindfold(src.loc)
 	delete_me = 1
 
 /obj/effect/landmark/costume/butler/New()
-	new /obj/item/clothing/accessory/waistcoat/black(src.loc)
+	new /obj/item/clothing/accessory/wcoat/black(src.loc)
 	new /obj/item/clothing/under/suit_jacket(src.loc)
 	new /obj/item/clothing/head/that(src.loc)
 	delete_me = 1
@@ -156,7 +156,7 @@
 	delete_me = 1
 
 /obj/effect/landmark/costume/prig/New()
-	new /obj/item/clothing/accessory/waistcoat/black(src.loc)
+	new /obj/item/clothing/accessory/wcoat/black(src.loc)
 	new /obj/item/clothing/glasses/monocle(src.loc)
 	var/CHOICE= pick( /obj/item/clothing/head/bowler, /obj/item/clothing/head/that)
 	new CHOICE(src.loc)
@@ -232,6 +232,10 @@
 	new /obj/item/clothing/mask/gas/sexymime(src.loc)
 	new /obj/item/clothing/under/sexymime(src.loc)
 	delete_me = 1
+
+/obj/effect/landmark/ban_prison
+	name = "ban_prison"
+	desc = "Ban is here."
 
 /obj/effect/landmark/costume/savagehunter/New()
 	new /obj/item/clothing/mask/spirit(src.loc)

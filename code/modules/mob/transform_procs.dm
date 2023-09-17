@@ -9,7 +9,7 @@
 	ADD_TRANSFORMATION_MOVEMENT_HANDLER(src)
 	stunned = 1
 	icon = null
-	set_invisibility(INVISIBILITY_ABSTRACT)
+	set_invisibility(101)
 	for(var/t in organs)
 		qdel(t)
 	var/atom/movable/overlay/animation = new /atom/movable/overlay(src)
@@ -33,8 +33,10 @@
 	set_species(species.primitive_form)
 	dna.SetSEState(GLOB.MONKEYBLOCK,1)
 	dna.SetSEValueRange(GLOB.MONKEYBLOCK,0xDAC, 0xFFF)
+	real_name = "unknown"
 
 	to_chat(src, "<B>You are now [species.name]. </B>")
+	ability_master.open_ability_master() //INF fix for hud icons
 	qdel(animation)
 
 	return src
@@ -58,7 +60,7 @@
 		drop_from_inventory(W)
 	ADD_TRANSFORMATION_MOVEMENT_HANDLER(src)
 	icon = null
-	set_invisibility(INVISIBILITY_ABSTRACT)
+	set_invisibility(101)
 	return ..()
 
 /mob/proc/AIize(move=1)
@@ -96,10 +98,7 @@
 			for(var/obj/effect/landmark/start/sloc in landmarks_list)
 				if (sloc.name == "AI")
 					loc_landmark = sloc
-		if (!loc_landmark)
-			to_chat(O, SPAN_DEBUG("We still failed to find a AI spawn location. Where you're standing is now you're new home."))
-		else
-			O.forceMove(loc_landmark.loc)
+		O.forceMove(loc_landmark.loc)
 		O.on_mob_init()
 
 	O.add_ai_verbs()
@@ -110,7 +109,7 @@
 	return O
 
 //human -> robot
-/mob/living/carbon/human/proc/Robotize(supplied_robot_type = /mob/living/silicon/robot)
+/mob/living/carbon/human/proc/Robotize(var/supplied_robot_type = /mob/living/silicon/robot)
 	if (HAS_TRANSFORMATION_MOVEMENT_HANDLER(src))
 		return
 	QDEL_NULL_LIST(worn_underwear)
@@ -119,7 +118,7 @@
 	regenerate_icons()
 	ADD_TRANSFORMATION_MOVEMENT_HANDLER(src)
 	icon = null
-	set_invisibility(INVISIBILITY_ABSTRACT)
+	set_invisibility(101)
 	for(var/t in organs)
 		qdel(t)
 
@@ -136,11 +135,6 @@
 			if(mmi_type)
 				O.mmi = new mmi_type(O)
 				O.mmi.transfer_identity(src)
-		if(O.mind.assigned_job && O.mind.assigned_job.faction)
-			O.faction = O.mind.assigned_job.faction
-			O.mind.faction = O.mind.assigned_job.faction
-		else
-			O.mind.faction = faction
 	else
 		O.key = key
 
@@ -160,7 +154,7 @@
 	regenerate_icons()
 	ADD_TRANSFORMATION_MOVEMENT_HANDLER(src)
 	icon = null
-	set_invisibility(INVISIBILITY_ABSTRACT)
+	set_invisibility(101)
 	for(var/t in organs)
 		qdel(t)
 
@@ -193,11 +187,11 @@
 	regenerate_icons()
 	ADD_TRANSFORMATION_MOVEMENT_HANDLER(src)
 	icon = null
-	set_invisibility(INVISIBILITY_ABSTRACT)
+	set_invisibility(101)
 	for(var/t in organs)	//this really should not be necessary
 		qdel(t)
 
-	var/mob/living/simple_animal/passive/corgi/new_corgi = new /mob/living/simple_animal/passive/corgi (loc)
+	var/mob/living/simple_animal/friendly/corgi/new_corgi = new /mob/living/simple_animal/friendly/corgi (loc)
 	new_corgi.a_intent = I_HURT
 	new_corgi.key = key
 
@@ -211,7 +205,7 @@
 	var/mobpath = input("Which type of mob should [src] turn into?", "Choose a type") in mobtypes
 
 	if(!safe_animal(mobpath))
-		to_chat(usr, SPAN_WARNING("Sorry but this mob type is currently unavailable."))
+		to_chat(usr, "<span class='warning'>Sorry but this mob type is currently unavailable.</span>")
 		return
 
 	if(HAS_TRANSFORMATION_MOVEMENT_HANDLER(src))
@@ -222,7 +216,7 @@
 	regenerate_icons()
 	ADD_TRANSFORMATION_MOVEMENT_HANDLER(src)
 	icon = null
-	set_invisibility(INVISIBILITY_ABSTRACT)
+	set_invisibility(101)
 
 	for(var/t in organs)
 		qdel(t)
@@ -244,7 +238,7 @@
 	var/mobpath = input("Which type of mob should [src] turn into?", "Choose a type") in mobtypes
 
 	if(!safe_animal(mobpath))
-		to_chat(usr, SPAN_WARNING("Sorry but this mob type is currently unavailable."))
+		to_chat(usr, "<span class='warning'>Sorry but this mob type is currently unavailable.</span>")
 		return
 
 	var/mob/new_mob = new mobpath(src.loc)
@@ -260,7 +254,7 @@
  * This proc is here to force coders to manually place their mob in this list, hopefully tested.
  * This also gives a place to explain -why- players shouldn't be turn into certain mobs and hopefully someone can fix them.
  */
-/mob/proc/safe_animal(MP)
+/mob/proc/safe_animal(var/MP)
 
 //Bad mobs! - Remember to add a comment explaining what's wrong with the mob
 	if(!MP)
@@ -279,21 +273,21 @@
 		return 0 //Verbs do not appear for players. These constructs should really have their own class simple_animal/construct/subtype
 
 //Good mobs!
-	if(ispath(MP, /mob/living/simple_animal/passive/cat))
+	if(ispath(MP, /mob/living/simple_animal/friendly/cat))
 		return 1
-	if(ispath(MP, /mob/living/simple_animal/passive/corgi))
+	if(ispath(MP, /mob/living/simple_animal/friendly/corgi))
 		return 1
-	if(ispath(MP, /mob/living/simple_animal/passive/crab))
+	if(ispath(MP, /mob/living/simple_animal/crab))
 		return 1
 	if(ispath(MP, /mob/living/simple_animal/hostile/carp))
 		return 1
-	if(ispath(MP, /mob/living/simple_animal/passive/mushroom))
+	if(ispath(MP, /mob/living/simple_animal/friendly/mushroom))
 		return 1
 	if(ispath(MP, /mob/living/simple_animal/shade))
 		return 1
-	if(ispath(MP, /mob/living/simple_animal/passive/tomato))
+	if(ispath(MP, /mob/living/simple_animal/friendly/tomato))
 		return 1
-	if(ispath(MP, /mob/living/simple_animal/passive/mouse))
+	if(ispath(MP, /mob/living/simple_animal/friendly/mouse))
 		return 1 //It is impossible to pull up the player panel for mice (Fixed! - Nodrak)
 	if(ispath(MP, /mob/living/simple_animal/hostile/bear))
 		return 1 //Bears will auto-attack mobs, even if they're player controlled (Fixed! - Nodrak)

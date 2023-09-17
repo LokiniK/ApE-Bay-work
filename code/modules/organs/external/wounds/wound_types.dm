@@ -3,9 +3,9 @@
 //the damage amount for the stage with the same name as the wound.
 //e.g. /datum/wound/cut/deep should only be applied for 15 damage and up,
 //because in it's stages list, "deep cut" = 15.
-/proc/get_wound_type(type, damage)
+/proc/get_wound_type(var/type, var/damage)
 	switch(type)
-		if (INJURY_TYPE_CUT)
+		if(CUT)
 			switch(damage)
 				if(70 to INFINITY)
 					return /datum/wound/cut/massive
@@ -19,7 +19,7 @@
 					return /datum/wound/cut/deep
 				if(0 to 15)
 					return /datum/wound/cut/small
-		if (INJURY_TYPE_PIERCE)
+		if(PIERCE)
 			switch(damage)
 				if(60 to INFINITY)
 					return /datum/wound/puncture/massive
@@ -31,9 +31,9 @@
 					return /datum/wound/puncture/flesh
 				if(0 to 15)
 					return /datum/wound/puncture/small
-		if (INJURY_TYPE_BRUISE)
+		if(BRUISE)
 			return /datum/wound/bruise
-		if (INJURY_TYPE_BURN, INJURY_TYPE_LASER)
+		if(BURN, LASER)
 			switch(damage)
 				if(50 to INFINITY)
 					return /datum/wound/burn/carbonised
@@ -45,7 +45,7 @@
 					return /datum/wound/burn/large
 				if(0 to 15)
 					return /datum/wound/burn/moderate
-		if (INJURY_TYPE_SHATTER)
+		if(SHATTER)
 			switch(damage)
 				if(50 to INFINITY)
 					return /datum/wound/shatter/smashed
@@ -66,7 +66,7 @@
 /** CUTS **/
 /datum/wound/cut
 	bleed_threshold = 5
-	damage_type = INJURY_TYPE_CUT
+	damage_type = CUT
 
 /datum/wound/cut/bandage()
 	..()
@@ -138,7 +138,7 @@
 		"large straight scar" = 0
 		)
 
-/datum/wound/cut/massive
+datum/wound/cut/massive
 	max_bleeding_stage = 3
 	stages = list(
 		"massive wound" = 70,
@@ -151,7 +151,7 @@
 /** PUNCTURES **/
 /datum/wound/puncture
 	bleed_threshold = 10
-	damage_type = INJURY_TYPE_PIERCE
+	damage_type = PIERCE
 
 /datum/wound/puncture/can_worsen(damage_type, damage)
 	return 0 //puncture wounds cannot be enlargened
@@ -193,7 +193,7 @@
 		"large round scar" = 0
 		)
 
-/datum/wound/puncture/massive
+datum/wound/puncture/massive
 	max_bleeding_stage = 3
 	stages = list(
 		"massive wound" = 60,
@@ -217,11 +217,11 @@
 	bleed_threshold = 20
 	max_bleeding_stage = 3 //only large bruise and above can bleed.
 	autoheal_cutoff = 30
-	damage_type = INJURY_TYPE_BRUISE
+	damage_type = BRUISE
 
 /** BURNS **/
 /datum/wound/burn
-	damage_type = INJURY_TYPE_BURN
+	damage_type = BURN
 	max_bleeding_stage = 0
 
 /datum/wound/burn/bleeding()
@@ -269,13 +269,13 @@
 /** EXTERNAL ORGAN LOSS **/
 /datum/wound/lost_limb
 
-/datum/wound/lost_limb/New(obj/item/organ/external/lost_limb, losstype, clean)
+/datum/wound/lost_limb/New(var/obj/item/organ/external/lost_limb, var/losstype, var/clean)
 	var/damage_amt = lost_limb.max_damage
 	if(clean) damage_amt /= 2
 
 	switch(losstype)
 		if(DROPLIMB_EDGE, DROPLIMB_BLUNT)
-			damage_type = INJURY_TYPE_CUT
+			damage_type = CUT
 			if(BP_IS_ROBOTIC(lost_limb))
 				max_bleeding_stage = -1
 				bleed_threshold = INFINITY
@@ -293,7 +293,7 @@
 					"scarred stump" = 0
 				)
 		if(DROPLIMB_BURN)
-			damage_type = INJURY_TYPE_BURN
+			damage_type = BURN
 			stages = list(
 				"mangled charred stump" = damage_amt*1.3,
 				"charred stump" = damage_amt,
@@ -303,13 +303,13 @@
 
 	..(damage_amt)
 
-/datum/wound/lost_limb/can_merge(datum/wound/other)
+/datum/wound/lost_limb/can_merge(var/datum/wound/other)
 	return 0 //cannot be merged
 
 /** CRYSTALLINE WOUNDS **/
 /datum/wound/shatter
 	bleed_threshold = INFINITY
-	damage_type = INJURY_TYPE_SHATTER
+	damage_type = SHATTER
 	max_bleeding_stage = -1
 
 /datum/wound/shatter/close()

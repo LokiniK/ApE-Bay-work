@@ -29,13 +29,14 @@
 	for(var/part in required_parts)
 		if(!parts[part])
 			return FALSE
+	SSstatistics.add_field("cyborg_frames_built",1)
 	return TRUE
 
 /obj/item/robot_parts/robot_suit/attackby(obj/item/W as obj, mob/user as mob)
 
 	// Uninstall a robotic part.
 	if(isCrowbar(W))
-		if(!length(parts))
+		if(!parts.len)
 			to_chat(user, SPAN_WARNING("\The [src] has no parts to remove."))
 			return
 		var/removing = pick(parts)
@@ -105,6 +106,8 @@
 
 		if(!user.unEquip(W))
 			return
+
+		SSstatistics.add_field("cyborg_frames_built",1)
 		var/mob/living/silicon/robot/O = new product(get_turf(loc))
 		if(!O)
 			return
@@ -113,15 +116,11 @@
 		O.set_invisibility(0)
 		O.custom_name = created_name
 		O.updatename("Default")
-		O.faction = user.faction
 		B.mind.transfer_to(O)
-		if(O.mind)
-			O.mind.faction = user.faction
-
-			if(O.mind.assigned_role)
-				O.job = O.mind.assigned_role
-			else
-				O.job = "Robot"
+		if(O.mind && O.mind.assigned_role)
+			O.job = O.mind.assigned_role
+		else
+			O.job = "Robot"
 
 		var/obj/item/robot_parts/chest/chest = parts[BP_CHEST]
 		if (chest && chest.cell)
@@ -133,6 +132,8 @@
 			var/datum/robot_component/cell_component = O.components["power cell"]
 			cell_component.wrapped = O.cell
 			cell_component.installed = 1
+
+		SSstatistics.add_field("cyborg_birth",1)
 		callHook("borgify", list(O))
 		O.Namepick()
 		qdel(src)
@@ -150,7 +151,7 @@
 		qdel(thing)
 	. = ..()
 
-/obj/item/robot_parts/robot_suit/proc/dismantled_from(mob/living/silicon/robot/donor)
+/obj/item/robot_parts/robot_suit/proc/dismantled_from(var/mob/living/silicon/robot/donor)
 	for(var/thing in required_parts - list(BP_CHEST, BP_HEAD))
 		var/part_type = required_parts[thing]
 		parts[thing] = new part_type(src)

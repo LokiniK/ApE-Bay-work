@@ -1,11 +1,11 @@
 /obj/structure/closet/wardrobe
 	name = "wardrobe"
 	desc = "It's a storage unit for standard-issue attire."
-	closet_appearance = /singleton/closet_appearance/wardrobe
+	icon_door = "blue"
 
 /obj/structure/closet/wardrobe/red
 	name = "security wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/red
+	icon_door = "red"
 
 /obj/structure/closet/wardrobe/red/New()
 	..()
@@ -30,7 +30,7 @@
 
 /obj/structure/closet/wardrobe/pink
 	name = "pink wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/pink
+	icon_door = "pink"
 
 
 /obj/structure/closet/wardrobe/pink/New()
@@ -44,7 +44,7 @@
 
 /obj/structure/closet/wardrobe/black
 	name = "black wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/black
+	icon_door = "black"
 
 /obj/structure/closet/wardrobe/black/New()
 	..()
@@ -64,7 +64,7 @@
 /obj/structure/closet/wardrobe/chaplain_black
 	name = "chapel wardrobe"
 	desc = "It's a storage unit for approved religious attire."
-	closet_appearance = /singleton/closet_appearance/wardrobe/black
+	icon_door = "black"
 
 /obj/structure/closet/wardrobe/chaplain_black/New()
 	..()
@@ -83,7 +83,7 @@
 
 /obj/structure/closet/wardrobe/green
 	name = "green wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/green
+	icon_door = "green"
 
 /obj/structure/closet/wardrobe/green/New()
 	..()
@@ -96,7 +96,7 @@
 
 /obj/structure/closet/wardrobe/xenos
 	name = "xenos wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/green
+	icon_door = "green"
 
 /obj/structure/closet/wardrobe/xenos/New()
 	..()
@@ -105,11 +105,13 @@
 	new /obj/item/clothing/shoes/sandal(src)
 	new /obj/item/clothing/shoes/sandal(src)
 	new /obj/item/clothing/shoes/sandal(src)
+	new /obj/item/clothing/under/resomi(src)
+	new /obj/item/clothing/under/resomi/white(src)
 
 /obj/structure/closet/wardrobe/orange
 	name = "prison wardrobe"
 	desc = "It's a storage unit for regulation prisoner attire."
-	closet_appearance = /singleton/closet_appearance/wardrobe/orange
+	icon_door = "orange"
 
 /obj/structure/closet/wardrobe/orange/New()
 	..()
@@ -125,7 +127,7 @@
 
 /obj/structure/closet/wardrobe/yellow
 	name = "yellow wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/yellow
+	icon_door = "yellow"
 
 /obj/structure/closet/wardrobe/yellow/New()
 	..()
@@ -138,7 +140,7 @@
 
 /obj/structure/closet/wardrobe/atmospherics_yellow
 	name = "atmospherics wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/yellow
+	icon_door = "yellow"
 
 /obj/structure/closet/wardrobe/atmospherics_yellow/New()
 	..()
@@ -157,7 +159,7 @@
 
 /obj/structure/closet/wardrobe/engineering_yellow
 	name = "engineering wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/yellow
+	icon_door = "yellow"
 
 /obj/structure/closet/wardrobe/engineering_yellow/New()
 	..()
@@ -167,6 +169,9 @@
 	new /obj/item/clothing/shoes/workboots(src)
 	new /obj/item/clothing/shoes/workboots(src)
 	new /obj/item/clothing/shoes/workboots(src)
+	new /obj/item/clothing/shoes/workboots/alt(src)
+	new /obj/item/clothing/shoes/workboots/alt(src)
+	new /obj/item/clothing/shoes/workboots/alt(src)
 	new /obj/item/clothing/head/hardhat(src)
 	new /obj/item/clothing/head/hardhat(src)
 	new /obj/item/clothing/head/hardhat(src)
@@ -176,7 +181,7 @@
 
 /obj/structure/closet/wardrobe/white
 	name = "white wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/white
+	icon_door = "white"
 
 /obj/structure/closet/wardrobe/white/New()
 	..()
@@ -189,14 +194,14 @@
 
 /obj/structure/closet/wardrobe/pjs
 	name = "pajama wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/white
+	icon_door = "white"
 
 /obj/structure/closet/wardrobe/pjs/New()
 	..()
-	new /obj/item/clothing/under/redpyjamas(src)
-	new /obj/item/clothing/under/redpyjamas(src)
-	new /obj/item/clothing/under/bluepyjamas(src)
-	new /obj/item/clothing/under/bluepyjamas(src)
+	new /obj/item/clothing/under/pj/red(src)
+	new /obj/item/clothing/under/pj/red(src)
+	new /obj/item/clothing/under/pj/blue(src)
+	new /obj/item/clothing/under/pj/blue(src)
 	new /obj/item/clothing/shoes/white(src)
 	new /obj/item/clothing/shoes/white(src)
 	new /obj/item/clothing/shoes/slippers(src)
@@ -204,7 +209,7 @@
 
 /obj/structure/closet/wardrobe/science_white
 	name = "science wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/white
+	icon_door = "white"
 
 /obj/structure/closet/wardrobe/science_white/New()
 	..()
@@ -220,7 +225,7 @@
 
 /obj/structure/closet/wardrobe/robotics_black
 	name = "robotics wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/black
+	icon_door = "black"
 
 /obj/structure/closet/wardrobe/robotics_black/New()
 	..()
@@ -228,6 +233,8 @@
 	new /obj/item/clothing/under/rank/roboticist(src)
 	new /obj/item/clothing/suit/storage/toggle/labcoat(src)
 	new /obj/item/clothing/suit/storage/toggle/labcoat(src)
+	new /obj/item/clothing/suit/sc_labcoat(src)
+	new /obj/item/clothing/suit/sc_labcoat(src)
 	new /obj/item/clothing/shoes/black(src)
 	new /obj/item/clothing/shoes/black(src)
 	new /obj/item/clothing/gloves/thick(src)
@@ -235,7 +242,7 @@
 
 /obj/structure/closet/wardrobe/chemistry_white
 	name = "chemistry wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/white
+	icon_door = "white"
 
 /obj/structure/closet/wardrobe/chemistry_white/New()
 	..()
@@ -248,7 +255,7 @@
 
 /obj/structure/closet/wardrobe/genetics_white
 	name = "genetics wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/white
+	icon_door = "white"
 
 /obj/structure/closet/wardrobe/genetics_white/New()
 	..()
@@ -261,7 +268,7 @@
 
 /obj/structure/closet/wardrobe/virology_white
 	name = "virology wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/white
+	icon_door = "white"
 
 /obj/structure/closet/wardrobe/virology_white/New()
 	..()
@@ -276,7 +283,7 @@
 
 /obj/structure/closet/wardrobe/medic_white
 	name = "medical wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/white
+	icon_door = "white"
 
 /obj/structure/closet/wardrobe/medic_white/New()
 	..()
@@ -301,7 +308,7 @@
 
 /obj/structure/closet/wardrobe/grey
 	name = "grey wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/grey
+	icon_door = "grey"
 
 /obj/structure/closet/wardrobe/grey/New()
 	..()
@@ -317,7 +324,7 @@
 
 /obj/structure/closet/wardrobe/mixed
 	name = "mixed wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/mixed
+	icon_door = "mixed"
 
 /obj/structure/closet/wardrobe/mixed/New()
 	..()
@@ -326,9 +333,9 @@
 	new /obj/item/clothing/under/color/green(src)
 	new /obj/item/clothing/under/color/orange(src)
 	new /obj/item/clothing/under/color/pink(src)
-	new /obj/item/clothing/under/skirt/plaid_blue(src)
-	new /obj/item/clothing/under/skirt/plaid_red(src)
-	new /obj/item/clothing/under/skirt/plaid_purple(src)
+	new /obj/item/clothing/under/dress/plaid_blue(src)
+	new /obj/item/clothing/under/dress/plaid_red(src)
+	new /obj/item/clothing/under/dress/plaid_purple(src)
 	new /obj/item/clothing/shoes/blue(src)
 	new /obj/item/clothing/shoes/yellow(src)
 	new /obj/item/clothing/shoes/green(src)
@@ -340,7 +347,7 @@
 
 /obj/structure/closet/wardrobe/tactical
 	name = "tactical equipment"
-	closet_appearance = /singleton/closet_appearance/tactical
+	icon_door = "syndicate1"
 
 /obj/structure/closet/wardrobe/tactical/New()
 	..()
@@ -355,7 +362,7 @@
 
 /obj/structure/closet/wardrobe/suit
 	name = "formal clothing locker"
-	closet_appearance = /singleton/closet_appearance/wardrobe/mixed
+	icon_door = "mixed"
 
 /obj/structure/closet/wardrobe/suit/New()
 	..()
@@ -385,7 +392,7 @@
 
 /obj/structure/closet/wardrobe/lawyer_black
 	name = "internal affairs wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/black
+	icon_door = "black"
 
 /obj/structure/closet/wardrobe/lawyer_black/New()
 	..()

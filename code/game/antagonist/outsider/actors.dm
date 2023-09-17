@@ -4,7 +4,7 @@ GLOBAL_DATUM_INIT(actor, /datum/antagonist/actor, new)
 	id = MODE_ACTOR
 	role_text = "Actor"
 	role_text_plural = "Actors"
-	welcome_text = "You've been hired to entertain people through the power of television!"
+	welcome_text = "Вы были наняты чтобы развлекать людей с помощью телевидения!"
 	landmark_id = "ActorSpawn"
 	id_type = /obj/item/card/id/syndicate
 
@@ -17,41 +17,45 @@ GLOBAL_DATUM_INIT(actor, /datum/antagonist/actor, new)
 	show_objectives_on_creation = 0 //actors are not antagonists and do not need the antagonist greet text
 	required_language = LANGUAGE_HUMAN_EURO
 
-/datum/antagonist/actor/greet(datum/mind/player)
+	antag_text = "" //INF
+	ambitious = 0 //INF
+
+/datum/antagonist/actor/greet(var/datum/mind/player)
 	if(!..())
 		return
 
-	player.current.show_message("You work for [GLOB.using_map.company_name], tasked with the production and broadcasting of entertainment to all of its assets.")
-	player.current.show_message("Entertain the crew! Try not to disrupt them from their work too much and remind them how great [GLOB.using_map.company_name] is!")
+	player.current.show_message("<span class='info'>Вы - актер, работающий на [GLOB.using_map.company_name] и назначенный на обеспечение многих корпоративных объектов развлекательным телевизионным контентом.</span>")
+	player.current.show_message("<span class='info'>Развлекайте экипаж! Старайтесь не отвлекать их и уж точно не мешать им в работе. И помните, [GLOB.using_map.company_name] прежде всего!</span>")
 
-/datum/antagonist/actor/equip(mob/living/carbon/human/player)
+/datum/antagonist/actor/equip(var/mob/living/carbon/human/player)
 	player.equip_to_slot_or_del(new /obj/item/clothing/under/chameleon(src), slot_w_uniform)
 	player.equip_to_slot_or_del(new /obj/item/clothing/shoes/chameleon(src), slot_shoes)
 	player.equip_to_slot_or_del(new /obj/item/device/radio/headset/entertainment(src), slot_l_ear)
-	var/obj/item/card/id/centcom/ERT/C = new(player.loc)
+	var/obj/item/card/id/centcom/ERT/commando/C = new(player.loc)
 	C.assignment = "Actor"
 	player.set_id_info(C)
 	player.equip_to_slot_or_del(C,slot_wear_id)
 
 	return 1
 
-/client/verb/join_as_actor()
-	set category = "IC"
+/mob/observer/ghost/verb/join_as_actor()
+	set category = "Ghost"
 	set name = "Join as Actor"
-	set desc = "Join as an Actor to entertain the crew through television!"
+	set desc = "Присоедениться как Актер, чтобы развлекать экипаж по средствам телевидения!"
 
 	if(!MayRespawn(1) || !GLOB.actor.can_become_antag(usr.mind, 1))
 		return
 
-	var/choice = alert("Are you sure you'd like to join as an actor?", "Confirmation","Yes", "No")
+	if(jobban_isbanned(usr, MODE_ACTOR))
+		to_chat(usr, "Кажется, у вас джоб-бан на работу Актера. Что ж, плохие новости.")
+		return
+
+	var/choice = alert("Вы уверены, что хотите стать актером?", "Confirmation","Yes", "No")
 	if(choice != "Yes")
 		return
 
-	if(isghostmind(usr.mind) || isnewplayer(usr))
-		if(length(GLOB.actor.current_antagonists) >= GLOB.actor.hard_cap)
-			to_chat(usr, "No more actors may spawn at the current time.")
-			return
-		GLOB.actor.create_default(usr)
+	if(GLOB.actor.current_antagonists.len >= GLOB.actor.hard_cap)
+		to_chat(usr, "В настоящее время актеры больше не могут появляться.")
 		return
 
-	to_chat(usr, "You must be observing or be a new player to spawn as an actor.")
+	GLOB.actor.create_default(usr)

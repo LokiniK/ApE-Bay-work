@@ -15,7 +15,7 @@
 /obj/item/paper
 	name = "sheet of paper"
 	gender = NEUTER
-	icon = 'icons/obj/bureaucracy.dmi'
+	icon = 'infinity/icons/obj/bureaucracy.dmi'
 	icon_state = "paper"
 	item_state = "paper"
 	randpixel = 8
@@ -27,6 +27,9 @@
 	slot_flags = SLOT_HEAD
 	body_parts_covered = HEAD
 	attack_verb = list("bapped")
+	sprite_sheets = list(
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_head_resomi.dmi'
+		)
 
 	var/info		//What's actually written on the paper.
 	var/info_links	//A different version of the paper which includes html links at fields and EOF
@@ -40,18 +43,18 @@
 	var/spam_flag = 0
 	var/last_modified_ckey
 	var/age = 0
+	var/log = ""
 	var/list/metadata
 	var/readable = TRUE  //Paper will not be able to be written on and will not bring up a window upon examine if FALSE
 	var/is_memo = FALSE  //If TRUE, paper will act the same as readable = FALSE, but will also be unrenameable.
 	var/datum/language/language = LANGUAGE_HUMAN_EURO // Language the paper was written in. Editable by users up until something's actually written
 
 	var/const/deffont = "Verdana"
-	var/const/signfont = "Brush Script MT"
+	var/const/signfont = "Monotype Corsiva"
 	var/const/crayonfont = "Comic Sans MS"
-	var/const/fancyfont = "Garamond"
+	var/const/fancyfont = "Segoe Script"
 
 	var/scan_file_type = /datum/computer_file/data/text
-	var/is_copy = TRUE
 
 /obj/item/paper/New(loc, text, title, list/md = null, datum/language/L = null)
 	..(loc)
@@ -65,10 +68,12 @@
 		log_debug("[src] ([type]) initialized with invalid or missing language `[old_language]` defined.")
 		set_language(LANGUAGE_HUMAN_EURO, TRUE)
 
-/obj/item/paper/proc/set_content(text, title, parse_pencode = TRUE)
+/obj/item/paper/proc/set_content(text,title)
 	if(title)
 		SetName(title)
-	info = parse_pencode ? parsepencode(text) : text
+	info = html_encode(text)
+	text = preSign(text)
+	info = parsepencode(text)
 	update_icon()
 	update_space(info)
 	updateinfolinks()
@@ -93,7 +98,7 @@
 	else
 		icon_state = "paper"
 
-/obj/item/paper/proc/update_space(new_text)
+/obj/item/paper/proc/update_space(var/new_text)
 	if(new_text)
 		free_space -= length(strip_html_properly(new_text))
 
@@ -104,7 +109,7 @@
 	if(distance <= 1)
 		show_content(usr)
 	else
-		to_chat(user, SPAN_NOTICE("You have to go closer if you want to read it."))
+		to_chat(user, "<span class='notice'>You have to go closer if you want to read it.</span>")
 
 /obj/item/paper/verb/user_set_language()
 	set name = "Set writing language"
@@ -117,7 +122,7 @@
 	if (info)
 		to_chat(user, SPAN_WARNING("\The [src] already has writing on it and cannot have its language changed."))
 		return
-	if (!admin_force && !length(user.languages))
+	if (!admin_force && !user.languages.len)
 		to_chat(user, SPAN_WARNING("You don't know any languages to choose from."))
 		return
 
@@ -160,7 +165,7 @@
 			can_read = ishuman(user) || issilicon(user)
 			if (can_read)
 				can_read = get_dist(src, user) < PAPER_EYEBALL_DISTANCE
-	var/html = "<html><head><title>[name]</title></head><body bgcolor='[color]'>"
+	var/html = "<html><meta charset=\"UTF-8\"><head><title>[name]</title></head><body bgcolor='[color]'>"
 	if (!can_read)
 		html += PAPER_META_BAD("The paper is too far away or you can't read.")
 		html += "<hr/></body></html>"
@@ -194,7 +199,7 @@
 	set src in usr
 
 	if((MUTATION_CLUMSY in usr.mutations) && prob(50))
-		to_chat(usr, SPAN_WARNING("You cut yourself on the paper."))
+		to_chat(usr, "<span class='warning'>You cut yourself on the paper.</span>")
 		return
 	else if(is_memo)
 		to_chat(usr, SPAN_NOTICE("You decide not to alter the name of \the [src]."))
@@ -210,41 +215,41 @@
 /obj/item/paper/attack_self(mob/living/user as mob)
 	if(user.a_intent == I_HURT)
 		if(icon_state == "scrap")
-			user.show_message(SPAN_WARNING("\The [src] is already crumpled."))
+			user.show_message("<span class='warning'>\The [src] is already crumpled.</span>")
 			return
 		//crumple dat paper
 		info = stars(info,85)
 		user.visible_message("\The [user] crumples \the [src] into a ball!")
 		icon_state = "scrap"
 		return
-	examinate(user, src)
+	user.examinate(src)
 
-/obj/item/paper/attack_ai(mob/living/silicon/ai/user)
+/obj/item/paper/attack_ai(var/mob/living/silicon/ai/user)
 	show_content(user)
 
 /obj/item/paper/attack(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
 	if(user.zone_sel.selecting == BP_EYES)
-		user.visible_message(SPAN_NOTICE("You show the paper to [M]. "), \
-			SPAN_NOTICE(" [user] holds up a paper and shows it to [M]. "))
-		examinate(M, src)
+		user.visible_message("<span class='notice'>You show the paper to [M]. </span>", \
+			"<span class='notice'> [user] holds up a paper and shows it to [M]. </span>")
+		M.examinate(src)
 
 	else if(user.zone_sel.selecting == BP_MOUTH) // lipstick wiping
 		if(ishuman(M))
 			var/mob/living/carbon/human/H = M
 			if(H == user)
-				to_chat(user, SPAN_NOTICE("You wipe off the lipstick with [src]."))
-				H.makeup_style = null
+				to_chat(user, "<span class='notice'>You wipe off the lipstick with [src].</span>")
+				H.lip_style = null
 				H.update_body()
 			else
-				user.visible_message(SPAN_WARNING("[user] begins to wipe [H]'s lipstick off with \the [src]."), \
-								 	 SPAN_NOTICE("You begin to wipe off [H]'s lipstick."))
-				if(do_after(user, 2 SECONDS, H, (DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS) & ~DO_BOTH_CAN_TURN))
-					user.visible_message(SPAN_NOTICE("[user] wipes [H]'s lipstick off with \the [src]."), \
-										 SPAN_NOTICE("You wipe off [H]'s lipstick."))
-					H.makeup_style = null
+				user.visible_message("<span class='warning'>[user] begins to wipe [H]'s lipstick off with \the [src].</span>", \
+								 	 "<span class='notice'>You begin to wipe off [H]'s lipstick.</span>")
+				if(do_after(user, 2 SECONDS, H, do_flags = DO_DEFAULT & ~DO_BOTH_CAN_TURN))
+					user.visible_message("<span class='notice'>[user] wipes [H]'s lipstick off with \the [src].</span>", \
+										 "<span class='notice'>You wipe off [H]'s lipstick.</span>")
+					H.lip_style = null
 					H.update_body()
 
-/obj/item/paper/proc/addtofield(id, text, links = 0)
+/obj/item/paper/proc/addtofield(var/id, var/text, var/links = 0)
 	var/locid = 0
 	var/laststart = 1
 	var/textindex = 1
@@ -284,8 +289,8 @@
 	info_links = info
 	var/i = 0
 	for(i=1,i<=fields,i++)
-		addtofield(i, "<span style='font-family: [deffont]'><A href='?src=\ref[src];write=[i]'>write</A></span>", 1)
-	info_links = info_links + "<span style='font-family: [deffont]'><A href='?src=\ref[src];write=end'>write</A></span>"
+		addtofield(i, "<font face=\"[deffont]\"><A href='?src=\ref[src];write=[i]'>write</A></font>", 1)
+	info_links = info_links + "<font face=\"[deffont]\"><A href='?src=\ref[src];write=end'>write</A></font>"
 
 
 /obj/item/paper/proc/clearpaper()
@@ -297,7 +302,7 @@
 	updateinfolinks()
 	update_icon()
 
-/obj/item/paper/proc/get_signature(obj/item/pen/P, mob/user as mob)
+/obj/item/paper/proc/get_signature(var/obj/item/pen/P, mob/user as mob)
 	if(P && istype(P, /obj/item/pen))
 		return P.get_signature(user)
 	return (user && user.real_name) ? user.real_name : "Anonymous"
@@ -310,7 +315,7 @@
 		t = replacetext(t, "\[sign\]", "")
 
 	if (findtext(t, "\[sign\]"))
-		t = replacetext(t, "\[sign\]", "<span style='font-family: [signfont]; font-size: 1.5em'><i>[get_signature(P, user)]</i></span>")
+		t = replacetext(t, "\[sign\]", "<font face=\"[signfont]\"><i>[get_signature(P, user)]</i></font>")
 
 	if(iscrayon) // If it is a crayon, and he still tries to use these, make them empty!
 		t = replacetext(t, "\[*\]", "")
@@ -326,11 +331,11 @@
 		t = replacetext(t, "\[logo\]", "")
 
 	if(iscrayon)
-		t = "<span style='font-family: [crayonfont]; color: [P ? P.colour : "black"]'><b>[t]</b></span>"
+		t = "<font face=\"[crayonfont]\" color=[P ? P.colour : "black"]><b>[t]</b></font>"
 	else if(isfancy)
-		t = "<span style='font-family: [fancyfont]; color: [P ? P.colour : "black"]'>[t]</span>"
+		t = "<font face=\"[fancyfont]\" color=[P ? P.colour : "black"]><i>[t]</i></font>"
 	else
-		t = "<span style='font-family: [deffont]; color: [P ? P.colour : "black"]'>[t]</span>"
+		t = "<font face=\"[deffont]\" color=[P ? P.colour : "black"]>[t]</font>"
 
 	t = pencode2html(t)
 
@@ -353,19 +358,19 @@
 		if(istype(P, /obj/item/flame/lighter/zippo))
 			class = "rose"
 
-		user.visible_message(SPAN_CLASS("[class]", "[user] holds \the [P] up to \the [src], it looks like \he's trying to burn it!"), \
-		SPAN_CLASS("[class]", "You hold \the [P] up to \the [src], burning it slowly."))
+		user.visible_message("<span class='[class]'>[user] holds \the [P] up to \the [src], it looks like \he's trying to burn it!</span>", \
+		"<span class='[class]'>You hold \the [P] up to \the [src], burning it slowly.</span>")
 
 		spawn(20)
 			if(get_dist(src, user) < 2 && user.get_active_hand() == P && P.lit)
-				user.visible_message(SPAN_CLASS("[class]", "[user] burns right through \the [src], turning it to ash. It flutters through the air before settling on the floor in a heap."), \
-				SPAN_CLASS("[class]", "You burn right through \the [src], turning it to ash. It flutters through the air before settling on the floor in a heap."))
+				user.visible_message("<span class='[class]'>[user] burns right through \the [src], turning it to ash. It flutters through the air before settling on the floor in a heap.</span>", \
+				"<span class='[class]'>You burn right through \the [src], turning it to ash. It flutters through the air before settling on the floor in a heap.</span>")
 
 				new /obj/effect/decal/cleanable/ash(get_turf(src))
 				qdel(src)
 
 			else
-				to_chat(user, SPAN_WARNING("You must hold \the [P] steady to burn \the [src]."))
+				to_chat(user, "<span class='warning'>You must hold \the [P] steady to burn \the [src].</span>")
 
 
 /obj/item/paper/Topic(href, href_list)
@@ -383,7 +388,7 @@
 		//var/t = strip_html_simple(input(usr, "What text do you wish to add to " + (id=="end" ? "the end of the paper" : "field "+id) + "?", "[name]", null),8192) as message
 
 		if(free_space <= 0)
-			to_chat(usr, SPAN_INFO("There isn't enough space left on \the [src] to write anything."))
+			to_chat(usr, "<span class='info'>There isn't enough space left on \the [src] to write anything.</span>")
 			return
 
 		var/obj/item/I = usr.get_active_hand() // Check to see if he still got that darn pen, also check what type of pen
@@ -419,13 +424,15 @@
 		if(src.loc != usr && !src.Adjacent(usr) && !((istype(src.loc, /obj/item/material/clipboard) || istype(src.loc, /obj/item/folder)) && (src.loc.loc == usr || src.loc.Adjacent(usr)) ) )
 			return
 
+		log += "<br />\[[time_stamp()]] [key_name(usr)] added: [t]"
+
 		var/last_fields_value = fields
 
 		t = parsepencode(t, I, usr, iscrayon, isfancy) // Encode everything from pencode to html
 
 
 		if(fields > MAX_FIELDS)
-			to_chat(usr, SPAN_WARNING("Too many fields. Sorry, you can't do this."))
+			to_chat(usr, "<span class='warning'>Too many fields. Sorry, you can't do this.</span>")
 			fields = last_fields_value
 			return
 
@@ -434,6 +441,8 @@
 		else
 			info += t // Oh, he wants to edit to the end of the file, let him.
 			updateinfolinks()
+
+		playsound(src,'sound/effects/PEN_Ball_Point_Pen_Circling_01_mono.ogg',40,1)
 
 		last_modified_ckey = usr.ckey
 
@@ -465,7 +474,7 @@
 		if (istype(P, /obj/item/paper/carbon))
 			var/obj/item/paper/carbon/C = P
 			if (!C.iscopy && !C.copied)
-				to_chat(user, SPAN_NOTICE("Take off the carbon copy first."))
+				to_chat(user, "<span class='notice'>Take off the carbon copy first.</span>")
 				add_fingerprint(user)
 				return
 		var/obj/item/paper_bundle/B = new(src.loc)
@@ -478,7 +487,7 @@
 			return
 		user.put_in_hands(B)
 
-		to_chat(user, SPAN_NOTICE("You clip the [P.name] to [(src.name == "paper") ? "the paper" : src.name]."))
+		to_chat(user, "<span class='notice'>You clip the [P.name] to [(src.name == "paper") ? "the paper" : src.name].</span>")
 
 		B.pages.Add(src)
 		B.pages.Add(P)
@@ -486,7 +495,7 @@
 
 	else if(istype(P, /obj/item/pen))
 		if(icon_state == "scrap")
-			to_chat(usr, SPAN_WARNING("\The [src] is too crumpled to write on."))
+			to_chat(usr, "<span class='warning'>\The [src] is too crumpled to write on.</span>")
 			return
 
 		var/obj/item/pen/robopen/RP = P
@@ -500,6 +509,7 @@
 		if((!in_range(src, usr) && loc != user && !( istype(loc, /obj/item/material/clipboard) ) && loc.loc != user && user.get_active_hand() != P))
 			return
 
+		playsound(src,'infinity/sound/effects/Stamp2.ogg',40,1)
 		stamps += (stamps=="" ? "<HR>" : "<BR>") + "<i>This paper has been stamped with the [P.name].</i>"
 
 		var/image/stampoverlay = image('icons/obj/bureaucracy.dmi')
@@ -518,7 +528,7 @@
 
 		if(istype(P, /obj/item/stamp/clown))
 			if(!clown)
-				to_chat(user, SPAN_NOTICE("You are totally unable to use the stamp. HONK!"))
+				to_chat(user, "<span class='notice'>You are totally unable to use the stamp. HONK!</span>")
 				return
 
 		if(!ico)
@@ -531,8 +541,8 @@
 		stamped += P.type
 		overlays += stampoverlay
 
-		playsound(src, 'sound/effects/stamp.ogg', 50, 1)
-		to_chat(user, SPAN_NOTICE("You stamp the paper with your [P.name]."))
+		playsound(src, 'infinity/sound/effects/stamp2.ogg', 50, 1)
+		to_chat(user, "<span class='notice'>You stamp the paper with your [P.name].</span>")
 
 	else if(istype(P, /obj/item/flame))
 		burnpaper(P, user)
@@ -541,27 +551,57 @@
 		if(!can_bundle())
 			return
 		var/obj/item/paper_bundle/attacking_bundle = P
-		attacking_bundle.insert_sheet_at(user, (length(attacking_bundle.pages))+1, src)
+		attacking_bundle.insert_sheet_at(user, (attacking_bundle.pages.len)+1, src)
 		attacking_bundle.update_icon()
 
 	add_fingerprint(user)
 
+/obj/item/paper/proc/preStampPaper(stamp_path) // INF, function ~bear1ake
+	var/obj/item/stamp/P = new stamp_path
+	stamps += (stamps=="" ? "<HR>" : "<BR>") + "<i>This paper has been stamped with the [P.name].</i>"
+
+	var/image/stampoverlay = image('icons/obj/bureaucracy.dmi')
+	var/x
+	var/y
+	if(istype(P, /obj/item/stamp/captain) || istype(P, /obj/item/stamp/boss))
+		x = rand(-2, 0)
+		y = rand(-1, 2)
+	else
+		x = rand(-2, 2)
+		y = rand(-3, 2)
+	offset_x += x
+	offset_y += y
+	stampoverlay.pixel_x = x
+	stampoverlay.pixel_y = y
+
+	if(!ico)
+		ico = new
+	ico += "paper_[P.icon_state]"
+	stampoverlay.icon_state = "paper_[P.icon_state]"
+
+	if(!stamped)
+		stamped = new
+	stamped += P.type
+	overlays += stampoverlay
+
+	qdel(P)
+
+/obj/item/paper/proc/preSign(t) // INF, function ~bear1ake
+	t = replacetext(t, "\[sign\]", "<font face=\"[signfont]\"><i>")
+	t = replacetext(t, "\[/sign\]", "</i></font>")
+	return t
+
 /obj/item/paper/proc/can_bundle()
 	return TRUE
 
-/obj/item/paper/proc/show_info(mob/user)
+/obj/item/paper/proc/show_info(var/mob/user)
 	return info
 
 
 //For supply.
 /obj/item/paper/manifest
 	name = "supply manifest"
-
-
-//For anomalies.
-/obj/item/paper/anomaly_scan
-	name = "anomaly scan result"
-
+	var/is_copy = 1
 /*
  * Premade paper
  */

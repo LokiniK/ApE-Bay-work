@@ -35,53 +35,53 @@
 /datum/category_item/player_setup_item/background/records/content(mob/user)
 	. = list()
 
-	. += "<br><b>Records</b>:"
+	. += "<br><b>Записи</b>:"
 	if (jobban_isbanned(user, "Records"))
-		. += "[SPAN_WARNING("You are banned from using character records.")]"
+		. += "[SPAN_WARNING("Записи заблокированы для вас из-за нарушения правил.")]"
 	else
-		.+= TBTN("set_public_record", TextPreview(pref.public_record, 40), "Public")
-		.+= TBTN("set_medical_records", TextPreview(pref.med_record, 40), "Medical")
-		.+= TBTN("set_general_records", TextPreview(pref.gen_record, 40), "Employment")
-		.+= TBTN("set_security_records", TextPreview(pref.sec_record, 40), "Security")
-		.+= TBTN("set_memory", TextPreview(pref.memory, 40), "Memory")
+		.+= UIBUTTON("set_public_record", TextPreview(pref.public_record, 40), "Общие записи (публичные)")
+		.+= UIBUTTON("set_medical_records", TextPreview(pref.med_record, 40), "Медицинские записи")
+		.+= UIBUTTON("set_general_records", TextPreview(pref.gen_record, 40), "Записи трудоустройства")
+		.+= UIBUTTON("set_security_records", TextPreview(pref.sec_record, 40), "Записи охраны")
+		.+= UIBUTTON("set_memory", TextPreview(pref.memory, 40), "Заметка")
 
-	. += "<br><b>Other</b>:"
-	var/set_addr_button = TBTN("set_email_addr", pref.email_addr ? pref.email_addr : "(default)", "Email Address")
-	var/list/branches = pref.for_each_selected_branch(new Callback(src, .proc/allow_email_branch_check))
+	. += "<br><b>Другое</b>:"
+	var/set_addr_button = UIBUTTON("set_email_addr", pref.email_addr ? pref.email_addr : "(default)", "Почтовый адрес")
+	var/list/branches = pref.for_each_selected_branch(CALLBACK(src, .proc/allow_email_branch_check))
 	for (var/name in branches)
 		set_addr_button += "  " + (branches[name] ? UI_FONT_GOOD(name) : UI_FONT_BAD(name))
 	. += set_addr_button
 
-	. += TBTN("set_email_pass", pref.email_pass ? pref.email_pass : "(random)", "Email Password")
+	. += UIBUTTON("set_email_pass", pref.email_pass ? pref.email_pass : "(random)", "Пароль от почты")
 	. = jointext(., "<br>")
 
-/datum/category_item/player_setup_item/background/records/OnTopic(href,list/href_list, mob/user)
+/datum/category_item/player_setup_item/background/records/OnTopic(var/href,var/list/href_list, var/mob/user)
 	if (href_list["set_public_record"])
-		var/new_public = sanitize(input(user,"Enter general public record information here.",CHARACTER_PREFERENCE_INPUT_TITLE, html_decode(pref.public_record)) as message|null, MAX_PAPER_MESSAGE_LEN, extra = 0)
+		var/new_public = sanitize(input(user,"Введите дополнительную общедоступную информацию о персонаже.",CHARACTER_PREFERENCE_INPUT_TITLE, html_decode(pref.public_record)) as message|null, MAX_PAPER_MESSAGE_LEN, extra = 0)
 		if (!isnull(new_public) && !jobban_isbanned(user, "Records") && CanUseTopic(user))
 			pref.public_record = new_public
 		return TOPIC_REFRESH
 
 	else if(href_list["set_medical_records"])
-		var/new_medical = sanitize(input(user,"Enter medical information here.",CHARACTER_PREFERENCE_INPUT_TITLE, html_decode(pref.med_record)) as message|null, MAX_PAPER_MESSAGE_LEN, extra = 0)
+		var/new_medical = sanitize(input(user,"Введите медицинские записи персонажа.",CHARACTER_PREFERENCE_INPUT_TITLE, html_decode(pref.med_record)) as message|null, MAX_PAPER_MESSAGE_LEN, extra = 0)
 		if(!isnull(new_medical) && !jobban_isbanned(user, "Records") && CanUseTopic(user))
 			pref.med_record = new_medical
 		return TOPIC_REFRESH
 
 	else if(href_list["set_general_records"])
-		var/new_general = sanitize(input(user,"Enter employment information here.",CHARACTER_PREFERENCE_INPUT_TITLE, html_decode(pref.gen_record)) as message|null, MAX_PAPER_MESSAGE_LEN, extra = 0)
+		var/new_general = sanitize(input(user,"Введите записи по трудоустройству персонажа.",CHARACTER_PREFERENCE_INPUT_TITLE, html_decode(pref.gen_record)) as message|null, MAX_PAPER_MESSAGE_LEN, extra = 0)
 		if(!isnull(new_general) && !jobban_isbanned(user, "Records") && CanUseTopic(user))
 			pref.gen_record = new_general
 		return TOPIC_REFRESH
 
 	else if(href_list["set_security_records"])
-		var/sec_medical = sanitize(input(user,"Enter security information here.",CHARACTER_PREFERENCE_INPUT_TITLE, html_decode(pref.sec_record)) as message|null, MAX_PAPER_MESSAGE_LEN, extra = 0)
+		var/sec_medical = sanitize(input(user,"Введите записи Службы Безопасности о персонаже.",CHARACTER_PREFERENCE_INPUT_TITLE, html_decode(pref.sec_record)) as message|null, MAX_PAPER_MESSAGE_LEN, extra = 0)
 		if(!isnull(sec_medical) && !jobban_isbanned(user, "Records") && CanUseTopic(user))
 			pref.sec_record = sec_medical
 		return TOPIC_REFRESH
 
 	else if(href_list["set_memory"])
-		var/memes = sanitize(input(user,"Enter memorized information here.",CHARACTER_PREFERENCE_INPUT_TITLE, html_decode(pref.memory)) as message|null, MAX_PAPER_MESSAGE_LEN, extra = 0)
+		var/memes = sanitize(input(user,"Введите заметку для себя.",CHARACTER_PREFERENCE_INPUT_TITLE, html_decode(pref.memory)) as message|null, MAX_PAPER_MESSAGE_LEN, extra = 0)
 		if(!isnull(memes) && CanUseTopic(user))
 			pref.memory = memes
 		return TOPIC_REFRESH

@@ -5,18 +5,17 @@
 	size = 4
 	usage_flags = PROGRAM_CONSOLE | PROGRAM_LAPTOP
 	program_icon_state = "security"
-	program_key_state = "security_key"
 	program_menu_icon = "locked"
 	requires_ntnet = TRUE
 	available_on_ntnet = TRUE
 	required_access = access_armory
-	nanomodule_path = /datum/nano_module/forceauthorization
+	nanomodule_path = /datum/nano_module/forceauthorization/
 	category = PROG_SEC
 
-/datum/nano_module/forceauthorization
+/datum/nano_module/forceauthorization/
 	name = "Use of Force Authorization Manager"
 
-/datum/nano_module/forceauthorization/ui_interact(mob/user, ui_key = "main", datum/nanoui/ui = null, force_open = 1, datum/topic_state/state = GLOB.default_state)
+/datum/nano_module/forceauthorization/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1, var/datum/topic_state/state = GLOB.default_state)
 	var/list/data = host.initial_data()
 
 	data["registered_guns"] = list()
@@ -36,7 +35,7 @@
 			area_name = sanitize(A.name)
 
 		var/list/modes = list()
-		for(var/i = 1 to length(G.firemodes))
+		for(var/i = 1 to G.firemodes.len)
 			if(G.authorized_modes[i] == ALWAYS_AUTHORIZED)
 				continue
 			var/datum/firemode/firemode = G.firemodes[i]
@@ -62,6 +61,6 @@
 		var/obj/item/gun/G = locate(href_list["gun"]) in GLOB.secure_weapons
 		var/do_authorize = text2num(href_list["authorize"])
 		var/mode = text2num(href_list["mode"])
-		return isnum(do_authorize) && isnum(mode) && G && G.authorize(mode, do_authorize)
+		return isnum(do_authorize) && isnum(mode) && G && G.authorize(mode, do_authorize, FindNameFromID(usr)) //inf, was: return isnum(do_authorize) && isnum(mode) && G && G.authorize(mode, do_authorize)
 
 	return FALSE

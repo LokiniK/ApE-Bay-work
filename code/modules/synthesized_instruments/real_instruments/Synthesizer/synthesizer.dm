@@ -12,6 +12,31 @@
 	path = /datum/instrument
 	sound_player = /datum/sound_player/synthesizer
 
+/obj/structure/synthesized_instrument/synthesizer/attackby(obj/item/O, mob/user, params)
+	if (istype(O, /obj/item/wrench))
+		if (!anchored && !isinspace())
+			playsound(src.loc, 'sound/items/Ratchet.ogg', 50, 1)
+			to_chat(usr, "<span class='notice'> You begin to tighten \the [src] to the floor...</span>")
+			if (do_after(user, 20))
+				if(!anchored && !isinspace())
+					user.visible_message( \
+						"[user] tightens \the [src]'s casters.", \
+						"<span class='notice'> You tighten \the [src]'s casters. Now it can be played again.</span>", \
+						"<span class='italics'>You hear ratchet.</span>")
+					src.anchored = TRUE
+		else if(anchored)
+			playsound(src.loc, 'sound/items/Ratchet.ogg', 50, 1)
+			to_chat(usr, "<span class='notice'> You begin to loosen \the [src]'s casters...</span>")
+			if (do_after(user, 40))
+				if(anchored)
+					user.visible_message( \
+						"[user] loosens \the [src]'s casters.", \
+						"<span class='notice'> You loosen \the [src]. Now it can be pulled somewhere else.</span>", \
+						"<span class='italics'>You hear ratchet.</span>")
+					src.anchored = FALSE
+	else
+		..()
+
 /obj/structure/synthesized_instrument/synthesizer/shouldStopPlaying(mob/user)
 	return !((src && in_range(src, user) && src.anchored) || src.real_instrument.player.song.autorepeat)
 
@@ -30,4 +55,3 @@
 	name = "space minimoog"
 	desc = "This is a minimoog, like a space piano, but more spacey!"
 	icon_state = "minimoog"
-	obj_flags = OBJ_FLAG_ROTATABLE | OBJ_FLAG_ANCHORABLE

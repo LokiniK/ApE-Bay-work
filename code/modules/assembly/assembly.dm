@@ -26,16 +26,16 @@
 /obj/item/device/assembly/proc/activate()									//What the device does when turned on
 	return
 
-/obj/item/device/assembly/proc/pulsed(radio = 0)						//Called when another assembly acts on this one, radio will determine where it came from for wire calcs
+/obj/item/device/assembly/proc/pulsed(var/radio = 0)						//Called when another assembly acts on this one, var/radio will determine where it came from for wire calcs
 	return
 
-/obj/item/device/assembly/proc/pulse(radio = 0)						//Called when this device attempts to act on another device, radio determines if it was sent via radio or direct
+/obj/item/device/assembly/proc/pulse(var/radio = 0)						//Called when this device attempts to act on another device, var/radio determines if it was sent via radio or direct
 	return
 
-/obj/item/device/assembly/proc/set_secure(make_secure = FALSE)								//Code that has to happen when the assembly is un\secured goes here
+/obj/item/device/assembly/proc/toggle_secure()								//Code that has to happen when the assembly is un\secured goes here
 	return
 
-/obj/item/device/assembly/proc/attach_assembly(obj/A, mob/user)	//Called when an assembly is attacked by another
+/obj/item/device/assembly/proc/attach_assembly(var/obj/A, var/mob/user)	//Called when an assembly is attacked by another
 	return
 
 /obj/item/device/assembly/proc/process_cooldown()							//Called via spawn(10) to have it count down the cooldown var
@@ -56,7 +56,7 @@
 	return 1
 
 
-/obj/item/device/assembly/pulsed(radio = 0)
+/obj/item/device/assembly/pulsed(var/radio = 0)
 	if(holder && (wires & WIRE_RECEIVE))
 		activate()
 	if(radio && (wires & WIRE_RADIO_RECEIVE))
@@ -64,7 +64,7 @@
 	return 1
 
 
-/obj/item/device/assembly/pulse(radio = 0)
+/obj/item/device/assembly/pulse(var/radio = 0)
 	if(holder && (wires & WIRE_PULSE))
 		holder.process_activation(src, 1, 0)
 	if(holder && (wires & WIRE_PULSE_SPECIAL))
@@ -82,63 +82,34 @@
 	return 1
 
 
-/obj/item/device/assembly/set_secure(make_secure)
-	if (make_secure == secured)
-		return
-	else
-		secured = make_secure
-		update_icon()
+/obj/item/device/assembly/toggle_secure()
+	secured = !secured
+	update_icon()
 	return secured
 
 
-/obj/item/device/assembly/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Assembly - Attach assembly
-	if (isassembly(tool))
-		if (!user.canUnEquip(tool))
-			FEEDBACK_UNEQUIP_FAILURE(user, tool)
-			return TRUE
-		if (!user.canUnEquip(src))
-			FEEDBACK_UNEQUIP_FAILURE(user, src)
-			return TRUE
-		if (secured)
-			USE_FEEDBACK_FAILURE("\The [src] is not ready to be modified or attached.")
-			return TRUE
-		var/obj/item/device/assembly/assembly = tool
-		if (assembly.secured)
-			USE_FEEDBACK_FAILURE("\The [tool] is not ready to be modified or attached.")
-			return TRUE
-		user.unEquip(src)
-		user.unEquip(tool)
-		holder = new /obj/item/device/assembly_holder(get_turf(src))
-		forceMove(holder)
-		transfer_fingerprints_to(holder)
-		assembly.holder = holder
-		tool.forceMove(holder)
-		tool.transfer_fingerprints_to(holder)
-		holder.a_left = src
-		holder.a_right = tool
-		holder.SetName("[name]-[tool.name] assembly")
-		holder.update_icon()
-		user.put_in_hands(holder)
-		set_secure(TRUE)
-		assembly.set_secure(TRUE)
-		user.visible_message(
-			SPAN_NOTICE("\The [user] attaches \a [tool] to \a [src]."),
-			SPAN_NOTICE("You attach \the [tool] to \the [src]."),
-			range = 3
-		)
-		return TRUE
+/obj/item/device/assembly/attach_assembly(var/obj/item/device/assembly/A, var/mob/user)
+	holder = new/obj/item/device/assembly_holder(get_turf(src))
+	if(holder.attach(A,src,user))
+		to_chat(user, "<span class='notice'>You attach \the [A] to \the [src]!</span>")
+		return 1
+	return 0
 
-	// Screwdriver - Toggle secured
-	if (isScrewdriver(tool))
-		set_secure(!secured)
-		user.visible_message(
-			SPAN_NOTICE("\The [user] adjusts \a [src] with \a [tool]."),
-			SPAN_NOTICE("You adjust \the [src] with \the [tool]. It [secured ? "is now ready to use" : "can now be taken apart"].")
-		)
-		return TRUE
 
-	return ..()
+/obj/item/device/assembly/attackby(obj/item/W as obj, mob/user as mob)
+	if(isassembly(W))
+		var/obj/item/device/assembly/A = W
+		if((!A.secured) && (!secured))
+			attach_assembly(A,user)
+			return
+	if(isScrewdriver(W))
+		if(toggle_secure())
+			to_chat(user, "<span class='notice'>\The [src] is ready!</span>")
+		else
+			to_chat(user, "<span class='notice'>\The [src] can now be attached!</span>")
+		return
+	..()
+	return
 
 
 /obj/item/device/assembly/Process()

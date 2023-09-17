@@ -1,3 +1,6 @@
+/datum/design/item/tool
+	category_items = "Tools and Devices"
+
 /datum/design/item/tool/AssembleDesignName()
 	..()
 	name = "Tool design ([item_name])"
@@ -20,13 +23,13 @@
 	build_path = /obj/item/airlock_brace
 	sort_string = "VAGAC"
 
-/datum/design/item/tool/jack
+/datum/design/item/tool/brace_jack
 	name = "maintenance jack"
 	desc = "A special maintenance tool that can be used to remove airlock braces."
 	id = "bracejack"
 	req_tech = list(TECH_ENGINEERING = 3, TECH_MATERIAL = 2)
 	materials = list(MATERIAL_STEEL = 120)
-	build_path = /obj/item/material/twohanded/jack
+	build_path = /obj/item/crowbar/brace_jack
 	sort_string = "VAGAD"
 
 /datum/design/item/tool/clamp
@@ -91,30 +94,3 @@
 	chemicals = list(/datum/reagent/sodiumchloride = 20, /datum/reagent/acetone = 20)
 	build_path = /obj/item/device/oxycandle
 	sort_string = "VAGAJ"
-
-/datum/design/item/tool/arc_welder
-	name = "arc welding tool"
-	desc = "a portable welder that uses an internal powercell instead of welding fuel."
-	id = "arc_welder"
-	req_tech = list(TECH_ENGINEERING = 3, TECH_POWER = 4)
-	materials = list(MATERIAL_STEEL = 6000, MATERIAL_GLASS = 6000, MATERIAL_ALUMINIUM = 4000, MATERIAL_PHORON = 4000)
-	build_path = /obj/item/weldingtool/electric
-	sort_string = "VAGAK"
-
-/datum/design/item/tool/power_drill
-	name = "power drill"
-	desc = "a portable power drill that can swap between bolt and screw heads for a range of fixings"
-	id = "power_drill"
-	req_tech = list(TECH_ENGINEERING = 4, TECH_POWER = 4)
-	materials = list(MATERIAL_STEEL = 100, MATERIAL_ALUMINIUM = 100, MATERIAL_PLASTIC = 6000)
-	build_path = /obj/item/swapper/power_drill
-	sort_string = "VAGAL"
-
-/datum/design/item/tool/jaws_of_life
-	name = "hydraulic prying tool"
-	desc = "a portable hydraulic rescue tool that can swap between prying and cutting heads for a range of breaching techniques"
-	id = "jaws_of_life"
-	req_tech = list(TECH_ENGINEERING = 5, TECH_POWER = 4)
-	materials = list(MATERIAL_STEEL = 6000, MATERIAL_ALUMINIUM = 1000, MATERIAL_PLASTIC = 750)
-	build_path = /obj/item/swapper/jaws_of_life
-	sort_string = "VAGAM"

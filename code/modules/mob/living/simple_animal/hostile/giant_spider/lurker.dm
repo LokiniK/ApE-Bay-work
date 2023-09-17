@@ -10,16 +10,16 @@
 	icon_living = "lurker"
 	icon_dead = "lurker_dead"
 
-	maxHealth = 45
-	health = 45
+	maxHealth = 100
+	health = 100
 
 	poison_per_bite = 5
 
-	movement_cooldown = 3
+	movement_cooldown = 5
 
 	natural_weapon = /obj/item/natural_weapon/bite/spider/lurker
 	poison_chance = 30
-	poison_type = /datum/reagent/drugs/cryptobiolin
+	poison_type = /datum/reagent/cryptobiolin
 	poison_per_bite = 1
 
 	ai_holder = /datum/ai_holder/simple_animal/melee/hit_and_run
@@ -92,8 +92,6 @@
 
 // Force uncloaking if attacked.
 /mob/living/simple_animal/hostile/giant_spider/lurker/bullet_act(obj/item/projectile/P)
-	if (status_flags & GODMODE)
-		return PROJECTILE_FORCE_MISS
 	. = ..()
 	break_cloak()
 

@@ -1,5 +1,6 @@
 /obj/effect/overmap/visitable/ship/landable/scavver_gantry
 	name = "ITV The Reclaimer"
+	scanner_name = "ITV The Reclaimer"
 	shuttle = "ITV The Reclaimer"
 	desc = "Sensor array detects a small vessel, claiming to be 'ITV The Reclaimer', an 'Armalev Industries Skyfin-E, Exoplanetary Suvival Pod'. Your sensors array describes the vessel exterior as 'irreconcilable' with the exterior of a 'Skyfin-E'"
 	fore_dir = SOUTH
@@ -14,6 +15,7 @@
 
 /obj/effect/overmap/visitable/ship/landable/scavver_gantry/two
 	name = "ITV Vulcan"
+	scanner_name = "ITV Vulcan"
 	shuttle = "ITV Vulcan"
 	desc = "Sensor array detects a tiny vessel, claiming to be 'ITV Vulcan', a utility pod of unknown make."
 	fore_dir = NORTH
@@ -26,6 +28,7 @@
 
 /obj/effect/overmap/visitable/ship/landable/scavver_gantry/three
 	name = "Unmarked shuttle"
+	scanner_name = "Unmarked shuttle"
 	shuttle = "ITV Spiritus"
 	desc = "Sensor array detects a tiny, unmarked vessel."
 	fore_dir = NORTH
@@ -215,28 +218,28 @@
 	landmark_tag = "nav_scavver_gantry_lift_bottom"
 	flags = SLANDMARK_FLAG_AUTOSET
 	base_area = /area/scavver/gantry/down1
-	base_turf = /turf/simulated/floor/plating
+	base_turf = /turf/simulated/floor/airless
 
-/singleton/stock_part_preset/radio/receiver/vent_pump/vulcan
+/decl/stock_part_preset/radio/receiver/vent_pump/vulcan
 	frequency = 1431
 
-/singleton/stock_part_preset/radio/event_transmitter/vent_pump/vulcan
+/decl/stock_part_preset/radio/event_transmitter/vent_pump/vulcan
 	frequency = 1431
 
 /obj/machinery/atmospherics/unary/vent_pump/high_volume/vulcan
 	stock_part_presets = list(
-		/singleton/stock_part_preset/radio/receiver/vent_pump/vulcan = 1,
-		/singleton/stock_part_preset/radio/event_transmitter/vent_pump/vulcan = 1
+		/decl/stock_part_preset/radio/receiver/vent_pump/vulcan = 1,
+		/decl/stock_part_preset/radio/event_transmitter/vent_pump/vulcan = 1
 	)
 
-/singleton/stock_part_preset/radio/receiver/vent_scrubber/vulcan
+/decl/stock_part_preset/radio/receiver/vent_scrubber/vulcan
 	frequency = 1431
 
-/singleton/stock_part_preset/radio/event_transmitter/vent_scrubber/vulcan
+/decl/stock_part_preset/radio/event_transmitter/vent_scrubber/vulcan
 	frequency = 1431
 
 /obj/machinery/atmospherics/unary/vent_scrubber/vulcan
 	stock_part_presets = list(
-		/singleton/stock_part_preset/radio/receiver/vent_scrubber/vulcan = 1,
-		/singleton/stock_part_preset/radio/event_transmitter/vent_scrubber/vulcan = 1
+		/decl/stock_part_preset/radio/receiver/vent_scrubber/vulcan = 1,
+		/decl/stock_part_preset/radio/event_transmitter/vent_scrubber/vulcan = 1
 	)

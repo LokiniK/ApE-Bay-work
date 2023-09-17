@@ -8,7 +8,7 @@
 	var/mob/living/simple_animal/borer/B = has_brain_worms()
 
 	if(B && B.host_brain)
-		to_chat(src, SPAN_DANGER("You withdraw your probosci, releasing control of [B.host_brain]"))
+		to_chat(src, "<span class='danger'>You withdraw your probosci, releasing control of [B.host_brain]</span>")
 
 		B.detatch()
 
@@ -17,7 +17,7 @@
 		verbs -= /mob/living/carbon/proc/spawn_larvae
 
 	else
-		to_chat(src, SPAN_DANGER("ERROR NO BORER OR BRAINMOB DETECTED IN THIS MOB, THIS IS A BUG !"))
+		to_chat(src, "<span class='danger'>ERROR NO BORER OR BRAINMOB DETECTED IN THIS MOB, THIS IS A BUG !</span>")
 
 //Brain slug proc for tormenting the host.
 /mob/living/carbon/proc/punish_host()
@@ -31,12 +31,12 @@
 		return
 
 	if(B.host_brain.ckey)
-		to_chat(src, SPAN_DANGER("You send a punishing spike of psychic agony lancing into your host's brain."))
+		to_chat(src, "<span class='danger'>You send a punishing spike of psychic agony lancing into your host's brain.</span>")
 		if (!can_feel_pain())
-			to_chat(B.host_brain, SPAN_WARNING("You feel a strange sensation as a foreign influence prods your mind."))
-			to_chat(src, SPAN_DANGER("It doesn't seem to be as effective as you hoped."))
+			to_chat(B.host_brain, "<span class='warning'>You feel a strange sensation as a foreign influence prods your mind.</span>")
+			to_chat(src, "<span class='danger'>It doesn't seem to be as effective as you hoped.</span>")
 		else
-			to_chat(B.host_brain, SPAN_DANGER(FONT_LARGE("Horrific, burning agony lances through you, ripping a soundless scream from your trapped mind!")))
+			to_chat(B.host_brain, "<span class='danger'><FONT size=3>Horrific, burning agony lances through you, ripping a soundless scream from your trapped mind!</FONT></span>")
 
 /mob/living/carbon/proc/spawn_larvae()
 	set category = "Abilities"
@@ -49,8 +49,8 @@
 		return
 
 	if(B.chemicals >= 100)
-		to_chat(src, SPAN_DANGER("Your host twitches and quivers as you rapidly excrete a larva from your sluglike body."))
-		visible_message(SPAN_DANGER("\The [src] heaves violently, expelling a rush of vomit and a wriggling, sluglike creature!"))
+		to_chat(src, "<span class='danger'>Your host twitches and quivers as you rapidly excrete a larva from your sluglike body.</span>")
+		visible_message("<span class='danger'>\The [src] heaves violently, expelling a rush of vomit and a wriggling, sluglike creature!</span>")
 		B.chemicals -= 100
 		B.has_reproduced = 1
 
@@ -59,7 +59,7 @@
 		new /mob/living/simple_animal/borer(get_turf(src), B.generation + 1)
 
 	else
-		to_chat(src, SPAN_WARNING("You do not have enough chemicals stored to reproduce."))
+		to_chat(src, "<span class='warning'>You do not have enough chemicals stored to reproduce.</span>")
 		return
 
 /**
@@ -75,13 +75,13 @@
 	var/eat_speed = 100
 	if(can_eat == DEVOUR_FAST)
 		eat_speed = 30
-	src.visible_message(SPAN_DANGER("\The [src] is attempting to devour \the [victim] whole!"))
+	src.visible_message("<span class='danger'>\The [src] is attempting to devour \the [victim] whole!</span>")
 	var/mob/target = victim
 	if(isobj(victim))
 		target = src
-	if(!do_after(src, eat_speed, target, DO_PUBLIC_UNIQUE))
+	if(!do_after(src, eat_speed, target))
 		return FALSE
-	src.visible_message(SPAN_DANGER("\The [src] devours \the [victim] whole!"))
+	src.visible_message("<span class='danger'>\The [src] devours \the [victim] whole!</span>")
 	if(ismob(victim))
 		admin_attack_log(src, victim, "Devoured.", "Was devoured by.", "devoured")
 	else

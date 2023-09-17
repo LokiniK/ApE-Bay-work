@@ -46,12 +46,12 @@
 	. = ..()
 	max_charge *= rating
 
-/obj/item/stock_parts/capacitor/proc/charge(amount)
+/obj/item/stock_parts/capacitor/proc/charge(var/amount)
 	charge += amount
 	if(charge > max_charge)
 		charge = max_charge
 
-/obj/item/stock_parts/capacitor/proc/use(amount)
+/obj/item/stock_parts/capacitor/proc/use(var/amount)
 	if(charge)
 		charge -= amount
 		if(charge < 0)
@@ -93,8 +93,8 @@
 
 /obj/item/stock_parts/capacitor/adv
 	name = "advanced capacitor"
-	desc = "An advanced capacitor used in the construction of a variety of devices."
 	icon_state = "advanced_capacitor"
+	desc = "An advanced capacitor used in the construction of a variety of devices."
 	origin_tech = list(TECH_POWER = 3)
 	rating = 2
 
@@ -102,8 +102,8 @@
 
 /obj/item/stock_parts/scanning_module/phasic
 	name = "phasic scanning module"
-	desc = "A compact, high resolution phasic scanning module used in the construction of certain devices."
 	icon_state = "phasic_scan_module"
+	desc = "A compact, high resolution phasic scanning module used in the construction of certain devices."
 	origin_tech = list(TECH_MAGNET = 5)
 	rating = 3
 	matter = list(MATERIAL_STEEL = 50,MATERIAL_GLASS = 20)
@@ -134,8 +134,8 @@
 
 /obj/item/stock_parts/capacitor/super
 	name = "super capacitor"
-	desc = "A super-high capacity capacitor used in the construction of a variety of devices."
 	icon_state = "super_capacitor"
+	desc = "A super-high capacity capacitor used in the construction of a variety of devices."
 	origin_tech = list(TECH_POWER = 5, TECH_MATERIAL = 4)
 	rating = 3
 

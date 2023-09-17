@@ -1,57 +1,40 @@
 /obj/structure/sign
-	icon = 'icons/obj/structures/decals.dmi'
+	icon = 'icons/obj/decals.dmi'
 	anchored = TRUE
 	opacity = 0
 	density = FALSE
 	layer = ABOVE_WINDOW_LAYER
 	w_class = ITEM_SIZE_NORMAL
 
-/obj/structure/sign/double/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Screwdriver - Block interaction
-	if (isScrewdriver(tool))
-		USE_FEEDBACK_FAILURE("\The [src] cannot be removed.")
-		return TRUE
-
-	return ..()
-
 /obj/structure/sign/ex_act(severity)
 	switch(severity)
-		if(EX_ACT_DEVASTATING)
+		if(1.0)
 			qdel(src)
 			return
-		if(EX_ACT_HEAVY)
+		if(2.0)
 			qdel(src)
 			return
-		if(EX_ACT_LIGHT)
+		if(3.0)
 			qdel(src)
 			return
 		else
 	return
 
-
-/obj/structure/sign/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Scrwedriver - Unfasten sign
-	if (isScrewdriver(tool))
-		var/obj/item/sign/S = new(loc)
+/obj/structure/sign/attackby(obj/item/tool as obj, mob/user as mob)	//deconstruction
+	if(isScrewdriver(tool) && !istype(src, /obj/structure/sign/double))
+		to_chat(user, "You unfasten the sign with your [tool.name].")
+		var/obj/item/sign/S = new(src.loc)
 		S.SetName(name)
 		S.desc = desc
 		S.icon_state = icon_state
 		S.sign_state = icon_state
-		transfer_fingerprints_to(S)
-		user.visible_message(
-			SPAN_NOTICE("\The [user] unfastens \the [src] with \a [tool]."),
-			SPAN_NOTICE("You unfasten \the [src] with \the [tool].")
-		)
-		qdel_self()
-		return TRUE
-
-	return ..()
-
+		qdel(src)
+	else ..()
 
 /obj/item/sign
 	name = "sign"
 	desc = ""
-	icon = 'icons/obj/structures/decals.dmi'
+	icon = 'icons/obj/decals.dmi'
 	w_class = ITEM_SIZE_NORMAL		//big
 	var/sign_state = ""
 
@@ -458,14 +441,14 @@
 /obj/item/sign/medipolma
 	name = "medical diploma"
 	desc = "A fancy print laminated paper that certifies that its bearer is indeed a Doctor of Medicine, graduated from a medical school in one of fringe systems. You don't recognize the name though, and half of latin words they used do not actually exist."
-	icon = 'icons/obj/structures/decals.dmi'
+	icon = 'icons/obj/decals.dmi'
 	icon_state = "goldenplaque"
 	sign_state = "goldenplaque"
 	var/claimant
 
 /obj/item/sign/medipolma/attack_self(mob/user)
 	if(!claimant)
-		to_chat(user, SPAN_NOTICE("You fill in your name in the blanks with a permanent marker."))
+		to_chat(user, "<span class='notice'>You fill in your name in the blanks with a permanent marker.</span>")
 		claimant = user.real_name
 	..()
 

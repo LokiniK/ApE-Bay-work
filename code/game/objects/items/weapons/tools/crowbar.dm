@@ -1,7 +1,7 @@
 /obj/item/crowbar
 	name = "crowbar"
 	desc = "A heavy crowbar of solid steel, good and solid in your hand."
-	icon = 'icons/obj/tools/crowbar.dmi'
+	icon = 'icons/obj/tools.dmi'
 	icon_state = "crowbar"
 	obj_flags = OBJ_FLAG_CONDUCTIBLE
 	slot_flags = SLOT_BELT
@@ -11,7 +11,6 @@
 	throwforce = 7
 	throw_range = 3
 	item_state = "crowbar"
-	base_parry_chance = 15
 	w_class = ITEM_SIZE_NORMAL
 	origin_tech = list(TECH_ENGINEERING = 1)
 	matter = list(MATERIAL_STEEL = 140)
@@ -30,7 +29,6 @@
 	force = 4
 	throwforce = 6
 	throw_range = 5
-	base_parry_chance = 0
 	w_class = ITEM_SIZE_SMALL
 	matter = list(MATERIAL_STEEL = 80)
 
@@ -65,7 +63,7 @@
 		force = initial(force)
 	. = ..()
 
-/obj/item/crowbar/emergency_forcing_tool/IsCrowbar()
+/obj/item/crowbar/emergency_forcing_tool/iscrowbar()//go ham
 	if(ismob(loc))
 		var/mob/M = loc
 		if(M.a_intent && M.a_intent == I_HURT)

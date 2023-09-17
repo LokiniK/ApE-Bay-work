@@ -1,93 +1,88 @@
 /obj/structure/boulder
-	name = "rocky debris"
+	name = "boulder"
 	desc = "Leftover rock from an excavation, it's been partially dug out already but there's still a lot to go."
-	icon = 'icons/obj/boulder.dmi'
+	icon = 'icons/obj/mining.dmi'
 	icon_state = "boulder1"
 	density = TRUE
-	opacity = 1
+	opacity = TRUE
 	anchored = TRUE
 	var/excavation_level = 0
 	var/datum/geosample/geological_data
 	var/datum/artifact_find/artifact_find
 	var/last_act = 0
-
+/*
 /obj/structure/boulder/New()
 	..()
 	icon_state = "boulder[rand(1,4)]"
 	excavation_level = rand(5, 50)
+*/
+/obj/structure/boulder/Initialize(mapload, var/coloration = "#9c9378")
+	icon_state = "boulder[rand(1,6)]"
+	if(coloration)
+		color = coloration
+	excavation_level = rand(5, 50)
+	. = ..()
 
 /obj/structure/boulder/Destroy()
 	qdel(geological_data)
 	qdel(artifact_find)
 	..()
 
+/obj/structure/boulder/attackby(var/obj/item/I, var/mob/user)
+	if(istype(I, /obj/item/device/core_sampler))
+		src.geological_data.artifact_distance = rand(-100,100) / 100
+		src.geological_data.artifact_id = artifact_find.artifact_id
 
-/obj/structure/boulder/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Core Sampler
-	if (istype(tool, /obj/item/device/core_sampler))
-		geological_data.artifact_distance = rand(-100, 100) / 100
-		geological_data.artifact_id = artifact_find.artifact_id
-		var/obj/item/device/core_sampler/core_sampler = tool
-		core_sampler.sample_item(src, user)
-		return TRUE
+		var/obj/item/device/core_sampler/C = I
+		C.sample_item(src, user)
+		return
 
-	// Depth Scanner
-	if (istype(tool, /obj/item/device/depth_scanner))
-		var/obj/item/device/depth_scanner/depth_scanner = tool
-		depth_scanner.scan_atom(user, src)
-		return TRUE
+	if(istype(I, /obj/item/device/depth_scanner))
+		var/obj/item/device/depth_scanner/C = I
+		C.scan_atom(user, src)
+		return
 
-	// Measuring Tape
-	if (istype(tool, /obj/item/device/measuring_tape))
-		user.visible_message(
-			SPAN_NOTICE("\The [user] extends \a [tool] towards \the [src]."),
-			SPAN_NOTICE("You extend \the [tool] towards \the [src].")
-		)
-		if (!user.do_skilled(1.5 SECONDS, SKILL_SCIENCE, src) || !user.use_sanity_check(src, tool))
-			return TRUE
-		to_chat(user, SPAN_INFO("\The [src] has been excavated to a depth of [excavation_level]cm."))
-		return TRUE
+	if(istype(I, /obj/item/device/measuring_tape))
+		var/obj/item/device/measuring_tape/P = I
+		user.visible_message("<span class='notice'>\The [user] extends \the [P] towards \the [src].</span>", "<span class='notice'>You extend \the [P] towards \the [src].</span>")
+		if(do_after(user, 15))
+			to_chat(user, "<span class='notice'>\The [src] has been excavated to a depth of [src.excavation_level]cm.</span>")
+		return
 
-	// Pickaxe - Excavate
-	if (istype(tool, /obj/item/pickaxe))
-		var/obj/item/pickaxe/pickaxe = tool
-		user.visible_message(
-			SPAN_NOTICE("\The [user] starts [pickaxe.drill_verb] \the [src] with \a [pickaxe]."),
-			SPAN_NOTICE("You start [pickaxe.drill_verb] \the [src] with \the [pickaxe].")
-		)
-		if (!do_after(user, pickaxe.digspeed, src, DO_PUBLIC_UNIQUE) || !user.use_sanity_check(src, tool))
-			return TRUE
-		user.visible_message(
-			SPAN_NOTICE("\The [user] finished [pickaxe.drill_verb] \the [src] with \a [pickaxe]."),
-			SPAN_NOTICE("You finish [pickaxe.drill_verb] \the [src] with \the [pickaxe].")
-		)
-		excavation_level += pickaxe.excavation_amount
-		if (excavation_level > 200)
-			visible_message(
-				SPAN_WARNING("\The [src] suddenly crumbles away. Any secrets it was holding are long gone.")
-			)
-			qdel_self()
-			return TRUE
-		if (prob(excavation_level))
-			if (artifact_find)
+	if(istype(I, /obj/item/pickaxe))
+		var/obj/item/pickaxe/P = I
+
+		if(last_act + P.digspeed > world.time)//prevents message spam
+			return
+		last_act = world.time
+
+		to_chat(user, "<span class='warning'>You start [P.drill_verb] [src].</span>")
+
+		if(!do_after(user, P.digspeed))
+			return
+
+		to_chat(user, "<span class='notice'>You finish [P.drill_verb] [src].</span>")
+		excavation_level += P.excavation_amount
+
+		if(excavation_level > 200)
+			//failure
+			user.visible_message("<span class='warning'>\The [src] suddenly crumbles away.</span>", "<span class='warning'>\The [src] has disintegrated under your onslaught, any secrets it was holding are long gone.</span>")
+			qdel(src)
+			return
+
+		if(prob(excavation_level))
+			//success
+			if(artifact_find)
 				var/spawn_type = artifact_find.artifact_find_type
-				var/obj/artifact = new spawn_type(get_turf(src))
-				if (istype(artifact, /obj/machinery/artifact))
-					var/obj/machinery/artifact/machine = artifact
-					if (machine.my_effect)
-						machine.my_effect.artifact_id = artifact_find.artifact_id
-				visible_message(
-					SPAN_WARNING("\The [src] suddenly crumbles away, revealing \a [artifact].")
-				)
+				var/obj/O = new spawn_type(get_turf(src))
+				if(istype(O, /obj/machinery/artifact))
+					var/obj/machinery/artifact/X = O
+					if(X.my_effect)
+						X.my_effect.artifact_id = artifact_find.artifact_id
+				src.visible_message("<span class='warning'>\The [src] suddenly crumbles away.</span>")
 			else
-				visible_message(
-					SPAN_WARNING("\The [src] suddenly crumbles away, but there was nothing of interest inside.")
-				)
-			qdel_self()
-		return TRUE
-
-	return ..()
-
+				user.visible_message("<span class='warning'>\The [src] suddenly crumbles away.</span>", "<span class='notice'>\The [src] has been whittled away under your careful excavation, but there was nothing of interest inside.</span>")
+			qdel(src)
 
 /obj/structure/boulder/Bumped(AM)
 	. = ..()

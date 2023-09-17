@@ -3,24 +3,22 @@
 //Do (almost) nothing - indev placeholder for switch case implementations etc
 #define NOOP (.=.);
 
+#define list_find(L, needle, LIMITS...) L.Find(needle, LIMITS)
+
 #define PUBLIC_GAME_MODE SSticker.master_mode
 
-#define CLAMP01(x) clamp(x, 0, 1)
+#define Clamp(value, low, high) (value <= low ? low : (value >= high ? high : value))
+#define CLAMP01(x) 		(Clamp(x, 0, 1))
 
-/**
- * Get the turf that `A` resides in, regardless of any containers.
- *
- * Use in favor of `A.loc` or `src.loc` so that things work correctly when
- * stored inside an inventory, locker, or other container.
- */
+var/const/POSITIVE_INFINITY = 1#INF // win: 1.#INF, lin: inf
+var/const/NEGATIVE_INFINITY = -1#INF // win: -1.#INF, lin: -inf
+//var/const/POSITIVE_NAN = -(1#INF/1#INF) // win: 1.#QNAN, lin: nan -- demonstration of creation, but not useful
+//var/const/NEGATIVE_NAN = (1#INF/1#INF) //win: -1.#IND, lin: -nan -- demonstration of creation, but not useful
+#define isfinite(N) (isnum(N) && ((N) == (N)) && ((N) != POSITIVE_INFINITY) && ((N) != NEGATIVE_INFINITY))
+
+#define isnan(N) (isnum(N) && (N) != (N))
+
 #define get_turf(A) get_step(A,0)
-
-/**
- * Get the ultimate area of `A`, similarly to [get_turf].
- *
- * Use instead of `A.loc.loc`.
- */
-#define get_area(A) (isarea(A) ? A : get_step(A, 0)?.loc)
 
 #define get_x(A) (get_step(A, 0)?.x || 0)
 
@@ -36,11 +34,7 @@
 
 #define isairlock(A) istype(A, /obj/machinery/door/airlock)
 
-#define isatom(A) (isloc(A) && !isarea(A))
-
-#define isprojectile(A) istype(A, /obj/item/projectile)
-
-#define isbeam(A) istype(A, /obj/item/projectile/beam)
+#define isatom(A) isloc(A)
 
 #define isbrain(A) istype(A, /mob/living/carbon/brain)
 
@@ -50,11 +44,9 @@
 
 #define isclient(A) istype(A, /client)
 
-#define iscorgi(A) istype(A, /mob/living/simple_animal/passive/corgi)
+#define iscorgi(A) istype(A, /mob/living/simple_animal/friendly/corgi)
 
-#define isdatum(A) istype(A, /datum)
-
-#define isdrone(A) istype(A, /mob/living/silicon/robot/drone)
+#define is_drone(A) istype(A, /mob/living/silicon/robot/drone)
 
 #define isEye(A) istype(A, /mob/observer/eye)
 
@@ -66,7 +58,7 @@
 
 #define isliving(A) istype(A, /mob/living)
 
-#define ismouse(A) istype(A, /mob/living/simple_animal/passive/mouse)
+#define ismouse(A) istype(A, /mob/living/simple_animal/friendly/mouse)
 
 #define isnewplayer(A) istype(A, /mob/new_player)
 
@@ -84,8 +76,6 @@
 
 #define isspaceturf(A) istype(A, /turf/space)
 
-#define isopenturf(A) istype(A, /turf/simulated/open)
-
 #define ispAI(A) istype(A, /mob/living/silicon/pai)
 
 #define isrobot(A) istype(A, /mob/living/silicon/robot)
@@ -95,6 +85,8 @@
 #define ismachinerestricted(A) (issilicon(A) && A.machine_restriction)
 
 #define isslime(A) istype(A, /mob/living/carbon/slime)
+
+#define ischorus(A) istype(A, /mob/living/carbon/alien/chorus)
 
 #define isunderwear(A) istype(A, /obj/item/underwear)
 
@@ -106,7 +98,7 @@
 
 #define isopenspace(A) istype(A, /turf/simulated/open)
 
-#define isplunger(A) istype(A, /obj/item/clothing/mask/plunger) || istype(A, /obj/item/device/plunger/robot)
+#define isPlunger(A) istype(A, /obj/item/clothing/mask/plunger) || istype(A, /obj/item/device/plunger/robot)
 
 #define isadmin(X) (check_rights(R_ADMIN, 0, (X)) != 0)
 
@@ -124,7 +116,7 @@
 #define to_world_log(message)                 to_target(world.log, message)
 #define sound_to(target, sound)               to_target(target, sound)
 #define image_to(target, image)               to_target(target, image)
-#define show_browser(target, content, title)  to_target(target, browse(content, title))
+#define show_browser(target, content, title)  to_target(target, browse(parse_html_inf(content), title))
 #define close_browser(target, title)          to_target(target, browse(null, title))
 #define send_rsc(target, content, title)      to_target(target, browse_rsc(content, title))
 #define send_link(target, url)                to_target(target, link(url))
@@ -151,11 +143,13 @@
 
 #define QDEL_NULL_LIST(x) if(x) { for(var/y in x) { qdel(y) }}; if(x) {x.Cut(); x = null; } // Second x check to handle items that LAZYREMOVE on qdel.
 
-#define QDEL_NULL_ASSOC_LIST(x) if(x) { for(var/y in x) { qdel(x[y]) }}; if(x) {x.Cut(); x = null; }
-
 #define QDEL_NULL(x) if(x) { qdel(x) ; x = null }
 
-#define QDEL_IN(item, time) addtimer(new Callback(item, /datum/proc/qdel_self), time, TIMER_STOPPABLE)
+#define QDEL_LIST_ASSOC(L) if(L) { for(var/I in L) { qdel(L[I]); qdel(I); } L.Cut(); }
+
+#define QDEL_LIST_ASSOC_VAL(L) if(L) { for(var/I in L) qdel(L[I]); L.Cut(); }
+
+#define QDEL_IN(item, time) addtimer(CALLBACK(GLOBAL_PROC, .proc/qdel, item), time, TIMER_STOPPABLE)
 
 #define DROP_NULL(x) if(x) { x.dropInto(loc); x = null; }
 
@@ -164,143 +158,51 @@
 #define ARGS_DEBUG log_debug("[__FILE__] - [__LINE__]") ; for(var/arg in args) { log_debug("\t[log_info_line(arg)]") }
 
 // Insert an object A into a sorted list using cmp_proc (/code/_helpers/cmp.dm) for comparison.
-#define ADD_SORTED(list, A, cmp_proc) if(!length(list)) {list.Add(A)} else {list.Insert(FindElementIndex(A, list, cmp_proc), A)}
+#define ADD_SORTED(list, A, cmp_proc) if(!list.len) {list.Add(A)} else {list.Insert(FindElementIndex(A, list, cmp_proc), A)}
 
 // Spawns multiple objects of the same type
 #define cast_new(type, num, args...) if((num) == 1) { new type(args) } else { for(var/i=0;i<(num),i++) { new type(args) } }
 
 #define JOINTEXT(X) jointext(X, null)
 
-#define SPAN_CLASS(class, X) "<span class='[class]'>[X]</span>"
+#define SPAN_ITALIC(X) "<span class='italic'>[X]</span>"
+
+#define SPAN_BOLD(X) "<span class='bold'>[X]</span>"
+
+#define SPAN_BOLDANNOUNCE(X) "<span class='boldannounce'>[X]</span>"
+
+#define SPAN_NOTICE(X) "<span class='notice'>[X]</span>"
+
+#define SPAN_WARNING(X) "<span class='warning'>[X]</span>"
+
+#define SPAN_GOOD(X) "<span class='good'>[X]</span>"
+
+#define SPAN_BAD(X) "<span class='bad'>[X]</span>"
+
+#define SPAN_DANGER(X) "<span class='danger'>[X]</span>"
+
+#define SPAN_OCCULT(X) "<span class='cult'>[X]</span>"
+
+#define SPAN_MFAUNA(X) "<span class='mfauna'>[X]</span>"
+
+#define SPAN_SUBTLE(X) "<span class='subtle'>[X]</span>"
+
+#define SPAN_INFO(X) "<span class='info'>[X]</span>"
+
+#define SPAN_DEBUG(X) "<span class='debug'>[X]</span>"
 
 #define SPAN_STYLE(style, X) "<span style=\"[style]\">[X]</span>"
 
-#define SPAN_ITALIC(X) SPAN_CLASS("italic", "[X]")
+#define FONT_COLORED(color, text) "<font color='[color]'>[text]</font>"
 
-#define SPAN_BOLD(X) SPAN_CLASS("bold", "[X]")
+#define FONT_SMALL(X) "<font size='1'>[X]</font>"
 
-#define SPAN_NOTICE(X) SPAN_CLASS("notice", "[X]")
+#define FONT_NORMAL(X) "<font size='2'>[X]</font>"
 
-#define SPAN_WARNING(X) SPAN_CLASS("warning", "[X]")
+#define FONT_LARGE(X) "<font size='3'>[X]</font>"
 
-#define SPAN_GOOD(X) SPAN_CLASS("good", "[X]")
+#define FONT_HUGE(X) "<font size='4'>[X]</font>"
 
-#define SPAN_BAD(X) SPAN_CLASS("bad", "[X]")
-
-#define SPAN_DANGER(X) SPAN_CLASS("danger", "[X]")
-
-#define SPAN_OCCULT(X) SPAN_CLASS("cult", "[X]")
-
-#define SPAN_MFAUNA(X) SPAN_CLASS("mfauna", "[X]")
-
-#define SPAN_SUBTLE(X) SPAN_CLASS("subtle", "[X]")
-
-#define SPAN_INFO(X) SPAN_CLASS("info", "[X]")
-
-#define STYLE_SMALLFONTS(X, S, C1) SPAN_STYLE("font-family: 'Small Fonts'; color: [C1]; font-size: [S]px", "[X]")
-
-#define STYLE_SMALLFONTS_OUTLINE(X, S, C1, C2) SPAN_STYLE("font-family: 'Small Fonts'; color: [C1]; -dm-text-outline: 1 [C2]; font-size: [S]px", "[X]")
-
-#define SPAN_DEBUG(X) SPAN_CLASS("debug", "[X]")
-
-#define SPAN_COLOR(color, text) SPAN_STYLE("color: [color]", "[text]")
-
-#define SPAN_SIZE(size, text) SPAN_STYLE("font-size: [size]", "[text]")
-
-#define FONT_SMALL(X) SPAN_SIZE("10px", "[X]")
-
-#define FONT_NORMAL(X) SPAN_SIZE("13px", "[X]")
-
-#define FONT_LARGE(X) SPAN_SIZE("16px", "[X]")
-
-#define FONT_HUGE(X) SPAN_SIZE("18px", "[X]")
-
-#define FONT_GIANT(X) SPAN_SIZE("24px", "[X]")
+#define FONT_GIANT(X) "<font size='5'>[X]</font>"
 
 #define crash_with(X) crash_at(X, __FILE__, __LINE__)
-
-#define TO_HEX_DIGIT(n) ascii2text((n&15) + ((n&15)<10 ? 48 : 87))
-
-
-/// Semantic define for a 0 int intended for use as a bitfield
-#define EMPTY_BITFIELD 0
-
-
-/// Right-shift of INT by BITS
-#define SHIFTR(INT, BITS) ((INT) >> (BITS))
-
-
-/// Left-shift of INT by BITS
-#define SHIFTL(INT, BITS) ((INT) << (BITS))
-
-
-/// Convenience define for nth-bit flags, 0-indexed
-#define FLAG(BIT) SHIFTL(1, BIT)
-
-
-/// Test bit at index BIT is set in FIELD
-#define GET_BIT(FIELD, BIT) ((FIELD) & FLAG(BIT))
-
-
-/// Test bit at index BIT is set in FIELD; semantic alias of GET_BIT
-#define HAS_BIT(FIELD, BIT) GET_BIT(FIELD, BIT)
-
-
-/// Set bit at index BIT in FIELD
-#define SET_BIT(FIELD, BIT) ((FIELD) |= FLAG(BIT))
-
-
-/// Unset bit at index BIT in FIELD
-#define CLEAR_BIT(FIELD, BIT) ((FIELD) &= ~FLAG(BIT))
-
-
-/// Flip bit at index BIT in FIELD
-#define FLIP_BIT(FIELD, BIT) ((FIELD) ^= FLAG(BIT))
-
-
-/// Test any bits of MASK are set in FIELD
-#define GET_FLAGS(FIELD, MASK) ((FIELD) & (MASK))
-
-
-/// Test all bits of MASK are set in FIELD
-#define HAS_FLAGS(FIELD, MASK) (((FIELD) & (MASK)) == (MASK))
-
-
-/// Set bits of MASK in FIELD
-#define SET_FLAGS(FIELD, MASK) ((FIELD) |= (MASK))
-
-
-/// Unset bits of MASK in FIELD
-#define CLEAR_FLAGS(FIELD, MASK) ((FIELD) &= ~(MASK))
-
-
-/// Flip bits of MASK in FIELD
-#define FLIP_FLAGS(FIELD, MASK) ((FIELD) ^= (MASK))
-
-
-#define hex2num(hex) (text2num(hex, 16) || 0)
-
-
-#define num2hex(num) num2text(num, 1, 16)
-
-
-/// Generate random hex up to char length nibbles
-/proc/randhex(nibbles)
-	for (var/i = 1 to nibbles)
-		. += num2text(rand(0, 15), 1, 16)
-
-
-/// Increase the size of L by 1 at the end. Is the old last entry index.
-#define LIST_INC(L) ((L).len++)
-
-/// Increase the size of L by 1 at the end. Is the new last entry index.
-#define LIST_PRE_INC(L) (++(L).len)
-
-/// Decrease the size of L by 1 from the end. Is the old last entry index.
-#define LIST_DEC(L) ((L).len--)
-
-/// Decrease the size of L by 1 from the end. Is the new last entry index.
-#define LIST_PRE_DEC(L) (--(L).len)
-
-/// Explicitly set the length of L to NEWLEN, adding nulls or dropping entries. Is the same value as NEWLEN.
-#define LIST_RESIZE(L, NEWLEN) ((L).len = (NEWLEN))

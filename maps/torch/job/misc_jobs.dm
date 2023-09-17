@@ -2,6 +2,7 @@
 Synthetic
 ********/
 
+
 /datum/job/cyborg
 	total_positions = 3
 	spawn_positions = 3
@@ -31,17 +32,18 @@ Civilian
 	economic_power = 6
 	announced = FALSE
 	alt_titles = list(
-		"Journalist" = /singleton/hierarchy/outfit/job/torch/passenger/passenger/journalist,
+		"Journalist" = /decl/hierarchy/outfit/job/torch/passenger/passenger/journalist,
 		"Historian",
 		"Botanist",
-		"Investor" = /singleton/hierarchy/outfit/job/torch/passenger/passenger/investor,
+		"Investor" = /decl/hierarchy/outfit/job/torch/passenger/passenger/investor,
+		"Psychologist" = /decl/hierarchy/outfit/job/torch/passenger/passenger/psychologist,
 		"Naturalist",
 		"Ecologist",
 		"Entertainer",
 		"Independent Observer",
 		"Sociologist",
 		"Trainer")
-	outfit_type = /singleton/hierarchy/outfit/job/torch/passenger/passenger
+	outfit_type = /decl/hierarchy/outfit/job/torch/passenger/passenger
 	allowed_branches = list(/datum/mil_branch/civilian)
 	allowed_ranks = list(
 		/datum/mil_rank/civ/civ,
@@ -61,7 +63,7 @@ Civilian
 	ideal_character_age = 30
 	minimal_player_age = 0
 	create_record = 0
-	outfit_type = /singleton/hierarchy/outfit/job/torch/merchant
+	outfit_type = /decl/hierarchy/outfit/job/torch/merchant
 	allowed_branches = list(
 		/datum/mil_branch/civilian,
 		/datum/mil_branch/alien
@@ -73,7 +75,7 @@ Civilian
 	latejoin_at_spawnpoints = 1
 	access = list(access_merchant)
 	announced = FALSE
-	min_skill = list(   SKILL_FINANCE = SKILL_TRAINED,
+	min_skill = list(   SKILL_FINANCE = SKILL_ADEPT,
 	                    SKILL_PILOT	  = SKILL_BASIC)
 
 	max_skill = list(   SKILL_PILOT       = SKILL_MAX)

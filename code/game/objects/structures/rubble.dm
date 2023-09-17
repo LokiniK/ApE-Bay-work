@@ -1,18 +1,20 @@
 /obj/structure/rubble
 	name = "pile of rubble"
 	desc = "One man's garbage is another man's treasure."
-	icon = 'icons/obj/structures/rubble.dmi'
+	icon = 'infinity/icons/obj/rubble.dmi' // inf-dev
 	icon_state = "base"
-	appearance_flags = DEFAULT_APPEARANCE_FLAGS | PIXEL_SCALE
-	opacity = 1
+	appearance_flags = PIXEL_SCALE
+	opacity = TRUE
 	density = TRUE
 	anchored = TRUE
-	health_max = 40
 
 	var/list/loot = list(/obj/item/cell,/obj/item/stack/material/iron,/obj/item/stack/material/rods)
 	var/lootleft = 1
 	var/emptyprob = 95
+	var/health = 40
 	var/is_rummaging = 0
+
+//	color = "#54362e" // inf-dev
 
 /obj/structure/rubble/New()
 	if(prob(emptyprob))
@@ -27,7 +29,8 @@
 	overlays.Cut()
 	var/list/parts = list()
 	for(var/i = 1 to 7)
-		var/image/I = image(icon,"rubble[rand(1,15)]")
+		var/image/I = image(icon,"rubble[rand(1,76)]")
+//		I.color = "#54362e" // inf-dev
 		if(prob(10))
 			var/atom/A = pick(loot)
 			if(initial(A.icon) && initial(A.icon_state))
@@ -36,10 +39,12 @@
 				I.color = initial(A.color)
 			if(!lootleft)
 				I.color = "#54362e"
-		I.appearance_flags = DEFAULT_APPEARANCE_FLAGS | PIXEL_SCALE
+		I.appearance_flags = PIXEL_SCALE
 		I.pixel_x = rand(-16,16)
 		I.pixel_y = rand(-16,16)
-		I.SetTransform(rotation = rand(0,360))
+		var/matrix/M = matrix()
+		M.Turn(rand(0,360))
+		I.transform = M
 		parts += I
 	overlays = parts
 	if(lootleft)
@@ -48,47 +53,49 @@
 /obj/structure/rubble/attack_hand(mob/user)
 	if(!is_rummaging)
 		if(!lootleft)
-			to_chat(user, SPAN_WARNING("There's nothing left in this one but unusable garbage..."))
+			to_chat(user, "<span class='warning'>There's nothing left in this one but unusable garbage...</span>")
 			return
 		visible_message("[user] starts rummaging through \the [src].")
 		is_rummaging = 1
-		if(do_after(user, 3 SECONDS, src, DO_PUBLIC_UNIQUE))
+		if(do_after(user, 30))
 			var/obj/item/booty = pickweight(loot)
 			booty = new booty(loc)
 			lootleft--
 			update_icon()
-			to_chat(user, SPAN_NOTICE("You find \a [booty] and pull it carefully out of \the [src]."))
+			to_chat(user, "<span class='notice'>You find \a [booty] and pull it carefully out of \the [src].</span>")
+			new /obj/item/scrap_lump(loc) // inf-dev
 		is_rummaging = 0
 	else
-		to_chat(user, SPAN_WARNING("Someone is already rummaging here!"))
+		to_chat(user, "<span class='warning'>Someone is already rummaging here!</span>")
 
-
-/obj/structure/rubble/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Pickaxe - Clear rubble
-	if (istype(tool, /obj/item/pickaxe))
-		var/obj/item/pickaxe/pickaxe = tool
-		user.visible_message(
-			SPAN_NOTICE("\The [user] starts clearing away \the [src] with \a [tool]."),
-			SPAN_NOTICE("You start clearing away \the [src] with \the [tool].")
-		)
-		if (!user.do_skilled(pickaxe.digspeed, SKILL_HAULING, src) || !user.use_sanity_check(src, tool))
-			return TRUE
-		if (lootleft && prob(1))
-			var/booty = pickweight(loot)
-			new booty(loc)
-		user.visible_message(
-			SPAN_NOTICE("\The [user] clears away \the [src] with \a [tool]."),
-			SPAN_NOTICE("You clear away \the [src] with \the [tool].")
-		)
-		qdel_self()
-		return TRUE
-
-	return ..()
-
-
-/obj/structure/rubble/on_death()
-	visible_message(SPAN_WARNING("\The [src] breaks apart!"))
-	qdel(src)
+/obj/structure/rubble/attackby(var/obj/item/I, var/mob/user)
+	if (istype(I, /obj/item/pickaxe))
+		var/obj/item/pickaxe/P = I
+		visible_message("[user] starts clearing away \the [src].")
+		if(do_after(user,P.digspeed, src))
+			visible_message("[user] clears away \the [src].")
+			if(lootleft && prob(1))
+				var/obj/item/booty = pickweight(loot)
+				booty = new booty(loc)
+			qdel(src)
+	// infinity ahead
+	if (istype(I, /obj/item/shovel))
+		visible_message("[user] starts clearing away \the [src].")
+		if(do_after(user, 70, src))
+			visible_message("[user] clears away \the [src].")
+			if(lootleft && prob(1))
+				var/obj/item/booty = pick(loot)
+				booty = new booty(loc)
+			new /obj/item/scrap_lump(loc)
+			qdel(src)
+	// infinity end
+	else
+		..()
+		health -= I.force
+		if(health < 1)
+			visible_message("[user] clears away \the [src].")
+			new /obj/item/scrap_lump(loc) // inf-dev
+			qdel(src)
 
 /obj/structure/rubble/house
 	loot = list(/obj/item/archaeological_find/bowl,

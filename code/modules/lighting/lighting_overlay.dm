@@ -1,4 +1,4 @@
-var/global/total_lighting_overlays = 0
+/var/total_lighting_overlays = 0
 /atom/movable/lighting_overlay
 	name = ""
 	mouse_opacity = 0
@@ -11,8 +11,9 @@ var/global/total_lighting_overlays = 0
 	color = LIGHTING_BASE_MATRIX
 	icon_state = "light1"
 	blend_mode = BLEND_OVERLAY
+	vis_flags = VIS_HIDE
 
-	appearance_flags = DEFAULT_APPEARANCE_FLAGS
+	appearance_flags = 0
 
 	var/lum_r = 0
 	var/lum_g = 0
@@ -20,20 +21,26 @@ var/global/total_lighting_overlays = 0
 
 	var/needs_update = FALSE
 
-/atom/movable/lighting_overlay/Initialize(mapload, no_update)
-	var/turf/turf = loc
-	if (!turf.dynamic_lighting)
-		atom_flags |= ATOM_FLAG_INITIALIZED
-		return INITIALIZE_HINT_QDEL
-	. = ..()
-	verbs.Cut()
-	total_lighting_overlays++
-	turf.lighting_overlay = src
-	turf.luminosity = 0
-	if (no_update)
-		return
-	update_overlay()
+/atom/movable/lighting_overlay/Initialize()
+	// doesn't need special init
+	SHOULD_CALL_PARENT(FALSE)
+	atom_flags |= ATOM_FLAG_INITIALIZED
+	return INITIALIZE_HINT_NORMAL
 
+/atom/movable/lighting_overlay/New(var/atom/loc, var/no_update = FALSE)
+	var/turf/T = loc //If this runtimes atleast we'll know what's creating overlays outside of turfs.
+	if(T.dynamic_lighting)
+		. = ..()
+		verbs.Cut()
+		total_lighting_overlays++
+
+		T.lighting_overlay = src
+		T.luminosity = 0
+		if(no_update)
+			return
+		update_overlay()
+	else
+		qdel(src)
 
 /atom/movable/lighting_overlay/proc/update_overlay()
 	set waitfor = FALSE
@@ -91,11 +98,11 @@ var/global/total_lighting_overlays = 0
 	var/set_luminosity = max > 1e-6
 	#endif
 
-	if((rr & gr & br & ar) && (rg + gg + bg + ag + rb + gb + bb + ab == 8))
+	/* if((rr & gr & br & ar) && (rg + gg + bg + ag + rb + gb + bb + ab == 8)) // Черные тайлы не оч. Да и проверка касается всего. ~bear1ake
 	//anything that passes the first case is very likely to pass the second, and addition is a little faster in this case
 		icon_state = "transparent"
 		color = null
-	else if(!set_luminosity)
+	else */if(!set_luminosity)
 		icon_state = LIGHTING_ICON_STATE_DARK
 		color = null
 	else

@@ -56,7 +56,7 @@
 		return 0
 
 	if(!holder.cell.check_charge(use_power_cost * CELLRATE))
-		to_chat(holder.wearer,SPAN_WARNING("Not enough stored power."))
+		to_chat(holder.wearer,"<span class='warning'>Not enough stored power.</span>")
 		return 0
 
 	if(!target)
@@ -101,7 +101,7 @@
 		list("EMP grenade", "EMP grenade", /obj/item/grenade/empgrenade, 3),
 		)
 
-/obj/item/rig_module/grenade_launcher/accepts_item(obj/item/input_device, mob/living/user)
+/obj/item/rig_module/grenade_launcher/accepts_item(var/obj/item/input_device, var/mob/living/user)
 
 	if(!istype(input_device) || !istype(user))
 		return 0
@@ -117,10 +117,10 @@
 		return 0
 
 	if(accepted_item.charges >= 5)
-		to_chat(user, SPAN_DANGER("Another grenade of that type will not fit into the module."))
+		to_chat(user, "<span class='danger'>Another grenade of that type will not fit into the module.</span>")
 		return 0
 
-	to_chat(user, SPAN_INFO("<b>You slot \the [input_device] into the suit module.</b>"))
+	to_chat(user, "<span class='info'><b>You slot \the [input_device] into the suit module.</b></span>")
 	qdel(input_device)
 	accepted_item.charges++
 	return 1
@@ -136,7 +136,7 @@
 	var/mob/living/carbon/human/H = holder.wearer
 
 	if(!charge_selected)
-		to_chat(H, SPAN_DANGER("You have not selected a grenade type."))
+		to_chat(H, "<span class='danger'>You have not selected a grenade type.</span>")
 		return 0
 
 	var/datum/rig_charge/charge = charges[charge_selected]
@@ -145,12 +145,12 @@
 		return 0
 
 	if(charge.charges <= 0)
-		to_chat(H, SPAN_DANGER("Insufficient grenades!"))
+		to_chat(H, "<span class='danger'>Insufficient grenades!</span>")
 		return 0
 
 	charge.charges--
 	var/obj/item/grenade/new_grenade = new charge.product_type(get_turf(H))
-	H.visible_message(SPAN_DANGER("[H] launches \a [new_grenade]!"))
+	H.visible_message("<span class='danger'>[H] launches \a [new_grenade]!</span>")
 	log_and_message_admins("fired a grenade ([new_grenade.name]) from a rigsuit grenade launcher.")
 	new_grenade.activate(H)
 	new_grenade.throw_at(target,fire_force,fire_distance)
@@ -214,6 +214,10 @@
 	if(ispath(gun))
 		gun = new gun(src)
 		gun.canremove = 0
+
+/obj/item/rig_module/mounted/Destroy()
+	QDEL_NULL(gun)
+	. = ..()
 
 /obj/item/rig_module/mounted/engage(atom/target)
 
@@ -323,7 +327,7 @@
 
 	if(holder && holder.wearer)
 		if(!(locate(/obj/item/melee/energy/blade) in holder.wearer))
-			deactivate()
+//inf			deactivate()
 			return 0
 
 	return ..()
@@ -331,10 +335,19 @@
 /obj/item/rig_module/mounted/energy_blade/activate()
 	var/mob/living/M = holder.wearer
 
-	if (!M.HasFreeHand())
-		to_chat(M, SPAN_DANGER("Your hands are full."))
+	if(M.l_hand && M.r_hand)
+		to_chat(M, "<span class='danger'>Your hands are full.</span>")
 		deactivate()
 		return
+
+	// infinity ahead
+	if(M.back && istype(M.back, /obj/item/rig/light/ninja))
+		var/obj/item/rig/light/ninja/rig = M.back
+		if(rig)
+			var/obj/item/rig_module/stealth_field/S = locate() in rig.installed_modules
+			if(S && M.is_cloaked())
+				S.deactivate()
+	// infinity end
 
 	var/obj/item/melee/energy/blade/blade = new(M)
 	blade.creator = M
@@ -383,15 +396,15 @@
 	if(target)
 		var/obj/item/firing = new fabrication_type()
 		firing.dropInto(loc)
-		H.visible_message(SPAN_DANGER("[H] launches \a [firing]!"))
+		H.visible_message("<span class='danger'>[H] launches \a [firing]!</span>")
 		firing.throw_at(target,fire_force,fire_distance)
 	else
-		if (!H.HasFreeHand())
-			to_chat(H, SPAN_DANGER("Your hands are full."))
+		if(H.l_hand && H.r_hand)
+			to_chat(H, "<span class='danger'>Your hands are full.</span>")
 		else
 			var/obj/item/new_weapon = new fabrication_type()
 			new_weapon.forceMove(H)
-			to_chat(H, SPAN_INFO("<b>You quickly fabricate \a [new_weapon].</b>"))
+			to_chat(H, "<span class='info'><b>You quickly fabricate \a [new_weapon].</b></span>")
 			H.put_in_hands(new_weapon)
 
 	return 1

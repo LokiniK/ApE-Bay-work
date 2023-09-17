@@ -82,16 +82,15 @@
 			src.close(M)
 	return 1
 
-/obj/item/storage/internal/Adjacent(atom/neighbor)
+/obj/item/storage/internal/Adjacent(var/atom/neighbor)
 	return master_item.Adjacent(neighbor)
 
 // Used by webbings, coat pockets, etc
-/obj/item/storage/internal/pockets/New(newloc, slots, slot_size)
+/obj/item/storage/internal/pockets/New(var/newloc, var/slots, var/slot_size)
 	storage_slots = slots
 	max_w_class = slot_size
 	..()
 
-/obj/item/storage/internal/pouch/New(newloc, storage_space, max_w_class)
+/obj/item/storage/internal/pouch/New(var/newloc, var/storage_space)
 	max_storage_space = storage_space
-	src.max_w_class = max_w_class || src.max_w_class
 	..()

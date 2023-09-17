@@ -1,5 +1,6 @@
 /datum/design/item/medical
 	materials = list(MATERIAL_STEEL = 30, MATERIAL_GLASS = 20)
+	category_items = "Medical"
 
 /datum/design/item/medical/AssembleDesignName()
 	..()
@@ -65,15 +66,6 @@
 	build_path = /obj/item/reagent_containers/hypospray/vial
 	sort_string = "MAEAA"
 
-/datum/design/item/weapon/storage/box/freezer
-	name = "Portable Freezer"
-	desc = "This nifty shock-resistant device will keep your 'groceries' nice and non-spoiled."
-	id = "freezer"
-	req_tech = list(TECH_MATERIAL = 3, TECH_POWER = 2)
-	materials = list(MATERIAL_PLASTIC = 350)
-	build_path = /obj/item/storage/box/freezer
-	sort_string = "MAFAA"
-
 /datum/design/item/medical/cryobag
 	desc = "A folded, reusable bag designed to prevent additional damage to an occupant, especially useful if short on time or in \
 	a hostile environment."
@@ -81,4 +73,4 @@
 	req_tech = list(TECH_MATERIAL = 6, TECH_BIO = 6)
 	materials = list(MATERIAL_PLASTIC = 15000, MATERIAL_GLASS = 15000, MATERIAL_SILVER = 5000, MATERIAL_GOLD = 1000)
 	build_path = /obj/item/bodybag/cryobag
-	sort_string = "MAGAA"
+	sort_string = "MAFAA"

@@ -44,7 +44,9 @@
 	pref.lastchangelog	= sanitize_text(pref.lastchangelog, initial(pref.lastchangelog))
 	pref.default_slot	= sanitize_integer(pref.default_slot, 1, config.character_slots, initial(pref.default_slot))
 
-/datum/category_item/player_setup_item/player_global/settings/content(mob/user)
+	pref.lastchangelog_infinity = sanitize_text(pref.lastchangelog_infinity, initial(pref.lastchangelog_infinity))
+
+/datum/category_item/player_setup_item/player_global/settings/content(var/mob/user)
 	. = list()
 	. += "<b>Preferences</b><br>"
 	. += "<table>"
@@ -69,7 +71,7 @@
 
 	return jointext(., "")
 
-/datum/category_item/player_setup_item/player_global/settings/OnTopic(href,list/href_list, mob/user)
+/datum/category_item/player_setup_item/player_global/settings/OnTopic(var/href,var/list/href_list, var/mob/user)
 	var/mob/pref_mob = preference_mob()
 
 	if(href_list["pref"] && href_list["value"])
@@ -80,7 +82,7 @@
 
 	return ..()
 
-/client/proc/get_preference_value(preference)
+/client/proc/get_preference_value(var/preference)
 	if(prefs)
 		var/datum/client_preference/cp = get_client_preference(preference)
 		if(cp && prefs.preference_values)
@@ -90,7 +92,7 @@
 	else
 		log_error("Client is lacking preferences: [log_info_line(src)]")
 
-/client/proc/set_preference(preference, set_preference)
+/client/proc/set_preference(var/preference, var/set_preference)
 	var/datum/client_preference/cp = get_client_preference(preference)
 
 	if(!cp)
@@ -103,7 +105,7 @@
 
 	return FALSE
 
-/client/proc/cycle_preference(preference)
+/client/proc/cycle_preference(var/preference)
 	var/datum/client_preference/cp = get_client_preference(preference)
 
 	if(!cp)
@@ -112,7 +114,7 @@
 	var/next_option = next_in_list(prefs.preference_values[cp.key], cp.options)
 	return set_preference(preference, next_option)
 
-/mob/proc/get_preference_value(preference)
+/mob/proc/get_preference_value(var/preference)
 	if(!client)
 		var/datum/client_preference/cp = get_client_preference(preference)
 		if(cp)
@@ -122,7 +124,7 @@
 
 	return client.get_preference_value(preference)
 
-/mob/proc/set_preference(preference, set_preference)
+/mob/proc/set_preference(var/preference, var/set_preference)
 	if(!client)
 		return FALSE
 	if(!client.prefs)
@@ -131,7 +133,7 @@
 
 	return client.set_preference(preference, set_preference)
 
-/mob/proc/cycle_preference(preference)
+/mob/proc/cycle_preference(var/preference)
 	if(!client)
 		return FALSE
 	if(!client.prefs)

@@ -1,7 +1,7 @@
 /obj/machinery/tele_projector
 	name = "projector"
 	desc = "This machine is capable of projecting a miniature wormhole leading directly to its provided target."
-	icon = 'icons/obj/machines/teleporter.dmi'
+	icon = 'icons/obj/teleporter.dmi'
 	icon_state = "station"
 	density = TRUE
 	anchored = TRUE
@@ -9,6 +9,8 @@
 	active_power_usage = 2000
 
 	var/obj/machinery/computer/teleporter/computer
+	construct_state = /decl/machine_construction/default/panel_closed //inf
+	maximum_component_parts = list(/obj/item/stock_parts = 15) //inf, было 10 (в родительском классе) ~bear1ake
 
 
 /obj/machinery/tele_projector/Destroy()

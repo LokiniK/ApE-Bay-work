@@ -10,7 +10,7 @@
 // Alert status
 // And arbitrary messages set by comms computer
 /obj/machinery/status_display
-	icon = 'icons/obj/machines/status_display.dmi'
+	icon = 'icons/obj/status_display.dmi'
 	icon_state = "frame"
 	name = "status display"
 	layer = ABOVE_WINDOW_LAYER
@@ -46,7 +46,7 @@
 	var/const/STATUS_DISPLAY_TIME = 4
 	var/const/STATUS_DISPLAY_IMAGE = 5
 	var/const/STATUS_DISPLAY_CUSTOM = 99
-
+	
 	var/status_display_show_alert_border = FALSE
 
 /obj/machinery/status_display/Destroy()
@@ -62,13 +62,13 @@
 
 // timed process
 /obj/machinery/status_display/Process()
-	if(!is_powered())
+	if(stat & NOPOWER)
 		remove_display()
 		return
 	update()
 
 /obj/machinery/status_display/emp_act(severity)
-	if(inoperable())
+	if(stat & (BROKEN|NOPOWER))
 		..(severity)
 		return
 	set_picture("ai_bsod")
@@ -78,7 +78,7 @@
 /obj/machinery/status_display/proc/update()
 	remove_display()
 	if(friendc && !ignore_friendc)
-		set_picture("ai_friend")
+		set_picture("ai_friend")		
 		if(status_display_show_alert_border)
 			add_alert_border_to_display()
 		return 1
@@ -154,7 +154,7 @@
 	if(mode != STATUS_DISPLAY_BLANK && mode != STATUS_DISPLAY_ALERT)
 		to_chat(user, "The display says:<br>\t[sanitize(message1)]<br>\t[sanitize(message2)]")
 	if(mode == STATUS_DISPLAY_ALERT || status_display_show_alert_border)
-		var/singleton/security_state/security_state = GET_SINGLETON(GLOB.using_map.security_state)
+		var/decl/security_state/security_state = decls_repository.get_decl(GLOB.using_map.security_state)
 		to_chat(user, "The current alert level is [security_state.current_security_level.name].")
 
 /obj/machinery/status_display/proc/set_message(m1, m2)
@@ -176,20 +176,20 @@
 	status_display_show_alert_border = !status_display_show_alert_border
 
 /obj/machinery/status_display/proc/add_alert_border_to_display()
-	var/singleton/security_state/security_state = GET_SINGLETON(GLOB.using_map.security_state)
-	var/singleton/security_level/sl = security_state.current_security_level
+	var/decl/security_state/security_state = decls_repository.get_decl(GLOB.using_map.security_state)
+	var/decl/security_level/sl = security_state.current_security_level	
 
 	var/border = image(sl.icon,sl.alert_border)
 
 	overlays |= border
 
-/obj/machinery/status_display/proc/display_alert()
+/obj/machinery/status_display/proc/display_alert()	
 	remove_display()
 
-	var/singleton/security_state/security_state = GET_SINGLETON(GLOB.using_map.security_state)
-	var/singleton/security_level/sl = security_state.current_security_level
+	var/decl/security_state/security_state = decls_repository.get_decl(GLOB.using_map.security_state)
+	var/decl/security_level/sl = security_state.current_security_level
 
-	var/image/alert = overlay_image(sl.icon, sl.overlay_status_display, plane = EFFECTS_ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+	var/image/alert = image(sl.icon, sl.overlay_status_display)
 
 	set_light(sl.light_max_bright, sl.light_inner_range, sl.light_outer_range, 2, sl.light_color_alarm)
 	overlays |= alert
@@ -198,7 +198,7 @@
 	remove_display()
 	if(!picture || picture_state != state)
 		picture_state = state
-		picture = image('icons/obj/machines/status_display.dmi', icon_state=picture_state)
+		picture = image('icons/obj/status_display.dmi', icon_state=picture_state)
 	overlays |= picture
 	set_light(0.5, 0.1, 1, 2, COLOR_WHITE)
 
@@ -212,7 +212,7 @@
 	var/timeleft = evacuation_controller.get_eta()
 	if(timeleft < 0)
 		return ""
-	return "[pad_left(num2text((timeleft / 60) % 60), 2, "0")]:[pad_left(num2text(timeleft % 60), 2, "0")]"
+	return "[add_zero(num2text((timeleft / 60) % 60),2)]:[add_zero(num2text(timeleft % 60), 2)]"
 
 /obj/machinery/status_display/proc/get_supply_shuttle_timer()
 	var/datum/shuttle/autodock/ferry/supply/shuttle = SSsupply.shuttle
@@ -223,11 +223,11 @@
 		var/timeleft = round((shuttle.arrive_time - world.time) / 10,1)
 		if(timeleft < 0)
 			return "Late"
-		return "[pad_left(num2text((timeleft / 60) % 60), 2, "0")]:[pad_left(num2text(timeleft % 60), 2, "0")]"
+		return "[add_zero(num2text((timeleft / 60) % 60),2)]:[add_zero(num2text(timeleft % 60), 2)]"
 	return ""
 
 /obj/machinery/status_display/proc/remove_display()
-	if(length(overlays))
+	if(overlays.len)
 		overlays.Cut()
 	if(maptext)
 		maptext = ""

@@ -4,11 +4,13 @@
 	icon = 'icons/obj/modular_tablet.dmi'
 	icon_state = "tablet"
 	icon_state_unpowered = "tablet"
+	base_active_power_usage = 8
+	base_idle_power_usage = 2
 
 	hardware_flag = PROGRAM_TABLET
 	max_hardware_size = 1
 	w_class = ITEM_SIZE_SMALL
-	light_strength = 5 // same as PDAs
+	light_strength = 2 // same as PDAs
 
 	interact_sounds = list('sound/machines/pda_click.ogg')
 	interact_sound_volume = 20

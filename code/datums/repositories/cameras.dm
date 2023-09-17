@@ -1,4 +1,4 @@
-var/global/repository/cameras/camera_repository = new()
+var/repository/cameras/camera_repository = new()
 
 /proc/invalidateCameraCache()
 	camera_repository.networks.Cut()
@@ -14,7 +14,7 @@ var/global/repository/cameras/camera_repository = new()
 	networks = list()
 	..()
 
-/repository/cameras/proc/cameras_in_network(network)
+/repository/cameras/proc/cameras_in_network(var/network)
 	setup_cache()
 	var/list/network_list = networks[network]
 	return network_list
@@ -32,4 +32,4 @@ var/global/repository/cameras/camera_repository = new()
 				ADD_SORTED(networks, network, /proc/cmp_text_asc)
 				networks[network] = list()
 			var/list/netlist = networks[network]
-			netlist[LIST_PRE_INC(netlist)] = cam
+			netlist[++netlist.len] = cam

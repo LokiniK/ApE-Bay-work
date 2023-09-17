@@ -1,6 +1,6 @@
 /obj/item/weldingtool
 	name = "welding tool"
-	icon = 'icons/obj/tools/welder.dmi'
+	icon = 'icons/obj/tools.dmi'
 	icon_state = "welder"
 	item_state = "welder"
 	desc = "A portable welding gun with a port for attaching fuel tanks."
@@ -20,6 +20,9 @@
 	var/status = 1 		//Whether the welder is secured or unsecured (able to attach rods to it to make a flamethrower)
 	var/welding_resource = "welding fuel"
 	var/obj/item/welder_tank/tank = /obj/item/welder_tank // where the fuel is stored
+
+	var/activate_sound = 'infinity/sound/items/WelderActivate.ogg'
+	var/deactivate_sound = 'infinity/sound/items/WelderDeactivate.ogg'
 
 /obj/item/weldingtool/Initialize()
 	if(ispath(tank))
@@ -47,6 +50,22 @@
 	else
 		to_chat(user, (distance <= 1 ? "It has [get_fuel()] [welding_resource] remaining. " : "") + "[tank] is attached.")
 
+/obj/item/weldingtool/MouseDrop(atom/over)
+	if(!CanMouseDrop(over, usr))
+		return
+
+	if(istype(over, /obj/item/weldpack))
+		var/obj/item/weldpack/wp = over
+		if(wp.welder)
+			to_chat(usr, "\The [wp] already has \a [wp.welder] attached.")
+		else if(usr.unEquip(src, wp))
+			wp.welder = src
+			usr.visible_message("[usr] attaches \the [src] to \the [wp].", "You attach \the [src] to \the [wp].")
+			wp.update_icon()
+		return
+
+	..()
+
 /obj/item/weldingtool/attackby(obj/item/W as obj, mob/user as mob)
 	if(welding)
 		to_chat(user, SPAN_DANGER("Stop welding first!"))
@@ -58,7 +77,6 @@
 			to_chat(user, SPAN_NOTICE("You secure the welder."))
 		else
 			to_chat(user, SPAN_NOTICE("The welder can now be attached and modified."))
-		playsound(src, 'sound/items/Screwdriver.ogg', 10, 1)
 		src.add_fingerprint(user)
 		return
 
@@ -85,7 +103,6 @@
 		user.visible_message("[user] slots \a [W] into \the [src].", "You slot \a [W] into \the [src].")
 		w_class = tank.size_in_use
 		force = tank.unlit_force
-		playsound(src, 'sound/items/cap_close.ogg', 10, 1)
 		update_icon()
 		return
 
@@ -100,7 +117,6 @@
 			tank = null
 			w_class = initial(w_class)
 			force = initial(force)
-			playsound(src, 'sound/items/cap_open.ogg', 10, 1)
 			update_icon()
 		else
 			to_chat(user, SPAN_DANGER("Turn off the welder first!"))
@@ -117,7 +133,7 @@
 		if((!waterproof && submerged()) || !remove_fuel(0.05))
 			setWelding(0)
 
-/obj/item/weldingtool/afterattack(obj/O, mob/user, proximity)
+/obj/item/weldingtool/afterattack(var/obj/O, var/mob/user, proximity)
 	if(!proximity)
 		return
 
@@ -153,36 +169,23 @@
 /obj/item/weldingtool/proc/get_fuel()
 	return tank ? tank.reagents.get_reagent_amount(/datum/reagent/fuel) : 0
 
-
-/**
- * Checks if the tool can be used for the given amount of fuel without actually using it.
- *
- * Returns boolean.
- */
-/obj/item/weldingtool/proc/can_use(amount = 1, mob/user = null, interaction_message = "to complete this task.", silent = FALSE)
-	if (!isOn())
-		if (!silent && user)
-			to_chat(user, SPAN_WARNING("\The [src] must be turned on [interaction_message]"))
-		return FALSE
-	if (get_fuel() < amount)
-		if (!silent && user)
-			to_chat(user, SPAN_WARNING("You need at least [amount] unit\s of [welding_resource] [interaction_message]"))
-		return FALSE
-	return TRUE
-
-
 //Removes fuel from the welding tool. If a mob is passed, it will perform an eyecheck on the mob. This should probably be renamed to use()
-/obj/item/weldingtool/proc/remove_fuel(amount = 1, mob/M = null)
-	if(!can_use(amount, M))
+/obj/item/weldingtool/proc/remove_fuel(var/amount = 1, var/mob/M = null)
+	if(!welding)
 		return 0
-	burn_fuel(amount)
-	if(M)
-		M.welding_eyecheck()//located in mob_helpers.dm
-		set_light(0.7, 2, 5, l_color = COLOR_LIGHT_CYAN)
-		addtimer(new Callback(src, /atom/proc/update_icon), 5)
-	return 1
+	if(get_fuel() >= amount)
+		burn_fuel(amount)
+		if(M)
+			M.welding_eyecheck()//located in mob_helpers.dm
+			set_light(0.7, 2, 5, l_color = COLOR_LIGHT_CYAN)
+			addtimer(CALLBACK(src, /atom/proc/update_icon), 5)
+		return 1
+	else
+		if(M)
+			to_chat(M, SPAN_NOTICE("You need more [welding_resource] to complete this task."))
+		return 0
 
-/obj/item/weldingtool/proc/burn_fuel(amount)
+/obj/item/weldingtool/proc/burn_fuel(var/amount)
 	if(!tank)
 		return
 
@@ -191,7 +194,7 @@
 	//consider ourselves in a mob if we are in the mob's contents and not in their hands
 	if(isliving(src.loc))
 		var/mob/living/L = src.loc
-		if (!L.IsHolding(src))
+		if(!(L.l_hand == src || L.r_hand == src))
 			in_mob = L
 
 	if(in_mob)
@@ -218,9 +221,9 @@
 	..()
 	overlays.Cut()
 	if(tank)
-		overlays += image('icons/obj/tools/welder.dmi', "welder_[tank.icon_state]")
+		overlays += image('icons/obj/tools.dmi', "welder_[tank.icon_state]")
 	if(welding)
-		overlays += image('icons/obj/tools/welder.dmi', "welder_on")
+		overlays += image('icons/obj/tools.dmi', "welder_on")
 		set_light(0.6, 0.5, 2.5, l_color =COLOR_PALE_ORANGE)
 	else
 		set_light(0)
@@ -232,7 +235,7 @@
 
 //Sets the welding state of the welding tool. If you see W.welding = 1 anywhere, please change it to W.setWelding(1)
 //so that the welding tool updates accordingly
-/obj/item/weldingtool/proc/setWelding(set_welding, mob/M)
+/obj/item/weldingtool/proc/setWelding(var/set_welding, var/mob/M)
 	if (!status)
 		return
 
@@ -251,12 +254,12 @@
 				T.visible_message(SPAN_WARNING("\The [src] turns on."))
 			if (istype(src, /obj/item/weldingtool/electric))
 				src.force = 11
-				src.damtype = DAMAGE_SHOCK
+				src.damtype = ELECTROCUTE
 			else
 				src.force = tank.lit_force
-				src.damtype = DAMAGE_BURN
+				src.damtype = BURN
 			welding = 1
-			playsound(src, 'sound/items/welderactivate.ogg', 10, 1)
+			playsound(loc, activate_sound, 50, 1)
 			update_icon()
 			START_PROCESSING(SSobj, src)
 		else
@@ -274,9 +277,9 @@
 			src.force = initial(force)
 		else
 			src.force = tank.unlit_force
-		src.damtype = DAMAGE_BRUTE
+		src.damtype = BRUTE
 		src.welding = 0
-		playsound(src, 'sound/items/welderdeactivate.ogg', 10, 1)
+		playsound(loc, deactivate_sound, 50, 1)
 		update_icon()
 
 /obj/item/weldingtool/attack(mob/living/M, mob/living/user, target_zone)
@@ -295,20 +298,11 @@
 			to_chat(user, SPAN_WARNING("You'll need to turn [src] on to patch the damage on [M]'s [S.name]!"))
 			return 1
 
-		if(S.robo_repair(15, DAMAGE_BRUTE, "some dents", src, user))
+		if(S.robo_repair(15, BRUTE, "some dents", src, user))
 			remove_fuel(1, user)
 
 	else
 		return ..()
-
-
-/obj/item/weldingtool/IsFlameSource()
-	return isOn()
-
-
-/obj/item/weldingtool/IsHeatSource()
-	return isOn() ? 3800 : 0
-
 
 /obj/item/weldingtool/mini
 	tank = /obj/item/welder_tank/mini
@@ -328,7 +322,7 @@
 /obj/item/welder_tank
 	name = "\improper welding fuel tank"
 	desc = "An interchangeable fuel tank meant for a welding tool."
-	icon = 'icons/obj/tools/welder.dmi'
+	icon = 'icons/obj/tools.dmi'
 	icon_state = "tank_normal"
 	w_class = ITEM_SIZE_SMALL
 	force = 5

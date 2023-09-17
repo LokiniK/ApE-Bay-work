@@ -2,7 +2,7 @@
 //list(ckey = real_name,)
 //Since the ckey is used as the icon_state, the current system will only permit a single custom robot sprite per ckey.
 //While it might be possible for a ckey to use that custom sprite for several real_names, it seems rather pointless to support it.
-var/global/list/robot_custom_icons
+var/list/robot_custom_icons
 
 /hook/startup/proc/load_robot_custom_sprites()
 	var/config_file = file2text(CUSTOM_ITEM_SYNTH_CONFIG)
@@ -17,8 +17,9 @@ var/global/list/robot_custom_icons
 
 		var/ckey = copytext(line, 1, split_idx)
 		var/real_name = copytext(line, split_idx+1)
-
-		robot_custom_icons[ckey] = real_name
+		if (!robot_custom_icons[ckey])
+			robot_custom_icons[ckey] = list()
+		robot_custom_icons[ckey] += real_name
 	return 1
 
 /mob/living/silicon/robot/proc/set_custom_sprite()
@@ -31,5 +32,5 @@ var/global/list/robot_custom_icons
 			if("[ckey]-Standard" in valid_states)
 				icon_state = "[ckey]-Standard"
 			else
-				to_chat(src, SPAN_WARNING("Could not locate [ckey]-Standard sprite."))
+				to_chat(src, "<span class='warning'>Could not locate [ckey]-Standard sprite.</span>")
 				icon =  'icons/mob/robots.dmi'

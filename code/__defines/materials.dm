@@ -4,7 +4,6 @@
 #define MATERIAL_GLASS                   "glass"
 #define MATERIAL_GOLD                    "gold"
 #define MATERIAL_SILVER                  "silver"
-#define MATERIAL_ELECTRUM                "electrum"
 #define MATERIAL_DIAMOND                 "diamond"
 #define MATERIAL_PHORON                  "phoron"
 #define MATERIAL_URANIUM                 "uranium"
@@ -14,8 +13,8 @@
 #define MATERIAL_IRON                    "iron"
 #define MATERIAL_PLATINUM                "platinum"
 #define MATERIAL_BRONZE                  "bronze"
-#define MATERIAL_BORAX                   "borax"
-#define MATERIAL_BORON_GLASS             "borosilicate glass"
+#define MATERIAL_PHORON_GLASS            "phglass"
+#define MATERIAL_REINFORCED_PHORON_GLASS "rphglass"
 #define MATERIAL_MARBLE                  "marble"
 #define MATERIAL_CULT                    "cult"
 #define MATERIAL_REINFORCED_CULT         "cult2"
@@ -46,6 +45,15 @@
 #define MATERIAL_COPPER                  "copper"
 #define MATERIAL_CARDBOARD               "cardboard"
 #define MATERIAL_CLOTH                   "cloth"
+#define MATERIAL_RED_CLOTH               "red_cloth"
+#define MATERIAL_YELLOW_CLOTH            "yellow_cloth"
+#define MATERIAL_TEAL_CLOTH              "teal_cloth"
+#define MATERIAL_BLACK_CLOTH             "black_cloth"
+#define MATERIAL_GREEN_CLOTH             "green_cloth"
+#define MATERIAL_PURPLE_CLOTH            "purple_cloth"
+#define MATERIAL_BLUE_CLOTH              "blue_cloth"
+#define MATERIAL_BEIGE_CLOTH             "beige_cloth"
+#define MATERIAL_LIME_CLOTH              "lime_cloth"
 #define MATERIAL_CARPET                  "carpet"
 #define MATERIAL_ALUMINIUM               "aluminium"
 #define MATERIAL_NULLGLASS               "nullglass"
@@ -59,7 +67,6 @@
 #define MATERIAL_WALNUT                  "walnut"
 #define MATERIAL_BAMBOO                  "bamboo"
 #define MATERIAL_YEW                     "yew"
-#define MATERIAL_VOXRES                  "vox bioresin"
 
 // skins and bones
 #define MATERIAL_SKIN_GENERIC            "skin"
@@ -97,11 +104,11 @@
 #define DEFAULT_WALL_MATERIAL      MATERIAL_STEEL
 #define DEFAULT_FURNITURE_MATERIAL MATERIAL_ALUMINIUM
 
-#define MATERIAL_ALTERATION_NONE     EMPTY_BITFIELD
-#define MATERIAL_ALTERATION_NAME     FLAG(0)
-#define MATERIAL_ALTERATION_DESC     FLAG(1)
-#define MATERIAL_ALTERATION_COLOR    FLAG(2)
-#define MATERIAL_ALTERATION_ALL      (~MATERIAL_ALTERATION_NONE)
+#define MATERIAL_ALTERATION_NONE 0
+#define MATERIAL_ALTERATION_NAME 1
+#define MATERIAL_ALTERATION_DESC 2
+#define MATERIAL_ALTERATION_COLOR 4
+#define MATERIAL_ALTERATION_ALL (~MATERIAL_ALTERATION_NONE)
 
 #define SHARD_SHARD "shard"
 #define SHARD_SHRAPNEL "shrapnel"
@@ -109,9 +116,9 @@
 #define SHARD_SPLINTER "splinters"
 #define SHARD_NONE ""
 
-#define MATERIAL_UNMELTABLE    FLAG(0)
-#define MATERIAL_BRITTLE       FLAG(1)
-#define MATERIAL_PADDING       FLAG(2)
+#define MATERIAL_UNMELTABLE 0x1
+#define MATERIAL_BRITTLE    0x2
+#define MATERIAL_PADDING    0x4
 
 #define TABLE_BRITTLE_MATERIAL_MULTIPLIER 4 // Amount table damage is multiplied by if it is made of a brittle material (e.g. glass)
 
@@ -126,10 +133,9 @@
 #define MATERIAL_VERY_HARD_DIY 	3
 
 //Stack flags
-#define USE_MATERIAL_COLOR            FLAG(0)
-#define USE_MATERIAL_SINGULAR_NAME    FLAG(1)
-#define USE_MATERIAL_PLURAL_NAME      FLAG(2)
-#define USE_MATERIAL_ICON             FLAG(3)
+#define USE_MATERIAL_COLOR 				0x1
+#define USE_MATERIAL_SINGULAR_NAME    	0x2
+#define USE_MATERIAL_PLURAL_NAME    	0x4
 
 //Arbitrary hardness thresholds
 #define  MATERIAL_SOFT   10

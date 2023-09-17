@@ -21,7 +21,7 @@ a, a:link, a:visited, a:active, .linkOn, .linkOff, input
 	background: #40628a;
 	border: 1px solid #161616;
 	padding: 1px 4px 1px 4px;
-	margin: 0 1px 0 1px;
+	margin: 0 2px 0 0;
 	cursor:default;
 	white-space:nowrap;
 }
@@ -83,10 +83,6 @@ ul
 	padding: 4px 0 0 10px;
 	margin: 0;
 	list-style-type: none;
-}
-
-dl dt {
-    font-weight: bold;
 }
 
 li
@@ -336,51 +332,25 @@ div.notice
 	margin: 3px 0;
 }
 
-
-/* Data tables */
-table.data {
-	border-collapse: collapse;
-	width: 100%;
+/* [INF] */
+a.donate, a.donate:link, a.donate:visited, a.donate:active
+{
+	color: #40628a;
+	border-color: #40628a;
+	background: #000000;
 }
 
-table.data thead th {
-	border-bottom: 2px solid #161616;
-	background: #383838;
-	color: #98B0C3;
+a.donate:hover
+{
+
+	color: #00aaee;
+	background: #002266;
+	border-color: #00aaee;
 }
 
-table.data tbody th {
-	border-right: 2px solid #161616;
-	background: #383838;
-	color: #98B0C3;
+.donate.linkOn
+{
+	color: #00aa88 !important;
+	border-color: #00aa88 !important;
 }
-
-table.data tbody td,
-table.data tbody th {
-	border-bottom: #40628a 1px solid;
-	vertical-align: top;
-}
-
-
-/* Hover tables */
-table.hover tr:hover,
-table tr.hover:hover,
-table tr.forcehover {
-	background: #294059;
-}
-
-
-/* Striped tables */
-table tr.stripe {
-	background: #383838;
-}
-
-
-/* Other misc table styles */
-table tr.disabled td,
-table tr.disabled th,
-table td.disabled,
-table th.disabled {
-	color: #999999;
-	font-style: italic;
-}
+/* [/INF] */

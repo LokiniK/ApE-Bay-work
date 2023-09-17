@@ -10,15 +10,16 @@
 
 	var/datum/gas_mixture/env = T.return_air()
 
-	var/t = "[SPAN_NOTICE("Coordinates: [T.x],[T.y],[T.z]")]\n"
-	t += "[SPAN_WARNING("Temperature: [env.temperature]")]\n"
-	t += "[SPAN_WARNING("Pressure: [env.return_pressure()]kPa")]\n"
+	var/t = "<span class='notice'>Coordinates: [T.x],[T.y],[T.z]</span>\n"
+	t += "<span class='warning'>Temperature: [env.temperature]</span>\n"
+	t += "<span class='warning'>Pressure: [env.return_pressure()]kPa</span>\n"
 	for(var/g in env.gas)
-		t += "[SPAN_NOTICE("[g]: [env.gas[g]] / [env.gas[g] * R_IDEAL_GAS_EQUATION * env.temperature / env.volume]kPa")]\n"
+		t += "<span class='notice'>[g]: [env.gas[g]] / [env.gas[g] * R_IDEAL_GAS_EQUATION * env.temperature / env.volume]kPa</span>\n"
 
 	usr.show_message(t, 1)
+	SSstatistics.add_field_details("admin_verb","ASL") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 
-/client/proc/cmd_admin_robotize(mob/M in SSmobs.mob_list)
+/client/proc/cmd_admin_robotize(var/mob/M in SSmobs.mob_list)
 	set category = "Fun"
 	set name = "Make Robot"
 
@@ -33,7 +34,7 @@
 	else
 		alert("Invalid mob")
 
-/client/proc/cmd_admin_animalize(mob/M in SSmobs.mob_list)
+/client/proc/cmd_admin_animalize(var/mob/M in SSmobs.mob_list)
 	set category = "Fun"
 	set name = "Make Simple Animal"
 
@@ -54,7 +55,7 @@
 		M.Animalize()
 
 
-/client/proc/makepAI(turf/T in SSmobs.mob_list)
+/client/proc/makepAI(var/turf/T in SSmobs.mob_list)
 	set category = "Fun"
 	set name = "Make pAI"
 	set desc = "Specify a location to spawn a pAI device, then specify a key to play that pAI"
@@ -71,7 +72,7 @@
 		if(confirm != "Yes")
 			return 0
 	var/obj/item/device/paicard/card = new(T)
-	var/mob/living/silicon/pai/pai = new(card, card)
+	var/mob/living/silicon/pai/pai = new(card)
 	pai.SetName(sanitizeSafe(input(choice, "Enter your pAI name:", "pAI Name", "Personal AI") as text))
 	pai.real_name = pai.name
 	pai.key = choice.key
@@ -79,8 +80,9 @@
 	for(var/datum/paiCandidate/candidate in paiController.pai_candidates)
 		if(candidate.key == choice.key)
 			paiController.pai_candidates.Remove(candidate)
+	SSstatistics.add_field_details("admin_verb","MPAI") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 
-/client/proc/cmd_admin_slimeize(mob/M in SSmobs.mob_list)
+/client/proc/cmd_admin_slimeize(var/mob/M in SSmobs.mob_list)
 	set category = "Fun"
 	set name = "Make slime"
 
@@ -91,11 +93,74 @@
 		log_admin("[key_name(src)] has slimeized [M.key].")
 		spawn(10)
 			M:slimeize()
+			SSstatistics.add_field_details("admin_verb","MKMET") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 		log_and_message_admins("made [key_name(M)] into a slime.")
 	else
 		alert("Invalid mob")
 
+/proc/make_types_fancy(var/list/types)
+	if(ispath(types))
+		types = list(types)
+	. = list()
+	for(var/type in types)
+		var/typename = "[type]"
+		var/static/list/TYPES_SHORTCUTS = list(
+			/obj/effect/decal/cleanable = "CLEANABLE",
+			/obj/item/device/radio/headset = "HEADSET",
+			/obj/item/clothing/head/helmet/space = "SPESSHELMET",
+			/obj/item/book/manual = "MANUAL",
+			/obj/item/reagent_containers/food/drinks = "DRINK",
+			/obj/item/reagent_containers/food = "FOOD",
+			/obj/item/reagent_containers = "REAGENT_CONTAINERS",
+			/obj/item/ = "WEAPON",
+			/obj/machinery/atmospherics = "ATMOS_MECH",
+			/obj/machinery/portable_atmospherics = "PORT_ATMOS",
+			//obj/item/mech_equipment/weapon/ballistic/missile_rack = "MECHA_MISSILE_RACK",
+			/obj/item/mech_equipment = "MECHA_EQUIP",
+			/obj/item/organ = "ORGAN",
+			/obj/item = "ITEM",
+			/obj/machinery = "MACHINERY",
+			/obj/effect = "EFFECT",
+			/obj = "O",
+			/datum = "D",
+			/turf/simulated = "SIMUL",
+			/turf/unsimulated = "UNSIMUL",
+			/turf = "T",
+			/mob/living/carbon = "CARBON",
+			/mob/living/simple_animal = "SIMPLE",
+			/mob/living = "LIVING",
+			/mob = "M"
+		)
+		for(var/tn in TYPES_SHORTCUTS)
+			if(copytext(typename,1, length("[tn]/")+1)=="[tn]/" /*findtextEx(typename,"[tn]/",1,2)*/ )
+				typename = TYPES_SHORTCUTS[tn]+copytext(typename,length("[tn]/"))
+				break
+		.[typename] = type
+
+/proc/get_fancy_list_of_atom_types()
+	var/static/list/pre_generated_list
+	if(!pre_generated_list) //init
+		pre_generated_list = make_types_fancy(typesof(/atom))
+	return pre_generated_list
+
+
+/proc/get_fancy_list_of_datum_types()
+	var/static/list/pre_generated_list
+	if(!pre_generated_list) //init
+		pre_generated_list = make_types_fancy(sortList(typesof(/datum) - typesof(/atom)))
+	return pre_generated_list
+
+
+/proc/filter_fancy_list(list/L, filter as text)
+	var/list/matches = new
+	for(var/key in L)
+		var/value = L[key]
+		if(findtext("[key]", filter) || findtext("[value]", filter))
+			matches[key] = value
+	return matches
+
 //TODO: merge the vievars version into this or something maybe mayhaps
+/* Baystation12 original
 /client/proc/cmd_debug_del_all()
 	set category = "Debug"
 	set name = "Del-All"
@@ -109,6 +174,30 @@
 				qdel(O)
 		log_admin("[key_name(src)] has deleted all instances of [hsbitem].")
 		message_admins("[key_name_admin(src)] has deleted all instances of [hsbitem].", 0)
+	SSstatistics.add_field_details("admin_verb","DELA") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
+*/
+/client/proc/cmd_debug_del_all(object as text)
+	set category = "Debug"
+	set name = "Del-All"
+
+	var/list/matches = get_fancy_list_of_atom_types()
+	if(!isnull(object) && object!="")
+		matches = filter_fancy_list(matches, object)
+
+	if(matches.len==0)
+		return
+	var/hsbitem = input(usr, "Choose an object to delete.", "Delete:") as null|anything in matches
+	if(hsbitem)
+		hsbitem = matches[hsbitem]
+		var/counter = 0
+		for(var/atom/O in world)
+			if(istype(O, hsbitem))
+				counter++
+				qdel(O)
+			CHECK_TICK
+		log_admin("[key_name(src)] has deleted all ([counter]) instances of [hsbitem].")
+		message_admins("[key_name_admin(src)] has deleted all ([counter]) instances of [hsbitem].", 0)
+	SSstatistics.add_field_details("admin_verb","Delete All") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 
 /client/proc/cmd_debug_make_powernets()
 	set category = "Debug"
@@ -116,8 +205,9 @@
 	SSmachines.makepowernets()
 	log_admin("[key_name(src)] has remade the powernet. makepowernets() called.")
 	message_admins("[key_name_admin(src)] has remade the powernets. makepowernets() called.", 0)
+	SSstatistics.add_field_details("admin_verb","MPWN") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 
-/client/proc/cmd_admin_grantfullaccess(mob/M in SSmobs.mob_list)
+/client/proc/cmd_admin_grantfullaccess(var/mob/M in SSmobs.mob_list)
 	set category = "Admin"
 	set name = "Grant Full Access"
 
@@ -141,9 +231,10 @@
 			H.update_inv_wear_id()
 	else
 		alert("Invalid mob")
+	SSstatistics.add_field_details("admin_verb","GFA") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 	log_and_message_admins("has granted [M.key] full access.")
 
-/client/proc/cmd_assume_direct_control(mob/M in SSmobs.mob_list)
+/client/proc/cmd_assume_direct_control(var/mob/M in SSmobs.mob_list)
 	set category = "Admin"
 	set name = "Assume direct control"
 	set desc = "Direct intervention"
@@ -158,8 +249,11 @@
 	log_and_message_admins("assumed direct control of [M].")
 	var/mob/adminmob = src.mob
 	M.ckey = src.ckey
+	M.teleop = null
+	adminmob.teleop = null
 	if(isghost(adminmob))
 		qdel(adminmob)
+	SSstatistics.add_field_details("admin_verb","ADC") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 
 
 
@@ -254,32 +348,34 @@
 	for(var/areatype in areas_without_camera)
 		log_debug("* [areatype]")
 
-/datum/admins/proc/cmd_admin_dress()
+/client/proc/cmd_admin_dress(mob/H as mob in SSmobs.mob_list) //inf, was /datum/admins/proc/cmd_admin_dress(),
 	set category = "Fun"
 	set name = "Select equipment"
 
 	if(!check_rights(R_FUN))
 		return
 
-	var/mob/living/carbon/human/H = input("Select mob.", "Select equipment.") as null|anything in GLOB.human_mobs
-	if(!H)
-		return
+//inf	var/mob/living/carbon/human/H = input("Select mob.", "Select equipment.") as null|anything in GLOB.human_mob_list
+//inf	if(!H)
+//inf		return
 
-	var/singleton/hierarchy/outfit/outfit = input("Select outfit.", "Select equipment.") as null|anything in outfits()
+	var/decl/hierarchy/outfit/outfit = input("Select outfit.", "Select equipment.") as null|anything in outfits()
 	if(!outfit)
 		return
 
 	var/reset_equipment = (outfit.flags&OUTFIT_RESET_EQUIPMENT)
 	if(!reset_equipment)
 		reset_equipment = alert("Do you wish to delete all current equipment first?", "Delete Equipment?","Yes", "No") == "Yes"
+
+	SSstatistics.add_field_details("admin_verb","SEQ")
 	dressup_human(H, outfit, reset_equipment)
 
-/proc/dressup_human(mob/living/carbon/human/H, singleton/hierarchy/outfit/outfit, undress = TRUE)
+/proc/dressup_human(var/mob/living/carbon/human/H, var/decl/hierarchy/outfit/outfit, var/undress = TRUE)
 	if(!H || !outfit)
 		return
 	if(undress)
 		H.delete_inventory(TRUE)
-	outfit.equip(H, equip_adjustments = outfit.flags)
+	outfit.equip(H)
 	log_and_message_admins("changed the equipment of [key_name(H)] to [outfit.name].")
 
 /client/proc/startSinglo()
@@ -345,16 +441,16 @@
 		if("Mobs")
 			to_chat(usr, jointext(SSmobs.mob_list,","))
 		if("Living Mobs")
-			to_chat(usr, jointext(GLOB.alive_mobs,","))
+			to_chat(usr, jointext(GLOB.living_mob_list_,","))
 		if("Dead Mobs")
-			to_chat(usr, jointext(GLOB.dead_mobs,","))
+			to_chat(usr, jointext(GLOB.dead_mob_list_,","))
 		if("Ghost Mobs")
-			to_chat(usr, jointext(GLOB.ghost_mobs,","))
+			to_chat(usr, jointext(GLOB.ghost_mob_list,","))
 		if("Clients")
 			to_chat(usr, jointext(GLOB.clients,","))
 
 // DNA2 - Admin Hax
-/client/proc/cmd_admin_toggle_block(mob/M,block)
+/client/proc/cmd_admin_toggle_block(var/mob/M,var/block)
 	if(GAME_STATE < RUNLEVEL_GAME)
 		alert("Wait until the game starts")
 		return
@@ -384,12 +480,12 @@
 	set name = "Analyse Health"
 	set desc = "Get an advanced health reading on a human mob."
 
-	var/mob/living/carbon/human/H = input("Select mob.", "Analyse Health") as null|anything in GLOB.human_mobs
+	var/mob/living/carbon/human/H = input("Select mob.", "Analyse Health") as null|anything in GLOB.human_mob_list
 	if(!H)	return
 
 	cmd_analyse_health(H)
 
-/client/proc/cmd_analyse_health(mob/living/carbon/human/H)
+/client/proc/cmd_analyse_health(var/mob/living/carbon/human/H)
 
 	if(!check_rights(R_DEBUG))
 		return
@@ -401,7 +497,7 @@
 	dat += text("<BR><A href='?src=\ref[];mach_close=scanconsole'>Close</A>", usr)
 	show_browser(usr, dat, "window=scanconsole;size=430x600")
 
-/client/proc/cmd_analyse_health_context(mob/living/carbon/human/H as mob in GLOB.human_mobs)
+/client/proc/cmd_analyse_health_context(mob/living/carbon/human/H as mob in GLOB.human_mob_list)
 	set category = null
 	set name = "Analyse Human Health"
 
@@ -409,6 +505,7 @@
 		return
 	if(!ishuman(H))	return
 	cmd_analyse_health(H)
+	SSstatistics.add_field_details("admin_verb","ANLS") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 
 /obj/effect/debugmarker
 	icon = 'icons/effects/lighting_overlay.dmi'
@@ -460,7 +557,7 @@
 	if (isnull(budget) || budget < 0)
 		budget = 5
 
-	var/theme = input("Choose a theme:", "Theme") as anything in typesof(/datum/exoplanet_theme) | null
+	var/theme = input("Choose a theme:", "Theme") as anything in typesof(/datum/exoplanet_theme/) | null
 
 	if (!theme)
 		theme = /datum/exoplanet_theme

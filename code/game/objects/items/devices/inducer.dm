@@ -1,7 +1,7 @@
 /obj/item/inducer
 	name = "inducer"
 	desc = "A tool for inductively charging internal power cells."
-	icon = 'icons/obj/tools/inducers.dmi'
+	icon = 'icons/obj/tools.dmi'
 	icon_state = "inducer-sci"
 	item_state = "inducer-sci"
 	force = 7
@@ -38,17 +38,17 @@
 	if(cell)
 		cell.emp_act(severity)
 
-/obj/item/inducer/afterattack(obj/O, mob/living/carbon/user, proximity)
+/obj/item/inducer/afterattack(obj/O, mob/living/carbon/user, var/proximity)
 	if (!proximity || user.a_intent == I_HURT || CannotUse(user) || !recharge(O, user))
 		return ..()
 
 /obj/item/inducer/proc/CannotUse(mob/user)
 	var/obj/item/cell/my_cell = get_cell()
 	if(!istype(my_cell))
-		to_chat(user, SPAN_WARNING("\The [src] doesn't have a power cell installed!"))
+		to_chat(user, "<span class='warning'>\The [src] doesn't have a power cell installed!</span>")
 		return TRUE
 	if(my_cell.percent() <= 0)
-		to_chat(user, SPAN_WARNING("\The [src]'s battery is dead!"))
+		to_chat(user, "<span class='warning'>\The [src]'s battery is dead!</span>")
 		return TRUE
 	return FALSE
 
@@ -56,22 +56,22 @@
 /obj/item/inducer/attackby(obj/item/W, mob/user)
 	if(isScrewdriver(W))
 		opened = !opened
-		to_chat(user, SPAN_NOTICE("You [opened ? "open" : "close"] the battery compartment."))
+		to_chat(user, "<span class='notice'>You [opened ? "open" : "close"] the battery compartment.</span>")
 		update_icon()
 	if(istype(W, /obj/item/cell))
 		if (istype(W, /obj/item/cell/device))
-			to_chat(user, SPAN_WARNING("\The [src] only takes full-size power cells."))
+			to_chat(user, "<span class='warning'>\The [src] only takes full-size power cells.</span>")
 			return
 		if(opened)
 			if(!cell)
 				if(!user.unEquip(W, src))
 					return
-				to_chat(user, SPAN_NOTICE("You insert \the [W] into \the [src]."))
+				to_chat(user, "<span class='notice'>You insert \the [W] into \the [src].</span>")
 				cell = W
 				update_icon()
 				return
 			else
-				to_chat(user, SPAN_NOTICE("\The [src] already has \a [cell] installed!"))
+				to_chat(user, "<span class='notice'>\The [src] already has \a [cell] installed!</span>")
 				return
 	if(CannotUse(user) || recharge(W, user))
 		return
@@ -91,42 +91,41 @@
 		O = A
 	if(C)
 		var/length = 10
+		var/done_any = FALSE
 		var/datum/effect/effect/system/spark_spread/sparks = new /datum/effect/effect/system/spark_spread()
 		sparks.set_up(1, 1, user.loc)
 		sparks.start()
 		if(C.charge >= C.maxcharge)
-			to_chat(user, SPAN_WARNING("\The [A] is already fully charged!"))
+			to_chat(user, "<span class='notice'>\The [A] is fully charged!</span>")
 			recharging = FALSE
 			return TRUE
-		user.visible_message(
-			SPAN_NOTICE("\The [user] starts recharging \the [A] with \the [src]."),
-			SPAN_NOTICE("You start recharging \the [A] with \the [src].")
-		)
+		user.visible_message("\The [user] starts recharging \the [A] with \the [src].","<span class='notice'>You start recharging \the [A] with \the [src].</span>")
 		if (istype(A, /obj/item/gun/energy))
-			length = 3 SECONDS
-			if (user.get_skill_value(SKILL_WEAPONS) <= SKILL_TRAINED)
-				length += rand(1, 3) SECONDS
-		if (user.get_skill_value(SKILL_ELECTRICAL) < SKILL_TRAINED)
-			length += rand(4, 6) SECONDS
-		if(MyC.charge > max(0, MyC.charge*failsafe) && do_after(user, length, A, DO_PUBLIC_UNIQUE))
-			if(CannotUse(user))
-				return TRUE
-			if(QDELETED(C))
-				return TRUE
-			sparks.start()
-			induce(C)
-			user.visible_message(
-				SPAN_NOTICE("\The [user] recharges \the [A] with \the [src]."),
-				SPAN_NOTICE("You recharge \the [A] with \the [src].")
-			)
-			if(O)
-				O.update_icon()
-		else
-			qdel(sparks)
+			length = 30
+			if (user.get_skill_value(SKILL_WEAPONS) <= SKILL_ADEPT)
+				length += rand(10, 30)
+		if (user.get_skill_value(SKILL_ELECTRICAL) < SKILL_ADEPT)
+			length += rand(40, 60)
+		while(C.charge < C.maxcharge)
+			if(MyC.charge > max(0, MyC.charge*failsafe) && do_after(user, length))
+				if(CannotUse(user))
+					return TRUE
+				if(QDELETED(C))
+					return TRUE
+				sparks.start()
+				done_any = TRUE
+				induce(C)
+				if(O)
+					O.update_icon()
+			else
+				qdel(sparks)
+				break
+		if(done_any) // Only show a message if we succeeded at least once
+			user.visible_message("\The [user] recharged \the [A]!","<span class='notice'>You recharged \the [A]!</span>")
 		recharging = FALSE
 		return TRUE
 	else
-		to_chat(user, SPAN_WARNING("No cell detected!"))
+		to_chat(user, "<span class='warning'>No cell detected!</span>")
 	recharging = FALSE
 
 // used only on the borg one, but here in case we invent inducer guns idk
@@ -142,7 +141,7 @@
 
 /obj/item/inducer/attack_self(mob/user)
 	if(opened && cell)
-		user.visible_message("\The [user] removes \the [cell] from \the [src]!",SPAN_NOTICE("You remove \the [cell]."))
+		user.visible_message("\The [user] removes \the [cell] from \the [src]!","<span class='notice'>You remove \the [cell].</span>")
 		cell.update_icon()
 		user.put_in_hands(cell)
 		cell = null
@@ -153,11 +152,11 @@
 	. = ..()
 	var/obj/item/cell/MyC = get_cell()
 	if(MyC)
-		to_chat(M, SPAN_NOTICE("Its display shows: [MyC.percent()]%."))
+		to_chat(M, "<span class='notice'>Its display shows: [MyC.percent()]%.</span>")
 	else
-		to_chat(M,SPAN_NOTICE("Its display is dark."))
+		to_chat(M,"<span class='notice'>Its display is dark.</span>")
 	if(opened)
-		to_chat(M,SPAN_NOTICE("Its battery compartment is open."))
+		to_chat(M,"<span class='notice'>Its battery compartment is open.</span>")
 
 /obj/item/inducer/on_update_icon()
 	overlays.Cut()
@@ -189,7 +188,7 @@
 	. = ..()
 	overlays += image("icons/obj/guns/gui.dmi","safety[safety()]")
 
-/obj/item/inducer/borg/verb/toggle_safety(mob/user)
+/obj/item/inducer/borg/verb/toggle_safety(var/mob/user)
 	set src in usr
 	set category = "Object"
 	set name = "Toggle Inducer Safety"
@@ -199,7 +198,7 @@
 		failsafe = 0.2
 	update_icon()
 	if(user)
-		to_chat(user, SPAN_NOTICE("You switch your battery output failsafe [safety() ? "on" : "off"	]."))
+		to_chat(user, "<span class='notice'>You switch your battery output failsafe [safety() ? "on" : "off"	].</span>")
 
 /obj/item/inducer/borg/get_cell()
 	return loc ? loc.get_cell() : null

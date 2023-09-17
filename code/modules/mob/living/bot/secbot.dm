@@ -86,7 +86,7 @@
 		if(2)
 			. += "ERROROROROROR-----"
 
-/mob/living/bot/secbot/ProcessCommand(mob/user, command, href_list)
+/mob/living/bot/secbot/ProcessCommand(var/mob/user, var/command, var/href_list)
 	..()
 	if(CanAccessPanel(user))
 		switch(command)
@@ -107,49 +107,22 @@
 				if(emagged < 2)
 					emagged = !emagged
 
-
-/mob/living/bot/secbot/get_mechanics_info()
+/mob/living/bot/secbot/attackby(var/obj/item/O, var/mob/user)
+	var/curhealth = health
 	. = ..()
-	. += {"
-		<p>If attacked and damaged, it will attempt to arrest or subdue the attacker.</p>
-	"}
-
-
-/mob/living/bot/secbot/get_construction_info()
-	return list(
-		"Attach a <b>Remote Signalling Device</b> to a <b>Helmet</b>.",
-		"Use a <b>Welding Tool</b>.",
-		"Add a <b>Proximity Sensor</b>.",
-		"Add a robotic <b>Left Arm</b> or <b>Right Arm</b>.",
-		"Add a <b>Stunbaton</b> to complete the securitron."
-	)
-
-
-/mob/living/bot/secbot/get_antag_interactions_info()
-	. = ..()
-	.[CODEX_INTERACTION_EMAG] += "<p>Causes \the [initial(name)] to attack and arrest anyone around it, except the person who emagged it.</p>"
-
-
-/mob/living/bot/secbot/post_use_item(obj/item/tool, mob/user, interaction_handled, use_call, click_params)
-	..()
-
-	// React to attack
-	if (use_call == "weapon")
+	if(health < curhealth)
 		react_to_attack(user)
 
-
-/mob/living/bot/secbot/emag_act(remaining_charges, mob/user)
+/mob/living/bot/secbot/emag_act(var/remaining_charges, var/mob/user)
 	. = ..()
 	if(!emagged)
 		if(user)
-			to_chat(user, SPAN_NOTICE("You short out [src]'s threat identificator."))
+			to_chat(user, "<span class='notice'>You short out [src]'s threat identificator.</span>")
 			ignore_list |= user
 		emagged = TRUE
 		return 1
 
-/mob/living/bot/secbot/bullet_act(obj/item/projectile/P)
-	if (status_flags & GODMODE)
-		return PROJECTILE_FORCE_MISS
+/mob/living/bot/secbot/bullet_act(var/obj/item/projectile/P)
 	var/curhealth = health
 	var/mob/shooter = P.firer
 	. = ..()
@@ -157,13 +130,12 @@
 	if(!target && health < curhealth && shooter && (shooter in view(world.view, src)))
 		react_to_attack(shooter)
 
-/mob/living/bot/secbot/proc/begin_arrest(mob/target, threat)
+/mob/living/bot/secbot/proc/begin_arrest(mob/target, var/threat)
 	var/suspect_name = target_name(target)
 	if(declare_arrests)
 		broadcast_security_hud_message("[src] is arresting a level [threat] suspect <b>[suspect_name]</b> in <b>[get_area(src)]</b>.", src)
 	say("Down on the floor, [suspect_name]! You have [SECBOT_WAIT_TIME] seconds to comply.")
-	if (length(preparing_arrest_sounds))
-		playsound(src.loc, pick(preparing_arrest_sounds), 50)
+	playsound(src.loc, pick(preparing_arrest_sounds), 50)
 	GLOB.moved_event.register(target, src, /mob/living/bot/secbot/proc/target_moved)
 
 /mob/living/bot/secbot/proc/target_moved(atom/movable/moving_instance, atom/old_loc, atom/new_loc)
@@ -189,7 +161,7 @@
 		return
 	..()
 
-/mob/living/bot/secbot/confirmTarget(atom/A)
+/mob/living/bot/secbot/confirmTarget(var/atom/A)
 	if(!..())
 		return 0
 	return (check_threat(A) >= SECBOT_THREAT_ARREST)
@@ -216,12 +188,12 @@
 	else
 		UnarmedAttack(target)
 
-/mob/living/bot/secbot/proc/cuff_target(mob/living/carbon/C)
+/mob/living/bot/secbot/proc/cuff_target(var/mob/living/carbon/C)
 	if(istype(C) && !C.handcuffed)
 		handcuffs.place_handcuffs(C, src)
 	resetTarget() //we're done, failed or not. Don't want to get stuck if C is not
 
-/mob/living/bot/secbot/UnarmedAttack(mob/M, proximity)
+/mob/living/bot/secbot/UnarmedAttack(var/mob/M, var/proximity)
 	if(!..())
 		return
 
@@ -242,7 +214,7 @@
 	flick(attack_state, src)
 
 /mob/living/bot/secbot/explode()
-	visible_message(SPAN_WARNING("[src] blows apart!"))
+	visible_message("<span class='warning'>[src] blows apart!</span>")
 	var/turf/Tsec = get_turf(src)
 	new /obj/item/device/assembly/prox_sensor(Tsec)
 	new /obj/item/melee/baton(Tsec)
@@ -262,7 +234,7 @@
 		return H.get_id_name("unidentified person")
 	return "unidentified lifeform"
 
-/mob/living/bot/secbot/proc/check_threat(mob/living/M)
+/mob/living/bot/secbot/proc/check_threat(var/mob/living/M)
 	if(!M || !istype(M) || M.stat == DEAD || src == M)
 		return 0
 

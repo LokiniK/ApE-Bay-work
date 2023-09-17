@@ -1,18 +1,17 @@
 // Variables not to expand the lists of. Vars is pointless to expand, and overlays/underlays cannot be expanded.
-var/global/list/view_variables_dont_expand = list("overlays", "underlays", "vars")
+/var/list/view_variables_dont_expand = list("overlays", "underlays", "vars")
 // Variables that runtime if you try to test associativity of the lists they contain by indexing
-var/global/list/view_variables_no_assoc = list("verbs", "contents","screen","images")
+/var/list/view_variables_no_assoc = list("verbs", "contents","screen","images")
 
 // Acceptable 'in world', as VV would be incredibly hampered otherwise
 /client/proc/debug_variables(datum/D in world)
 	set category = "Debug"
 	set name = "View Variables"
 
-	if(!istype(D, /datum))
-		to_chat(usr, SPAN_WARNING("Not a viewable datum."))
+	if(!check_rights(R_VAREDIT | R_DEBUG))
 		return
 
-	if(!check_rights())
+	if(!D)
 		return
 
 	var/static/cookieoffset = rand(1, 9999) //to force cookies to reset after the round.
@@ -29,6 +28,7 @@ var/global/list/view_variables_no_assoc = list("verbs", "contents","screen","ima
 
 	var/html = {"
 		<html>
+		<meta charset=\"UTF-8\">
 		<head>
 			<script src='view_variables.js'></script>
 			<title>[D] (\ref[D] - [D.type])</title>
@@ -46,8 +46,8 @@ var/global/list/view_variables_no_assoc = list("verbs", "contents","screen","ima
 							<td><div align='center'>[D.get_view_variables_header()]</div></td>
 						</tr></table>
 						<div align='center'>
-							<b><span style='font-size: 10px'>[replacetext("[D.type]", "/", "/<wbr>")]</span></b>
-							[holder.marked_datum() == D ? "<br/><span style='font-size: 10px; color: red'><b>Marked Object</b></span>" : ""]
+							<b><font size='1'>[replacetext("[D.type]", "/", "/<wbr>")]</font></b>
+							[holder.marked_datum() == D ? "<br/><font size='1' color='red'><b>Marked Object</b></font>" : ""]
 						</div>
 					</td>
 					<td width='50%'>
@@ -73,11 +73,11 @@ var/global/list/view_variables_no_assoc = list("verbs", "contents","screen","ima
 				</tr></table>
 			</div>
 			<hr/>
-			<span style='font-size: 10px'>
+			<font size='1'>
 				<b>E</b> - Edit, tries to determine the variable type by itself.<br/>
 				<b>C</b> - Change, asks you for the var type first.<br/>
 				<b>M</b> - Mass modify: changes this variable for all objects of this type.<br/>
-			</span>
+			</font>
 			<hr/>
 			<table width='100%'><tr>
 				<td width='20%'>
@@ -180,12 +180,12 @@ var/global/list/view_variables_no_assoc = list("verbs", "contents","screen","ima
 		vtext = "<a href='?_src_=vars;Vars=\ref[C]'>\ref[C]</a> - [C] ([C.type])"
 	else if(islist(value))
 		var/list/L = value
-		vtext = "/list ([length(L)])"
-		if(!(varname in view_variables_dont_expand) && length(L) > 0 && length(L) < 100)
+		vtext = "/list ([L.len])"
+		if(!(varname in view_variables_dont_expand) && L.len > 0 && L.len < 100)
 			extra += "<ul>"
-			for (var/index = 1 to length(L))
+			for (var/index = 1 to L.len)
 				var/entry = L[index]
-				if(!isnum(entry) && !isnull(entry) && !(varname in view_variables_no_assoc))
+				if(!isnum(entry) && !isnull(entry) && !(varname in view_variables_no_assoc) && L[entry] != null)
 					extra += "<li>[index]: [make_view_variables_value(entry)] -> [make_view_variables_value(L[entry])]</li>"
 				else
 					extra += "<li>[index]: [make_view_variables_value(entry)]</li>"
@@ -193,7 +193,7 @@ var/global/list/view_variables_no_assoc = list("verbs", "contents","screen","ima
 	else
 		vtext = "[value]"
 
-	return "[SPAN_CLASS("value", "[vtext]")][jointext(extra, null)]"
+	return "<span class=value>[vtext]</span>[jointext(extra, null)]"
 
 /proc/make_view_variables_var_entry(datum/D, varname, value, level=0)
 	var/ecm = null

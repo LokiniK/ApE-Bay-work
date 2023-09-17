@@ -44,7 +44,7 @@
 	gender = PLURAL
 	attack_verb = list("smacked around")
 	force = 0
-	damtype = DAMAGE_BRUTE
+	damtype = BRUTE
 	canremove = FALSE
 
 /mob/living/simple_animal/hostile/retaliate/goose/on_update_icon()
@@ -58,7 +58,7 @@
 	. = ..()
 	update_icon()
 
-/mob/living/simple_animal/hostile/retaliate/goose/proc/enrage(potency)
+/mob/living/simple_animal/hostile/retaliate/goose/proc/enrage(var/potency)
 	var/obj/item/W = get_natural_weapon()
 	if(W)
 		W.force = min((W.force + potency), max_damage)

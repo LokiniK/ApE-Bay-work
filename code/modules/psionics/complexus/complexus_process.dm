@@ -1,4 +1,4 @@
-/datum/psi_complexus/proc/update(force)
+/datum/psi_complexus/proc/update(var/force)
 
 	set waitfor = FALSE
 
@@ -66,7 +66,7 @@
 	if(!announced && owner && owner.client && !QDELETED(src))
 		announced = TRUE
 		to_chat(owner, "<hr>")
-		to_chat(owner, SPAN_NOTICE(FONT_LARGE("You are <b>psionic</b>, touched by powers beyond understanding.")))
+		to_chat(owner, SPAN_NOTICE("<font size = 3>You are <b>psionic</b>, touched by powers beyond understanding.</font>"))
 		to_chat(owner, SPAN_NOTICE("<b>Shift-left-click your Psi icon</b> on the bottom right to <b>view a summary of how to use them</b>, or <b>left click</b> it to <b>suppress or unsuppress</b> your psionics. Beware: overusing your gifts can have <b>deadly consequences</b>."))
 		to_chat(owner, "<hr>")
 
@@ -115,13 +115,10 @@
 		last_aura_size =  next_aura_size
 		last_aura_alpha = next_aura_alpha
 		last_aura_color = aura_color
-		animate(
-			get_aura_image(),
-			alpha = next_aura_alpha,
-			transform = matrix().Update(scale_x = next_aura_size, scale_y = next_aura_size),
-			color = aura_color,
-			time = 3
-		)
+		var/matrix/M = matrix()
+		if(next_aura_size != 1)
+			M.Scale(next_aura_size)
+		animate(get_aura_image(), alpha = next_aura_alpha, transform = M, color = aura_color, time = 3)
 
 	if(update_hud)
 		ui.update_icon()
@@ -193,7 +190,7 @@
 						return
 
 			// Heal broken bones.
-			if(length(H.bad_external_organs))
+			if(H.bad_external_organs.len)
 				for(var/obj/item/organ/external/E in H.bad_external_organs)
 
 					if(BP_IS_ROBOTIC(E))

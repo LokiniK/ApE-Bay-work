@@ -4,7 +4,7 @@
 
 	..()
 
-	if (HasMovementHandler(/datum/movement_handler/mob/transformation))
+	if (HasMovementHandler(/datum/movement_handler/mob/transformation/))
 		return
 	if (!loc)
 		return
@@ -42,6 +42,8 @@
 
 	handle_regular_hud_updates()
 
+	eye_blink() // INF@CODE
+
 	return 1
 
 /mob/living/proc/handle_breathing()
@@ -56,7 +58,7 @@
 /mob/living/proc/handle_random_events()
 	return
 
-/mob/living/proc/handle_environment(datum/gas_mixture/environment)
+/mob/living/proc/handle_environment(var/datum/gas_mixture/environment)
 	return
 
 /mob/living/proc/update_pulling()
@@ -189,10 +191,11 @@
 	else if(eyeobj)
 		if(eyeobj.owner != src)
 			reset_view(null)
-	else if(!client?.adminobs)
+	else if(!client.adminobs)
 		reset_view(null)
 
 /mob/living/proc/update_sight()
+	if(stop_sight_update) return //INF
 	set_sight(0)
 	set_see_in_dark(0)
 	if(stat == DEAD || eyeobj)

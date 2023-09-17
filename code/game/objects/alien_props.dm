@@ -4,11 +4,11 @@
 /obj/item/cell/alien
 	name = "alien device"
 	desc = "It hums with power."
-	icon = 'icons/obj/xenoarchaeology_finds.dmi'
+	icon = 'icons/obj/xenoarchaeology.dmi'
 	icon_state = "unknown1"
 	maxcharge = 5000
 	origin_tech = list(TECH_POWER = 7)
-	var/static/base_icon
+	var/global/base_icon
 
 /obj/item/cell/alien/on_update_icon()
 	if(!base_icon)
@@ -21,12 +21,12 @@
 /obj/machinery/power/apc/alien
 	name = "alien device"
 	desc = "It's affixed to the floor, with a thick wire going into it."
-	icon = 'icons/obj/xenoarchaeology_finds.dmi'
+	icon = 'icons/obj/xenoarchaeology.dmi'
 	icon_state = "ano10"
 	update_state = 0 //Don't pixelshift us on wall
 	cell_type = /obj/item/cell/alien
 	autoname = 0
-
+	
 /obj/machinery/power/apc/alien/on_update_icon()
 	check_updates()
 	if(update_state & APC_UPDATE_ALLGOOD)
@@ -55,7 +55,7 @@
 	base_state = "lbulb"
 	desc = "A simple alien device, perhaps some sort of light source."
 	color = COLOR_PURPLE
-	var/static/random_light_color
+	var/global/random_light_color
 
 /obj/item/light/alien/Initialize()
 	. = ..()

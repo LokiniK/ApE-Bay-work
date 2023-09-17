@@ -1,6 +1,10 @@
 /obj/effect/overmap/visitable/sector/exoplanet/snow
 	name = "snow exoplanet"
-	desc = "Cold planet with limited plant life."
+	scanner_name = "snow exoplanet"
+	scanner_desc = @{"[i]Stellar Body[/i]>: UNKNOWN
+[i]Class[/i]>: L-Class Planetoid
+[i]Habitability[/i]>: Moderate (Low Temperature)
+[b]Notice[/b]>: Cold planet with limited plant life"}
 	color = "#dcdcdc"
 	planetary_area = /area/exoplanet/snow
 	rock_colors = list(COLOR_DARK_BLUE_GRAY, COLOR_GUNMETAL, COLOR_GRAY80, COLOR_DARK_GRAY)
@@ -35,4 +39,4 @@
 
 /area/exoplanet/snow
 	ambience = list('sound/effects/wind/tundra0.ogg','sound/effects/wind/tundra1.ogg','sound/effects/wind/tundra2.ogg','sound/effects/wind/spooky0.ogg','sound/effects/wind/spooky1.ogg')
-	base_turf = /turf/simulated/floor/exoplanet/snow
+	base_turf = /turf/simulated/floor/exoplanet/snow/

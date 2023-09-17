@@ -5,10 +5,10 @@
 	name = "\proper space"
 	icon_state = "default"
 	dynamic_lighting = 0
+	//permit_ao = FALSE
 	temperature = T20C
 	thermal_conductivity = OPEN_HEAT_TRANSFER_COEFFICIENT
 	permit_ao = FALSE
-	turf_flags = TURF_DISALLOW_BLOB
 
 	z_eventually_space = TRUE
 
@@ -39,7 +39,7 @@
 			T.z_eventually_space = FALSE
 	return ..()
 
-/turf/space/LateInitialize(mapload)
+/turf/space/LateInitialize()
 	if(GLOB.using_map.base_floor_area)
 		var/area/new_area = locate(GLOB.using_map.base_floor_area) || new GLOB.using_map.base_floor_area
 		ChangeArea(src, new_area)
@@ -69,12 +69,12 @@
 			return L.attackby(C, user)
 		var/obj/item/stack/material/rods/R = C
 		if (R.use(1))
-			to_chat(user, SPAN_NOTICE("You lay down the support lattice."))
+			to_chat(user, "<span class='notice'>Constructing support lattice ...</span>")
 			playsound(src, 'sound/weapons/Genhit.ogg', 50, 1)
 			ReplaceWithLattice(R.material.name)
 		return
 
-	if (istype(C, /obj/item/stack/tile))
+	if (istype(C, /obj/item/stack/tile/floor))
 		var/obj/structure/lattice/L = locate(/obj/structure/lattice, src)
 		if(L)
 			var/obj/item/stack/tile/floor/S = C
@@ -82,22 +82,10 @@
 				return
 			qdel(L)
 			playsound(src, 'sound/weapons/Genhit.ogg', 50, 1)
-			ChangeTurf(/turf/simulated/floor/plating, keep_air = TRUE)
+			ChangeTurf(/turf/simulated/floor/airless, keep_air = TRUE)
 			return
 		else
-			to_chat(user, SPAN_WARNING("The plating is going to need some support."))
-
-	//Checking if the user attacked with a cable coil
-	if(isCoil(C))
-		var/obj/item/stack/cable_coil/coil = C
-		var/obj/structure/lattice/L = locate(/obj/structure/lattice, src)
-		if(L)
-			coil.PlaceCableOnTurf(src, user)
-			return
-		else
-			to_chat(user, SPAN_WARNING("The cable needs something to be secured to."))
-			return
-
+			to_chat(user, "<span class='warning'>The plating is going to need some support.</span>")
 	return
 
 
@@ -108,6 +96,9 @@
 	if(A && A.loc == src)
 		if (A.x <= TRANSITIONEDGE || A.x >= (world.maxx - TRANSITIONEDGE + 1) || A.y <= TRANSITIONEDGE || A.y >= (world.maxy - TRANSITIONEDGE + 1))
 			A.touch_map_edge()
+
+/turf/space/ChangeTurf(turf/N, tell_universe = TRUE, force_lighting_update = FALSE, keep_air = FALSE)
+	return ..(N, tell_universe, TRUE, keep_air)
 
 /turf/space/is_open()
 	return TRUE

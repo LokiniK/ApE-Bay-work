@@ -1,7 +1,7 @@
 /obj/machinery/igniter
 	name = "igniter"
 	desc = "It's useful for igniting flammable items."
-	icon = 'icons/obj/structures/igniter.dmi'
+	icon = 'icons/obj/stationobjs.dmi'
 	icon_state = "igniter1"
 	var/on = 0
 	anchored = TRUE
@@ -13,12 +13,12 @@
 		/obj/item/stock_parts/power/apc
 	)
 	public_variables = list(
-		/singleton/public_access/public_variable/igniter_on
+		/decl/public_access/public_variable/igniter_on
 	)
 	public_methods = list(
-		/singleton/public_access/public_method/igniter_toggle
+		/decl/public_access/public_method/igniter_toggle
 	)
-	stock_part_presets = list(/singleton/stock_part_preset/radio/receiver/igniter = 1)
+	stock_part_presets = list(/decl/stock_part_preset/radio/receiver/igniter = 1)
 
 /obj/machinery/igniter/Initialize()
 	. = ..()
@@ -36,7 +36,7 @@
 	return TRUE
 
 /obj/machinery/igniter/Process()
-	if(is_powered())
+	if(!(stat & NOPOWER))
 		var/turf/location = src.loc
 		if (isturf(location))
 			location.hotspot_expose(1000,500,1)
@@ -51,31 +51,31 @@
 		STOP_PROCESSING_MACHINE(src, MACHINERY_PROCESS_SELF)
 	update_icon()
 
-/singleton/public_access/public_variable/igniter_on
+/decl/public_access/public_variable/igniter_on
 	expected_type = /obj/machinery/igniter
 	name = "igniter active"
 	desc = "Whether or not the igniter is igniting."
 	can_write = FALSE
 	has_updates = FALSE
 
-/singleton/public_access/public_variable/holosign_on/access_var(obj/machinery/igniter/igniter)
+/decl/public_access/public_variable/holosign_on/access_var(obj/machinery/igniter/igniter)
 	return igniter.on
 
-/singleton/public_access/public_method/igniter_toggle
+/decl/public_access/public_method/igniter_toggle
 	name = "igniter toggle"
 	desc = "Toggle the igniter on or off."
 	call_proc = /obj/machinery/igniter/proc/ignite
 
-/singleton/stock_part_preset/radio/receiver/igniter
+/decl/stock_part_preset/radio/receiver/igniter
 	frequency = BUTTON_FREQ
-	receive_and_call = list("button_active" = /singleton/public_access/public_method/igniter_toggle)
+	receive_and_call = list("button_active" = /decl/public_access/public_method/igniter_toggle)
 
 // Wall mounted remote-control igniter.
 
 /obj/machinery/sparker
-	name = "mounted igniter"
+	name = "Mounted igniter"
 	desc = "A wall-mounted ignition device."
-	icon = 'icons/obj/structures/mounted_igniter.dmi'
+	icon = 'icons/obj/stationobjs.dmi'
 	icon_state = "migniter"
 	var/disable = 0
 	var/last_spark = 0
@@ -89,9 +89,9 @@
 		/obj/item/stock_parts/power/apc
 	)
 	public_methods = list(
-		/singleton/public_access/public_method/sparker_spark
+		/decl/public_access/public_method/sparker_spark
 	)
-	stock_part_presets = list(/singleton/stock_part_preset/radio/receiver/sparker = 1)
+	stock_part_presets = list(/decl/stock_part_preset/radio/receiver/sparker = 1)
 
 /obj/machinery/sparker/on_update_icon()
 	..()
@@ -109,9 +109,9 @@
 		add_fingerprint(user)
 		disable = !disable
 		if(disable)
-			user.visible_message(SPAN_WARNING("[user] has disabled the [src]!"), SPAN_WARNING("You disable the connection to the [src]."))
+			user.visible_message("<span class='warning'>[user] has disabled the [src]!</span>", "<span class='warning'>You disable the connection to the [src].</span>")
 		else if(!disable)
-			user.visible_message(SPAN_WARNING("[user] has reconnected the [src]!"), SPAN_WARNING("You fix the connection to the [src]."))
+			user.visible_message("<span class='warning'>[user] has reconnected the [src]!</span>", "<span class='warning'>You fix the connection to the [src].</span>")
 		update_icon()
 	else
 		..()
@@ -142,20 +142,20 @@
 	return 1
 
 /obj/machinery/sparker/emp_act(severity)
-	if(inoperable())
+	if(stat & (BROKEN|NOPOWER))
 		..(severity)
 		return
 	ignite()
 	..(severity)
 
-/singleton/public_access/public_method/sparker_spark
+/decl/public_access/public_method/sparker_spark
 	name = "spark"
 	desc = "Creates sparks to ignite nearby gases."
 	call_proc = /obj/machinery/sparker/proc/ignite
 
-/singleton/stock_part_preset/radio/receiver/sparker
+/decl/stock_part_preset/radio/receiver/sparker
 	frequency = BUTTON_FREQ
-	receive_and_call = list("button_active" = /singleton/public_access/public_method/sparker_spark)
+	receive_and_call = list("button_active" = /decl/public_access/public_method/sparker_spark)
 
 /obj/machinery/button/ignition
 	name = "ignition switch"

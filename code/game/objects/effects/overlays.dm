@@ -1,18 +1,16 @@
 /obj/effect/overlay
 	name = "overlay"
 	unacidable = TRUE
-	var/i_attached //Added for possible image attachments to objects. For hallucinations and the like.
+	var/i_attached//Added for possible image attachments to objects. For hallucinations and the like.
 
-/obj/effect/overlay/beam
+/obj/effect/overlay/beam//Not actually a projectile, just an effect.
 	name="beam"
 	icon='icons/effects/beam.dmi'
 	icon_state= "b_beam"
-	var/atom/BeamSource
-
-/obj/effect/overlay/beam/New()
-	..()
-	spawn(10)
-		qdel(src)
+	var/tmp/atom/BeamSource
+	New()
+		..()
+		spawn(10) qdel(src)
 
 /obj/effect/overlay/palmtree_r
 	name = "Palm tree"
@@ -55,30 +53,36 @@
 	pixel_x += rand(-10, 10)
 	pixel_y += rand(-10, 10)
 
-
-/// Effect overlays that should automatically delete themselves after a set time.
-/obj/effect/overlay/self_deleting
-	/// The amount of time in deciseconds before the effect deletes itself. Can be defined in the object's definition or via `New()`.
-	var/delete_time
-
-
-/obj/effect/overlay/self_deleting/emppulse
-	name = "emp pulse"
-	icon = 'icons/effects/effects.dmi'
-	icon_state = "emppulse"
+/obj/effect/overlay/closet_door
 	anchored = TRUE
-	delete_time = 2 SECONDS
+	plane = FLOAT_PLANE
+	layer = FLOAT_LAYER
+	vis_flags = VIS_INHERIT_ID
+	appearance_flags = KEEP_TOGETHER | LONG_GLIDE | PIXEL_SCALE
 
+/atom/proc/compile_overlays()
+	var/list/oo = our_overlays
+	var/list/po = priority_overlays
+	if(LAZYLEN(po) && LAZYLEN(oo))
+		overlays = oo + po
+	else if(LAZYLEN(oo))
+		overlays = oo
+	else if(LAZYLEN(po))
+		overlays = po
+	else
+		overlays.Cut()
 
-/obj/effect/overlay/self_deleting/Initialize(mapload, _delete_time)
-	. = ..()
-	if (_delete_time)
-		delete_time = _delete_time
-	if (delete_time <= 0)
-		log_debug(append_admin_tools("A self deleting overlay ([src]) was spawned with a negative or zero delete time ([delete_time]) and was instantly deleted.", location = get_turf(src)))
-		return INITIALIZE_HINT_QDEL
-	addtimer(new Callback(src, .proc/self_delete), delete_time)
+	overlay_queued = FALSE
 
+/atom/movable/compile_overlays()
+	..()
+	UPDATE_OO_IF_PRESENT
 
-/obj/effect/overlay/self_deleting/proc/self_delete()
-	qdel(src)
+/turf/compile_overlays()
+	..()
+	if (istype(above))
+		update_above()
+/atom
+	var/tmp/list/our_overlays	//our local copy of (non-priority) overlays without byond magic. Use procs in SSoverlays to manipulate
+	var/tmp/list/priority_overlays	//overlays that should remain on top and not normally removed when using cut_overlay functions, like c4.
+	var/tmp/overlay_queued

@@ -1,6 +1,6 @@
 /obj/machinery/psi_monitor
 	name = "psionic implant monitor"
-	icon = 'icons/obj/machines/research/psimeter.dmi'
+	icon = 'icons/obj/machines/psimeter.dmi'
 	icon_state = "meter_on"
 	use_power = POWER_USE_ACTIVE
 	anchored = TRUE
@@ -16,12 +16,12 @@
 	SSpsi.psi_monitors += src
 	..()
 
-/obj/machinery/psi_monitor/emag_act(remaining_charges, mob/user)
+/obj/machinery/psi_monitor/emag_act(var/remaining_charges, var/mob/user)
 	if(!emagged)
 		emagged = TRUE
 		remaining_charges--
 		req_access.Cut()
-		to_chat(user, SPAN_NOTICE("You short out the access protocols."))
+		to_chat(user, "<span class='notice'>You short out the access protocols.</span>")
 		return TRUE
 	return FALSE
 
@@ -34,7 +34,7 @@
 
 			var/obj/item/card/id/ID = usr.GetIdCard()
 			if(!ID || !allowed(usr))
-				to_chat(usr, SPAN_WARNING("Access denied."))
+				to_chat(usr, "<span class='warning'>Access denied.</span>")
 			else
 				authorized = "[ID.registered_name] ([ID.assignment])"
 			. = 1
@@ -49,7 +49,7 @@
 
 		else  if(href_list["remove_violation"])
 			var/remove_ind = text2num(href_list["remove_violation"])
-			if(remove_ind > 0 && remove_ind <= length(psi_violations))
+			if(remove_ind > 0 && remove_ind <= psi_violations.len)
 				psi_violations.Cut(remove_ind, remove_ind++)
 				. = 1
 
@@ -65,11 +65,11 @@
 		if(. && usr)
 			interact(usr)
 
-/obj/machinery/psi_monitor/interface_interact(mob/user)
+/obj/machinery/psi_monitor/interface_interact(var/mob/user)
 	interact(user)
 	return TRUE
 
-/obj/machinery/psi_monitor/interact(mob/user)
+/obj/machinery/psi_monitor/interact(var/mob/user)
 
 	var/list/dat = list()
 	dat += "<h1>Psi Dampener Monitor</h1>"
@@ -95,8 +95,8 @@
 
 	if(show_violations)
 		dat += "<h2>Psionic Control Violations <a href='?src=\ref[src];show_violations=0'>-</a></h2><hr><center><table>"
-		if(length(psi_violations))
-			for(var/i =  1 to length(psi_violations))
+		if(psi_violations.len)
+			for(var/i =  1 to psi_violations.len)
 				var/entry = psi_violations[i]
 				dat += "<tr><td><br>[entry]</td><td>[authorized ? "<a href='?src=\ref[src];remove_violation=[i]'>Remove</a>" : ""]</td></tr>"
 		else
@@ -110,8 +110,8 @@
 	popup.open()
 
 
-/obj/machinery/psi_monitor/proc/report_failure(obj/item/implant/psi_control/implant)
-	psi_violations += SPAN_COLOR("#ff0000", "Critical system failure - [implant.imp_in.name].")
+/obj/machinery/psi_monitor/proc/report_failure(var/obj/item/implant/psi_control/implant)
+	psi_violations += "<font color='#FF0000'>Critical system failure - [implant.imp_in.name].</font>"
 
-/obj/machinery/psi_monitor/proc/report_violation(obj/item/implant/psi_control/implant, stress)
+/obj/machinery/psi_monitor/proc/report_violation(var/obj/item/implant/psi_control/implant, var/stress)
 	psi_violations += "Sigma [round(stress/10)] event - [implant.imp_in.name]."

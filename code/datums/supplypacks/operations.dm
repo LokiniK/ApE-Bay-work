@@ -1,7 +1,21 @@
-/singleton/hierarchy/supply_pack/operations
+/decl/hierarchy/supply_pack/operations
 	name = "Operations"
 
-/singleton/hierarchy/supply_pack/operations/contraband
+/decl/hierarchy/supply_pack/operations/cargotrain
+	name = "Equipment - Cargo Train Tug"
+	contains = list(/obj/vehicle/train/cargo/engine)
+	cost = 45
+	containertype = /obj/structure/largecrate
+	containername = "cargo train tug crate"
+
+/decl/hierarchy/supply_pack/operations/cargotrailer
+	name = "Equipment - Cargo Train Trolley"
+	contains = list(/obj/vehicle/train/cargo/trolley)
+	cost = 15
+	containertype = /obj/structure/largecrate
+	containername = "cargo train trolley crate"
+
+/decl/hierarchy/supply_pack/operations/contraband
 	num_contained = 5
 	contains = list(/obj/item/seeds/bloodtomatoseed,
 					/obj/item/storage/pill_bottle/zoom,
@@ -13,9 +27,9 @@
 	cost = 30
 	containername = "unlabeled crate"
 	contraband = 1
-	supply_method = /singleton/supply_method/randomized
+	supply_method = /decl/supply_method/randomized
 
-/singleton/hierarchy/supply_pack/operations/plasma_cutter
+/decl/hierarchy/supply_pack/operations/plasma_cutter
 	name = "Equipment - Plasma Cutter"
 	contains = list(/obj/item/gun/energy/plasmacutter)
 	cost = 120
@@ -23,14 +37,14 @@
 	containername = "plasma cutter crate"
 	access = list(list(access_mining,access_engine))
 
-/singleton/hierarchy/supply_pack/operations/orebox
+/decl/hierarchy/supply_pack/operations/orebox
 	name = "Equipment - Ore box"
 	contains = list(/obj/structure/ore_box)
 	cost = 15
 	containertype = /obj/structure/largecrate
 	containername = "Ore box crate"
 
-/singleton/hierarchy/supply_pack/operations/webbing
+/decl/hierarchy/supply_pack/operations/webbing
 	name = "Gear - Webbing, vests, holsters."
 	num_contained = 4
 	contains = list(/obj/item/clothing/accessory/storage/holster,
@@ -44,7 +58,7 @@
 	cost = 15
 	containername = "webbing crate"
 
-/singleton/hierarchy/supply_pack/operations/voidsuit_engineering
+/decl/hierarchy/supply_pack/operations/voidsuit_engineering
 	name = "EVA - Engineering voidsuit"
 	contains = list(/obj/item/clothing/suit/space/void/engineering/alt,
 					/obj/item/clothing/head/helmet/space/void/engineering/alt,
@@ -54,7 +68,7 @@
 	containertype = /obj/structure/closet/crate/secure/large
 	access = access_engine
 
-/singleton/hierarchy/supply_pack/operations/voidsuit_medical
+/decl/hierarchy/supply_pack/operations/voidsuit_medical
 	name = "EVA - Medical voidsuit"
 	contains = list(/obj/item/clothing/suit/space/void/medical/alt,
 					/obj/item/clothing/head/helmet/space/void/medical/alt,
@@ -64,7 +78,7 @@
 	containertype = /obj/structure/closet/crate/secure/large
 	access = access_medical_equip
 
-/singleton/hierarchy/supply_pack/operations/voidsuit_security
+/decl/hierarchy/supply_pack/operations/voidsuit_security
 	name = "EVA - Security (armored) voidsuit"
 	contains = list(/obj/item/clothing/suit/space/void/security/alt,
 					/obj/item/clothing/head/helmet/space/void/security/alt,
@@ -74,7 +88,7 @@
 	containertype = /obj/structure/closet/crate/secure/large
 	access = access_brig
 
-/singleton/hierarchy/supply_pack/operations/bureaucracy
+/decl/hierarchy/supply_pack/operations/bureaucracy
 	contains = list(/obj/item/material/clipboard,
 					 /obj/item/material/clipboard,
 					 /obj/item/pen/retractable/red,
@@ -92,3 +106,4 @@
 	cost = 15
 	containertype = /obj/structure/closet/crate/large
 	containername = "office supplies crate"
+

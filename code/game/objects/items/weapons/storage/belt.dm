@@ -13,6 +13,10 @@
 	slot_flags = SLOT_BELT
 	var/overlay_flags
 	attack_verb = list("whipped", "lashed", "disciplined")
+	sprite_sheets = list(
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_belt_resomi.dmi',
+		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/belt.dmi'
+		)
 
 /obj/item/storage/belt/verb/toggle_layer()
 	set name = "Switch Belt Layer"
@@ -33,7 +37,7 @@
 
 /obj/item/storage/belt/get_mob_overlay(mob/user_mob, slot)
 	var/image/ret = ..()
-	if(slot == slot_belt_str && length(contents))
+	if(slot == slot_belt_str && contents.len)
 		var/list/ret_overlays = list()
 		for(var/obj/item/I in contents)
 			var/use_state = (I.item_state ? I.item_state : I.icon_state)
@@ -106,7 +110,7 @@
 	item_state = "utility"
 	overlay_flags = BELT_OVERLAY_ITEMS
 	can_hold = list(
-		///obj/item/combitool,
+		/obj/item/combitool,
 		/obj/item/crowbar,
 		/obj/item/screwdriver,
 		/obj/item/weldingtool,
@@ -118,7 +122,7 @@
 		/obj/item/device/t_scanner,
 		/obj/item/device/scanner/gas,
 		/obj/item/taperoll/engineering,
-		/obj/item/inducer,
+		/obj/item/inducer/,
 		/obj/item/device/robotanalyzer,
 		/obj/item/material/minihoe,
 		/obj/item/material/hatchet,
@@ -131,8 +135,8 @@
 		/obj/item/clothing/gloves,
 		/obj/item/tape_roll,
 		/obj/item/clothing/head/beret,
-		/obj/item/material/knife/folding,
-		/obj/item/swapper
+		/obj/item/material/knife/folding/,
+		/obj/item/welder_tank
 		)
 
 
@@ -143,7 +147,7 @@
 	new /obj/item/weldingtool(src)
 	new /obj/item/crowbar(src)
 	new /obj/item/wirecutters(src)
-	new /obj/random/single/color/cable_coil(src, 30)
+	new /obj/item/stack/cable_coil/random(src, 30)
 	update_icon()
 
 
@@ -157,14 +161,7 @@
 	new /obj/item/device/t_scanner(src)
 	update_icon()
 
-/obj/item/storage/belt/utility/engi_command/New()
-	..()
-	new /obj/item/swapper/power_drill(src)
-	new /obj/item/weldingtool(src)
-	new /obj/item/swapper/jaws_of_life(src)
-	new /obj/random/single/color/cable_coil(src, 30)
-	new /obj/item/device/t_scanner(src)
-	update_icon()
+
 
 /obj/item/storage/belt/medical
 	name = "medical belt"
@@ -179,7 +176,7 @@
 		/obj/item/reagent_containers/pill,
 		/obj/item/reagent_containers/syringe,
 		/obj/item/flame/lighter/zippo,
-		/obj/item/storage/fancy/smokable,
+		/obj/item/storage/fancy/cigarettes,
 		/obj/item/storage/pill_bottle,
 		/obj/item/stack/medical,
 		/obj/item/device/flashlight/pen,
@@ -196,7 +193,7 @@
 		/obj/item/bodybag,
 		/obj/item/clothing/gloves,
 		/obj/item/clothing/head/beret,
-		/obj/item/material/knife/folding
+		/obj/item/material/knife/folding/
 		)
 
 /obj/item/storage/belt/medical/emt
@@ -213,6 +210,8 @@
 	storage_slots = 8
 	overlay_flags = BELT_OVERLAY_ITEMS|BELT_OVERLAY_HOLSTER
 	can_hold = list(
+		/obj/item/storage/firstaid/individual/military,
+		/obj/item/storage/firstaid/light,
 		/obj/item/crowbar,
 		/obj/item/grenade,
 		/obj/item/reagent_containers/spray/pepper,
@@ -221,7 +220,7 @@
 		/obj/item/clothing/glasses,
 		/obj/item/ammo_casing/shotgun,
 		/obj/item/ammo_magazine,
-		/obj/item/reagent_containers/food/snacks/donut,
+		/obj/item/reagent_containers/food/snacks/donut/,
 		/obj/item/melee/baton,
 		/obj/item/melee/telebaton,
 		/obj/item/flame/lighter,
@@ -237,16 +236,8 @@
 		/obj/item/device/binoculars,
 		/obj/item/clothing/gloves,
 		/obj/item/clothing/head/beret,
-		/obj/item/material/knife/folding
+		/obj/item/material/knife/folding/
 		)
-
-/obj/item/storage/belt/holster/security/full/Initialize()
-	. = ..()
-	new /obj/item/device/flash (src)
-	new /obj/item/reagent_containers/spray/pepper (src)
-	new /obj/item/melee/baton/loaded (src)
-	new /obj/item/device/holowarrant (src)
-	queue_icon_update()
 
 /obj/item/storage/belt/security
 	name = "security belt"
@@ -255,6 +246,8 @@
 	item_state = "basicsecurity"
 	overlay_flags = BELT_OVERLAY_ITEMS
 	can_hold = list(
+		/obj/item/storage/firstaid/individual/military,
+		/obj/item/storage/firstaid/light,
 		/obj/item/crowbar,
 		/obj/item/grenade,
 		/obj/item/reagent_containers/spray/pepper,
@@ -263,7 +256,7 @@
 		/obj/item/clothing/glasses,
 		/obj/item/ammo_casing/shotgun,
 		/obj/item/ammo_magazine,
-		/obj/item/reagent_containers/food/snacks/donut,
+		/obj/item/reagent_containers/food/snacks/donut/,
 		/obj/item/melee/baton,
 		/obj/item/melee/telebaton,
 		/obj/item/flame/lighter,
@@ -279,7 +272,7 @@
 		/obj/item/device/binoculars,
 		/obj/item/clothing/gloves,
 		/obj/item/clothing/head/beret,
-		/obj/item/material/knife/folding
+		/obj/item/material/knife/folding/
 		)
 
 /obj/item/storage/belt/general
@@ -317,24 +310,13 @@
 		/obj/item/hand_labeler,
 		/obj/item/clothing/gloves,
 		/obj/item/crowbar/prybar,
-		/obj/item/tank/oxygen_emergency,
-		/obj/item/tank/nitrogen_emergency,
+		/obj/item/tank/emergency,
 		/obj/item/clothing/mask/breath,
 		/obj/item/toy/bosunwhistle,
 		/obj/item/clothing/head/beret,
-		/obj/item/material/knife/folding,
+		/obj/item/material/knife/folding/,
 		/obj/item/device/tape
 		)
-
-/obj/item/storage/belt/general/full/Initialize()
-	. = ..()
-	new /obj/item/material/clipboard(src)
-	new /obj/item/folder(src)
-	new /obj/item/device/taperecorder(src)
-	new /obj/item/device/camera(src)
-	new /obj/item/taperoll/research(src)
-	new /obj/item/device/tape/random(src)
-	queue_icon_update()
 
 /obj/item/storage/belt/janitor
 	name = "janibelt"
@@ -347,14 +329,13 @@
 		/obj/item/device/flashlight,
 		/obj/item/reagent_containers/spray/cleaner,
 		/obj/item/soap,
-		/obj/item/reagent_containers/glass/rag,
 		/obj/item/holosign_creator,
 		/obj/item/clothing/gloves,
 		/obj/item/device/assembly/mousetrap,
 		/obj/item/crowbar/prybar,
 		/obj/item/clothing/mask/plunger,
 		/obj/item/clothing/head/beret,
-		/obj/item/material/knife/folding
+		/obj/item/material/knife/folding/
 		)
 
 /obj/item/storage/belt/holster/general
@@ -393,12 +374,11 @@
 		/obj/item/hand_labeler,
 		/obj/item/clothing/gloves,
 		/obj/item/crowbar/prybar,
-		/obj/item/tank/oxygen_emergency,
-		/obj/item/tank/nitrogen_emergency,
+		/obj/item/tank/emergency,
 		/obj/item/clothing/mask/breath,
 		/obj/item/toy/bosunwhistle,
 		/obj/item/clothing/head/beret,
-		/obj/item/material/knife/folding,
+		/obj/item/material/knife/folding/,
 		/obj/item/device/tape
 		)
 
@@ -418,11 +398,10 @@
 		/obj/item/sample/fibers,
 		/obj/item/device/taperecorder,
 		/obj/item/device/tape,
-		/obj/item/clothing/gloves,
+		/obj/item/clothing/gloves/latex,
+		/obj/item/clothing/gloves/forensic,
 		/obj/item/folder,
 		/obj/item/paper,
-		/obj/item/photo,
-		/obj/item/paper_bundle,
 		/obj/item/forensics/sample_kit,
 		/obj/item/device/camera,
 		/obj/item/device/taperecorder,
@@ -430,8 +409,7 @@
 		/obj/item/storage/csi_markers,
 		/obj/item/device/scanner,
 		/obj/item/clothing/head/beret,
-		/obj/item/material/knife/folding,
-		/obj/item/modular_computer/tablet
+		/obj/item/material/knife/folding/
 		)
 
 /obj/item/storage/belt/forensic
@@ -449,11 +427,10 @@
 		/obj/item/sample/fibers,
 		/obj/item/device/taperecorder,
 		/obj/item/device/tape,
-		/obj/item/clothing/gloves,
+		/obj/item/clothing/gloves/latex,
+		/obj/item/clothing/gloves/forensic,
 		/obj/item/folder,
 		/obj/item/paper,
-		/obj/item/photo,
-		/obj/item/paper_bundle,
 		/obj/item/forensics/sample_kit,
 		/obj/item/device/camera,
 		/obj/item/device/taperecorder,
@@ -461,8 +438,7 @@
 		/obj/item/storage/csi_markers,
 		/obj/item/device/scanner,
 		/obj/item/clothing/head/beret,
-		/obj/item/material/knife/folding,
-		/obj/item/modular_computer/tablet
+		/obj/item/material/knife/folding/
 		)
 
 /obj/item/storage/belt/holster/machete
@@ -487,6 +463,7 @@
 		/obj/item/paper,
 		/obj/item/pen,
 		/obj/item/device/spaceflare,
+		/obj/item/device/radio/beacon,
 		/obj/item/pinpointer/radio,
 		/obj/item/device/taperecorder,
 		/obj/item/device/tape,
@@ -494,7 +471,7 @@
 		/obj/item/clothing/gloves,
 		/obj/item/tape_roll,
 		/obj/item/clothing/head/beret,
-		/obj/item/material/knife/folding,
+		/obj/item/material/knife/folding/,
 		/obj/item/storage/firstaid/light,
 		/obj/item/device/flash
 		)
@@ -535,12 +512,33 @@
 
 /obj/item/storage/belt/holster/security/tactical
 	name = "combat belt"
-	desc = "Can hold security gear like handcuffs and flashes, with more pouches for more storage."
+	desc = "A special combat belt with varios strapes and pouches for ammo and grenades." //INF WAS "Can hold security gear like handcuffs and flashes, with more pouches for more storage."
 	icon_state = "swatbelt"
 	item_state = "swatbelt"
-	storage_slots = 10
-
-
+	storage_slots = 11 //INF WAS 10
+//[INF]
+	can_hold = list(
+		/obj/item/storage/firstaid/individual/military,
+		/obj/item/storage/firstaid/light,
+		/obj/item/grenade,
+		/obj/item/device/flash,
+		/obj/item/handcuffs,
+		/obj/item/ammo_casing/shotgun,
+		/obj/item/ammo_magazine,
+		/obj/item/magnetic_ammo,
+		/obj/item/melee/baton,
+		/obj/item/melee/telebaton,
+		/obj/item/flame/lighter,
+		/obj/item/device/flashlight,
+		/obj/item/device/megaphone,
+		/obj/item/reagent_containers/spray/pepper
+		)
+//[/INF]
+/* INF | А надо ли? ~bear1ake
+/obj/item/storage/belt/holster/security/tactical/Initialize()
+	.=..()
+	slowdown_per_slot[slot_belt] = 1
+*/
 /obj/item/storage/belt/waistpack
 	name = "waist pack"
 	desc = "A small bag designed to be worn on the waist. May make your butt look big."
@@ -548,8 +546,26 @@
 	item_state = "fannypack_white"
 	storage_slots = null
 	max_w_class = ITEM_SIZE_SMALL
-	max_storage_space = ITEM_SIZE_SMALL * 4
+	max_storage_space = ITEM_SIZE_SMALL * 3
 	slot_flags = SLOT_BELT | SLOT_BACK
+//[INF]
+	sprite_sheets = list(
+		SPECIES_HUMAN = 'icons/mob/onmob/infinity/onmob_belt.dmi',
+		)
+//[/INF]
+
+/obj/item/storage/belt/waistpack/big
+	name = "large waist pack"
+	desc = "A bag designed to be worn on the waist. Definitely makes your butt look big."
+	icon_state = "fannypack_big_white"
+	item_state = "fannypack_big_white"
+	w_class = ITEM_SIZE_LARGE
+	max_w_class = ITEM_SIZE_NORMAL
+	max_storage_space = ITEM_SIZE_NORMAL * 3
+
+/obj/item/storage/belt/waistpack/big/Initialize()
+	.=..()
+	slowdown_per_slot[slot_belt] = 1
 
 /obj/item/storage/belt/fire_belt
 	name = "firefighting equipment belt"

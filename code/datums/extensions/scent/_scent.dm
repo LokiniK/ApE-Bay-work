@@ -1,21 +1,19 @@
 #define SCENT_DESC_ODOR        "odour"
 #define SCENT_DESC_SMELL       "smell"
 #define SCENT_DESC_FRAGRANCE   "fragrance"
-#define SCENT_DESC_HAZE        "haze"
-#define SCENT_DESC_PLUME       "plume"
 
 /*****
 Scent intensity
 *****/
 
-/singleton/scent_intensity
+/decl/scent_intensity
 	var/cooldown = 5 MINUTES
 	var/intensity = 1
 
-/singleton/scent_intensity/proc/can_smell(mob/living/carbon/human/user)
+/decl/scent_intensity/proc/can_smell(mob/living/carbon/human/user)
 	return TRUE
 
-/singleton/scent_intensity/proc/PrintMessage(mob/living/carbon/human/user, descriptor, scent)
+/decl/scent_intensity/proc/PrintMessage(mob/living/carbon/human/user, var/descriptor, scent)
 	if(!can_smell(user))
 		return
 	if(!user.isSynthetic())
@@ -24,11 +22,11 @@ Scent intensity
 		to_chat(user, SPAN_NOTICE("Your sensors detect trace amounts of [scent] in the air."))
 
 
-/singleton/scent_intensity/normal
+/decl/scent_intensity/normal
 	cooldown = 4 MINUTES
 	intensity = 2
 
-/singleton/scent_intensity/normal/PrintMessage(mob/living/carbon/human/user, descriptor, scent)
+/decl/scent_intensity/normal/PrintMessage(mob/living/carbon/human/user, var/descriptor, scent)
 	if(!can_smell(user))
 		return
 	if(!user.isSynthetic())
@@ -36,11 +34,11 @@ Scent intensity
 	else
 		to_chat(user, SPAN_NOTICE("Your sensors pick up the presence of [scent] in the air."))
 
-/singleton/scent_intensity/strong
+/decl/scent_intensity/strong
 	cooldown = 3 MINUTES
 	intensity = 3
 
-/singleton/scent_intensity/strong/PrintMessage(mob/living/carbon/human/user, descriptor, scent)
+/decl/scent_intensity/strong/PrintMessage(mob/living/carbon/human/user, var/descriptor, scent)
 	if(!can_smell(user))
 		return
 	if(!user.isSynthetic())
@@ -48,17 +46,6 @@ Scent intensity
 	else
 		to_chat(user, SPAN_WARNING("Your sensors pick up an intense concentration of [scent]."))
 
-/singleton/scent_intensity/overpowering
-	cooldown = 1 MINUTES
-	intensity = 4
-
-/singleton/scent_intensity/overpowering/PrintMessage(mob/living/carbon/human/user, descriptor, scent)
-	if(!can_smell(user))
-		return
-	if(!user.isSynthetic())
-		to_chat(user, SPAN_WARNING("The overwhelming [descriptor] of [scent] assaults your senses. You stifle a gag."))
-	else
-		to_chat(user, SPAN_WARNING("ALERT! Your sensors pick up an overwhelming concentration of [scent]."))
 /*****
  Scent extensions
  Usage:
@@ -75,14 +62,14 @@ Scent intensity
 	flags = EXTENSION_FLAG_IMMEDIATE
 
 	var/scent = "something"
-	var/singleton/scent_intensity/intensity = /singleton/scent_intensity
+	var/decl/scent_intensity/intensity = /decl/scent_intensity
 	var/descriptor = SCENT_DESC_SMELL //unambiguous descriptor of smell; food is generally good, sewage is generally bad. how 'nice' the scent is
 	var/range = 1 //range in tiles
 
 /datum/extension/scent/New()
 	..()
 	if(ispath(intensity))
-		intensity = GET_SINGLETON(intensity)
+		intensity = decls_repository.get_decl(intensity)
 	START_PROCESSING(SSprocessing, src)
 
 /datum/extension/scent/Destroy()
@@ -112,12 +99,12 @@ Custom subtype
 	set_extension(atom, /datum/extension/scent/custom, scent = "scent", intensity = SCENT_INTENSITY_, ... etc)
 This will let you set an extension without needing to define it beforehand. Note that all vars are required if generating.
 *****/
-/datum/extension/scent/custom/New(datum/holder, provided_scent, provided_intensity, provided_descriptor, provided_range)
+/datum/extension/scent/custom/New(var/datum/holder, var/provided_scent, var/provided_intensity, var/provided_descriptor, var/provided_range)
 	..()
 	if(provided_scent && provided_intensity && provided_descriptor && provided_range)
 		scent = provided_scent
 		if(ispath(provided_intensity))
-			intensity = GET_SINGLETON(provided_intensity)
+			intensity = decls_repository.get_decl(provided_intensity)
 		descriptor = provided_descriptor
 		range = provided_range
 	else
@@ -132,7 +119,7 @@ Reagents have the following vars, which coorelate to the vars on the standard sc
 To add a scent extension to an atom using a reagent's info, where R. is the reagent, use set_scent_by_reagents().
 *****/
 
-/proc/set_scent_by_reagents(atom/smelly_atom)
+/proc/set_scent_by_reagents(var/atom/smelly_atom)
 	var/datum/reagent/smelliest
 	var/datum/reagent/scent_intensity
 	if(!smelly_atom.reagents || !smelly_atom.reagents.total_volume)
@@ -141,7 +128,7 @@ To add a scent extension to an atom using a reagent's info, where R. is the reag
 		var/datum/reagent/R = reagent_to_compare
 		if(!R.scent)
 			continue
-		var/singleton/scent_intensity/SI = GET_SINGLETON(R.scent_intensity)
+		var/decl/scent_intensity/SI = decls_repository.get_decl(R.scent_intensity)
 		var/r_scent_intensity = R.volume * SI.intensity
 		if(r_scent_intensity > scent_intensity)
 			smelliest = R

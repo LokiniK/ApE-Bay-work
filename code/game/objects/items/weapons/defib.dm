@@ -5,7 +5,7 @@
 /obj/item/defibrillator
 	name = "auto-resuscitator"
 	desc = "A device that delivers powerful shocks via detachable paddles to resuscitate incapacitated patients."
-	icon = 'icons/obj/tools/defibrillator.dmi'
+	icon = 'icons/obj/defibrillator.dmi'
 	icon_state = "defibunit"
 	item_state = "defibunit"
 	slot_flags = SLOT_BACK
@@ -13,7 +13,6 @@
 	throwforce = 6
 	w_class = ITEM_SIZE_LARGE
 	origin_tech = list(TECH_BIO = 4, TECH_POWER = 2)
-	matter = list(MATERIAL_STEEL = 5000, MATERIAL_PLASTIC = 2000, MATERIAL_GLASS = 1500, MATERIAL_ALUMINIUM = 1000)
 	action_button_name = "Remove/Replace Paddles"
 
 	var/obj/item/shockpaddles/linked/paddles
@@ -51,7 +50,7 @@
 				new_overlays += "[initial(icon_state)]-powered"
 
 	if(bcell)
-		var/ratio = ceil(bcell.percent()/25) * 25
+		var/ratio = Ceiling(bcell.percent()/25) * 25
 		new_overlays += "[initial(icon_state)]-charge[ratio]"
 	else
 		new_overlays += "[initial(icon_state)]-nocell"
@@ -65,7 +64,7 @@
 	else
 		to_chat(user, "There is no cell inside.")
 
-/obj/item/defibrillator/ui_action_click(mob/living/user)
+/obj/item/defibrillator/ui_action_click()
 	toggle_paddles()
 
 /obj/item/defibrillator/attack_hand(mob/user)
@@ -90,13 +89,13 @@
 		reattach_paddles(user)
 	else if(istype(W, /obj/item/cell))
 		if(bcell)
-			to_chat(user, SPAN_NOTICE("\the [src] already has a cell."))
+			to_chat(user, "<span class='notice'>\the [src] already has a cell.</span>")
 		else
 			if(!user.unEquip(W))
 				return
 			W.forceMove(src)
 			bcell = W
-			to_chat(user, SPAN_NOTICE("You install a cell in \the [src]."))
+			to_chat(user, "<span class='notice'>You install a cell in \the [src].</span>")
 			update_icon()
 
 	else if(isScrewdriver(W))
@@ -104,12 +103,12 @@
 			bcell.update_icon()
 			bcell.dropInto(loc)
 			bcell = null
-			to_chat(user, SPAN_NOTICE("You remove the cell from \the [src]."))
+			to_chat(user, "<span class='notice'>You remove the cell from \the [src].</span>")
 			update_icon()
 	else
 		return ..()
 
-/obj/item/defibrillator/emag_act(uses, mob/user)
+/obj/item/defibrillator/emag_act(var/uses, var/mob/user)
 	if(paddles)
 		return paddles.emag_act(uses, user, src)
 	return NO_EMAG_ACT
@@ -122,7 +121,7 @@
 
 	var/mob/living/carbon/human/user = usr
 	if(!paddles)
-		to_chat(user, SPAN_WARNING("The paddles are missing!"))
+		to_chat(user, "<span class='warning'>The paddles are missing!</span>")
 		return
 
 	if(paddles.loc != src)
@@ -130,10 +129,10 @@
 		return
 
 	if(!slot_check())
-		to_chat(user, SPAN_WARNING("You need to equip [src] before taking out [paddles]."))
+		to_chat(user, "<span class='warning'>You need to equip [src] before taking out [paddles].</span>")
 	else
 		if(!usr.put_in_hands(paddles)) //Detach the paddles into the user's hands
-			to_chat(user, SPAN_WARNING("You need a free hand to hold the paddles!"))
+			to_chat(user, "<span class='warning'>You need a free hand to hold the paddles!</span>")
 		update_icon() //success
 
 //checks that the base unit is in the correct slot to be used
@@ -159,7 +158,7 @@
 	if(ismob(paddles.loc))
 		var/mob/M = paddles.loc
 		if(M.drop_from_inventory(paddles, src))
-			to_chat(user, SPAN_NOTICE("\The [paddles] snap back into the main unit."))
+			to_chat(user, "<span class='notice'>\The [paddles] snap back into the main unit.</span>")
 	else
 		paddles.forceMove(src)
 
@@ -201,7 +200,7 @@
 /obj/item/shockpaddles
 	name = "defibrillator paddles"
 	desc = "A pair of plastic-gripped paddles with flat metal surfaces that are used to deliver powerful electric shocks."
-	icon = 'icons/obj/tools/defibrillator.dmi'
+	icon = 'icons/obj/defibrillator.dmi'
 	icon_state = "defibpaddles"
 	item_state = "defibpaddles"
 	gender = PLURAL
@@ -220,7 +219,7 @@
 	var/cooldown = 0
 	var/busy = 0
 
-/obj/item/shockpaddles/proc/set_cooldown(delay)
+/obj/item/shockpaddles/proc/set_cooldown(var/delay)
 	cooldown = 1
 	update_icon()
 
@@ -253,13 +252,13 @@
 	if(busy)
 		return 0
 	if(!check_charge(chargecost))
-		to_chat(user, SPAN_WARNING("\The [src] doesn't have enough charge left to do that."))
+		to_chat(user, "<span class='warning'>\The [src] doesn't have enough charge left to do that.</span>")
 		return 0
 	if(!wielded && !isrobot(user))
-		to_chat(user, SPAN_WARNING("You need to wield the paddles with both hands before you can use them on someone!"))
+		to_chat(user, "<span class='warning'>You need to wield the paddles with both hands before you can use them on someone!</span>")
 		return 0
 	if(cooldown)
-		to_chat(user, SPAN_WARNING("\The [src] are re-energizing!"))
+		to_chat(user, "<span class='warning'>\The [src] are re-energizing!</span>")
 		return 0
 	return 1
 
@@ -290,13 +289,13 @@
 		return TRUE
 	return FALSE
 
-/obj/item/shockpaddles/proc/check_charge(charge_amt)
+/obj/item/shockpaddles/proc/check_charge(var/charge_amt)
 	return 0
 
-/obj/item/shockpaddles/proc/checked_use(charge_amt)
+/obj/item/shockpaddles/proc/checked_use(var/charge_amt)
 	return 0
 
-/obj/item/shockpaddles/attack(mob/living/M, mob/living/user, target_zone)
+/obj/item/shockpaddles/attack(mob/living/M, mob/living/user, var/target_zone)
 	var/mob/living/carbon/human/H = M
 	if(!istype(H) || user.a_intent == I_HURT)
 		return ..() //Do a regular attack. Harm intent shocking happens as a hit effect
@@ -313,7 +312,7 @@
 	return 1
 
 //Since harm-intent now skips the delay for deliberate placement, you have to be able to hit them in combat in order to shock people.
-/obj/item/shockpaddles/apply_hit_effect(mob/living/target, mob/living/user, hit_zone)
+/obj/item/shockpaddles/apply_hit_effect(mob/living/target, mob/living/user, var/hit_zone)
 	if(ishuman(target) && can_use(user, target))
 		busy = 1
 		update_icon()
@@ -330,13 +329,13 @@
 // This proc is used so that we can return out of the revive process while ensuring that busy and update_icon() are handled
 /obj/item/shockpaddles/proc/do_revive(mob/living/carbon/human/H, mob/living/user)
 	if(H.ssd_check())
-		to_chat(find_dead_player(H.ckey, 1), SPAN_NOTICE("Someone is attempting to resuscitate you. Re-enter your body if you want to be revived!"))
+		to_chat(find_dead_player(H.ckey, 1), "<span class='notice'>Someone is attempting to resuscitate you. Re-enter your body if you want to be revived!</span>")
 
 	//beginning to place the paddles on patient's chest to allow some time for people to move away to stop the process
-	user.visible_message(SPAN_WARNING("\The [user] begins to place [src] on [H]'s chest."), SPAN_WARNING("You begin to place [src] on [H]'s chest..."))
-	if(!user.do_skilled(3 SECONDS, SKILL_MEDICAL, H, do_flags = DO_MEDICAL | DO_USER_UNIQUE_ACT))
+	user.visible_message("<span class='warning'>\The [user] begins to place [src] on [H]'s chest.</span>", "<span class='warning'>You begin to place [src] on [H]'s chest...</span>")
+	if(!user.do_skilled(3 SECONDS, SKILL_MEDICAL, H))
 		return
-	user.visible_message(SPAN_NOTICE("\The [user] places [src] on [H]'s chest."), SPAN_WARNING("You place [src] on [H]'s chest."))
+	user.visible_message("<span class='notice'>\The [user] places [src] on [H]'s chest.</span>", "<span class='warning'>You place [src] on [H]'s chest.</span>")
 	playsound(get_turf(src), 'sound/machines/defib_charge.ogg', 50, 0)
 
 	var/error = can_defib(H)
@@ -349,7 +348,7 @@
 		make_announcement("buzzes, \"Warning - Patient is in hypovolemic shock and may require a blood transfusion.\"", "warning") //also includes heart damage
 
 	//placed on chest and short delay to shock for dramatic effect, revive time is 5sec total
-	if(!do_after(user, chargetime, H, DO_MEDICAL | DO_USER_UNIQUE_ACT))
+	if(!do_after(user, chargetime, H))
 		return
 
 	//deduct charge here, in case the base unit was EMPed or something during the delay time
@@ -358,7 +357,7 @@
 		playsound(get_turf(src), 'sound/machines/defib_failed.ogg', 50, 0)
 		return
 
-	H.visible_message(SPAN_WARNING("\The [H]'s body convulses a bit."))
+	H.visible_message("<span class='warning'>\The [H]'s body convulses a bit.</span>")
 	playsound(get_turf(src), "bodyfall", 50, 1)
 	playsound(get_turf(src), 'sound/machines/defib_zap.ogg', 50, 1, -1)
 	set_cooldown(cooldowntime)
@@ -370,7 +369,7 @@
 		return
 	if(!user.skill_check(SKILL_MEDICAL, SKILL_BASIC) && !lowskill_revive(H, user))
 		return
-	H.apply_damage(burn_damage_amt, DAMAGE_BURN, BP_CHEST)
+	H.apply_damage(burn_damage_amt, BURN, BP_CHEST)
 
 	//set oxyloss so that the patient is just barely in crit, if possible
 	make_announcement("pings, \"Resuscitation successful.\"", "notice")
@@ -387,34 +386,34 @@
 	if(prob(60))
 		playsound(get_turf(src), 'sound/machines/defib_zap.ogg', 100, 1, -1)
 		H.electrocute_act(burn_damage_amt*4, src, def_zone = BP_CHEST)
-		user.visible_message(SPAN_WARNING("<i>The paddles were misaligned! \The [user] shocks [H] with \the [src]!</i>"), SPAN_WARNING("The paddles were misaligned! You shock [H] with \the [src]!"))
+		user.visible_message("<span class='warning'><i>The paddles were misaligned! \The [user] shocks [H] with \the [src]!</i></span>", "<span class='warning'>The paddles were misaligned! You shock [H] with \the [src]!</span>")
 		return 0
 	if(prob(50))
 		playsound(get_turf(src), 'sound/machines/defib_zap.ogg', 100, 1, -1)
 		user.electrocute_act(burn_damage_amt*2, src, def_zone = BP_L_HAND)
 		user.electrocute_act(burn_damage_amt*2, src, def_zone = BP_R_HAND)
-		user.visible_message(SPAN_WARNING("<i>\The [user] shocks themselves with \the [src]!</i>"), SPAN_WARNING("You forget to move your hands away and shock yourself with \the [src]!"))
+		user.visible_message("<span class='warning'><i>\The [user] shocks themselves with \the [src]!</i></span>", "<span class='warning'>You forget to move your hands away and shock yourself with \the [src]!</span>")
 		return 0
 	return 1
 
-/obj/item/shockpaddles/proc/do_electrocute(mob/living/carbon/human/H, mob/user, target_zone)
+/obj/item/shockpaddles/proc/do_electrocute(mob/living/carbon/human/H, mob/user, var/target_zone)
 	var/obj/item/organ/external/affecting = H.get_organ(target_zone)
 	if(!affecting)
-		to_chat(user, SPAN_WARNING("They are missing that body part!"))
+		to_chat(user, "<span class='warning'>They are missing that body part!</span>")
 		return
 
 	//no need to spend time carefully placing the paddles, we're just trying to shock them
-	user.visible_message(SPAN_DANGER("\The [user] slaps [src] onto [H]'s [affecting.name]."), SPAN_DANGER("You overcharge [src] and slap them onto [H]'s [affecting.name]."))
+	user.visible_message("<span class='danger'>\The [user] slaps [src] onto [H]'s [affecting.name].</span>", "<span class='danger'>You overcharge [src] and slap them onto [H]'s [affecting.name].</span>")
 
 	//Just stop at awkwardly slapping electrodes on people if the safety is enabled
 	if(safety)
-		to_chat(user, SPAN_WARNING("You can't do that while the safety is enabled."))
+		to_chat(user, "<span class='warning'>You can't do that while the safety is enabled.</span>")
 		return
 
 	playsound(get_turf(src), 'sound/machines/defib_charge.ogg', 50, 0)
-	audible_message(SPAN_WARNING("\The [src] lets out a steadily rising hum..."))
+	audible_message("<span class='warning'>\The [src] lets out a steadily rising hum...</span>")
 
-	if(!do_after(user, chargetime, H, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
+	if(!do_after(user, chargetime, H))
 		return
 
 	//deduct charge here, in case the base unit was EMPed or something during the delay time
@@ -423,7 +422,7 @@
 		playsound(get_turf(src), 'sound/machines/defib_failed.ogg', 50, 0)
 		return
 
-	user.visible_message(SPAN_DANGER("<i>\The [user] shocks [H] with \the [src]!</i>"), SPAN_WARNING("You shock [H] with \the [src]!"))
+	user.visible_message("<span class='danger'><i>\The [user] shocks [H] with \the [src]!</i></span>", "<span class='warning'>You shock [H] with \the [src]!</span>")
 	playsound(get_turf(src), 'sound/machines/defib_zap.ogg', 100, 1, -1)
 	playsound(loc, 'sound/weapons/Egloves.ogg', 100, 1, -1)
 	set_cooldown(cooldowntime)
@@ -434,7 +433,7 @@
 		H.emote("scream")
 	var/obj/item/organ/internal/heart/doki = LAZYACCESS(affecting.internal_organs, BP_HEART)
 	if(istype(doki) && doki.pulse && !doki.open && prob(10))
-		to_chat(doki, SPAN_DANGER("Your [doki] has stopped!"))
+		to_chat(doki, "<span class='danger'>Your [doki] has stopped!</span>")
 		doki.pulse = PULSE_NONE
 
 	admin_attack_log(user, H, "Electrocuted using \a [src]", "Was electrocuted with \a [src]", "used \a [src] to electrocute")
@@ -454,7 +453,7 @@
 	M.updatehealth()
 	apply_brain_damage(M, deadtime)
 
-/obj/item/shockpaddles/proc/apply_brain_damage(mob/living/carbon/human/H, deadtime)
+/obj/item/shockpaddles/proc/apply_brain_damage(mob/living/carbon/human/H, var/deadtime)
 	if(deadtime < DEFIB_TIME_LOSS) return
 
 	if(!H.should_have_organ(BP_BRAIN)) return //no brain
@@ -462,13 +461,13 @@
 	var/obj/item/organ/internal/brain/brain = H.internal_organs_by_name[BP_BRAIN]
 	if(!brain) return //no brain
 
-	var/brain_damage = clamp((deadtime - DEFIB_TIME_LOSS)/(DEFIB_TIME_LIMIT - DEFIB_TIME_LOSS)*brain.max_damage, H.getBrainLoss(), brain.max_damage)
+	var/brain_damage = Clamp((deadtime - DEFIB_TIME_LOSS)/(DEFIB_TIME_LIMIT - DEFIB_TIME_LOSS)*brain.max_damage, H.getBrainLoss(), brain.max_damage)
 	H.setBrainLoss(brain_damage)
 
-/obj/item/shockpaddles/proc/make_announcement(message, msg_class)
+/obj/item/shockpaddles/proc/make_announcement(var/message, var/msg_class)
 	audible_message("<b>\The [src]</b> [message]", "\The [src] vibrates slightly.")
 
-/obj/item/shockpaddles/emag_act(uses, mob/user, obj/item/defibrillator/base)
+/obj/item/shockpaddles/emag_act(var/uses, var/mob/user, var/obj/item/defibrillator/base)
 	if(istype(src, /obj/item/shockpaddles/linked))
 		var/obj/item/shockpaddles/linked/dfb = src
 		if(dfb.base_unit)
@@ -477,13 +476,13 @@
 		return
 	if(safety)
 		safety = 0
-		to_chat(user, SPAN_WARNING("You silently disable \the [src]'s safety protocols with the cryptographic sequencer."))
+		to_chat(user, "<span class='warning'>You silently disable \the [src]'s safety protocols with the cryptographic sequencer.</span>")
 		burn_damage_amt *= 3
 		base.update_icon()
 		return 1
 	else
 		safety = 1
-		to_chat(user, SPAN_NOTICE("You silently enable \the [src]'s safety protocols with the cryptographic sequencer."))
+		to_chat(user, "<span class='notice'>You silently enable \the [src]'s safety protocols with the cryptographic sequencer.</span>")
 		burn_damage_amt = initial(burn_damage_amt)
 		base.update_icon()
 		return 1
@@ -494,10 +493,10 @@
 		safety = new_safety
 		if(safety)
 			make_announcement("beeps, \"Safety protocols enabled!\"", "notice")
-			playsound(get_turf(src), 'sound/machines/defib_SafetyOn.ogg', 50, 0)
+			playsound(get_turf(src), 'sound/machines/defib_safetyon.ogg', 50, 0)
 		else
 			make_announcement("beeps, \"Safety protocols disabled!\"", "warning")
-			playsound(get_turf(src), 'sound/machines/defib_safetyOff.ogg', 50, 0)
+			playsound(get_turf(src), 'sound/machines/defib_safetyoff.ogg', 50, 0)
 		update_icon()
 	..()
 
@@ -510,12 +509,12 @@
 	item_state = "defibpaddles0"
 	cooldowntime = (3 SECONDS)
 
-/obj/item/shockpaddles/robot/check_charge(charge_amt)
+/obj/item/shockpaddles/robot/check_charge(var/charge_amt)
 	if(isrobot(src.loc))
 		var/mob/living/silicon/robot/R = src.loc
 		return (R.cell && R.cell.check_charge(charge_amt))
 
-/obj/item/shockpaddles/robot/checked_use(charge_amt)
+/obj/item/shockpaddles/robot/checked_use(var/charge_amt)
 	if(isrobot(src.loc))
 		var/mob/living/silicon/robot/R = src.loc
 		return (R.cell && R.cell.checked_use(charge_amt))
@@ -529,17 +528,17 @@
 	safety = 0
 	wielded = 1
 
-/obj/item/shockpaddles/rig/check_charge(charge_amt)
+/obj/item/shockpaddles/rig/check_charge(var/charge_amt)
 	if(istype(src.loc, /obj/item/rig_module/device/defib))
 		var/obj/item/rig_module/device/defib/module = src.loc
 		return (module.holder && module.holder.cell && module.holder.cell.check_charge(charge_amt))
 
-/obj/item/shockpaddles/rig/checked_use(charge_amt)
+/obj/item/shockpaddles/rig/checked_use(var/charge_amt)
 	if(istype(src.loc, /obj/item/rig_module/device/defib))
 		var/obj/item/rig_module/device/defib/module = src.loc
 		return (module.holder && module.holder.cell && module.holder.cell.checked_use(charge_amt))
 
-/obj/item/shockpaddles/rig/set_cooldown(delay)
+/obj/item/shockpaddles/rig/set_cooldown(var/delay)
 	..()
 	if(istype(src.loc, /obj/item/rig_module/device/defib))
 		var/obj/item/rig_module/device/defib/module = src.loc
@@ -568,13 +567,13 @@
 	if(base_unit)
 		base_unit.reattach_paddles(user) //paddles attached to a base unit should never exist outside of their base unit or the mob equipping the base unit
 
-/obj/item/shockpaddles/linked/check_charge(charge_amt)
+/obj/item/shockpaddles/linked/check_charge(var/charge_amt)
 	return (base_unit.bcell && base_unit.bcell.check_charge(charge_amt))
 
-/obj/item/shockpaddles/linked/checked_use(charge_amt)
+/obj/item/shockpaddles/linked/checked_use(var/charge_amt)
 	return (base_unit.bcell && base_unit.bcell.checked_use(charge_amt))
 
-/obj/item/shockpaddles/linked/make_announcement(message, msg_class)
+/obj/item/shockpaddles/linked/make_announcement(var/message, var/msg_class)
 	base_unit.audible_message("<b>\The [base_unit]</b> [message]", "\The [base_unit] vibrates slightly.")
 
 /*
@@ -590,10 +589,10 @@
 	if(fail_counter)
 		STOP_PROCESSING(SSobj, src)
 
-/obj/item/shockpaddles/standalone/check_charge(charge_amt)
+/obj/item/shockpaddles/standalone/check_charge(var/charge_amt)
 	return 1
 
-/obj/item/shockpaddles/standalone/checked_use(charge_amt)
+/obj/item/shockpaddles/standalone/checked_use(var/charge_amt)
 	SSradiation.radiate(src, charge_amt/12) //just a little bit of radiation. It's the price you pay for being powered by magic I guess
 	return 1
 
@@ -608,13 +607,13 @@
 	..()
 	var/new_fail = 0
 	switch(severity)
-		if(EMP_ACT_HEAVY)
+		if(1)
 			new_fail = max(fail_counter, 20)
 			visible_message("\The [src]'s reactor overloads!")
-		if(EMP_ACT_LIGHT)
+		if(2)
 			new_fail = max(fail_counter, 8)
 			if(ismob(loc))
-				to_chat(loc, SPAN_WARNING("\The [src] feel pleasantly warm."))
+				to_chat(loc, "<span class='warning'>\The [src] feel pleasantly warm.</span>")
 
 	if(new_fail && !fail_counter)
 		START_PROCESSING(SSobj, src)

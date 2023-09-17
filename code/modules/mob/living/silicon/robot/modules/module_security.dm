@@ -7,20 +7,21 @@
 	)
 	subsystems = list(
 		/datum/nano_module/crew_monitor,
-		/datum/nano_module/program/digitalwarrant
+		/datum/nano_module/program/digitalwarrant,
+		/datum/nano_module/records //INF
 	)
 	can_be_pushed = FALSE
 	supported_upgrades = list(
 		/obj/item/borg/upgrade/weaponcooler
 	)
 	skills = list(
-		SKILL_COMBAT      = SKILL_EXPERIENCED,
-		SKILL_WEAPONS     = SKILL_EXPERIENCED,
-		SKILL_FORENSICS   = SKILL_EXPERIENCED,
-		SKILL_BUREAUCRACY = SKILL_TRAINED
+		SKILL_COMBAT      = SKILL_EXPERT,
+		SKILL_WEAPONS     = SKILL_EXPERT,
+		SKILL_FORENSICS   = SKILL_EXPERT,
+		SKILL_BUREAUCRACY = SKILL_ADEPT
 	)
 
-/obj/item/robot_module/security/respawn_consumable(mob/living/silicon/robot/R, amount)
+/obj/item/robot_module/security/respawn_consumable(var/mob/living/silicon/robot/R, var/amount)
 	..()
 	for(var/obj/item/gun/energy/T in equipment)
 		if(T && T.power_supply)
@@ -43,7 +44,8 @@
 		"Black Knight" = "securityrobot",
 		"Bloodhound" = "bloodhound",
 		"Bloodhound - Treaded" = "secborg+tread",
-		"Tridroid" = "orb-security"
+		"Tridroid" = "orb-security",
+		"Motile" = "motile-sec",
 	)
 	equipment = list(
 		/obj/item/device/flash,

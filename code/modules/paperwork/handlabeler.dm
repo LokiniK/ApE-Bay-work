@@ -1,46 +1,67 @@
 /obj/item/hand_labeler
 	name = "hand labeler"
-	icon = 'icons/obj/bureaucracy.dmi'
+	icon = 'infinity/icons/obj/bureaucracy.dmi' //inf, was: 'icons/obj/bureaucracy.dmi'
 	icon_state = "labeler0"
 	item_state = "flight"
-	item_flags = ITEM_FLAG_TRY_ATTACK
+	var/label = null
+	var/labels_left = 30
+	var/mode = 0	//off or on.
 	matter = list(MATERIAL_PLASTIC = 100)
 
-	/// If set, the label text this will apply.
-	var/label
+/obj/item/hand_labeler/attack()
+	return
 
-/obj/item/hand_labeler/get_mechanics_info()
-	. = ..()
-	. += {"
-		<p>The hand labeler can be used to attach labels to objects. To do this, first set a label by using the labeler in your hand and typing in the text to use. Then click on any object.</p>
-		<p>You can turn the labeler back off by using it in hand again.</p>
-		<p>If the labeler is turned on, this will bypass all other interactions - This means you can use the labeler on bags without also storing it, and other such interactions.</p>
-	"}
+/obj/item/hand_labeler/afterattack(atom/A, mob/user as mob, proximity)
+	if(!proximity)
+		return
+	if(!mode)	//if it's off, give up.
+		return
+	if(A == loc)	// if placing the labeller into something (e.g. backpack)
+		return		// don't set a label
 
+	if(!labels_left)
+		to_chat(user, "<span class='notice'>No labels left.</span>")
+		return
+	if(!label || !length(label))
+		to_chat(user, "<span class='notice'>No label text set.</span>")
+		return
+	if(has_extension(A, /datum/extension/labels))
+		var/datum/extension/labels/L = get_extension(A, /datum/extension/labels)
+		if(!L.CanAttachLabel(user, label))
+			return
+	playsound(src,'infinity/sound/effects/FOLEY_Gaffer_Tape_Tear_mono.ogg',100,1)
+	A.attach_label(user, src, label)
 
-/obj/item/hand_labeler/on_update_icon()
-	icon_state = "labeler[!isnull(label)]"
+/atom/proc/attach_label(var/user, var/atom/labeler, var/label_text)
+	to_chat(user, "<span class='notice'>The label refuses to stick to [name].</span>")
 
+/mob/observer/attach_label(var/user, var/atom/labeler, var/label_text)
+	to_chat(user, "<span class='notice'>\The [labeler] passes through \the [src].</span>")
 
-/obj/item/hand_labeler/attack(atom/target, mob/living/user, target_zone, animate)
-	if (label)
-		target.AddLabel(label, user)
-		return TRUE
+/obj/machinery/portable_atmospherics/hydroponics/attach_label(var/user)
+	if(!mechanical)
+		to_chat(user, "<span class='notice'>How are you going to label that?</span>")
+		return
+	..()
+	update_icon()
 
+/obj/attach_label(var/user, var/atom/labeler, var/label_text)
+	if(!simulated)
+		return
+	var/datum/extension/labels/L = get_or_create_extension(src, /datum/extension/labels)
+	L.AttachLabel(user, label_text)
 
-/obj/item/hand_labeler/attack_self(mob/living/user)
-	if (label)
-		to_chat(user, SPAN_ITALIC("You turn off \the [src]."))
-		label = null
-		update_icon()
+/obj/item/hand_labeler/attack_self(mob/user as mob)
+	mode = !mode
+	icon_state = "labeler[mode]"
+	if(mode)
+		to_chat(user, "<span class='notice'>You turn on \the [src].</span>")
+		//Now let them chose the text.
+		var/str = sanitizeSafe(input(user,"Label text?","Set label",""), MAX_LNAME_LEN)
+		if(!str || !length(str))
+			to_chat(user, "<span class='notice'>Invalid text.</span>")
+			return
+		label = str
+		to_chat(user, "<span class='notice'>You set the text to '[str]'.</span>")
 	else
-		var/response = input(user, "Label Text:") as null | text
-		if (!response)
-			return
-		response = sanitizeSafe(response, MAX_LNAME_LEN)
-		if (!length(response))
-			to_chat(user, SPAN_WARNING("Invalid Label."))
-			return
-		label = response
-		to_chat(user, SPAN_ITALIC("You turn \the [src] on and set its text to \"[label]\"."))
-		update_icon()
+		to_chat(user, "<span class='notice'>You turn off \the [src].</span>")

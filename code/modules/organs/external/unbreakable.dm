@@ -6,6 +6,7 @@
 
 /obj/item/organ/external/groin/unbreakable
 	dislocated = -1
+	max_damage = 400	
 	arterial_bleed_severity = 0
 	limb_flags = ORGAN_FLAG_CAN_AMPUTATE
 
@@ -51,5 +52,6 @@
 
 /obj/item/organ/external/head/unbreakable
 	dislocated = -1
+	max_damage = 400
 	arterial_bleed_severity = 0
 	limb_flags = ORGAN_FLAG_CAN_AMPUTATE

@@ -1,6 +1,6 @@
 /obj/item/soap
 	name = "soap"
-	desc = "A cheap bar of soap. Smells of lye."
+	desc = "A cheap bar of soap. Doesn't smell."
 	gender = PLURAL
 	icon = 'icons/obj/soap.dmi'
 	icon_state = "soap"
@@ -14,109 +14,35 @@
 	var/list/valid_colors = list(COLOR_GREEN_GRAY, COLOR_RED_GRAY, COLOR_BLUE_GRAY, COLOR_BROWN, COLOR_PALE_PINK, COLOR_PALE_BTL_GREEN, COLOR_OFF_WHITE, COLOR_GRAY40, COLOR_GOLD)
 	var/list/valid_scents = list("fresh air", "cinnamon", "mint", "cocoa", "lavender", "an ocean breeze", "a summer garden", "vanilla", "cheap perfume")
 	var/list/scent_intensity = list("faintly", "strongly", "overbearingly")
+	var/list/valid_shapes = list("oval", "circular", "rectangular", "square")
 	var/decal_name
-	var/list/decals = list("diamond", "heart", "circle")
+	var/list/decals = list("diamond", "heart", "circle", "triangle", "")
 
 /obj/item/soap/New()
 	..()
 	create_reagents(30)
 	wet()
-/obj/item/soap/random
-	icon_state = "soap"
 
-/obj/item/soap/random/Initialize()
+/obj/item/soap/Initialize()
 	. = ..()
+	var/shape = pick(valid_shapes)
 	var/scent = pick(valid_scents)
 	var/smelly = pick(scent_intensity)
+	icon_state = "soap-[shape]"
 	color = pick(valid_colors)
 	decal_name = pick(decals)
-	desc = "A bar of soap. It smells [smelly] of [scent]."
+	desc = "\A [shape] bar of soap. It smells [smelly] of [scent]."
 	update_icon()
-
-/obj/item/soap/space_soap
-	desc = "Smells like hot metal and walnuts."
-	icon_state = "space_soap"
-
-/obj/item/soap/water_soap
-	desc = "Smells like chlorine."
-	icon_state = "water_soap"
-
-/obj/item/soap/fire_soap
-	desc = "Smells like a campfire."
-	icon_state = "fire_soap"
-
-/obj/item/soap/rainbow_soap
-	desc = "Smells sickly sweet."
-	icon_state = "rainbow_soap"
-
-/obj/item/soap/diamond_soap
-	desc = "Smells like saffron and vanilla."
-	icon_state = "diamond_soap"
-
-/obj/item/soap/uranium_soap
-	desc = "Smells not great... Not terrible."
-	icon_state = "uranium_soap"
-
-/obj/item/soap/silver_soap
-	desc = "Smells like birch and amaranth."
-	icon_state = "silver_soap"
-
-/obj/item/soap/brown_soap
-	desc = "Smells like cinnamon and cognac."
-	icon_state = "brown_soap"
-
-/obj/item/soap/white_soap
-	desc = "Smells like nutmeg and oats."
-	icon_state = "white_soap"
-
-/obj/item/soap/grey_soap
-	desc = "Smells like bergamot and lilies."
-	icon_state = "grey_soap"
-
-/obj/item/soap/pink_soap
-	desc = "Smells like bubblegum."
-	icon_state = "pink_soap"
-
-/obj/item/soap/purple_soap
-	desc = "Smells like lavender."
-	icon_state = "purple_soap"
-
-/obj/item/soap/blue_soap
-	desc = "Smells like cardamom."
-	icon_state = "blue_soap"
-
-/obj/item/soap/cyan_soap
-	desc = "Smells like bluebells and peaches."
-	icon_state = "cyan_soap"
-
-/obj/item/soap/green_soap
-	desc = "Smells like a freshly mowed lawn."
-	icon_state = "green_soap"
-
-/obj/item/soap/yellow_soap
-	desc = "Smells like citron and ginger."
-	icon_state = "yellow_soap"
-
-/obj/item/soap/orange_soap
-	desc = "Smells like oranges and dark chocolate."
-	icon_state = "orange_soap"
-
-/obj/item/soap/red_soap
-	desc = "Smells like cherries."
-	icon_state = "red_soap"
-
-/obj/item/soap/golden_soap
-	desc = "Smells like honey."
-	icon_state = "golden_soap"
 
 /obj/item/soap/proc/wet()
 	reagents.add_reagent(/datum/reagent/space_cleaner, 15)
 
-/obj/item/soap/Crossed(mob/living/AM)
+/obj/item/soap/Crossed(var/mob/living/AM)
 	if (istype(AM))
 		if(AM.pulledby)
 			return
-		AM.slip("the [src.name]",3)
+		if((!AM.weakened || !AM.resting) && prob(30 + (log(6, reagents.total_volume) * 5)) && reagents.reagent_list.len) //inf, was: if(!AM.weakened || !AM.resting)
+			AM.slip("the [src.name]",3)
 
 /obj/item/soap/afterattack(atom/target, mob/user as mob, proximity)
 	if(!proximity) return
@@ -124,53 +50,56 @@
 	//So this is a workaround. This also makes more sense from an IC standpoint. ~Carn
 	var/cleaned = FALSE
 	if(user.client && (target in user.client.screen))
-		to_chat(user, SPAN_NOTICE("You need to take that [target.name] off before cleaning it."))
-	else if(istype(target,/obj/effect/decal/cleanable/blood))
-		to_chat(user, SPAN_NOTICE("You scrub \the [target.name] out."))
-		target.clean_blood() //Blood is a cleanable decal, therefore needs to be accounted for before all cleanable decals.
-		cleaned = TRUE
-	else if(istype(target,/obj/effect/decal/cleanable))
-		to_chat(user, SPAN_NOTICE("You scrub \the [target.name] out."))
-		qdel(target)
-		cleaned = TRUE
-	else if(istype(target,/turf) || istype(target, /obj/structure/catwalk))
+		to_chat(user, "<span class='notice'>You need to take that [target.name] off before cleaning it.</span>")
+	else if(istype(target,/turf) || istype(target, /obj/structure/catwalk) || istype(target,/obj/effect/decal/cleanable))
 		var/turf/T = get_turf(target)
 		if(!T)
 			return
-		user.visible_message(SPAN_WARNING("[user] starts scrubbing \the [T]."))
-		T.clean(src, user, 80, SPAN_NOTICE("You scrub \the [target.name] clean."))
+		var/list/cleanable = list()
+		for(var/obj/effect/C in T)
+			if(istype(C, /obj/effect/rune) || istype(C, /obj/effect/decal/cleanable) || istype(C, /obj/effect/overlay))
+				cleanable += C
+		if(!cleanable.len)
+			to_chat(usr, "<span class='notice'>\The [T] is already clean.</span>")
+			return
+		user.visible_message("<span class='notice'>[user] starts scrubbing \the [T].</span>")
+		for(var/obj/effect/E in cleanable)
+			var/CD = rand(15,25)
+			user.setClickCooldown(CD)
+		user.visible_message("<span class='warning'>[user] starts scrubbing \the [T].</span>")
+		T.clean(src, user, 80, "<span class='notice'>You scrub \the [target.name] clean.</span>")
 		cleaned = TRUE
 	else if(istype(target,/obj/structure/hygiene/sink))
-		to_chat(user, SPAN_NOTICE("You wet \the [src] in the sink."))
+		to_chat(user, "<span class='notice'>You wet \the [src] in the sink.</span>")
 		wet()
 	else if(ishuman(target))
-		to_chat(user, SPAN_NOTICE("You clean \the [target.name]."))
+		to_chat(user, "<span class='notice'>You clean \the [target.name].</span>")
 		if(reagents)
 			reagents.trans_to(target, reagents.total_volume / 8)
 		target.clean_blood() //Clean bloodied atoms. Blood decals themselves need to be handled above.
 		cleaned = TRUE
-	else
-		to_chat(user, SPAN_NOTICE("You clean \the [target.name]."))
+	else 
+		to_chat(user, "<span class='notice'>You clean \the [target.name].</span>")
 		target.clean_blood() //Clean bloodied atoms. Blood decals themselves need to be handled above.
-		cleaned = TRUE
+		cleaned++
 
 	if(cleaned)
-		user.update_personal_goal(/datum/goal/clean, 1)
+		user.update_personal_goal(/datum/goal/clean, TRUE)
 
 //attack_as_weapon
-/obj/item/soap/attack(mob/living/target, mob/living/user, target_zone)
+/obj/item/soap/attack(mob/living/target, mob/living/user, var/target_zone)
 	if(target && user && ishuman(target) && ishuman(user) && !target.stat && !user.stat && user.zone_sel &&user.zone_sel.selecting == BP_MOUTH)
-		user.visible_message(SPAN_DANGER("\The [user] washes \the [target]'s mouth out with soap!"))
+		user.visible_message("<span class='danger'>\The [user] washes \the [target]'s mouth out with soap!</span>")
 		if(reagents)
 			reagents.trans_to_mob(target, reagents.total_volume / 2, CHEM_INGEST)
 		user.setClickCooldown(DEFAULT_QUICK_COOLDOWN) //prevent spam
 		return
 	..()
 
-/obj/item/soap/attackby(obj/item/I, mob/user)
+/obj/item/soap/attackby(var/obj/item/I, var/mob/user)
 	if(istype(I, /obj/item/key))
 		if(!key_data)
-			to_chat(user, SPAN_NOTICE("You imprint \the [I] into \the [src]."))
+			to_chat(user, "<span class='notice'>You imprint \the [I] into \the [src].</span>")
 			var/obj/item/key/K = I
 			key_data = K.key_data
 			update_icon()
@@ -180,6 +109,26 @@
 /obj/item/soap/on_update_icon()
 	overlays.Cut()
 	if(key_data)
-		overlays += image('icons/obj/soap.dmi', icon_state = "soap_key_overlay")
+		overlays += image('icons/obj/items.dmi', icon_state = "soap_key_overlay")
 	else if(decal_name)
 		overlays +=	overlay_image(icon, "decal-[decal_name]")
+
+/*INF@SAVE4SOMETHING
+/obj/item/soap/nanotrasen
+	desc = "A NanoTrasen-brand bar of soap. Smells of phoron."
+	icon_state = "soapnt"
+
+/obj/item/soap/deluxe
+	icon_state = "soapdeluxe"
+
+/obj/item/soap/deluxe/New()
+	desc = "A deluxe Waffle Co. brand bar of soap. Smells of [pick("lavender", "vanilla", "strawberry", "chocolate" ,"space")]."
+	..()
+
+/obj/item/soap/syndie
+	desc = "An untrustworthy bar of soap. Smells of fear."
+	icon_state = "soapsyndie"
+
+/obj/item/soap/gold
+	desc = "One true soap to rule them all."
+	icon_state = "soapgold"*/

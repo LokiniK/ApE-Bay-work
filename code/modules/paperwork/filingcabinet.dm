@@ -11,7 +11,7 @@
 /obj/structure/filingcabinet
 	name = "filing cabinet"
 	desc = "A large cabinet with drawers."
-	icon = 'icons/obj/structures/drawers.dmi'
+	icon = 'icons/obj/bureaucracy.dmi'
 	icon_state = "filingcabinet"
 	density = TRUE
 	anchored = TRUE
@@ -22,7 +22,8 @@
 		/obj/item/folder,
 		/obj/item/photo,
 		/obj/item/paper_bundle,
-		/obj/item/sample)
+		/obj/item/sample,
+		/obj/item/card)
 
 /obj/structure/filingcabinet/chestdrawer
 	name = "chest drawer"
@@ -46,27 +47,20 @@
 			I.forceMove(src)
 	. = ..()
 
-
-/obj/structure/filingcabinet/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Any item - Attempt to put in cabinet
-	if (is_type_in_list(tool, can_hold))
-		if (!user.unEquip(tool, src))
-			FEEDBACK_UNEQUIP_FAILURE(tool, user)
+/obj/structure/filingcabinet/attackby(obj/item/P as obj, mob/user as mob)
+	if(is_type_in_list(P, can_hold))
+		if(!user.unEquip(P, src))
 			return
-		flick("[initial(icon_state)]-open", src)
-		user.visible_message(
-			SPAN_NOTICE("\The [user] puts \a [tool] in \the [src]."),
-			SPAN_NOTICE("You put \the [tool] in \the [src].")
-		)
+		add_fingerprint(user)
+		to_chat(user, "<span class='notice'>You put [P] in [src].</span>")
+		flick("[initial(icon_state)]-open",src)
 		updateUsrDialog()
-		return TRUE
-
-	return ..()
-
+	else
+		..()
 
 /obj/structure/filingcabinet/attack_hand(mob/user as mob)
-	if(length(contents) <= 0)
-		to_chat(user, SPAN_NOTICE("\The [src] is empty."))
+	if(contents.len <= 0)
+		to_chat(user, "<span class='notice'>\The [src] is empty.</span>")
 		return
 
 	user.set_machine(src)
@@ -74,7 +68,7 @@
 	for(var/obj/item/P in src)
 		dat += "<tr><td><a href='?src=\ref[src];retrieve=\ref[P]'>[P.name]</a></td></tr>"
 	dat += "</table></center>"
-	show_browser(user, "<html><head><title>[name]</title></head><body>[jointext(dat,null)]</body></html>", "window=filingcabinet;size=350x300")
+	show_browser(user, "<html><meta charset=\"UTF-8\"><head><title>[name]</title></head><body>[jointext(dat,null)]</body></html>", "window=filingcabinet;size=350x300")
 
 /obj/structure/filingcabinet/Topic(href, href_list)
 	if(href_list["retrieve"])

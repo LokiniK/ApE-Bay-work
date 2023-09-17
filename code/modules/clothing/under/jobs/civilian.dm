@@ -23,12 +23,13 @@
 	icon_state = "qm"
 	item_state = "lb_suit"
 	worn_state = "qm"
+	gender_icons = 1
 
 
 /obj/item/clothing/under/rank/cargotech
 	name = "cargo technician's jumpsuit"
 	desc = "Shooooorts! They're comfy and easy to wear!"
-	icon_state = "cargotech"
+	icon_state = "cargo"
 	item_state = "lb_suit"
 	worn_state = "cargo"
 	gender_icons = 1
@@ -93,18 +94,17 @@
 	item_state = "ba_suit"
 	worn_state = "internalaffairs"
 	gender_icons = 1
-	accessories = list(/obj/item/clothing/accessory/black)
+	starting_accessories = list(/obj/item/clothing/accessory/black)
 
 /obj/item/clothing/under/rank/internalaffairs/plain
 	desc = "A plain shirt and pair of pressed black pants."
 	name = "formal outfit"
-	accessories = null
+	starting_accessories = null
 
 /obj/item/clothing/under/rank/internalaffairs/plain/nt
 	desc = "A plain shirt and pair of pressed black pants."
 	name = "formal outfit"
-	accessories = list(/obj/item/clothing/accessory/red_long)
-	item_flags = ITEM_FLAG_WASHER_ALLOWED | ITEM_FLAG_INVALID_FOR_CHAMELEON
+	starting_accessories = list(/obj/item/clothing/accessory/red_long)
 
 
 /obj/item/clothing/under/rank/janitor
@@ -121,18 +121,18 @@
 
 /obj/item/clothing/under/lawyer
 	desc = "Slick threads."
-	name = "lawyer suit"
+	name = "Lawyer suit"
 
 
 /obj/item/clothing/under/lawyer/black
-	name = "black lawyer suit"
+	name = "black Lawyer suit"
 	icon_state = "lawyer_black"
 	item_state = "lawyer_black"
 	worn_state = "lawyer_black"
 
 
 /obj/item/clothing/under/lawyer/female
-	name = "black lawyer suit"
+	name = "black Lawyer suit"
 	icon_state = "black_suit_fem"
 	item_state = "lawyer_black"
 	worn_state = "black_suit_fem"
@@ -140,37 +140,37 @@
 
 
 /obj/item/clothing/under/lawyer/red
-	name = "red lawyer suit"
+	name = "red Lawyer suit"
 	icon_state = "lawyer_red"
 	item_state = "lawyer_red"
 	worn_state = "lawyer_red"
 
 
 /obj/item/clothing/under/lawyer/blue
-	name = "blue lawyer suit"
+	name = "blue Lawyer suit"
 	icon_state = "lawyer_blue"
 	item_state = "lawyer_blue"
 	worn_state = "lawyer_blue"
 
 
 /obj/item/clothing/under/lawyer/bluesuit
-	name = "blue suit"
+	name = "Blue Suit"
 	desc = "A classy suit."
 	icon_state = "bluesuit"
 	item_state = "ba_suit"
 	worn_state = "bluesuit"
 	gender_icons = 1
-	accessories = list(/obj/item/clothing/accessory/red)
+	starting_accessories = list(/obj/item/clothing/accessory/red)
 
 
 /obj/item/clothing/under/lawyer/purpsuit
-	name = "purple suit"
+	name = "Purple Suit"
 	icon_state = "lawyer_purp"
 	item_state = "ba_suit"
 	worn_state = "lawyer_purp"
 
 /obj/item/clothing/under/lawyer/oldman
-	name = "old man's suit"
+	name = "Old Man's Suit"
 	desc = "A classic suit for the older gentleman with built in back support."
 	icon_state = "oldman"
 	item_state = "johnny"

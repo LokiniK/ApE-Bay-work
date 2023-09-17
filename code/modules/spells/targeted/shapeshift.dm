@@ -21,7 +21,7 @@
 	var/toggle = 0 //Can we toggle this?
 	var/list/transformed_dudes = list() //Who we transformed. Transformed = Transformation. Both mobs.
 
-/spell/targeted/shapeshift/cast(list/targets, mob/user)
+/spell/targeted/shapeshift/cast(var/list/targets, mob/user)
 	for(var/m in targets)
 		var/mob/living/M = m
 		if(M.stat == DEAD)
@@ -29,7 +29,7 @@
 			continue
 		if(M.buckled)
 			M.buckled.unbuckle_mob()
-		if(toggle && length(transformed_dudes) && stop_transformation(M))
+		if(toggle && transformed_dudes.len && stop_transformation(M))
 			continue
 		var/new_mob = pick(possible_transformations)
 
@@ -62,12 +62,12 @@
 			spawn(duration)
 				stop_transformation(trans)
 
-/spell/targeted/shapeshift/proc/destroyed_transformer(mob/target) //Juuuuust in case
+/spell/targeted/shapeshift/proc/destroyed_transformer(var/mob/target) //Juuuuust in case
 	var/mob/current = transformed_dudes[target]
-	to_chat(current, SPAN_DANGER("You suddenly feel as if this transformation has become permanent..."))
+	to_chat(current, "<span class='danger'>You suddenly feel as if this transformation has become permanent...</span>")
 	remove_target(target)
 
-/spell/targeted/shapeshift/proc/stop_transformation(mob/living/target)
+/spell/targeted/shapeshift/proc/stop_transformation(var/mob/living/target)
 	var/mob/living/transformer = transformed_dudes[target]
 	if(!transformer)
 		return FALSE
@@ -87,7 +87,7 @@
 	qdel(target)
 	return TRUE
 
-/spell/targeted/shapeshift/proc/remove_target(mob/living/target)
+/spell/targeted/shapeshift/proc/remove_target(var/mob/living/target)
 	var/mob/current = transformed_dudes[target]
 	GLOB.destroyed_event.unregister(target,src)
 	GLOB.death_event.unregister(current,src)
@@ -99,7 +99,7 @@
 	name = "Baleful Polymorth"
 	desc = "This spell transforms its target into a small, furry animal."
 	feedback = "BP"
-	possible_transformations = list(/mob/living/simple_animal/passive/lizard,/mob/living/simple_animal/passive/mouse,/mob/living/simple_animal/passive/corgi)
+	possible_transformations = list(/mob/living/simple_animal/friendly/lizard,/mob/living/simple_animal/friendly/mouse,/mob/living/simple_animal/friendly/corgi)
 
 	share_damage = 0
 	invocation = "Yo'balada!"
@@ -135,14 +135,14 @@
 	invocation = "Poli'crakata!"
 	invocation_type = SpI_SHOUT
 	spell_flags = INCLUDEUSER
-	range = -1
+	range = 0
 	duration = 150
 	charge_max = 600
 	cooldown_min = 300
 	level_max = list(Sp_TOTAL = 1, Sp_SPEED = 1, Sp_POWER = 0)
 	hud_state = "wiz_parrot"
 
-/spell/targeted/shapeshift/corrupt_form
+/*/spell/targeted/shapeshift/corrupt_form
 	name = "Corrupt Form"
 	desc = "This spell shapes the wizard into a terrible, terrible beast."
 	feedback = "CF"
@@ -181,7 +181,7 @@
 						"maxHealth" = 125)
 			duration = 0
 			return "You revel in the corruption. There is no turning back."
-
+*/
 /spell/targeted/shapeshift/familiar
 	name = "Transform"
 	desc = "Transform into a familiar form. Literally."

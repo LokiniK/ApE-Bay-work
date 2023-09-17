@@ -5,7 +5,7 @@
 /obj/item/bananapeel
 	name = "banana peel"
 	desc = "A peel from a banana."
-	icon = 'icons/obj/flora/hydroponics_products.dmi'
+	icon = 'icons/obj/items.dmi'
 	icon_state = "banana_peel"
 	item_state = "banana_peel"
 	w_class = ITEM_SIZE_SMALL
@@ -32,7 +32,7 @@
 			blind_message = SPAN_ITALIC("You can hear quiet scraping."),
 			range = 5
 		)
-		if (!do_after(user, carve_time, src, DO_PUBLIC_UNIQUE))
+		if (!do_after(user, carve_time, src))
 			to_chat(user, SPAN_ITALIC("You stop carving \the [src]."))
 			return
 		var/result = new result_type()

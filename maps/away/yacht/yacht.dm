@@ -1,8 +1,11 @@
 #include "yacht_areas.dm"
 
 /obj/effect/overmap/visitable/ship/yacht
-	name = "private yacht"
-	desc = "Sensor array is detecting a small vessel with unknown lifeforms on board."
+	scanner_name = "Private yacht"
+	scanner_desc = @{"[i]Registration[/i]: Aronai Sieyes
+[i]Class[/i]: Small Ship (Low Displacement)
+[i]Transponder[/i]: None Detected
+[b]Notice[/b]: Many lifeforms lifesigns detected"}
 	color = "#ffc966"
 	vessel_mass = 3000
 	max_speed = 1/(2 SECONDS)
@@ -14,7 +17,7 @@
 	)
 
 /obj/effect/overmap/visitable/ship/yacht/New(nloc, max_x, max_y)
-	name = "IPV [pick("Razorshark", "Aurora", "Lighting", "Pequod", "Anansi")], \a [name]"
+	scanner_name = "IPV [pick("Razorshark", "Aurora", "Lighting", "Pequod", "Anansi")], \a [name]"
 	..()
 
 /datum/map_template/ruin/away_site/yacht
@@ -22,7 +25,7 @@
 	id = "awaysite_yach"
 	description = "Tiny movable ship with spiders."
 	suffixes = list("yacht/yacht.dmm")
-	spawn_cost = 0.5
+	spawn_cost = 10
 	area_usage_test_exempted_root_areas = list(/area/yacht)
 
 /obj/effect/shuttle_landmark/nav_yacht/nav1

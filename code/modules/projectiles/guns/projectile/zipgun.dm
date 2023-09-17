@@ -9,9 +9,8 @@
 	load_method = SINGLE_CASING
 	max_shells = 1 //literally just a barrel
 	has_safety = FALSE
-	w_class = ITEM_SIZE_NORMAL
 
-	var/static/list/ammo_types = list(
+	var/global/list/ammo_types = list(
 		/obj/item/ammo_casing/pistol,
 		/obj/item/ammo_casing/shotgun,
 		/obj/item/ammo_casing/shotgun,
@@ -25,8 +24,11 @@
 		/obj/item/ammo_casing/rifle
 		)
 
-/obj/item/gun/projectile/pirate/toggle_safety(mob/user)
-	to_chat(user, SPAN_WARNING("There's no safety on \the [src]!"))
+	bulk = GUN_BULK_CARABINE //inf
+	w_class = ITEM_SIZE_NORMAL
+
+/obj/item/gun/projectile/pirate/toggle_safety(var/mob/user)
+	to_chat(user, "<span class='warning'>There's no safety on \the [src]!</span>")
 
 /obj/item/gun/projectile/pirate/Initialize()
 	var/obj/item/ammo_casing/ammo = pick(ammo_types)
@@ -36,10 +38,3 @@
 
 /obj/item/gun/projectile/pirate/unloaded
 	starts_loaded = FALSE
-
-/obj/item/gun/projectile/pirate/on_update_icon()
-	..()
-	if(length(loaded))
-		icon_state = initial(icon_state)
-	else
-		icon_state = "[initial(icon_state)]-empty"

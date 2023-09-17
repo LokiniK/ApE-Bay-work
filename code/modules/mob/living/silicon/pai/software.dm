@@ -1,4 +1,4 @@
-var/global/list/pai_emotions = list(
+var/list/pai_emotions = list(
 		"Happy" = 1,
 		"Cat" = 2,
 		"Extremely Happy" = 3,
@@ -25,7 +25,7 @@ var/global/list/default_pai_software = list()
 		var/datum/pai_software/P = new type()
 		if(pai_software_by_key[P.id])
 			var/datum/pai_software/O = pai_software_by_key[P.id]
-			log_error(SPAN_WARNING("pAI software module [P.name] has the same key as [O.name]!"))
+			log_error("<span class='warning'>pAI software module [P.name] has the same key as [O.name]!</span>")
 			r = 0
 			continue
 		pai_software_by_key[P.id] = P
@@ -33,6 +33,9 @@ var/global/list/default_pai_software = list()
 			default_pai_software[P.id] = P
 	return r
 
+/mob/living/silicon/pai/New()
+	..()
+	software = default_pai_software.Copy()
 
 /mob/living/silicon/pai/proc/paiInterface()
 	ui_interact(src)
@@ -64,22 +67,26 @@ var/global/list/default_pai_software = list()
 		software_data["id"] = S.id
 		if(key in software)
 			software_data["on"] = S.is_active(src)
-			bought_software[LIST_PRE_INC(bought_software)] = software_data
+			bought_software[++bought_software.len] = software_data
 		else
 			software_data["ram"] = S.ram_cost
-			not_bought_software[LIST_PRE_INC(not_bought_software)] = software_data
+			not_bought_software[++not_bought_software.len] = software_data
 
 	data["bought"] = bought_software
 	data["not_bought"] = not_bought_software
 	data["available_ram"] = ram
-
+	//[INF]
+	data["holoproj"] = is_advanced_holo
+	data["hackcover"] = is_hack_covered
+	data["hackspeed"] = hack_speed
+	//[/INF]
 	// Emotions
 	var/emotions[0]
 	for(var/name in pai_emotions)
 		var/emote[0]
 		emote["name"] = name
 		emote["id"] = pai_emotions[name]
-		emotions[LIST_PRE_INC(emotions)] = emote
+		emotions[++emotions.len] = emote
 
 	data["emotions"] = emotions
 	data["current_emotion"] = card.current_emotion
@@ -119,7 +126,7 @@ var/global/list/default_pai_software = list()
 
 		else if(href_list["image"])
 			var/img = text2num(href_list["image"])
-			if(1 <= img && img <= length(pai_emotions))
+			if(1 <= img && img <= pai_emotions.len)
 				card.setEmotion(img)
 			return TOPIC_HANDLED
 

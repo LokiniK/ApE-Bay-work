@@ -13,7 +13,7 @@
 #define COLOR_GRAY20           "#333333"
 #define COLOR_GRAY15           "#151515"
 #define COLOR_SEDONA           "#cc6600"
-#define COLOR_DARK_BROWN       "#917448"
+#define COLOR_DARK_BROWN       "#675233" //inf //was: "#917448"
 #define COLOR_BLUE             "#0000ff"
 #define COLOR_DEEP_SKY_BLUE    "#00e1ff"
 #define COLOR_LIME             "#00ff00"
@@ -81,18 +81,6 @@
 #define COLOR_ASTEROID_ROCK    "#735555"
 #define COLOR_NULLGLASS        "#ff6088"
 #define COLOR_DIAMOND          "#d8d4ea"
-#define COLOR_VOX			   "#244238"
-
-
-#define CABLE_COLOR_RED "#800000"
-#define CABLE_COLOR_YELLOW "#ffbf00"
-#define CABLE_COLOR_GREEN "#008000"
-#define CABLE_COLOR_BLUE "#3366cc"
-#define CABLE_COLOR_PINK "#800080"
-#define CABLE_COLOR_ORANGE "#ff9900"
-#define CABLE_COLOR_CYAN "#5ca1cc"
-#define CABLE_COLOR_WHITE "#c0c0c0"
-#define CABLE_COLOR_BLACK "#333333"
 
 
 #define	PIPE_COLOR_GREY        "#808080"
@@ -134,29 +122,15 @@
 #define WOOD_COLOR_PALE        "#d2bc9d"
 #define WOOD_COLOR_PALE2       "#e6d2ba"
 #define WOOD_COLOR_BLACK       "#332521"
-#define WOOD_COLOR_CHOCOLATE   "#543c30"
+#define WOOD_COLOR_CHOCOLATE   "#78523b" //inf, was: "#543c30"
 #define WOOD_COLOR_YELLOW      "#e3994e"
 
 #define GLASS_COLOR            "#aaccff"
-#define GLASS_COLOR_BORON      "#899ebd"
+#define GLASS_COLOR_PHORON     "#7c3a9a"
 #define GLASS_COLOR_TINTED     "#222222"
 #define GLASS_COLOR_FROSTED    "#eeeeee"
 
 #define COLOR_BLOOD_HUMAN      "#a10808"
-
-// Color defines used by the crew manifest
-#define MANIFEST_COLOR_COMMAND  "#204090"
-#define MANIFEST_COLOR_SUPPORT  "#3085b6"
-#define MANIFEST_COLOR_SCIENCE  "#993399"
-#define MANIFEST_COLOR_SECURITY "#930000"
-#define MANIFEST_COLOR_MEDICAL  "#009190"
-#define MANIFEST_COLOR_ENGINEER "#a66300"
-#define MANIFEST_COLOR_SUPPLY   "#7f6539"
-#define MANIFEST_COLOR_EXPLORER "#929820"
-#define MANIFEST_COLOR_SERVICE  "#709b00"
-#define MANIFEST_COLOR_CIVILIAN "#408010"
-#define MANIFEST_COLOR_MISC     "#353a42"
-#define MANIFEST_COLOR_SILICON  "#4c535b"
 
 //Color defines used by the assembly detailer.
 #define COLOR_ASSEMBLY_BLACK   "#545454"
@@ -209,23 +183,5 @@
 #define COLOR_DARKMODE_DARKBACKGROUND "#171717"
 #define COLOR_DARKMODE_TEXT "#a4bad6"
 
-// Medical readout colors
-#define COLOR_MEDICAL_BRUTE "#ff0000"
-#define COLOR_MEDICAL_BURN "#ff7700"
-#define COLOR_MEDICAL_TOXIN "#00ff00"
-#define COLOR_MEDICAL_OXYLOSS "#0000ff"
-#define COLOR_MEDICAL_CRYSTAL "#0066ff"
-#define COLOR_MEDICAL_ROBOTIC "#666688"
-#define COLOR_MEDICAL_INTERNAL "#ff66ff"
-#define COLOR_MEDICAL_RADIATION "#66ff66"
-#define COLOR_MEDICAL_NECROTIC "#663333"
-#define COLOR_MEDICAL_INTERNAL_DANGER "#aa3333"
-#define COLOR_MEDICAL_DISLOCATED "#6666ff"
-#define COLOR_MEDICAL_BROKEN "#ff00aa"
-#define COLOR_MEDICAL_SPLINTED "#ff66aa"
-#define COLOR_MEDICAL_IMPLANT "#aa66ff"
-#define COLOR_MEDICAL_UNKNOWN_IMPLANT "#aa00ff"
-#define COLOR_MEDICAL_SCARRING "#aa9999"
-#define COLOR_MEDICAL_MISSING "#886666"
-
-#define COLORED_SQUARE(COLOR) "<span style='font-face: fixedsys; font-size: 14px; background-color: [COLOR]; color: [COLOR]'>___</span>"
+#define COLOR_INPUT_DISABLED "#F0F0F0"
+#define COLOR_INPUT_ENABLED "#D3B5B5"

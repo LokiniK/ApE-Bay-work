@@ -23,13 +23,14 @@
 	has_sensor = SUIT_HAS_SENSORS
 
 /obj/item/clothing/under/syndicate/tacticool
-	name = "\improper Tacticool turtleneck"
+	name = "\improper tacticool turtleneck"
 	desc = "Just looking at it makes you want to buy an SKS, go into the woods, and -operate-."
 	icon_state = "tactifool"
 	item_state = "bl_suit"
 	worn_state = "tactifool"
 	armor = null
 	siemens_coefficient = 1
+	gender_icons = 1
 	has_sensor = SUIT_HAS_SENSORS
 
 

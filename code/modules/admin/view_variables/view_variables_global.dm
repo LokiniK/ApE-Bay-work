@@ -1,84 +1,51 @@
-GLOBAL_DATUM_INIT(debug_real_globals, /datum/debug_real_globals, new)
+/var/decl/global_vars/global_vars_
 
+/decl/global_vars/get_view_variables_header()
+	return "<b>Global Variables</b>"
 
-/datum/debug_real_globals
-	var/static/atom/movable/clickable_stat/__stat_line
-	var/static/list/global_names
+/decl/global_vars/get_view_variables_options()
+	return "" // Ensuring changes to the base proc never affect us
 
+/decl/global_vars/get_variables()
+	. = _all_globals - VV_hidden()
+	if(!usr || !check_rights(R_ADMIN|R_DEBUG, FALSE))
+		. -= VV_secluded()
 
-/datum/debug_real_globals/New()
-	global_names = list()
-	var/list/hidden = VV_hidden()
-	for (var/name in global.vars)
-		if (name in hidden)
-			continue
-		ADD_SORTED(global_names, name, /proc/cmp_text_asc)
+/decl/global_vars/get_variable_value(varname)
+	return readglobal(varname)
 
+/decl/global_vars/set_variable_value(varname, value)
+	writeglobal(varname, value)
 
-/datum/debug_real_globals/proc/UpdateStat()
-	if (!__stat_line)
-		__stat_line = new (null, src)
-		__stat_line.name = "Edit"
-	stat("Real Globals", __stat_line)
+/decl/global_vars/make_view_variables_variable_entry(varname, value)
+	return "(<a href='?_src_=vars;datumedit=\ref[src];varnameedit=[varname]'>E</a>) "
 
+/decl/global_vars/VV_locked()
+	return vars
 
-/datum/debug_real_globals/get_variables()
-	return global_names.Copy()
+/decl/global_vars/VV_hidden()
+	return list("forumsqladdress",
+				"forumsqldb",
+				"forumsqllogin",
+				"forumsqlpass",
+				"forumsqlport",
+				"sqladdress",
+				"sqldb",
+				"sqlfdbkdb",
+				"sqlfdbklogin",
+				"sqlfdbkpass",
+				"sqllogin",
+				"sqlpass",
+				"sqlport",
+				"comms_password",
+				"ban_comms_password",
+				"login_export_addr"
+			)
 
+/client/proc/debug_global_variables()
+	set category = "Debug"
+	set name = "View Global Variables"
 
-/datum/debug_real_globals/make_view_variables_variable_entry(name, value)
-	return {"(<a href="?_src_=vars;datumedit=\ref[src];varnameedit=[name]">E</a>) "}
-
-
-/datum/debug_real_globals/set_variable_value(name, value)
-	if (name in global_names)
-		global.vars[name] = value
-
-
-/datum/debug_real_globals/get_variable_value(name)
-	if (name in global_names)
-		return global.vars[name]
-
-
-/datum/debug_real_globals/get_view_variables_options()
-	return ""
-
-
-/datum/debug_real_globals/may_not_edit_var(user, name, silent)
-	. = ..(user, name, TRUE)
-	if (. == 2 && (name in global_names))
-		return FALSE
-
-
-/datum/debug_real_globals/VV_hidden()
-	return list(
-		"sqladdress",
-		"sqldb",
-		"sqlfdbkdb",
-		"sqlfdbklogin",
-		"sqlfdbkpass",
-		"sqllogin",
-		"sqlpass",
-		"sqlport",
-		"comms_password",
-		"ban_comms_password",
-		"login_export_addr",
-		"admin_verbs_default",
-		"admin_verbs_admin",
-		"admin_verbs_ban",
-		"admin_verbs_sounds",
-		"admin_verbs_fun",
-		"admin_verbs_spawn",
-		"admin_verbs_server",
-		"admin_verbs_debug",
-		"admin_verbs_paranoid_debug",
-		"admin_verbs_possess",
-		"admin_verbs_permissions",
-		"admin_verbs_rejuv",
-		"admin_verbs_hideable",
-		"admin_verbs_mod",
-		"admin_datums",
-		"admin_ranks",
-		"alien_whitelist",
-		"adminfaxes"
-	)
+	if(!global_vars_)
+		global_vars_ = new()
+	debug_variables(global_vars_)

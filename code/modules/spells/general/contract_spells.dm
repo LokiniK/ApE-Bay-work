@@ -13,7 +13,7 @@
 
 	var/mob/subject
 
-/spell/contract/New(mob/M)
+/spell/contract/New(var/mob/M)
 	..()
 	subject = M
 	name += " ([M.real_name])"
@@ -45,7 +45,7 @@
 	if(!target)
 		return
 
-	to_chat(target, SPAN_INFO("You feel great!"))
+	to_chat(target, "<span class='info'>You feel great!</span>")
 	target.ExtinguishMob()
 
 /spell/contract/punish
@@ -62,6 +62,6 @@
 	if(!target)
 		return
 
-	to_chat(target, SPAN_DANGER("You feel punished!"))
+	to_chat(target, "<span class='danger'>You feel punished!</span>")
 	target.fire_stacks += 15
 	target.IgniteMob()

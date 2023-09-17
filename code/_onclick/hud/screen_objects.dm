@@ -11,10 +11,11 @@
 	icon = 'icons/mob/screen1.dmi'
 	plane = HUD_PLANE
 	layer = HUD_BASE_LAYER
-	appearance_flags = DEFAULT_APPEARANCE_FLAGS | NO_CLIENT_COLOR
+	appearance_flags = NO_CLIENT_COLOR
 	unacidable = TRUE
 	var/obj/master = null    //A reference to the object in the slot. Grabs or items, generally.
 	var/globalscreen = FALSE //Global screens are not qdeled when the holding mob is destroyed.
+	var/use_additional_colors = FALSE //inf
 
 /obj/screen/Destroy()
 	master = null
@@ -48,8 +49,8 @@
 	var/obj/item/owner
 
 /obj/screen/item_action/Destroy()
-	..()
 	owner = null
+	. = ..()
 
 /obj/screen/item_action/Click()
 	if(!usr || !owner)
@@ -63,7 +64,7 @@
 	if(!(owner in usr))
 		return 1
 
-	owner.ui_action_click(owner)
+	owner.ui_action_click()
 	return 1
 
 /obj/screen/storage
@@ -168,7 +169,7 @@
 	screen_loc = ui_acti
 	var/intent = I_HELP
 
-/obj/screen/intent/Click(location, control, params)
+/obj/screen/intent/Click(var/location, var/control, var/params)
 	var/list/P = params2list(params)
 	var/icon_x = text2num(P["icon-x"])
 	var/icon_y = text2num(P["icon-y"])
@@ -184,6 +185,7 @@
 	usr.a_intent = intent
 
 /obj/screen/intent/on_update_icon()
+	. = ..()//inf
 	icon_state = "intent_[intent]"
 
 /obj/screen/Click(location, control, params)
@@ -226,7 +228,7 @@
 								no_mask = 1
 
 						if(no_mask)
-							to_chat(C, SPAN_NOTICE("You are not wearing a suitable mask or helmet."))
+							to_chat(C, "<span class='notice'>You are not wearing a suitable mask or helmet.</span>")
 							return 1
 						else
 							var/list/nicename = null
@@ -252,7 +254,7 @@
 									nicename |= "hardsuit"
 									tankcheck |= rig.air_supply
 
-							for(var/i=1, i<length(tankcheck)+1, ++i)
+							for(var/i=1, i<tankcheck.len+1, ++i)
 								if(istype(tankcheck[i], /obj/item/tank))
 									var/obj/item/tank/t = tankcheck[i]
 									if (!isnull(t.manipulated_by) && t.manipulated_by != C.real_name && findtext(t.desc,breathes))
@@ -270,7 +272,7 @@
 
 							var/best = 0
 							var/bestcontents = 0
-							for(var/i=1, i <  length(contents) + 1 , ++i)
+							for(var/i=1, i <  contents.len + 1 , ++i)
 								if(!contents[i])
 									continue
 								if(contents[i] > bestcontents)
@@ -302,6 +304,37 @@
 			if(usr.client)
 				usr.client.drop_item()
 
+//[inf]
+		if("holster")
+			if(usr.stat)
+				return
+			var/mob/living/carbon/human/H = usr
+			var/obj/item/clothing/under/U = H.w_uniform
+			for(var/obj/S in U.accessories)
+				if(istype(S, /obj/item/clothing/accessory/storage/holster))
+					var/datum/extension/holster/E = get_extension(S, /datum/extension/holster)
+					if(!E.holstered)
+						if(!usr.get_active_hand())
+							to_chat(usr, "<span class='warning'>You're not holding anything to holster.</span>")
+							return
+						E.holster(usr.get_active_hand(), usr)
+						return
+					else
+						E.unholster(usr, TRUE)
+						return
+			if(istype(H.belt, /obj/item/storage/belt/holster))
+				var/obj/item/storage/belt/holster/B = H.belt
+				var/datum/extension/holster/E = get_extension(B, /datum/extension/holster)
+				if(!E.holstered)
+					if(!usr.get_active_hand())
+						to_chat(usr, "<span class='warning'>You're not holding anything to holster.</span>")
+						return
+					E.holster(usr.get_active_hand(), usr)
+					return
+				else
+					E.unholster(usr, TRUE)
+					return
+//[/inf]
 		if("module")
 			if(isrobot(usr))
 				var/mob/living/silicon/robot/R = usr
@@ -381,3 +414,8 @@
 				usr.update_inv_l_hand(0)
 				usr.update_inv_r_hand(0)
 	return 1
+
+/obj/screen/health
+
+/obj/screen/health/Click(var/location, var/control, var/params)
+	usr.Click(usr, params)

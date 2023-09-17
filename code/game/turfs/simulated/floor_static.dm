@@ -6,9 +6,9 @@
 	icon = 'icons/turf/flooring/tiles.dmi'
 	icon_state = "steel"
 	initial_flooring = null
-	footstep_type = /singleton/footsteps/plating
+	footstep_type = /decl/footsteps/plating
 
-/turf/simulated/floor/fixed/attackby(obj/item/C, mob/user)
+/turf/simulated/floor/fixed/attackby(var/obj/item/C, var/mob/user)
 	if(istype(C, /obj/item/stack) && !isCoil(C))
 		return
 	return ..()
@@ -28,9 +28,9 @@
 	icon = 'icons/turf/flooring/alium.dmi'
 	icon_state = "jaggy"
 
-/turf/simulated/floor/fixed/alium/attackby(obj/item/C, mob/user)
+/turf/simulated/floor/fixed/alium/attackby(var/obj/item/C, var/mob/user)
 	if(isCrowbar(C))
-		to_chat(user, SPAN_NOTICE("There aren't any openings big enough to pry it away..."))
+		to_chat(user, "<span class='notice'>There aren't any openings big enough to pry it away...</span>")
 		return
 	return ..()
 
@@ -43,9 +43,13 @@
 	var/style = A.hardness % 2 ? "curvy" : "jaggy"
 	icon_state = "[style][(x*y) % 7]"
 
+/turf/simulated/floor/fixed/alium/airless
+	initial_gas = null
+	temperature = TCMB
+
 /turf/simulated/floor/fixed/alium/ex_act(severity)
 	var/material/A = SSmaterials.get_material_by_name(MATERIAL_ALIENALLOY)
 	if(prob(A.explosion_resistance))
 		return
-	if(severity == EX_ACT_DEVASTATING)
+	if(severity == 1)
 		ChangeTurf(get_base_turf_by_area(src))

@@ -11,6 +11,15 @@
 	slot_flags = SLOT_EARS
 	species_restricted = list(SPECIES_SKRELL)
 
+/obj/item/clothing/ears/skrell/equipped(mob/user)
+	. = ..()
+	if(istype(src, /obj/item/clothing/ears/skrell/cloth_female) || istype(src, /obj/item/clothing/ears/skrell/cloth_male))
+		return
+	var/mob/living/carbon/human/human_user = user
+	var/datum/sprite_accessory/hair/hairstyle = GLOB.hair_styles_list[human_user.h_style]
+	src.item_state = "[initial(icon_state)]_[hairstyle.icon_state]_s"
+	user.update_inv_head()
+
 /obj/item/clothing/ears/skrell/chain
 	name = "gold headtail chains"
 	desc = "A delicate golden chain worn by female skrell to decorate their head tails."
@@ -77,7 +86,6 @@
 	name = "headtail cloth"
 	desc = "A cloth shawl worn by female skrell draped around their head tails."
 	icon_state = "skrell_cloth_female"
-	item_flags = ITEM_FLAG_WASHER_ALLOWED
 
 //spawnable presets
 /obj/item/clothing/ears/skrell/cloth_female/red
@@ -102,7 +110,6 @@
 	name = "headtail cloth"
 	desc = "A cloth band worn by male skrell around their head tails."
 	icon_state = "skrell_cloth_male"
-	item_flags = ITEM_FLAG_WASHER_ALLOWED
 
 //spawnable presets
 /obj/item/clothing/ears/skrell/cloth_male/red

@@ -41,8 +41,7 @@
 //
 //	The primary helper proc.
 //
-/proc/test_air_in_area(test_area, expectation = UT_NORMAL)
-	RETURN_TYPE(/list)
+/proc/test_air_in_area(var/test_area, var/expectation = UT_NORMAL)
 	var/test_result = list("result" = FAILURE, "msg"    = "")
 
 	var/area/A = locate(test_area)
@@ -53,23 +52,14 @@
 		test_result["result"] = FAILURE
 		return test_result
 
-	// Airless areas are skipped
-	if (initial(A.turfs_airless))
-		test_result["result"] = SUCCESS
-		test_result["msg"] = "Area flagged airless. Skipped."
-
 	var/list/GM_checked = list()
 
 	for(var/turf/simulated/T in A)
 
-		if(!istype(T) || isnull(T.zone))
+		if(!istype(T) || isnull(T.zone) || istype(T, /turf/simulated/floor/airless))
 			continue
 		if(T.zone.air in GM_checked)
 			continue
-		var/turf/simulated/floor/floor = T
-		if (istype(floor) && floor.map_airless)
-			continue
-
 
 		var/t_msg = "Turf: [T] |  Location: [T.x] // [T.y] // [T.z]"
 
@@ -85,7 +75,7 @@
 					return test_result
 
 
-			if(UT_NORMAL, UT_NORMAL_COLD)
+			if(UT_NORMAL || UT_NORMAL_COLD)
 				if(abs(pressure - ONE_ATMOSPHERE) > 10)
 					test_result["msg"] = "Pressure out of bounds: [pressure] | [t_msg]"
 					return test_result
@@ -104,9 +94,9 @@
 
 		GM_checked.Add(GM)
 
-	if(length(GM_checked))
+	if(GM_checked.len)
 		test_result["result"] = SUCCESS
-		test_result["msg"] = "Checked [length(GM_checked)] zones"
+		test_result["msg"] = "Checked [GM_checked.len] zones"
 	else
 		test_result["msg"] = "No zones checked."
 
@@ -131,7 +121,7 @@
 	if(!SSshuttle)
 		fail("Shuttle Controller not setup at time of test.")
 		return 1
-	if(!length(SSshuttle.shuttles))
+	if(!SSshuttle.shuttles.len)
 		skip("No shuttles have been setup for this map.")
 		return 1
 

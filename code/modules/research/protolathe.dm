@@ -2,14 +2,14 @@
 	name = "protolathe"
 	desc = "Accessed by a connected core fabricator console, it produces items from various materials."
 	icon_state = "protolathe"
-	icon = 'icons/obj/machines/research/protolathe.dmi'
 	atom_flags = ATOM_FLAG_NO_TEMP_CHANGE | ATOM_FLAG_OPEN_CONTAINER
+	layer = BELOW_OBJ_LAYER
 
 	idle_power_usage = 30
 	active_power_usage = 5000
 	base_type = /obj/machinery/r_n_d/protolathe
-	construct_state = /singleton/machine_construction/default/panel_closed
-
+	construct_state = /decl/machine_construction/default/panel_closed
+	
 	machine_name = "protolathe"
 	machine_desc = "Uses raw materials to produce prototypes. Part of an R&D network."
 
@@ -27,10 +27,10 @@
 
 /obj/machinery/r_n_d/protolathe/Process()
 	..()
-	if(inoperable())
+	if(stat & (BROKEN | NOPOWER))
 		update_icon()
 		return
-	if(length(queue) == 0)
+	if(queue.len == 0)
 		busy = 0
 		update_icon()
 		return
@@ -47,7 +47,7 @@
 		update_icon()
 	else
 		if(busy)
-			visible_message(SPAN_NOTICE("[icon2html(src, viewers(get_turf(src)))] [src] flashes: insufficient materials: [getLackingMaterials(D)]."))
+			visible_message("<span class='notice'>[icon2html(src, viewers(get_turf(src)))] [src] flashes: insufficient materials: [getLackingMaterials(D)].</span>")
 			busy = 0
 			update_icon()
 
@@ -62,27 +62,23 @@
 		else
 			reagents.maximum_volume = T
 
-	max_material_storage = 75000 * clamp(total_component_rating_of_type(/obj/item/stock_parts/matter_bin), 0, 10)
+	max_material_storage = 75000 * Clamp(total_component_rating_of_type(/obj/item/stock_parts/matter_bin), 0, 10)
 
-	T = clamp(total_component_rating_of_type(/obj/item/stock_parts/manipulator), 0, 6)
+	T = Clamp(total_component_rating_of_type(/obj/item/stock_parts/manipulator), 0, 6)
 	mat_efficiency = 1 - (T - 2) / 8
 	speed = T / 2
 	..()
 
 
 /obj/machinery/r_n_d/protolathe/on_update_icon()
-	overlays.Cut()
 	if(panel_open)
-		overlays += "[icon_state]_panel"
-	if(is_powered())
-		overlays += emissive_appearance(icon, "[icon_state]_lights")
-		overlays += "[icon_state]_lights"
-	if(busy)
-		overlays += "[icon_state]_working"
-		overlays += emissive_appearance(icon, "[icon_state]_lights_working")
-		overlays += "[icon_state]_lights_working"
+		icon_state = "protolathe_t"
+	else if(busy)
+		icon_state = "protolathe_n"
+	else
+		icon_state = "protolathe"
 
-/obj/machinery/r_n_d/protolathe/state_transition(singleton/machine_construction/default/new_state)
+/obj/machinery/r_n_d/protolathe/state_transition(var/decl/machine_construction/default/new_state)
 	. = ..()
 	if(istype(new_state) && linked_console)
 		linked_console.linked_lathe = null
@@ -96,30 +92,30 @@
 		return SPAN_NOTICE("\The [src] is busy. Please wait for completion of previous operation.")
 	return ..()
 
-/obj/machinery/r_n_d/protolathe/attackby(obj/item/O as obj, mob/user as mob)
+/obj/machinery/r_n_d/protolathe/attackby(var/obj/item/O as obj, var/mob/user as mob)
 	if(busy)
-		to_chat(user, SPAN_NOTICE("\The [src] is busy. Please wait for completion of previous operation."))
+		to_chat(user, "<span class='notice'>\The [src] is busy. Please wait for completion of previous operation.</span>")
 		return 1
 	if(component_attackby(O, user))
 		return TRUE
 	if(O.is_open_container())
 		return 1
 	if(panel_open)
-		to_chat(user, SPAN_NOTICE("You can't load \the [src] while it's opened."))
+		to_chat(user, "<span class='notice'>You can't load \the [src] while it's opened.</span>")
 		return 1
 	if(!linked_console)
-		to_chat(user, SPAN_NOTICE("\The [src] must be linked to an R&D console first!"))
+		to_chat(user, "<span class='notice'>\The [src] must be linked to an R&D console first!</span>")
 		return 1
 	if(is_robot_module(O))
 		return 0
 	if(!istype(O, /obj/item/stack/material))
-		to_chat(user, SPAN_NOTICE("You cannot insert this item into \the [src]!"))
+		to_chat(user, "<span class='notice'>You cannot insert this item into \the [src]!</span>")
 		return 0
-	if(inoperable())
+	if(stat & (BROKEN | NOPOWER))
 		return 1
 
 	if(TotalMaterials() + SHEET_MATERIAL_AMOUNT > max_material_storage)
-		to_chat(user, SPAN_NOTICE("\The [src]'s material bin is full. Please remove material before adding more."))
+		to_chat(user, "<span class='notice'>\The [src]'s material bin is full. Please remove material before adding more.</span>")
 		return 1
 
 	var/obj/item/stack/material/stack = O
@@ -134,32 +130,32 @@
 
 	busy = 1
 	use_power_oneoff(max(1000, (SHEET_MATERIAL_AMOUNT * amount / 10)))
-	if(do_after(user, 1.6 SECONDS, src, DO_PUBLIC_UNIQUE))
+	if(do_after(user, 16,src))
 		if(stack.use(amount))
-			to_chat(user, SPAN_NOTICE("You add [amount] sheet\s to \the [src]."))
+			to_chat(user, "<span class='notice'>You add [amount] sheet\s to \the [src].</span>")
 			materials[stack.material.name] += amount * SHEET_MATERIAL_AMOUNT
 	busy = 0
 	updateUsrDialog()
 
-/obj/machinery/r_n_d/protolathe/proc/addToQueue(datum/design/D)
+/obj/machinery/r_n_d/protolathe/proc/addToQueue(var/datum/design/D)
 	queue += D
 	return
 
-/obj/machinery/r_n_d/protolathe/proc/removeFromQueue(index)
+/obj/machinery/r_n_d/protolathe/proc/removeFromQueue(var/index)
 	if(!is_valid_index(index, queue))
 		return
 	queue.Cut(index, index + 1)
 
-/obj/machinery/r_n_d/protolathe/proc/canBuild(datum/design/D)
+/obj/machinery/r_n_d/protolathe/proc/canBuild(var/datum/design/D, var/protolathe_bonus)
 	for(var/M in D.materials)
-		if(materials[M] < D.materials[M] * mat_efficiency)
+		if(materials[M] < D.materials[M] * mat_efficiency * protolathe_bonus)
 			return 0
 	for(var/C in D.chemicals)
-		if(!reagents.has_reagent(C, D.chemicals[C] * mat_efficiency))
+		if(!reagents.has_reagent(C, D.chemicals[C] * mat_efficiency * protolathe_bonus))
 			return 0
 	return 1
 
-/obj/machinery/r_n_d/protolathe/proc/build(datum/design/D)
+/obj/machinery/r_n_d/protolathe/proc/build(var/datum/design/D)
 	var/power = active_power_usage
 	for(var/M in D.materials)
 		power += round(D.materials[M] / 5)
@@ -171,8 +167,16 @@
 		reagents.remove_reagent(C, D.chemicals[C] * mat_efficiency)
 
 	if(D.build_path)
+		if(prob(D.skill_fail_chance))
+			src.audible_message("<span class='warning'>[pick("You hear a strange noises and some metal crackles.", "You hear a strange buzz.")]</span>")
+			if(prob(D.skill_fail_chance / 2))
+				playsound(src.loc, 'sound/effects/smoke.ogg', 50, 1, -3)
+				var/datum/effect/effect/system/smoke_spread/smoke = new
+				smoke.set_up(8, 0, src.loc, 0)
+				smoke.start()
+			return
 		var/obj/new_item = D.Fabricate(loc, src)
 		if(mat_efficiency != 1) // No matter out of nowhere
-			if(new_item.matter && length(new_item.matter) > 0)
+			if(new_item.matter && new_item.matter.len > 0)
 				for(var/i in new_item.matter)
 					new_item.matter[i] = new_item.matter[i] * mat_efficiency

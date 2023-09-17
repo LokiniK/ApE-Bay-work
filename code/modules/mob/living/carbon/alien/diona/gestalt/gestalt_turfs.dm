@@ -1,4 +1,4 @@
-/singleton/flooring/diona
+/decl/flooring/diona
 	name = "biomass"
 	desc = "A mass of small intertwined aliens forming a floor... creepy."
 	icon = 'icons/mob/gestalt.dmi'
@@ -8,4 +8,4 @@
 /turf/simulated/floor/diona
 	name = "biomass"
 	icon = 'icons/turf/floors.dmi'
-	initial_flooring = /singleton/flooring/diona
+	initial_flooring = /decl/flooring/diona

@@ -11,7 +11,9 @@
 	pull_mask = 1
 	w_class = ITEM_SIZE_SMALL
 	sprite_sheets = list(
+		SPECIES_TAJARA = 'icons/mob/species/tajaran/mask.dmi',
 		SPECIES_UNATHI = 'icons/mob/species/unathi/onmob_mask_unathi.dmi',
+		SPECIES_EROSAN = 'infinity/icons/mob/species/erosan/mask.dmi',
 		)
 
 /obj/item/clothing/mask/balaclava/tactical
@@ -20,7 +22,7 @@
 	down_icon_state = "swatclava_r"
 
 /obj/item/clothing/mask/luchador
-	name = "luchador mask"
+	name = "Luchador Mask"
 	desc = "Worn by robust fighters, flying high to defeat their foes!"
 	icon_state = "luchag"
 	item_state = "luchag"
@@ -30,13 +32,13 @@
 	siemens_coefficient = 3.0
 
 /obj/item/clothing/mask/luchador/tecnicos
-	name = "\improper Tecnicos mask"
+	name = "Tecnicos Mask"
 	desc = "Worn by robust fighters who uphold justice and fight honorably."
 	icon_state = "luchador"
 	item_state = "luchador"
 
 /obj/item/clothing/mask/luchador/rudos
-	name = "\improper Rudos mask"
+	name = "Rudos Mask"
 	desc = "Worn by robust fighters who are willing to do anything to win."
 	icon_state = "luchar"
 	item_state = "luchar"

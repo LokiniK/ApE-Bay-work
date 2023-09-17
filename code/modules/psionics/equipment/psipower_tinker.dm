@@ -4,24 +4,27 @@
 	force = 1
 	var/emulating = "Crowbar"
 
-/obj/item/psychic_power/tinker/IsCrowbar()
+/obj/item/psychic_power/tinker/iscrowbar()
 	return emulating == "Crowbar"
 
-/obj/item/psychic_power/tinker/IsWrench()
+/obj/item/psychic_power/tinker/iswrench()
 	return emulating == "Wrench"
 
-/obj/item/psychic_power/tinker/IsScrewdriver()
+/obj/item/psychic_power/tinker/isscrewdriver()
 	return emulating == "Screwdriver"
 
-/obj/item/psychic_power/tinker/IsWirecutter()
+/obj/item/psychic_power/tinker/iswirecutter()
 	return emulating == "Wirecutters"
+
+/obj/item/psychic_power/tinker/ismultitool()
+	return emulating == "Multitool"
 
 /obj/item/psychic_power/tinker/attack_self()
 
 	if(!owner || loc != owner)
 		return
 
-	var/choice = input("Select a tool to emulate.","Power") as null|anything in list("Crowbar","Wrench","Screwdriver","Wirecutters","Dismiss")
+	var/choice = input("Select a tool to emulate.","Power") as null|anything in list("Crowbar","Wrench","Screwdriver","Wirecutters","Multitool","Dismiss")
 	if(!choice)
 		return
 
@@ -35,5 +38,5 @@
 
 	emulating = choice
 	name = "psychokinetic [lowertext(emulating)]"
-	to_chat(owner, SPAN_NOTICE("You begin emulating \a [lowertext(emulating)]."))
+	to_chat(owner, "<span class='notice'>You begin emulating \a [lowertext(emulating)].</span>")
 	sound_to(owner, 'sound/effects/psi/power_fabrication.ogg')

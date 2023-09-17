@@ -8,6 +8,7 @@
 	name = "Freedom Implant"
 	desc = "An implant with an emotive trigger that can break you free of restraints. Show Security who has the real upperhand!"
 	item_cost = 24
+	antag_costs = list(MODE_MERCENARY = 18)
 	path = /obj/item/storage/box/syndie_kit/imp_freedom
 
 /datum/uplink_item/item/implants/imp_compress
@@ -15,6 +16,7 @@
 	desc = "An implant with an emotive trigger used to hide a handheld item in your body. \
 	Activating it materializes the item in your hand."
 	item_cost = 32
+	antag_costs = list(MODE_MERCENARY = 24)
 	path = /obj/item/storage/box/syndie_kit/imp_compress
 
 /datum/uplink_item/item/implants/imp_explosive
@@ -22,6 +24,7 @@
 	desc = "An explosive impant activated with a vocal trigger or radio signal. \
 	Use the included pad to adjust the settings before implanting."
 	item_cost = 40
+	antag_costs = list(MODE_MERCENARY = 30)
 	path = /obj/item/storage/box/syndie_kit/imp_explosive
 
 /datum/uplink_item/item/implants/imp_uplink

@@ -4,7 +4,7 @@
 /obj/machinery/atmospherics/binary/circulator
 	name = "circulator"
 	desc = "A gas circulator turbine and heat exchanger."
-	icon = 'icons/obj/machines/power/teg.dmi'
+	icon = 'icons/obj/power.dmi'
 	icon_state = "circ-unassembled"
 	anchored = FALSE
 
@@ -30,7 +30,7 @@
 
 /obj/machinery/atmospherics/binary/circulator/proc/return_transfer_air()
 	var/datum/gas_mixture/removed
-	if(anchored && !MACHINE_IS_BROKEN(src) && network1)
+	if(anchored && !(stat&BROKEN) && network1)
 		var/input_starting_pressure = air1.return_pressure()
 		var/output_starting_pressure = air2.return_pressure()
 		last_pressure_delta = max(input_starting_pressure - output_starting_pressure - 5, 0)
@@ -76,20 +76,17 @@
 /obj/machinery/atmospherics/binary/circulator/on_update_icon()
 	icon_state = anchored ? "circ-assembled" : "circ-unassembled"
 	overlays.Cut()
-	if (inoperable() || !anchored)
+	if (stat & (BROKEN|NOPOWER) || !anchored)
 		return 1
 	if (last_pressure_delta > 0 && recent_moles_transferred > 0)
 		if (temperature_overlay)
-			overlays += emissive_appearance(icon, temperature_overlay)
-			overlays += image(icon, temperature_overlay)
+			overlays += image('icons/obj/power.dmi', temperature_overlay)
 		if (last_pressure_delta > 5*ONE_ATMOSPHERE)
-			overlays += emissive_appearance(icon, "circ-run")
-			overlays += image(icon, "circ-run")
+			overlays += image('icons/obj/power.dmi', "circ-run")
 		else
-			overlays += emissive_appearance(icon, "circ-slow")
-			overlays += image(icon, "circ-slow")
+			overlays += image('icons/obj/power.dmi', "circ-slow")
 	else
-		overlays += image(icon, "circ-off")
+		overlays += image('icons/obj/power.dmi', "circ-off")
 
 	return 1
 

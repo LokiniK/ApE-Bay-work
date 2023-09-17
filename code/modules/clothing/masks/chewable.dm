@@ -9,34 +9,27 @@
 	var/chewtime = 0
 	var/brand
 	var/list/filling = list()
-	item_flags = null
 
-/obj/item/clothing/mask/chewable/New()
+obj/item/clothing/mask/chewable/New()
 	..()
 	atom_flags |= ATOM_FLAG_NO_REACT // so it doesn't react until you light it
 	create_reagents(chem_volume) // making the cigarrete a chemical holder with a maximum volume of 15
 	for(var/R in filling)
 		reagents.add_reagent(R, filling[R])
 
-/obj/item/clothing/mask/chewable/equipped(mob/living/user, slot)
+/obj/item/clothing/mask/chewable/equipped(var/mob/living/user, var/slot)
 	..()
 	if(slot == slot_wear_mask)
-		sprite_sheets = list(
-				SPECIES_VOX = 'icons/mob/species/vox/onmob_mask_vox.dmi',
-				SPECIES_UNATHI = 'icons/mob/species/unathi/onmob_mask_unathi.dmi'
-				)
 		if(user.check_has_mouth())
 			START_PROCESSING(SSobj, src)
 		else
-			to_chat(user, SPAN_NOTICE("You don't have a mouth, and can't make much use of \the [src]."))
-	else
-		sprite_sheets = list()
+			to_chat(user, "<span class='notice'>You don't have a mouth, and can't make much use of \the [src].</span>")
 
 /obj/item/clothing/mask/chewable/dropped()
 	STOP_PROCESSING(SSobj, src)
 	..()
 
-/obj/item/clothing/mask/chewable/Destroy()
+obj/item/clothing/mask/chewable/Destroy()
 	. = ..()
 	STOP_PROCESSING(SSobj, src)
 
@@ -73,7 +66,7 @@
 	desc = "A disgusting spitwad."
 	icon_state = "spit-chew"
 
-/obj/item/clothing/mask/chewable/proc/extinguish(mob/user, no_message)
+/obj/item/clothing/mask/chewable/proc/extinguish(var/mob/user, var/no_message)
 	STOP_PROCESSING(SSobj, src)
 	if (type_butt)
 		var/obj/item/butt = new type_butt(get_turf(src))
@@ -84,7 +77,8 @@
 		if(ismob(loc))
 			var/mob/living/M = loc
 			if (!no_message)
-				to_chat(M, SPAN_NOTICE("You spit out the [name]."))
+				to_chat(M, "<span class='notice'>You spit out the [name].</span>") // if the mob has free hands, put the gum in them
+			M.put_in_any_hand_if_possible(butt)
 		qdel(src)
 
 /obj/item/clothing/mask/chewable/tobacco/lenni

@@ -32,7 +32,7 @@
 		threatening = TRUE
 		last_threaten_time = world.time
 
-		if (length(holder.say_list?.say_threaten))
+		if (holder.say_list)
 			holder.ISay(pick(holder.say_list.say_threaten))
 			playsound(holder, holder.say_list.threaten_sound, 50, 1) // We do this twice to make the sound -very- noticable to the target.
 			playsound(target, holder.say_list.threaten_sound, 50, 1) // Actual aim-mode also does that so at least it's consistant.
@@ -46,7 +46,7 @@
 			if (should_escalate)
 				threatening = FALSE
 				set_stance(STANCE_APPROACH)
-				if (length(holder.say_list?.say_escalate))
+				if (holder.say_list)
 					holder.ISay(pick(holder.say_list.say_escalate))
 			else
 				return // Wait a bit.
@@ -55,7 +55,7 @@
 			if (last_threaten_time + threaten_timeout < world.time)	// They've been gone long enough, probably safe to stand down
 				threatening = FALSE
 			set_stance(STANCE_IDLE)
-			if (length(holder.say_list?.say_stand_down))
+			if (holder.say_list)
 				holder.ISay(pick(holder.say_list.say_stand_down))
 				playsound(holder, holder.say_list.stand_down_sound, 50, 1) // We do this twice to make the sound -very- noticable to the target.
 				playsound(target, holder.say_list.stand_down_sound, 50, 1) // Actual aim-mode also does that so at least it's consistant.
@@ -96,14 +96,14 @@
 		if (!holder.say_list)
 			return
 
-		if (length(holder.say_list?.speak))
+		if (holder.say_list.speak.len)
 			comm_types += COMM_SAY
-		if (length(holder.say_list?.emote_hear))
+		if (holder.say_list.emote_hear.len)
 			comm_types += COMM_AUDIBLE_EMOTE
-		if (length(holder.say_list?.emote_see))
+		if (holder.say_list.emote_see.len)
 			comm_types += COMM_VISUAL_EMOTE
 
-		if (!length(comm_types))
+		if (!comm_types.len)
 			return // All the relevant lists are empty, so do nothing.
 
 		switch(pick(comm_types))
@@ -125,7 +125,7 @@
 
 // This is to make responses feel a bit more natural and not instant.
 /datum/ai_holder/proc/delayed_say(message, mob/speak_to)
-	addtimer(new Callback(src, .proc/do_delayed_say, message, speak_to), rand(1 SECOND, 2 SECONDS))
+	addtimer(CALLBACK(src, .proc/do_delayed_say, message, speak_to), rand(1 SECOND, 2 SECONDS))
 
 /datum/ai_holder/proc/do_delayed_say(message, mob/speak_to)
 	if (!src || !holder || !can_act())  // We might've died/got deleted/etc in the meantime.

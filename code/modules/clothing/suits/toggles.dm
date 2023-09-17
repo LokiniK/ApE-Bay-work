@@ -17,7 +17,7 @@
 	if(!hood)
 		hood = new hoodtype(src)
 
-/obj/item/clothing/suit/storage/hooded/ui_action_click(mob/living/user)
+/obj/item/clothing/suit/storage/hooded/ui_action_click()
 	ToggleHood()
 
 /obj/item/clothing/suit/storage/hooded/equipped(mob/user, slot)
@@ -44,14 +44,16 @@
 		if(ishuman(loc))
 			var/mob/living/carbon/human/H = src.loc
 			if(H.wear_suit != src)
-				to_chat(H, SPAN_WARNING("You must be wearing \the [src] to put up the hood!"))
+				to_chat(H, "<span class='warning'>You must be wearing \the [src] to put up the hood!</span>")
 				return
 			if(H.head)
-				to_chat(H, SPAN_WARNING("You're already wearing something on your head!"))
+				to_chat(H, "<span class='warning'>You're already wearing something on your head!</span>")
 				return
 			else
-				H.equip_to_slot_if_possible(hood, slot_head)
+				H.equip_to_slot_if_possible(hood,slot_head,0,0,1)
 				suittoggled = 1
+				hood.icon_state = "[icon_state]_hood"
+//				hood.item_state = "[icon_state]_hood"
 				update_icon()
 				H.update_inv_wear_suit()
 	else
@@ -77,17 +79,17 @@
 		)
 	action_button_name = "Toggle Winter Hood"
 	hoodtype = /obj/item/clothing/head/winterhood
-	allowed = list (/obj/item/pen, /obj/item/paper, /obj/item/device/flashlight,/obj/item/storage/fancy/smokable, /obj/item/storage/fancy/matches, /obj/item/reagent_containers/food/drinks/flask)
+	allowed = list (/obj/item/pen, /obj/item/paper, /obj/item/device/flashlight,/obj/item/storage/fancy/cigarettes, /obj/item/storage/box/matches, /obj/item/reagent_containers/food/drinks/flask)
 	siemens_coefficient = 0.6
 
 /obj/item/clothing/head/winterhood
 	name = "winter hood"
 	desc = "A hood attached to a heavy winter jacket."
-	icon_state = "generic_hood"
+	icon_state = "coatwinter_hood"
+	item_icons = list(slot_head_str = 'infinity/icons/mob/onmob/onmob_head.dmi')
 	body_parts_covered = HEAD
 	cold_protection = HEAD
 	flags_inv = HIDEEARS | BLOCKHAIR
-	item_flags = ITEM_FLAG_WASHER_ALLOWED | ITEM_FLAG_INVALID_FOR_CHAMELEON
 	min_cold_protection_temperature = ARMOR_MIN_COLD_PROTECTION_TEMPERATURE
 
 /obj/item/clothing/suit/storage/hooded/wintercoat/captain
@@ -170,7 +172,11 @@
 	cold_protection = UPPER_TORSO|LOWER_TORSO|ARMS
 	action_button_name = "Toggle Hood"
 	hoodtype = /obj/item/clothing/head/hoodiehood
-	item_flags = ITEM_FLAG_WASHER_ALLOWED | ITEM_FLAG_INVALID_FOR_CHAMELEON
+	sprite_sheets = list(
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_suit_resomi.dmi',
+		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/infinity/onmob_suit.dmi', //inf, orig was SPECIES_UNATHI = 'icons/mob/onmob/Unathi/suit.dmi'
+		SPECIES_HUMAN  = 'icons/mob/onmob/infinity/onmob_suit.dmi',        //inf
+		)
 
 /obj/item/clothing/head/hoodiehood
 	name = "hoodie hood"
@@ -180,4 +186,3 @@
 	min_cold_protection_temperature = T0C - 20
 	cold_protection = HEAD
 	flags_inv = HIDEEARS | BLOCKHAIR
-	item_flags = ITEM_FLAG_WASHER_ALLOWED | ITEM_FLAG_INVALID_FOR_CHAMELEON

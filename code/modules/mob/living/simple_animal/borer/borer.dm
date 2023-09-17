@@ -14,6 +14,7 @@
 	speed = 5
 	a_intent = I_HURT
 	status_flags = CANPUSH
+	density = FALSE //INF
 	natural_weapon = /obj/item/natural_weapon/bite/weak
 	friendly = "prods"
 	pass_flags = PASS_FLAG_TABLE
@@ -28,11 +29,7 @@
 	var/static/list/chemical_types = list(
 		"bicaridine" = /datum/reagent/bicaridine,
 		"hyperzine" =  /datum/reagent/hyperzine,
-		"tramadol" =   /datum/reagent/tramadol,
-		"dermaline" =  /datum/reagent/dermaline,
-		"peridaxon" =  /datum/reagent/peridaxon,
-		"inaprovaline" =  /datum/reagent/inaprovaline,
-		"dylovene" =  /datum/reagent/dylovene
+		"tramadol" =   /datum/reagent/tramadol
 	)
 
 	var/generation = 1
@@ -72,7 +69,7 @@
 		client.screen -= hud_elements
 		client.screen -= hud_intent_selector
 
-/mob/living/simple_animal/borer/Initialize(mapload, gen=1)
+/mob/living/simple_animal/borer/Initialize(var/mapload, var/gen=1)
 
 	hud_intent_selector =  new
 	hud_inject_chemicals = new
@@ -101,7 +98,9 @@
 	aura_image.color = "#aaffaa"
 	aura_image.blend_mode = BLEND_SUBTRACT
 	aura_image.alpha = 125
-	aura_image.SetTransform(scale = 0.33)
+	var/matrix/M = matrix()
+	M.Scale(0.33)
+	aura_image.transform = M
 
 /mob/living/simple_animal/borer/death(gibbed, deathmessage, show_dead_message)
 	if(aura_image)
@@ -124,7 +123,7 @@
 	. = ..()
 
 /mob/living/simple_animal/borer/proc/set_borer_name()
-	truename = "[borer_names[min(generation, length(borer_names))]] [random_id("borer[generation]", 1000, 9999)]"
+	truename = "[borer_names[min(generation, borer_names.len)]] [random_id("borer[generation]", 1000, 9999)]"
 
 /mob/living/simple_animal/borer/Life()
 
@@ -168,7 +167,6 @@
 			if(chemicals < 250 && host.nutrition >= (neutered ? 200 : 50))
 				host.nutrition--
 				chemicals++
-
 			if(controlling)
 
 				if(neutered)
@@ -186,10 +184,14 @@
 				if(prob(host.getBrainLoss()/20))
 					host.say("*[pick(list("blink","blink_r","choke","aflap","drool","twitch","twitch_v","gasp"))]")
 
+/*//This All cool, but bay create verb that give you control under DEAD host
+		if(host.getBrainLoss() >= 100 && !src.now_escaping == 1)
+			to_chat(src, "<span class='notice'>Мозг жертвы теряет былую функциональность. Нужно найти другого...</span>")
+			src.release_host()*/
+
 /mob/living/simple_animal/borer/Stat()
 	. = ..()
 	statpanel("Status")
-
 	if(evacuation_controller)
 		var/eta_status = evacuation_controller.get_status_panel_eta()
 		if(eta_status)
@@ -250,11 +252,11 @@
 	qdel(host_brain)
 
 #define COLOR_BORER_RED "#ff5555"
-/mob/living/simple_animal/borer/proc/set_ability_cooldown(amt)
+/mob/living/simple_animal/borer/proc/set_ability_cooldown(var/amt)
 	last_special = world.time + amt
 	for(var/obj/thing in hud_elements)
 		thing.color = COLOR_BORER_RED
-	addtimer(new Callback(src, /mob/living/simple_animal/borer/proc/reset_ui_callback), amt)
+	addtimer(CALLBACK(src, /mob/living/simple_animal/borer/proc/reset_ui_callback), amt)
 #undef COLOR_BORER_RED
 
 /mob/living/simple_animal/borer/proc/leave_host()

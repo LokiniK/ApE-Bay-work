@@ -1,7 +1,7 @@
 /mob
 	var/moving           = FALSE
 
-/mob/proc/SelfMove(direction)
+/mob/proc/SelfMove(var/direction)
 	if(DoMove(direction, src) & MOVEMENT_HANDLED)
 		return TRUE // Doesn't necessarily mean the mob physically moved
 
@@ -16,12 +16,12 @@
 	else
 		return (!mover.density || !density || lying)
 
-/mob/proc/SetMoveCooldown(timeout)
+/mob/proc/SetMoveCooldown(var/timeout)
 	var/datum/movement_handler/mob/delay/delay = GetMovementHandler(/datum/movement_handler/mob/delay)
 	if(delay)
 		delay.SetDelay(timeout)
 
-/mob/proc/ExtraMoveCooldown(timeout)
+/mob/proc/ExtraMoveCooldown(var/timeout)
 	var/datum/movement_handler/mob/delay/delay = GetMovementHandler(/datum/movement_handler/mob/delay)
 	if(delay)
 		delay.AddDelay(timeout)
@@ -56,18 +56,18 @@
 				var/mob/living/carbon/C = usr
 				C.toggle_throw_mode()
 			else
-				to_chat(usr, SPAN_WARNING("This mob type cannot throw items."))
+				to_chat(usr, "<span class='warning'>This mob type cannot throw items.</span>")
 			return
 		if(NORTHWEST)
 			mob.hotkey_drop()
 
 /mob/proc/hotkey_drop()
-	to_chat(src, SPAN_WARNING("This mob type cannot drop items."))
+	to_chat(src, "<span class='warning'>This mob type cannot drop items.</span>")
 
 /mob/living/carbon/hotkey_drop()
 	var/obj/item/hand = get_active_hand()
 	if(!hand)
-		to_chat(src, SPAN_WARNING("You have nothing to drop in your hand."))
+		to_chat(src, "<span class='warning'>You have nothing to drop in your hand.</span>")
 	else if(hand.can_be_dropped_by_client(src))
 		drop_item()
 
@@ -76,7 +76,7 @@
 	set hidden = 1
 
 	if(!usr.pulling)
-		to_chat(usr, SPAN_NOTICE("You are not pulling anything."))
+		to_chat(usr, "<span class='notice'>You are not pulling anything.</span>")
 		return
 	usr.stop_pulling()
 
@@ -114,6 +114,15 @@
 		var/obj/item/I = mob.get_active_hand()
 		if(I && I.can_be_dropped_by_client(mob))
 			mob.drop_item()
+
+/atom/movable/proc/set_glide_size(glide_size_override = 0, var/min = 0.9, var/max = world.icon_size/2)
+	if (!glide_size_override || glide_size_override > max)
+		glide_size = 0
+	else
+		glide_size = max(min, glide_size_override)
+
+	for (var/atom/movable/AM in contents)
+		AM.set_glide_size(glide_size, min, max)
 
 //This proc should never be overridden elsewhere at /atom/movable to keep directions sane.
 /atom/movable/Move(newloc, direct)
@@ -162,87 +171,74 @@
 		if ((A != src.loc && A && A.z == src.z))
 			src.last_move = get_dir(A, src.loc)
 
-	if(!inertia_moving)
-		inertia_next_move = world.time + inertia_move_delay
-		space_drift(direct ? direct : last_move)
+/proc/step_glide(var/atom/movable/am, var/dir, var/glide_size_override)
+	am.set_glide_size(glide_size_override)
+	return step(am, dir)
 
 /client/Move(n, direction)
 	if(!user_acted(src))
 		return
 	if(!mob)
 		return // Moved here to avoid nullrefs below
+	var/datum/movement_handler/H = mob.GetMovementHandler(/datum/movement_handler/mob/delay)
+	if(H && H.MayMove() != MOVEMENT_PROCEED)
+		return
+	else
+		next_move_dir_add = 0
+		next_move_dir_sub = 0
+
+	if(!n || !direction)
+		return FALSE
+
 	return mob.SelfMove(direction)
 
 
-/mob/Process_Spacemove(allow_movement)
-	. = ..()
-	if(.)
-		return
 
-	var/atom/movable/backup = get_spacemove_backup()
-	if(backup)
-		if(istype(backup) && allow_movement)
-			return backup
-		return -1
+// Checks whether this mob is allowed to move in space
+// Return 1 for movement, 0 for none,
+// -1 to allow movement but with a chance of slipping
+/mob/proc/Allow_Spacemove(var/check_drift = 0)
+	if(!Check_Dense_Object()) //Nothing to push off of so end here
+		return 0
 
-/mob/proc/space_do_move(allow_move, direction)
-	if(ismovable(allow_move))//push off things in space
-		handle_space_pushoff(allow_move, direction)
-		allow_move = -1
+	if(restrained()) //Check to see if we can do things
+		return 0
 
-	if(allow_move == -1 && handle_spaceslipping())
+	return -1
+
+//Checks if a mob has solid ground to stand on
+//If there's no gravity then there's no up or down so naturally you can't stand on anything.
+//For the same reason lattices in space don't count - those are things you grip, presumably.
+/mob/proc/check_solid_ground()
+	if(istype(loc, /turf/space))
+		return 0
+
+	if(!lastarea)
+		lastarea = get_area(src)
+	if(!lastarea || !lastarea.has_gravity)
 		return 0
 
 	return 1
 
-/mob/proc/handle_space_pushoff(atom/movable/AM, direction)
-	if(AM.anchored)
-		return
+/mob/proc/Check_Dense_Object() //checks for anything to push off or grip in the vicinity. also handles magboots on gravity-less floors tiles
 
-	if(ismob(AM))
-		var/mob/M = AM
-		if(M.check_space_footing())
-			return
-
-	AM.inertia_ignore = src
-	if(step(AM, turn(direction, 180)))
-		to_chat(src, "<span class='info'>You push off of [AM] to propel yourself.</span>")
-		inertia_ignore = AM
-
-/mob/proc/get_spacemove_backup()
 	var/shoegrip = Check_Shoegrip()
 
-	for(var/thing in trange(1,src))//checks for walls or grav turf first
-		var/turf/T = thing
-		if(T.density || T.is_wall() || (T.is_floor() && (shoegrip || T.has_gravity())))
-			return T
-
-	var/obj/item/grab/G = locate() in src
-	for(var/A in range(1, get_turf(src)))
-		if(istype(A,/atom/movable))
-			var/atom/movable/AM = A
-			if(AM == src || AM == inertia_ignore || !AM.simulated || !AM.mouse_opacity || AM == buckled)	//mouse_opacity is hacky as hell, need better solution
-				continue
-			if(ismob(AM))
-				var/mob/M = AM
-				if(M.buckled)
-					continue
-			if(AM.density || !AM.CanPass(src))
-				if(AM.anchored)
-					return AM
-				if(G && AM == G.affecting)
-					continue
-				. = AM
-
-/mob/proc/check_space_footing()	//checks for gravity or maglockable turfs to prevent space related movement
-	if(has_gravity() || anchored || buckled)
-		return 1
-
-	if(Check_Shoegrip())
-		for(var/thing in trange(1,src))	//checks for turfs that one can maglock to
-			var/turf/T = thing
-			if(T.density || T.is_wall() || T.is_floor())
+	for(var/turf/simulated/T in trange(1,src)) //we only care for non-space turfs
+		if(T.density)	//walls work
+			return 1
+		else
+			var/area/A = T.loc
+			if(A.has_gravity || (shoegrip && !isopenspace(T)))
 				return 1
+
+	for(var/obj/O in orange(1, src))
+		if(istype(O, /obj/structure/lattice))
+			return 1
+		if(istype(O, /obj/structure/catwalk))
+			return 1
+		if(O && O.density && O.anchored)
+			return 1
 
 	return 0
 
@@ -251,13 +247,14 @@
 
 //return 1 if slipped, 0 otherwise
 /mob/proc/handle_spaceslipping()
-	if(prob(skill_fail_chance(SKILL_EVA, slip_chance(10), SKILL_EXPERIENCED)))
-		to_chat(src, SPAN_WARNING("You slipped!"))
-		step(src,turn(last_move, pick(45,-45)))
+	if(prob(skill_fail_chance(SKILL_EVA, slip_chance(10), SKILL_EXPERT)))
+		to_chat(src, "<span class='warning'>You slipped!</span>")
+		src.inertia_dir = src.last_move
+		step(src, src.inertia_dir)
 		return 1
 	return 0
 
-/mob/proc/slip_chance(prob_slip = 10)
+/mob/proc/slip_chance(var/prob_slip = 10)
 	if(stat)
 		return 0
 	if(buckled)
@@ -296,10 +293,10 @@
 	var/checking_intent = (istype(move_intent) ? move_intent.type : move_intents[1])
 	for(var/i = 1 to length(move_intents)) // One full iteration of the move set.
 		checking_intent = next_in_list(checking_intent, move_intents)
-		if(set_move_intent(GET_SINGLETON(checking_intent)))
+		if(set_move_intent(decls_repository.get_decl(checking_intent)))
 			return
 
-/mob/proc/set_move_intent(singleton/move_intent/next_intent)
+/mob/proc/set_move_intent(var/decl/move_intent/next_intent)
 	if(next_intent && move_intent != next_intent && next_intent.can_be_used_by(src))
 		move_intent = next_intent
 		if(hud_used)
@@ -307,29 +304,29 @@
 		return TRUE
 	return FALSE
 
-/mob/proc/get_movement_datum_by_flag(move_flag = MOVE_INTENT_DELIBERATE)
+/mob/proc/get_movement_datum_by_flag(var/move_flag = MOVE_INTENT_DELIBERATE)
 	for(var/m_intent in move_intents)
-		var/singleton/move_intent/check_move_intent = GET_SINGLETON(m_intent)
+		var/decl/move_intent/check_move_intent = decls_repository.get_decl(m_intent)
 		if(check_move_intent.flags & move_flag)
 			return check_move_intent
 
-/mob/proc/get_movement_datum_by_missing_flag(move_flag = MOVE_INTENT_DELIBERATE)
+/mob/proc/get_movement_datum_by_missing_flag(var/move_flag = MOVE_INTENT_DELIBERATE)
 	for(var/m_intent in move_intents)
-		var/singleton/move_intent/check_move_intent = GET_SINGLETON(m_intent)
+		var/decl/move_intent/check_move_intent = decls_repository.get_decl(m_intent)
 		if(!(check_move_intent.flags & move_flag))
 			return check_move_intent
 
-/mob/proc/get_movement_datums_by_flag(move_flag = MOVE_INTENT_DELIBERATE)
+/mob/proc/get_movement_datums_by_flag(var/move_flag = MOVE_INTENT_DELIBERATE)
 	. = list()
 	for(var/m_intent in move_intents)
-		var/singleton/move_intent/check_move_intent = GET_SINGLETON(m_intent)
+		var/decl/move_intent/check_move_intent = decls_repository.get_decl(m_intent)
 		if(check_move_intent.flags & move_flag)
 			. += check_move_intent
 
-/mob/proc/get_movement_datums_by_missing_flag(move_flag = MOVE_INTENT_DELIBERATE)
+/mob/proc/get_movement_datums_by_missing_flag(var/move_flag = MOVE_INTENT_DELIBERATE)
 	. = list()
 	for(var/m_intent in move_intents)
-		var/singleton/move_intent/check_move_intent = GET_SINGLETON(m_intent)
+		var/decl/move_intent/check_move_intent = decls_repository.get_decl(m_intent)
 		if(!(check_move_intent.flags & move_flag))
 			. += check_move_intent
 
@@ -376,7 +373,7 @@
 /mob/proc/can_sprint()
 	return FALSE
 
-/mob/proc/adjust_stamina(amt)
+/mob/proc/adjust_stamina(var/amt)
 	return
 
 /mob/proc/get_stamina()

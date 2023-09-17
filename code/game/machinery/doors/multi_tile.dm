@@ -16,8 +16,8 @@
 	welded_file = 'icons/obj/doors/double/welded.dmi'
 	emag_file = 'icons/obj/doors/double/emag.dmi'
 	width = 2
-	appearance_flags = DEFAULT_APPEARANCE_FLAGS
-	opacity = 1
+	appearance_flags = 0
+	opacity = TRUE
 	assembly_type = /obj/structure/door_assembly/multi_tile
 
 /obj/machinery/door/airlock/multi_tile/New()
@@ -29,6 +29,16 @@
 	SetBounds()
 
 /obj/machinery/door/airlock/multi_tile/proc/SetBounds()
+	if(!(width > 1)) return //Bubblewrap
+
+	for(var/i = 1, i < width, i++)
+		if(dir in list(NORTH, SOUTH))
+			var/turf/T = locate(x + i, y, z)
+			T.set_opacity(opacity)
+		else if(dir in list(EAST, WEST))
+			var/turf/T = locate(x, y + i, z)
+			T.set_opacity(opacity)
+
 	if(dir in list(NORTH, SOUTH))
 		bound_width = width * world.icon_size
 		bound_height = world.icon_size
@@ -47,7 +57,7 @@
 	else
 		set_dir(SOUTH)
 
-/obj/machinery/door/airlock/multi_tile/update_connections(propagate = 0)
+/obj/machinery/door/airlock/multi_tile/update_connections(var/propagate = 0)
 	var/dirs = 0
 
 	for(var/direction in GLOB.cardinal)
@@ -119,6 +129,10 @@
 /obj/machinery/door/airlock/multi_tile/sol
 	door_color = COLOR_BLUE_GRAY
 
+/obj/machinery/door/airlock/multi_tile/terran
+	door_color = COLOR_DARK_BLUE_GRAY
+	stripe_color = COLOR_NT_RED
+
 /obj/machinery/door/airlock/multi_tile/maintenance
 	name = "Maintenance Access"
 	stripe_color = COLOR_AMBER
@@ -132,8 +146,9 @@
 
 /obj/machinery/door/airlock/multi_tile/glass
 	name = "Glass Airlock"
-	damage_hitsound = 'sound/effects/Glasshit.ogg'
-	glass = TRUE
+	opacity = 0
+	hitsound = 'sound/effects/Glasshit.ogg'
+	glass = 1
 
 /obj/machinery/door/airlock/multi_tile/glass/command
 	door_color = COLOR_COMMAND_BLUE
@@ -143,9 +158,15 @@
 	door_color = COLOR_NT_RED
 	stripe_color = COLOR_ORANGE
 
+/obj/machinery/door/airlock/multi_tile/glass/security/no_stripe
+	stripe_color = null
+
 /obj/machinery/door/airlock/multi_tile/glass/engineering
 	door_color = COLOR_AMBER
 	stripe_color = COLOR_RED
+
+/obj/machinery/door/airlock/multi_tile/glass/engineering/no_stripe
+	stripe_color = null
 
 /obj/machinery/door/airlock/multi_tile/glass/medical
 	door_color = COLOR_WHITE
@@ -174,6 +195,10 @@
 /obj/machinery/door/airlock/multi_tile/glass/sol
 	door_color = COLOR_BLUE_GRAY
 	stripe_color = COLOR_AMBER
+
+/obj/machinery/door/airlock/multi_tile/glass/terran
+	door_color = COLOR_DARK_BLUE_GRAY
+	stripe_color = COLOR_NT_RED
 
 /obj/machinery/door/airlock/multi_tile/glass/freezer
 	door_color = COLOR_WHITE

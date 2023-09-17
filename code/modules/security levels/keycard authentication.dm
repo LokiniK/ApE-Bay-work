@@ -1,7 +1,7 @@
 /obj/machinery/keycard_auth
-	name = "keycard authentication device"
+	name = "Keycard Authentication Device"
 	desc = "This device is used to trigger functions which require more than one ID card to authenticate."
-	icon = 'icons/obj/structures/keycard_authenticator.dmi'
+	icon = 'icons/obj/monitors.dmi'
 	icon_state = "auth_off"
 	var/active = 0 //This gets set to 1 on all devices except the one where the initial request was made.
 	var/event = ""
@@ -18,32 +18,37 @@
 	idle_power_usage = 2
 	active_power_usage = 6
 	power_channel = ENVIRON
+	var/list/isounds = list("card_swipe" = 'infinity/sound/SS2/effects/machines/keycard.wav', "access_deny" = 'infinity/sound/SS2/effects/machines/access_needed.wav') //inf
+	var/last_activation = 0 //inf
 
 /obj/machinery/keycard_auth/attack_ai(mob/user as mob)
-	to_chat(user, SPAN_WARNING("A firewall prevents you from interfacing with this device!"))
+	to_chat(user, "<span class='warning'>A firewall prevents you from interfacing with this device!</span>")
 	return
 
 /obj/machinery/keycard_auth/attackby(obj/item/W as obj, mob/user as mob)
-	if(inoperable())
+	if(stat & (NOPOWER|BROKEN))
 		to_chat(user, "This device is not powered.")
 		return
-	if(istype(W,/obj/item/card/id))
+	if(istype(W,/obj/item/card/id) && last_activation + 2 SECONDS < world.time) //inf //was: if(istype(W,/obj/item/card/id))
+		last_activation = world.time//inf
 		var/obj/item/card/id/ID = W
 		if(access_keycard_auth in ID.access)
+			playsound(src, sound(isounds["card_swipe"]))//inf
 			if(active == 1)
 				//This is not the device that made the initial request. It is the device confirming the request.
 				if(event_source && event_source.event_triggered_by != usr)
 					event_source.confirmed = 1
 					event_source.event_confirmed_by = usr
 				else
-					to_chat(user, SPAN_WARNING("Unable to confirm, DNA matches that of origin."))
+					to_chat(user, "<span class='warning'>Unable to confirm, DNA matches that of origin.</span>")
 			else if(screen == 2)
 				event_triggered_by = usr
 				broadcast_request() //This is the device making the initial event request. It needs to broadcast to other devices
+		else playsound(src, sound(isounds["access_deny"])) //inf
 
 //icon_state gets set everwhere besides here, that needs to be fixed sometime
 /obj/machinery/keycard_auth/on_update_icon()
-	if(!is_powered())
+	if(stat &NOPOWER)
 		icon_state = "auth_off"
 
 /obj/machinery/keycard_auth/interface_interact(mob/user)
@@ -64,7 +69,7 @@
 	if(screen == 1)
 		dat += "Select an event to trigger:<ul>"
 
-		var/singleton/security_state/security_state = GET_SINGLETON(GLOB.using_map.security_state)
+		var/decl/security_state/security_state = decls_repository.get_decl(GLOB.using_map.security_state)
 		if(security_state.current_security_level == security_state.severe_security_level)
 			dat += "<li>Cannot modify the alert level at this time: [security_state.severe_security_level.name] engaged.</li>"
 		else
@@ -87,7 +92,7 @@
 		show_browser(user, dat, "window=keycard_auth;size=500x250")
 	return
 
-/obj/machinery/keycard_auth/CanUseTopic(mob/user, href_list)
+/obj/machinery/keycard_auth/CanUseTopic(var/mob/user, href_list)
 	if(busy)
 		to_chat(user, "This device is busy.")
 		return STATUS_CLOSE
@@ -133,8 +138,8 @@
 		log_and_message_admins("triggered and [key_name(event_confirmed_by)] confirmed event [event]", event_triggered_by || usr)
 	reset()
 
-/obj/machinery/keycard_auth/proc/receive_request(obj/machinery/keycard_auth/source)
-	if(inoperable())
+/obj/machinery/keycard_auth/proc/receive_request(var/obj/machinery/keycard_auth/source)
+	if(stat & (BROKEN|NOPOWER))
 		return
 	event_source = source
 	busy = 1
@@ -151,29 +156,37 @@
 /obj/machinery/keycard_auth/proc/trigger_event()
 	switch(event)
 		if("Red alert")
-			var/singleton/security_state/security_state = GET_SINGLETON(GLOB.using_map.security_state)
+			var/decl/security_state/security_state = decls_repository.get_decl(GLOB.using_map.security_state)
 			security_state.stored_security_level = security_state.current_security_level
 			security_state.set_security_level(security_state.high_security_level)
+			SSstatistics.add_field("alert_keycard_auth_red",1)
 		if("Revert alert")
-			var/singleton/security_state/security_state = GET_SINGLETON(GLOB.using_map.security_state)
+			var/decl/security_state/security_state = decls_repository.get_decl(GLOB.using_map.security_state)
 			security_state.set_security_level(security_state.stored_security_level)
+			SSstatistics.add_field("alert_keycard_revert_red",1)
 		if("Grant Emergency Maintenance Access")
 			GLOB.using_map.make_maint_all_access()
+			SSstatistics.add_field("alert_keycard_auth_maintGrant",1)
 		if("Revoke Emergency Maintenance Access")
 			GLOB.using_map.revoke_maint_all_access()
+			SSstatistics.add_field("alert_keycard_auth_maintRevoke",1)
 		if("Emergency Response Team")
 			if(is_ert_blocked())
-				to_chat(usr, SPAN_WARNING("All emergency response teams are dispatched and can not be called at this time."))
+				to_chat(usr, "<span class='warning'>All emergency response teams are dispatched and can not be called at this time.</span>")
 				return
 
 			trigger_armed_response_team(1)
+			SSstatistics.add_field("alert_keycard_auth_ert",1)
 		if("Grant Nuclear Authorization Code")
 			var/obj/machinery/nuclearbomb/nuke = locate(/obj/machinery/nuclearbomb/station) in world
 			if(nuke)
 				to_chat(usr, "The nuclear authorization code is [nuke.r_code]")
 			else
 				to_chat(usr, "No self destruct terminal found.")
+			SSstatistics.add_field("alert_keycard_auth_nukecode",1)
 
 /obj/machinery/keycard_auth/proc/is_ert_blocked()
 	if(config.ert_admin_call_only) return 1
 	return SSticker.mode && SSticker.mode.ert_disabled
+
+var/global/maint_all_access = 0

@@ -1,6 +1,10 @@
 /obj/effect/overmap/visitable/sector/exoplanet/shrouded
 	name = "shrouded exoplanet"
-	desc = "An exoplanet shrouded in a perpetual storm of bizzare, light absorbing particles."
+	scanner_name = "shrouded exoplanet"
+	scanner_desc = @{"[i]Stellar Body[/i]>: UNKNOWN
+[i]Class[/i]>: Unknown-Class Planetoid
+[i]Habitability[/i]>: Unknown
+[b]Notice[/b]>: An exoplanet shrouded in a perpetual storm of bizzare, light absorbing particles"}
 	color = "#783ca4"
 	planetary_area = /area/exoplanet/shrouded
 	rock_colors = list(COLOR_INDIGO, COLOR_DARK_BLUE_GRAY, COLOR_NAVY_BLUE)
@@ -58,7 +62,7 @@
 	dirt_color = "#3e3960"
 
 /turf/simulated/floor/exoplanet/water/shallow/tar/get_footstep_sound(mob/caller)
-	return get_footstep(/singleton/footsteps/water, caller)
+	return get_footstep(/decl/footsteps/water, caller)
 
 
 /turf/simulated/floor/exoplanet/shrouded

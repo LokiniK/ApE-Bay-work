@@ -2,7 +2,7 @@
 /obj/machinery/power/port_gen
 	name = "Placeholder Generator"	//seriously, don't use this. It can't be anchored without VV magic.
 	desc = "A portable generator for emergency backup power."
-	icon = 'icons/obj/structures/portgen.dmi'
+	icon = 'icons/obj/power.dmi'
 	icon_state = "portgen0"
 	density = TRUE
 	anchored = FALSE
@@ -21,7 +21,7 @@
 	var/working_sound
 
 /obj/machinery/power/port_gen/proc/IsBroken()
-	return (MACHINE_IS_BROKEN(src) || GET_FLAGS(stat, MACHINE_STAT_EMPED))
+	return (stat & (BROKEN|EMPED))
 
 /obj/machinery/power/port_gen/proc/HasFuel() //Placeholder for fuel check.
 	return 1
@@ -70,7 +70,7 @@
 
 /obj/machinery/power/port_gen/CanUseTopic(mob/user)
 	if(!anchored)
-		to_chat(user, SPAN_WARNING("The generator needs to be secured first."))
+		to_chat(user, "<span class='warning'>The generator needs to be secured first.</span>")
 		return STATUS_CLOSE
 	return ..()
 
@@ -79,32 +79,31 @@
 	if(distance > 1)
 		return
 	if(active)
-		to_chat(usr, SPAN_NOTICE("The generator is on."))
+		to_chat(usr, "<span class='notice'>The generator is on.</span>")
 	else
-		to_chat(usr, SPAN_NOTICE("The generator is off."))
+		to_chat(usr, "<span class='notice'>The generator is off.</span>")
 /obj/machinery/power/port_gen/emp_act(severity)
 	if(!active)
 		return
-	var/duration
+	var/duration = 6000 //ten minutes
 	switch(severity)
-		if(EMP_ACT_HEAVY)
-			set_broken(TRUE)
+		if(1)
+			stat &= BROKEN
 			if(prob(75)) explode()
-			else duration = 10 MINUTES
-		if(EMP_ACT_LIGHT)
-			if(prob(25)) set_broken(TRUE)
+		if(2)
+			if(prob(25)) stat &= BROKEN
 			if(prob(10)) explode()
-			else duration = 30 SECONDS
+		if(3)
+			if(prob(10)) stat &= BROKEN
+			duration = 300
 
+	stat |= EMPED
 	if(duration)
-		set_stat(MACHINE_STAT_EMPED, TRUE)
-		addtimer(new Callback(src, .proc/resolve_emp_timer), duration)
-
-/obj/machinery/power/port_gen/proc/resolve_emp_timer()
-	set_stat(MACHINE_STAT_EMPED, FALSE)
+		spawn(duration)
+			stat &= ~EMPED
 
 /obj/machinery/power/port_gen/proc/explode()
-	explosion(src.loc, 8, EX_ACT_HEAVY)
+	explosion(src.loc, -1, 3, 5, -1)
 	qdel(src)
 
 #define TEMPERATURE_DIVISOR 40
@@ -114,7 +113,7 @@
 /obj/machinery/power/port_gen/pacman
 	name = "\improper P.A.C.M.A.N.-type Portable Generator"
 	desc = "A power generator that runs on solid phoron sheets. Rated for 80 kW max safe output."
-
+	
 	machine_name = "\improper PACMAN-type generator"
 	machine_desc = "A portable generator often used for backup power or running small spacecraft. Runs on solid phoron sheets; rated for 80 kW max safe output."
 
@@ -129,7 +128,7 @@
 	*/
 	power_gen = 20000			//Watts output per power_output level
 	working_sound = 'sound/machines/engine.ogg'
-	construct_state = /singleton/machine_construction/default/panel_closed
+	construct_state = /decl/machine_construction/default/panel_closed
 	uncreated_component_parts = null
 	stat_immune = 0
 	var/max_power_output = 5	//The maximum power setting without emagging.
@@ -158,17 +157,17 @@
 	var/temp_rating = total_component_rating_of_type(/obj/item/stock_parts/micro_laser)
 	temp_rating += total_component_rating_of_type(/obj/item/stock_parts/capacitor)
 
-	max_sheets = 50 * clamp(total_component_rating_of_type(/obj/item/stock_parts/matter_bin), 0, 5) ** 2
+	max_sheets = 50 * Clamp(total_component_rating_of_type(/obj/item/stock_parts/matter_bin), 0, 5) ** 2
 
-	power_gen = round(initial(power_gen) * clamp(temp_rating, 0, 20) / 2)
+	power_gen = round(initial(power_gen) * Clamp(temp_rating, 0, 20) / 2)
 	..()
 
 /obj/machinery/power/port_gen/pacman/examine(mob/user)
 	. = ..(user)
 	to_chat(user, "\The [src] appears to be producing [power_gen*power_output] W.")
 	to_chat(user, "There [sheets == 1 ? "is" : "are"] [sheets] sheet\s left in the hopper.")
-	if(IsBroken()) to_chat(user, SPAN_WARNING("\The [src] seems to have broken down."))
-	if(overheating) to_chat(user, SPAN_DANGER("\The [src] is overheating!"))
+	if(IsBroken()) to_chat(user, "<span class='warning'>\The [src] seems to have broken down.</span>")
+	if(overheating) to_chat(user, "<span class='danger'>\The [src] is overheating!</span>")
 
 /obj/machinery/power/port_gen/pacman/proc/process_exhaust()
 	var/datum/gas_mixture/environment = loc?.return_air()
@@ -230,7 +229,7 @@
 	var/average = (upper_limit + lower_limit)/2
 
 	//calculate the temperature increase
-	var/bias = clamp(round((average - operating_temperature)/TEMPERATURE_DIVISOR, 1),  -TEMPERATURE_CHANGE_MAX, TEMPERATURE_CHANGE_MAX)
+	var/bias = Clamp(round((average - operating_temperature)/TEMPERATURE_DIVISOR, 1),  -TEMPERATURE_CHANGE_MAX, TEMPERATURE_CHANGE_MAX)
 	operating_temperature += bias + rand(-7, 7)
 
 	if (operating_temperature > max_temperature)
@@ -249,7 +248,7 @@
 
 	if (operating_temperature > cooling_temperature)
 		var/temp_loss = (operating_temperature - cooling_temperature)/TEMPERATURE_DIVISOR
-		temp_loss = clamp(round(temp_loss, 1), 2, TEMPERATURE_CHANGE_MAX)
+		temp_loss = between(2, round(temp_loss, 1), TEMPERATURE_CHANGE_MAX)
 		operating_temperature = max(operating_temperature - temp_loss, cooling_temperature)
 		src.updateDialog()
 
@@ -274,7 +273,7 @@
 	sheet_left = 0
 	..()
 
-/obj/machinery/power/port_gen/pacman/emag_act(remaining_charges, mob/user)
+/obj/machinery/power/port_gen/pacman/emag_act(var/remaining_charges, var/mob/user)
 	if (active && prob(25))
 		explode() //if they're foolish enough to emag while it's running
 
@@ -290,14 +289,14 @@
 		return SPAN_WARNING("You cannot do this while \the [src] is running!")
 	return ..()
 
-/obj/machinery/power/port_gen/pacman/attackby(obj/item/O as obj, mob/user as mob)
+/obj/machinery/power/port_gen/pacman/attackby(var/obj/item/O as obj, var/mob/user as mob)
 	if(istype(O, sheet_path))
 		var/obj/item/stack/addstack = O
 		var/amount = min((max_sheets - sheets), addstack.amount)
 		if(amount < 1)
-			to_chat(user, SPAN_NOTICE("The [src.name] is full!"))
+			to_chat(user, "<span class='notice'>The [src.name] is full!</span>")
 			return
-		to_chat(user, SPAN_NOTICE("You add [amount] sheet\s to the [src.name]."))
+		to_chat(user, "<span class='notice'>You add [amount] sheet\s to the [src.name].</span>")
 		sheets += amount
 		addstack.use(amount)
 		updateUsrDialog()
@@ -305,10 +304,10 @@
 	if(isWrench(O) && !active)
 		if(!anchored)
 			connect_to_network()
-			to_chat(user, SPAN_NOTICE("You secure the generator to the floor."))
+			to_chat(user, "<span class='notice'>You secure the generator to the floor.</span>")
 		else
 			disconnect_from_network()
-			to_chat(user, SPAN_NOTICE("You unsecure the generator from the floor."))
+			to_chat(user, "<span class='notice'>You unsecure the generator from the floor.</span>")
 
 		playsound(src.loc, 'sound/items/Deconstruct.ogg', 50, 1)
 		anchored = !anchored
@@ -323,7 +322,7 @@
 	ui_interact(user)
 	return TRUE
 
-/obj/machinery/power/port_gen/pacman/ui_interact(mob/user, ui_key = "main", datum/nanoui/ui = null, force_open = 1)
+/obj/machinery/power/port_gen/pacman/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1)
 	if(IsBroken())
 		return
 
@@ -386,7 +385,7 @@
 	dat += text("Power current: [(powernet == null ? "Unconnected" : "[avail()]")]<br>")
 
 	var/tempstr = "Temperature: [temperature]&deg;C<br>"
-	dat += (overheating)? SPAN_DANGER("[tempstr]") : tempstr
+	dat += (overheating)? "<span class='danger'>[tempstr]</span>" : tempstr
 	dat += "<br><A href='?src=\ref[src];action=close'>Close</A>"
 	show_browser(user, "[dat]", "window=port_gen")
 	onclose(user, "port_gen")
@@ -417,7 +416,7 @@
 				power_output++
 
 /obj/machinery/power/port_gen/pacman/super
-	name = "\improper S.U.P.E.R.P.A.C.M.A.N.-type Portable Generator"
+	name = "S.U.P.E.R.P.A.C.M.A.N.-type Portable Generator"
 	desc = "A power generator that utilizes uranium sheets as fuel. Can run for much longer than the standard PACMAN type generators. Rated for 80 kW max safe output."
 	icon_state = "portgen1"
 	sheet_path = /obj/item/stack/material/uranium
@@ -457,7 +456,7 @@
 	var/rads = rad_power*25 + (sheets + sheet_left)*1.5
 	SSradiation.radiate(src, (max(40, rads)))
 
-	explosion(src.loc, rad_power * 4)
+	explosion(src.loc, rad_power+1, rad_power+1, rad_power*2, 3)
 	qdel(src)
 
 /obj/machinery/power/port_gen/pacman/super/potato
@@ -493,7 +492,12 @@
 		temperature_gain = 60
 		reagents.remove_any(coolant_use)
 		if(prob(2))
-			audible_message(SPAN_NOTICE("[src] churns happily"))
+			audible_message("<span class='notice'>[src] churns happily!</span>")
+	else if(reagents.has_reagent("water"))
+		temperature_gain = -10
+		reagents.remove_any(1)
+		if(prob(2))
+			audible_message("<span class='notice'>[src] churns unhappily...</span>")
 	else
 		rad_power = initial(rad_power)
 		temperature_gain = initial(temperature_gain)
@@ -505,15 +509,15 @@
 	if(power_output > max_safe_output)
 		icon_state = "potatodanger"
 
-/obj/machinery/power/port_gen/pacman/super/potato/attackby(obj/item/O, mob/user)
-	if(istype(O, /obj/item/reagent_containers))
+/obj/machinery/power/port_gen/pacman/super/potato/attackby(var/obj/item/O, var/mob/user)
+	if(istype(O, /obj/item/reagent_containers/))
 		var/obj/item/reagent_containers/R = O
 		if(R.standard_pour_into(src,user))
 			if(reagents.has_reagent("vodka"))
-				audible_message(SPAN_NOTICE("[src] blips happily"))
+				audible_message("<span class='notice'>[src] blips happily</span>")
 				playsound(get_turf(src),'sound/machines/synth_yes.ogg', 50, 0)
 			else
-				audible_message(SPAN_WARNING("[src] blips in disappointment"))
+				audible_message("<span class='warning'>[src] blips in disappointment</span>")
 				playsound(get_turf(src), 'sound/machines/synth_no.ogg', 50, 0)
 		return
 	..()
@@ -534,7 +538,7 @@
 	machine_desc = "A standard nuclear generator that produces a respectable amount of power by processing uranium and industrial coolant. Rated for 180 kW max safe output."
 
 /obj/machinery/power/port_gen/pacman/mrs
-	name = "\improper M.R.S.P.A.C.M.A.N.-type Portable Generator"
+	name = "M.R.S.P.A.C.M.A.N.-type Portable Generator"
 	desc = "An advanced power generator that runs on tritium. Rated for 200 kW maximum safe output!"
 	icon_state = "portgen2"
 	sheet_path = /obj/item/stack/material/tritium
@@ -553,5 +557,5 @@
 
 /obj/machinery/power/port_gen/pacman/mrs/explode()
 	//no special effects, but the explosion is pretty big (same as a supermatter shard).
-	explosion(src.loc, 21)
+	explosion(src.loc, 3, 6, 12, 16, 1)
 	qdel(src)

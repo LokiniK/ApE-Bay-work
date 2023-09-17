@@ -3,11 +3,9 @@
 	plane = DEFAULT_PLANE
 	layer = MOB_LAYER
 
-	appearance_flags = DEFAULT_APPEARANCE_FLAGS | PIXEL_SCALE
+	appearance_flags = PIXEL_SCALE | LONG_GLIDE
 	animate_movement = 2
 	movable_flags = MOVABLE_FLAG_PROXMOVE
-
-	blocks_emissive = EMISSIVE_BLOCK_GENERIC
 
 	virtual_mob = /mob/observer/virtual/mob
 
@@ -26,6 +24,8 @@
 		/datum/movement_handler/mob/multiz,
 		/datum/movement_handler/mob/movement
 	)
+
+	does_spin = FALSE //because it's looks awful on mobs. You can remove it anytime if you want.
 
 	var/mob_flags
 	var/last_quick_move_time = 0
@@ -59,6 +59,7 @@
 	var/obj/screen/gun/item/item_use_icon = null
 	var/obj/screen/gun/radio/radio_use_icon = null
 	var/obj/screen/gun/move/gun_move_icon = null
+	var/obj/screen/gun/run/gun_run_icon = null
 	var/obj/screen/gun/mode/gun_setting_icon = null
 
 	var/obj/screen/movable/ability_master/ability_master = null
@@ -83,7 +84,6 @@
 	var/next_move = null
 	var/hand = null
 	var/real_name = null
-	var/fake_name = null
 
 	var/bhunger = 0			//Carbon
 
@@ -106,6 +106,7 @@
 	var/emote_type = 1		// Define emote default type, 1 for seen emotes, 2 for heard emotes
 	var/facing_dir = null   // Used for the ancient art of moonwalking.
 
+	var/tail_layer = FALSE
 	var/name_archive //For admin things like possession
 
 	var/timeofdeath = 0
@@ -118,11 +119,11 @@
 	var/shakecamera = 0
 	var/a_intent = I_HELP//Living
 
-	var/singleton/move_intent/move_intent = /singleton/move_intent/walk
-	var/list/move_intents = list(/singleton/move_intent/walk)
+	var/decl/move_intent/move_intent = /decl/move_intent/walk
+	var/list/move_intents = list(/decl/move_intent/walk)
 
-	var/singleton/move_intent/default_walk_intent
-	var/singleton/move_intent/default_run_intent
+	var/decl/move_intent/default_walk_intent
+	var/decl/move_intent/default_run_intent
 
 	var/obj/buckled = null//Living
 	var/obj/item/l_hand = null//Living
@@ -134,6 +135,8 @@
 	var/list/grabbed_by = list()
 
 	var/in_throw_mode = 0
+
+	var/inertia_dir = 0
 
 //	var/job = null//Living
 
@@ -150,7 +153,6 @@
 	var/voice_name = "unidentifiable voice"
 
 	var/faction = MOB_FACTION_NEUTRAL //Used for checking whether hostile simple animals will attack you, possibly more stuff later
-	var/last_faction = MOB_FACTION_NEUTRAL
 	var/blinded = null
 	var/ear_deaf = null		//Carbon
 
@@ -189,8 +191,10 @@
 
 	var/flavor_text = ""
 
+	var/list/progressbars = null //for stacking do_after bars
 	var/datum/skillset/skillset = /datum/skillset
 
-	var/pronouns = null
 
 	var/list/additional_vision_handlers = list() //Basically a list of atoms from which additional vision data is retrieved
+
+	var/last_radio_sound = null //inf

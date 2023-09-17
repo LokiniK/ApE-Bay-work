@@ -11,7 +11,7 @@ GLOBAL_LIST_INIT(surgery_tool_exceptions, list(
 GLOBAL_LIST_INIT(surgery_tool_exception_cache, new)
 
 /* SURGERY STEPS */
-/singleton/surgery_step
+/decl/surgery_step
 	var/name
 	var/list/allowed_tools               // type path referencing tools that can be used for this step, and how well are they suited for it
 	var/list/allowed_species             // type paths referencing races that this step applies to.
@@ -26,17 +26,17 @@ GLOBAL_LIST_INIT(surgery_tool_exception_cache, new)
 	var/strict_access_requirement = TRUE // Whether or not this surgery will be fuzzy on size requirements.
 
 //returns how well tool is suited for this step
-/singleton/surgery_step/proc/tool_quality(obj/item/tool)
+/decl/surgery_step/proc/tool_quality(obj/item/tool)
 	for (var/T in allowed_tools)
 		if (istype(tool,T))
 			return allowed_tools[T]
 	return 0
 
-/singleton/surgery_step/proc/pre_surgery_step(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
+/decl/surgery_step/proc/pre_surgery_step(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
 	return TRUE
 
 // Checks if this step applies to the user mob at all
-/singleton/surgery_step/proc/is_valid_target(mob/living/carbon/human/target)
+/decl/surgery_step/proc/is_valid_target(mob/living/carbon/human/target)
 	if(!ishuman(target))
 		return 0
 
@@ -52,17 +52,17 @@ GLOBAL_LIST_INIT(surgery_tool_exception_cache, new)
 
 	return 1
 
-/singleton/surgery_step/proc/get_skill_reqs(mob/living/user, mob/living/carbon/human/target, obj/item/tool, target_zone)
+/decl/surgery_step/proc/get_skill_reqs(mob/living/user, mob/living/carbon/human/target, obj/item/tool, target_zone)
 	if(delicate)
 		return SURGERY_SKILLS_DELICATE
 	else
 		return SURGERY_SKILLS_GENERIC
 
 // checks whether this step can be applied with the given user and target
-/singleton/surgery_step/proc/can_use(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
+/decl/surgery_step/proc/can_use(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
 	return assess_bodypart(user, target, target_zone, tool) && assess_surgery_candidate(user, target, target_zone, tool)
 
-/singleton/surgery_step/proc/assess_bodypart(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
+/decl/surgery_step/proc/assess_bodypart(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
 	if(istype(target) && target_zone)
 		var/obj/item/organ/external/affected = target.get_organ(target_zone)
 		if(affected)
@@ -98,11 +98,11 @@ GLOBAL_LIST_INIT(surgery_tool_exception_cache, new)
 			return affected
 	return FALSE
 
-/singleton/surgery_step/proc/assess_surgery_candidate(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
+/decl/surgery_step/proc/assess_surgery_candidate(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
 	return ishuman(target)
 
 // does stuff to begin the step, usually just printing messages. Moved germs transfering and bloodying here too
-/singleton/surgery_step/proc/begin_step(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
+/decl/surgery_step/proc/begin_step(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
 	var/obj/item/organ/external/affected = target.get_organ(target_zone)
 	if (can_infect && affected)
 		spread_germs_to_organ(affected, user)
@@ -119,14 +119,14 @@ GLOBAL_LIST_INIT(surgery_tool_exception_cache, new)
 	return
 
 // does stuff to end the step, which is normally print a message + do whatever this step changes
-/singleton/surgery_step/proc/end_step(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
+/decl/surgery_step/proc/end_step(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
 	return
 
 // stuff that happens when the step fails
-/singleton/surgery_step/proc/fail_step(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
+/decl/surgery_step/proc/fail_step(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
 	return null
 
-/singleton/surgery_step/proc/success_chance(mob/living/user, mob/living/carbon/human/target, obj/item/tool, target_zone)
+/decl/surgery_step/proc/success_chance(mob/living/user, mob/living/carbon/human/target, obj/item/tool, target_zone)
 	. = tool_quality(tool)
 	if(user == target)
 		. -= 10
@@ -135,7 +135,7 @@ GLOBAL_LIST_INIT(surgery_tool_exception_cache, new)
 	for(var/skill in skill_reqs)
 		var/penalty = delicate ? 40 : 20
 		. -= max(0, penalty * (skill_reqs[skill] - user.get_skill_value(skill)))
-		if(user.skill_check(skill, SKILL_MASTER))
+		if(user.skill_check(skill, SKILL_PROF))
 			. += 20
 
 	if(ishuman(user))
@@ -156,15 +156,13 @@ GLOBAL_LIST_INIT(surgery_tool_exception_cache, new)
 			. -= 0
 		else if(locate(/obj/structure/bed, T))
 			. -= 5
-		else if(locate(/obj/structure/roller_bed, T))
-			. -= 5
 		else if(locate(/obj/structure/table, T))
 			. -= 10
-		else if(locate(/obj/effect/rune, T))
+		else if(locate(/obj/effect/rune/, T))
 			. -= 10
 	. = max(., 0)
 
-/proc/spread_germs_to_organ(obj/item/organ/external/E, mob/living/carbon/human/user)
+/proc/spread_germs_to_organ(var/obj/item/organ/external/E, var/mob/living/carbon/human/user)
 	if(!istype(user) || !istype(E)) return
 
 	var/germ_level = user.germ_level
@@ -187,27 +185,22 @@ GLOBAL_LIST_INIT(surgery_tool_exception_cache, new)
 
 	// What surgeries does our tool/target enable?
 	var/list/possible_surgeries
-	var/list/all_surgeries = GET_SINGLETON_SUBTYPE_MAP(/singleton/surgery_step)
-	for(var/singleton in all_surgeries)
-		var/singleton/surgery_step/S = all_surgeries[singleton]
+	var/list/all_surgeries = decls_repository.get_decls_of_subtype(/decl/surgery_step)
+	for(var/decl in all_surgeries)
+		var/decl/surgery_step/S = all_surgeries[decl]
 		if(S.name && S.tool_quality(src) && S.can_use(user, M, zone, src))
-			var/image/radial_button = image(icon = icon, icon_state = icon_state)
-			radial_button.name = S.name
-			LAZYSET(possible_surgeries, S, radial_button)
+			LAZYSET(possible_surgeries, S, TRUE)
 
 	// Which surgery, if any, do we actually want to do?
-	var/singleton/surgery_step/S
-	if (user.client && length(possible_surgeries))
-		if (length(possible_surgeries) == 1 && user.get_preference_value(/datum/client_preference/surgery_skip_radial))
-			S = possible_surgeries[1]
-		else
-			S = show_radial_menu(user, M, possible_surgeries, radius = 42, use_labels = TRUE, require_near = TRUE, check_locs = list(src))
-		if (!user.use_sanity_check(M))
-			S = null
-		if (S && !user.skill_check_multiple(S.get_skill_reqs(user, M, src, zone)))
+	var/decl/surgery_step/S
+	if(LAZYLEN(possible_surgeries) == 1)
+		S = possible_surgeries[1]
+	else if(LAZYLEN(possible_surgeries) >= 1)
+		if(user.client) // In case of future autodocs.
+			S = input(user, "Which surgery would you like to perform?", "Surgery") as null|anything in possible_surgeries
+		if(S && !user.skill_check_multiple(S.get_skill_reqs(user, M, src, zone)))
 			S = pick(possible_surgeries)
 
-	var/obj/item/gripper/gripper = user.get_active_hand()
 	// We didn't find a surgery, or decided not to perform one.
 	if(!istype(S))
 		// If we're on an optable, we are protected from some surgery fails. Bypass this for some items (like health analyzers).
@@ -223,7 +216,7 @@ GLOBAL_LIST_INIT(surgery_tool_exception_cache, new)
 			return TRUE
 
 	// Otherwise we can make a start on surgery!
-	else if(istype(M) && !QDELETED(M) && user.a_intent != I_HURT && (user.get_active_hand() == src || (istype(gripper) && gripper.wrapped == src)))
+	else if(istype(M) && !QDELETED(M) && user.a_intent != I_HURT && (user.get_active_hand() == src || istype(src.loc, /mob/living/silicon/) && istype(user.get_active_hand(), /obj/item/gripper/))) //INF
 		// Double-check this in case it changed between initial check and now.
 		if(zone in M.surgeries_in_progress)
 			to_chat(user, SPAN_WARNING("You can't operate on this area while surgery is already in progress."))
@@ -233,8 +226,8 @@ GLOBAL_LIST_INIT(surgery_tool_exception_cache, new)
 				LAZYSET(M.surgeries_in_progress, zone, operation_data)
 				S.begin_step(user, M, zone, src)
 				var/skill_reqs = S.get_skill_reqs(user, M, src, zone)
-				var/duration = user.skill_delay_mult(skill_reqs[1]) * rand(S.min_duration, S.max_duration)
-				if(prob(S.success_chance(user, M, src, zone)) && do_after(user, duration, M, DO_SURGERY))
+				var/duration = user.skill_delay_mult(skill_reqs[1]) * rand(S.min_duration, S.max_duration * surgery_speed)
+				if(prob(S.success_chance(user, M, src, zone)) && do_after(user, duration, M) * surgery_speed)
 					if (S.can_use(user, M, zone, src))
 						S.end_step(user, M, zone, src)
 						handle_post_surgery()

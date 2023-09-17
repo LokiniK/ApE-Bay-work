@@ -1,7 +1,7 @@
 /obj/machinery/compressor
 	name = "compressor"
 	desc = "The compressor stage of a gas turbine generator."
-	icon = 'icons/obj/atmospherics/pipes.dmi'
+	icon = 'icons/obj/pipes.dmi'
 	icon_state = "compressor"
 	anchored = TRUE
 	density = TRUE
@@ -19,7 +19,7 @@
 /obj/machinery/power/turbine
 	name = "gas turbine generator"
 	desc = "A gas turbine used for backup power generation."
-	icon = 'icons/obj/atmospherics/pipes.dmi'
+	icon = 'icons/obj/pipes.dmi'
 	icon_state = "turbine"
 	anchored = TRUE
 	density = TRUE
@@ -28,9 +28,9 @@
 	var/lastgen
 
 /obj/machinery/computer/turbine_computer
-	name = "gas turbine control computer"
+	name = "Gas turbine control computer"
 	desc = "A computer to remotely control a gas turbine."
-	icon = 'icons/obj/machines/computer.dmi'
+	icon = 'icons/obj/computer.dmi'
 	icon_keyboard = "tech_key"
 	icon_screen = "turbinecomp"
 	anchored = TRUE
@@ -66,7 +66,7 @@
 	if(!starter)
 		return
 	overlays.Cut()
-	if(MACHINE_IS_BROKEN(src))
+	if(stat & BROKEN)
 		return
 	rpm = 0.9* rpm + 0.1 * rpmtarget
 	var/datum/gas_mixture/environment = inturf.return_air()
@@ -78,7 +78,7 @@
 	rpm = max(0, rpm - (rpm*rpm)/COMPFRICTION)
 
 
-	if(starter && is_powered())
+	if(starter && !(stat & NOPOWER))
 		use_power_oneoff(2800)
 		if(rpm<1000)
 			rpmtarget = 1000
@@ -89,13 +89,13 @@
 
 
 	if(rpm>50000)
-		overlays += image('icons/obj/atmospherics/pipes.dmi', "comp-o4", FLY_LAYER)
+		overlays += image('icons/obj/pipes.dmi', "comp-o4", FLY_LAYER)
 	else if(rpm>10000)
-		overlays += image('icons/obj/atmospherics/pipes.dmi', "comp-o3", FLY_LAYER)
+		overlays += image('icons/obj/pipes.dmi', "comp-o3", FLY_LAYER)
 	else if(rpm>2000)
-		overlays += image('icons/obj/atmospherics/pipes.dmi', "comp-o2", FLY_LAYER)
+		overlays += image('icons/obj/pipes.dmi', "comp-o2", FLY_LAYER)
 	else if(rpm>500)
-		overlays += image('icons/obj/atmospherics/pipes.dmi', "comp-o1", FLY_LAYER)
+		overlays += image('icons/obj/pipes.dmi', "comp-o1", FLY_LAYER)
 	 //TODO: DEFERRED
 
 /obj/machinery/power/turbine/Initialize()
@@ -103,7 +103,8 @@
 	outturf = get_step(src, dir)
 	return INITIALIZE_HINT_LATELOAD
 
-/obj/machinery/power/turbine/LateInitialize(mapload)
+/obj/machinery/power/turbine/LateInitialize()
+	..()
 	if(!compressor) // It should have found us and subscribed.
 		set_broken(TRUE)
 
@@ -122,7 +123,7 @@
 	if(!compressor.starter)
 		return
 	overlays.Cut()
-	if(MACHINE_IS_BROKEN(src))
+	if(stat & BROKEN)
 		return
 	lastgen = ((compressor.rpm / TURBGENQ)**TURBGENG) *TURBGENQ
 
@@ -139,7 +140,7 @@
 		outturf.assume_air(removed)
 
 	if(lastgen > 100)
-		overlays += image('icons/obj/atmospherics/pipes.dmi', "turb-o", FLY_LAYER)
+		overlays += image('icons/obj/pipes.dmi', "turb-o", FLY_LAYER)
 
 
 	for(var/mob/M in viewers(1, src))
@@ -149,7 +150,7 @@
 
 /obj/machinery/power/turbine/interact(mob/user)
 
-	if ( (get_dist(src, user) > 1 ) || (inoperable()) && (!istype(user, /mob/living/silicon/ai)) )
+	if ( (get_dist(src, user) > 1 ) || (stat & (NOPOWER|BROKEN)) && (!istype(user, /mob/living/silicon/ai)) )
 		user.machine = null
 		close_browser(user, "window=turbine")
 		return
@@ -172,7 +173,7 @@
 
 	return
 
-/obj/machinery/power/turbine/CanUseTopic(mob/user, href_list)
+/obj/machinery/power/turbine/CanUseTopic(var/mob/user, href_list)
 	if(!user.IsAdvancedToolUser())
 		to_chat(user, FEEDBACK_YOU_LACK_DEXTERITY)
 		return min(..(), STATUS_UPDATE)
@@ -215,7 +216,7 @@
 	interact(user)
 	return TRUE
 
-/obj/machinery/computer/turbine_computer/interact(mob/user)
+/obj/machinery/computer/turbine_computer/interact(var/mob/user)
 	user.machine = src
 	var/dat
 	if(src.compressor)
@@ -231,7 +232,7 @@
 		\n<BR>
 		\n"}
 	else
-		dat += SPAN_DANGER("No compatible attached compressor found.")
+		dat += "<span class='danger'>No compatible attached compressor found.</span>"
 
 	show_browser(user, dat, "window=computer;size=400x500")
 	onclose(user, "computer")

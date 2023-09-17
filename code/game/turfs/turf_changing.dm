@@ -1,7 +1,7 @@
-/turf/proc/ReplaceWithLattice(material)
-	var base_turf = get_base_turf_by_area(src, TRUE)
+/turf/proc/ReplaceWithLattice(var/material)
+	var base_turf = get_base_turf_by_area(src);
 	if(type != base_turf)
-		src.ChangeTurf(get_base_turf_by_area(src, TRUE))
+		src.ChangeTurf(get_base_turf_by_area(src))
 	if(!locate(/obj/structure/lattice) in src)
 		new /obj/structure/lattice(src, material)
 
@@ -17,12 +17,9 @@
 		above.update_mimic()
 
 //Creates a new turf
-/turf/proc/ChangeTurf(turf/N, tell_universe = TRUE, force_lighting_update = FALSE, keep_air = FALSE)
+/turf/proc/ChangeTurf(var/turf/N, var/tell_universe = TRUE, var/force_lighting_update = FALSE, var/keep_air = FALSE)
 	if (!N)
 		return
-
-	if(isturf(N) && !N.flooded && N.flood_object)
-		QDEL_NULL(flood_object)
 
 	// This makes sure that turfs are not changed to space when one side is part of a zone
 	if(N == /turf/space)
@@ -30,10 +27,8 @@
 		if(istype(below) && !istype(below,/turf/space))
 			N = /turf/simulated/open
 
-	var/old_density = density
 	var/old_air = air
-	var/old_hotspot = hotspot
-	var/old_turf_fire = null
+	var/old_fire = fire
 	var/old_opacity = opacity
 	var/old_dynamic_lighting = dynamic_lighting
 	var/old_affecting_lights = affecting_lights
@@ -41,14 +36,8 @@
 	var/old_corners = corners
 	var/old_ao_neighbors = ao_neighbors
 	var/old_above = above
-	var/old_permit_ao = permit_ao
 
-	if(isspaceturf(N) || isopenspace(N))
-		QDEL_NULL(turf_fire)
-	else
-		old_turf_fire = turf_fire
-
-	//log_debug("Replacing [src.type] with [N]")
+//	log_debug("Replacing [src.type] with [N]")
 
 	changing_turf = TRUE
 
@@ -56,12 +45,6 @@
 
 	overlays.Cut()
 	underlays.Cut()
-	if(istype(src,/turf/simulated))
-		//Yeah, we're just going to rebuild the whole thing.
-		//Despite this being called a bunch during explosions,
-		//the zone will only really do heavy lifting once.
-		var/turf/simulated/S = src
-		if(S.zone) S.zone.rebuild()
 
 	// Run the Destroy() chain.
 	qdel(src)
@@ -79,13 +62,12 @@
 		W.air = old_air
 
 	if(ispath(N, /turf/simulated))
-		if(old_hotspot)
-			hotspot = old_hotspot
+		if(old_fire)
+			fire = old_fire
 		if (istype(W,/turf/simulated/floor))
 			W.RemoveLattice()
-	else if(hotspot)
-		qdel(hotspot)
-
+	else if(old_fire)
+		qdel(old_fire)
 
 	if(tell_universe)
 		GLOB.universe.OnTurfChange(W)
@@ -116,20 +98,6 @@
 	for(var/turf/T in RANGE_TURFS(src, 1))
 		T.update_icon()
 
-	if(density != old_density)
-		GLOB.density_set_event.raise_event(src, old_density, density)
-
-	if(!density)
-		turf_fire = old_turf_fire
-	else if(old_turf_fire)
-		QDEL_NULL(old_turf_fire)
-
-	if(density != old_density || permit_ao != old_permit_ao)
-		regenerate_ao()
-
-	GLOB.turf_changed_event.raise_event(src, old_density, density, old_opacity, opacity)
-	updateVisibility(src, FALSE)
-
 /turf/proc/transport_properties_from(turf/other)
 	if(!istype(other, src.type))
 		return 0
@@ -159,6 +127,7 @@
 	if(!..())
 		return 0
 	paint_color = other.paint_color
+	stripe_color = other.stripe_color
 	return 1
 
 //No idea why resetting the base appearence from New() isn't enough, but without this it doesn't work

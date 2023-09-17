@@ -5,6 +5,7 @@
 	simulated = FALSE
 	screen_loc = "CENTER:-224,CENTER:-224"
 	plane = SKYBOX_PLANE
+	blend_mode = BLEND_MULTIPLY
 
 /client
 	var/obj/skybox/skybox
@@ -25,7 +26,7 @@
 
 /mob/Login()
 	..()
-	client.update_skybox(1)
+	addtimer(CALLBACK(src.client, /client/proc/update_skybox, TRUE), 0)	// INF WAS client.update_skybox(1)
 
 /mob/Move()
 	var/old_z = get_z(src)

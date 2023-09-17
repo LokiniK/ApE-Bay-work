@@ -1,7 +1,7 @@
 //A portable analyzer, for research borgs.  This is better then giving them a gripper which can hold anything and letting them use the normal analyzer.
 /obj/item/portable_destructive_analyzer
 	name = "Portable Destructive Analyzer"
-	icon = 'icons/obj/tools/portable_analyzer.dmi'
+	icon = 'icons/obj/items.dmi'
 	icon_state = "portable_analyzer"
 	desc = "Similar to the stationary version, this rather unwieldy device allows you to break down objects in the name of science."
 
@@ -76,7 +76,7 @@
 			to_chat(user, "The [src] is already empty.")
 
 
-/obj/item/portable_destructive_analyzer/afterattack(atom/target, mob/living/user, proximity)
+/obj/item/portable_destructive_analyzer/afterattack(var/atom/target, var/mob/living/user, proximity)
 	if(!target)
 		return
 	if(!proximity)
@@ -99,7 +99,7 @@
 /obj/item/party_light
 	name = "party light"
 	desc = "An array of LEDs in tons of colors."
-	icon = 'icons/obj/structures/lighting.dmi'
+	icon = 'icons/obj/lighting.dmi'
 	icon_state = "partylight-off"
 	item_state = "partylight-off"
 	var/activated = 0
@@ -173,7 +173,7 @@
 	icon = 'icons/obj/weapons/other.dmi'
 	icon_state = "autoharvester"
 
-/obj/item/robot_harvester/afterattack(atom/target, mob/living/user, proximity)
+/obj/item/robot_harvester/afterattack(var/atom/target, var/mob/living/user, proximity)
 	if(!target)
 		return
 	if(!proximity)
@@ -270,7 +270,7 @@
 /obj/item/form_printer/attack_self(mob/user as mob)
 	deploy_paper(get_turf(src))
 
-/obj/item/form_printer/proc/deploy_paper(turf/T)
+/obj/item/form_printer/proc/deploy_paper(var/turf/T)
 	T.visible_message(SPAN_NOTICE("\The [src.loc] dispenses a sheet of crisp white paper."))
 	new /obj/item/paper(T)
 
@@ -279,7 +279,7 @@
 /obj/item/borg/combat/shield
 	name = "personal shielding"
 	desc = "A powerful experimental module that turns aside or absorbs incoming attacks at the cost of charge."
-	icon = 'icons/obj/structures/decals.dmi'
+	icon = 'icons/obj/decals.dmi'
 	icon_state = "shock"
 	var/shield_level = 0.5 //Percentage of damage absorbed by the shield.
 
@@ -295,15 +295,14 @@
 /obj/item/borg/combat/mobility
 	name = "mobility module"
 	desc = "By retracting limbs and tucking in its head, a combat android can roll at high speeds."
-	icon = 'icons/obj/structures/decals.dmi'
+	icon = 'icons/obj/decals.dmi'
 	icon_state = "shock"
 
 /obj/item/inflatable_dispenser
 	name = "inflatables dispenser"
 	desc = "Hand-held device which allows rapid deployment and removal of inflatables."
-	icon = 'icons/obj/tools/inflatable_dispenser.dmi'
+	icon = 'infinity/icons/obj/storage.dmi'
 	icon_state = "inf_deployer"
-	item_state = "RPED"
 	w_class = ITEM_SIZE_LARGE
 
 	var/stored_walls = 5
@@ -338,7 +337,7 @@
 		return
 
 	if (istype(target, /obj/structure/inflatable))
-		if (!do_after(user, 0.5 SECONDS, target, DO_PUBLIC_UNIQUE))
+		if (!do_after(user, 0.5 SECONDS, target))
 			return
 		playsound(loc, 'sound/machines/hiss.ogg', 75, 1)
 		var/obj/item/inflatable/I
@@ -360,7 +359,7 @@
 		)
 		if (I)
 			var/obj/structure/inflatable/S = target
-			copy_health(S, I)
+			I.health = S.health
 		qdel(target)
 
 	else if (istype(target, /obj/item/inflatable))
@@ -392,7 +391,7 @@
 		if (obstruction)
 			to_chat(user, SPAN_WARNING("\The [english_list(obstruction)] is blocking that spot."))
 			return
-		if (!do_after(user, 0.5 SECONDS, T, DO_PUBLIC_UNIQUE))
+		if (!do_after(user, 0.5 SECONDS))
 			return
 		obstruction = T.get_obstruction()
 		if (obstruction)
@@ -475,7 +474,7 @@
 /obj/item/bioreactor
 	name = "bioreactor"
 	desc = "An integrated power generator that runs on most kinds of biomass."
-	icon = 'icons/obj/structures/portgen.dmi'
+	icon = 'icons/obj/power.dmi'
 	icon_state = "portgen0"
 
 	var/base_power_generation = 75 KILOWATTS
@@ -485,15 +484,15 @@
 		/obj/item/reagent_containers/food/snacks/fish = 1.5
 	)
 
-/obj/item/bioreactor/attack_self(mob/user)
-	if(length(contents) >= 1)
+/obj/item/bioreactor/attack_self(var/mob/user)
+	if(contents.len >= 1)
 		var/obj/item/removing = contents[1]
 		user.put_in_hands(removing)
 		to_chat(user, SPAN_NOTICE("You remove \the [removing] from \the [src]."))
 	else
 		to_chat(user, SPAN_WARNING("There is nothing loaded into \the [src]."))
 
-/obj/item/bioreactor/afterattack(atom/movable/target, mob/user, proximity_flag, click_parameters)
+/obj/item/bioreactor/afterattack(var/atom/movable/target, var/mob/user, var/proximity_flag, var/click_parameters)
 	if(!proximity_flag || !istype(target))
 		return
 
@@ -504,7 +503,7 @@
 		to_chat(user, SPAN_WARNING("\The [target] cannot be used as fuel by \the [src]."))
 		return
 
-	if(length(contents) >= max_fuel_items)
+	if(contents.len >= max_fuel_items)
 		to_chat(user, SPAN_WARNING("\The [src] can fit no more fuel inside."))
 		return
 	target.forceMove(src)
@@ -520,7 +519,7 @@
 
 /obj/item/bioreactor/Process()
 	var/mob/living/silicon/robot/R = loc
-	if(!istype(R) || !R.cell || R.cell.fully_charged() || !length(contents))
+	if(!istype(R) || !R.cell || R.cell.fully_charged() || !contents.len)
 		return
 
 	var/generating_power
@@ -531,7 +530,7 @@
 		if(istype(A, /obj/item/reagent_containers/food/snacks/grown))
 			generating_power = base_power_generation
 			using_item = A
-		else
+		else 
 			for(var/fuel_type in fuel_types)
 				if(istype(A, fuel_type))
 					generating_power = fuel_types[fuel_type] * base_power_generation

@@ -93,20 +93,7 @@
 	name = "beret"
 	desc = "A beret, an artists favorite headwear."
 	icon_state = "beret"
-	slot_flags = SLOT_HEAD | SLOT_BELT
 	body_parts_covered = 0
-
-/obj/item/clothing/head/beret/equipped(mob/user, slot)
-	switch(slot)
-		if(slot_belt)
-			sprite_sheets = list()
-		if(slot_head)
-			sprite_sheets = list(
-				SPECIES_VOX = 'icons/mob/species/vox/onmob_head_vox.dmi',
-				SPECIES_UNATHI = 'icons/mob/species/unathi/onmob_head_unathi.dmi',
-				SPECIES_NABBER = 'icons/mob/species/nabber/onmob_head_gas.dmi'
-				)
-	return ..()
 
 /obj/item/clothing/head/beret/sec
 	name = "corporate security beret"
@@ -146,7 +133,7 @@
 /obj/item/clothing/head/beret/engineering
 	name = "corporate engineering beret"
 	desc = "A beret with the engineering insignia emblazoned on it. For engineers that are more inclined towards style than safety."
-	icon_state = "beret_corporate_navy"
+	icon_state = "beret_orange"
 
 /obj/item/clothing/head/beret/purple
 	name = "purple beret"
@@ -166,7 +153,7 @@
 /obj/item/clothing/head/beret/deathsquad
 	name = "heavy asset protection beret"
 	desc = "An armored red beret adorned with the crest of corporate asset protection. Doesn't sacrifice style or safety."
-	icon_state = "beret_corporate_red"
+	icon_state = "beret_red"
 	armor = list(
 		melee = ARMOR_MELEE_VERY_HIGH,
 		bullet = ARMOR_BALLISTIC_RIFLE,
@@ -181,9 +168,26 @@
 /obj/item/clothing/head/beret/guard
 	name = "corporate security beret"
 	desc = "A white beret adorned with a corporate logo. For security guards that are more inclined towards style than safety."
-	icon_state = "corpsec_beret"
+	icon_state = "beret_corporate_white"
 
 /obj/item/clothing/head/beret/plaincolor
 	name = "beret"
 	desc = "A simple, solid color beret. This one has no emblems or insignia on it."
 	icon_state = "beret_white"
+
+//engineering berets
+
+/obj/item/clothing/head/beret/engineer
+	name = "engineer beret"
+	desc = "An orange beret. Only real engineer can wear such stylish headdress"
+	icon_state = "eng_beret"
+
+/obj/item/clothing/head/beret/atmos_technician
+	name = "atmospheric technician beret"
+	desc = "A blue beret. Equipped with drawstrings, so it won't be blown off the head when you try to look into the ventilation"
+	icon_state = "atmos_beret"
+
+/obj/item/clothing/head/beret/senior_engineer
+	name = "senior engineer beret"
+	desc = "A light yellow beret. Emphasizes the status of a senior engineer"
+	icon_state = "se_beret"

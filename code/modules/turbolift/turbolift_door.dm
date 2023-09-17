@@ -1,9 +1,9 @@
 /obj/machinery/door/airlock/lift
-	name = "elevator door"
+	name = "Elevator Door"
 	desc = "Ding."
 	opacity = 0
-	autoclose = FALSE
-	glass = TRUE
+	autoclose = 0
+	glass = 1
 	airlock_type = "Lift"
 	icon = 'icons/obj/doors/elevator/door.dmi'
 	fill_file = 'icons/obj/doors/elevator/fill_steel.dmi'
@@ -12,7 +12,7 @@
 	deny_file = 'icons/obj/doors/elevator/lights_deny.dmi'
 	lights_file = 'icons/obj/doors/elevator/lights_green.dmi'
 
-	paintable = AIRLOCK_PAINTABLE_WINDOW
+	paintable = AIRLOCK_WINDOW_PAINTABLE
 
 	var/datum/turbolift/lift
 	var/datum/turbolift_floor/floor
@@ -24,13 +24,30 @@
 		floor.doors -= src
 	return ..()
 
-/obj/machinery/door/airlock/lift/bumpopen(mob/user)
+/obj/machinery/door/airlock/lift/bumpopen(var/mob/user)
 	return // No accidental sprinting into open elevator shafts.
 
 /obj/machinery/door/airlock/lift/allowed(mob/M)
 	return FALSE //only the lift machinery is allowed to operate this door
 
-/obj/machinery/door/airlock/lift/close(forced=0)
+/obj/machinery/door/airlock/lift/on_update_icon(state=0, override=0)
+	switch(state)	// Elevator doors must not rotate every time structure changed
+		if(0)
+			if(density)
+				icon_state = "closed"
+				state = AIRLOCK_CLOSED
+			else
+				icon_state = "open"
+				state = AIRLOCK_OPEN
+		if(AIRLOCK_OPEN)
+			icon_state = "open"
+		if(AIRLOCK_CLOSED)
+			icon_state = "closed"
+		if(AIRLOCK_OPENING, AIRLOCK_CLOSING, AIRLOCK_EMAG, AIRLOCK_DENY)
+			icon_state = ""
+	set_airlock_overlays(state)
+
+/obj/machinery/door/airlock/lift/close(var/forced=0)
 	for(var/turf/turf in locs)
 		for(var/mob/living/LM in turf)
 			if(LM.mob_size <= MOB_TINY)

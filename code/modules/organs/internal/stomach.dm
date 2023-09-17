@@ -17,10 +17,11 @@
 
 /obj/item/organ/internal/stomach/New()
 	..()
-	var/ingested_atom = owner ? owner : src
-	ingested = new/datum/reagents/metabolism(240, ingested_atom, CHEM_INGEST)
-	if(species.gluttonous)
-		action_button_name = PUKE_ACTION_NAME
+	ingested = new/datum/reagents/metabolism(240, owner, CHEM_INGEST)
+	if(!ingested.my_atom)
+		ingested.my_atom = src
+//	if(species.gluttonous)
+//		action_button_name = PUKE_ACTION_NAME
 
 /obj/item/organ/internal/stomach/removed()
 	. = ..()
@@ -36,11 +37,11 @@
 	. = ..()
 	icon_state = "stomach-prosthetic"
 
-/obj/item/organ/internal/stomach/proc/can_eat_atom(atom/movable/food)
+/obj/item/organ/internal/stomach/proc/can_eat_atom(var/atom/movable/food)
 	return !isnull(get_devour_time(food))
 
-/obj/item/organ/internal/stomach/proc/is_full(atom/movable/food)
-	var/total = floor(ingested.total_volume / 10)
+/obj/item/organ/internal/stomach/proc/is_full(var/atom/movable/food)
+	var/total = Floor(ingested.total_volume / 10)
 	for(var/a in contents + food)
 		if(ismob(a))
 			var/mob/M = a
@@ -54,7 +55,7 @@
 			return TRUE
 	return FALSE
 
-/obj/item/organ/internal/stomach/proc/get_devour_time(atom/movable/food)
+/obj/item/organ/internal/stomach/proc/get_devour_time(var/atom/movable/food)
 	if(iscarbon(food) || isanimal(food))
 		var/mob/living/L = food
 		if((species.gluttonous & GLUT_TINY) && (L.mob_size <= MOB_TINY) && !ishuman(food)) // Anything MOB_TINY or smaller
@@ -63,7 +64,7 @@
 			return DEVOUR_SLOW
 		else if(species.gluttonous & GLUT_ANYTHING) // Eat anything ever
 			return DEVOUR_FAST
-	else if(istype(food, /obj/item))
+	else if(istype(food, /obj/item) && !istype(food, /obj/item/holder)) //Don't eat holders. They are special.
 		var/obj/item/I = food
 		var/cost = I.get_storage_cost()
 		if(cost != ITEM_SIZE_NO_CONTAINER)
@@ -73,50 +74,18 @@
 				return DEVOUR_SLOW
 			else if(species.gluttonous & GLUT_ITEM_ANYTHING)
 				return DEVOUR_FAST
-
+/*
 /obj/item/organ/internal/stomach/refresh_action_button()
 	. = ..()
 	if(.)
 		action.button_icon_state = "puke"
 		if(action.button) action.button.UpdateIcon()
-
+*/
 /obj/item/organ/internal/stomach/attack_self(mob/user)
 	. = ..()
 	if(. && action_button_name == PUKE_ACTION_NAME && owner && !owner.incapacitated())
 		owner.empty_stomach()
 		refresh_action_button()
-
-/obj/item/organ/internal/stomach/attackby(obj/item/item, mob/living/user)
-	if (!is_sharp(item))
-		return ..()
-	. = TRUE
-	user.visible_message(
-		SPAN_ITALIC("\The [user] begins cutting into \a [src] with \a [item]."),
-		SPAN_ITALIC("You start to cut open \the [src] with \the [item]."),
-		range = 5
-	)
-	take_internal_damage(5)
-	if (!user.do_skilled(5 SECONDS, SKILL_ANATOMY, src) || QDELETED(src))
-		return
-	if (!Adjacent(user) || user.incapacitated())
-		return
-	var/removed_message
-	var/length = length(contents)
-	switch (length)
-		if (0)
-			removed_message = "There's nothing inside."
-		if (1)
-			removed_message = "Something falls out."
-		else
-			removed_message = "Several things fall out."
-	user.visible_message(
-		SPAN_ITALIC("\The [user] finishes cutting \a [src] open. [removed_message]"),
-		SPAN_ITALIC("You finish cutting \the [src] open. [removed_message]"),
-		range = 2
-	)
-	take_internal_damage(5)
-	for (var/atom/movable/movable as anything in contents)
-		movable.dropInto(loc)
 
 /obj/item/organ/internal/stomach/return_air()
 	return null

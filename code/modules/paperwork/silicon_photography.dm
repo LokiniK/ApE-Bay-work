@@ -15,7 +15,7 @@
 /obj/item/device/camera/siliconcam/drone_camera //currently doesn't offer the verbs, thus cannot be used
 	name = "Drone photo camera"
 
-/obj/item/device/camera/siliconcam/proc/injectaialbum(obj/item/photo/p, sufix = "") //stores image information to a list similar to that of the datacore
+/obj/item/device/camera/siliconcam/proc/injectaialbum(obj/item/photo/p, var/sufix = "") //stores image information to a list similar to that of the datacore
 	p.forceMove(src)
 	photos_taken++
 	p.SetName("Image [photos_taken][sufix]")
@@ -25,10 +25,10 @@
 	var/mob/living/silicon/robot/C = usr
 	if(C.connected_ai)
 		C.connected_ai.silicon_camera.injectaialbum(p.copy(1), " (synced from [C.name])")
-		to_chat(C.connected_ai, SPAN_CLASS("unconscious", "Image uploaded by [C.name]"))
-		to_chat(usr, SPAN_CLASS("unconscious", "Image synced to remote database, and can be printed from any photocopier."))//feedback to the Cyborg player that the picture was taken
+		to_chat(C.connected_ai, "<span class='unconscious'>Image uploaded by [C.name]</span>")
+		to_chat(usr, "<span class='unconscious'>Image synced to remote database, and can be printed from any photocopier.</span>")//feedback to the Cyborg player that the picture was taken
 	else
-		to_chat(usr, SPAN_CLASS("unconscious", "Image recorded, and can be printed from any photocopier."))
+		to_chat(usr, "<span class='unconscious'>Image recorded, and can be printed from any photocopier.</span>")
 	// Always save locally
 	injectaialbum(p)
 
@@ -38,8 +38,8 @@
 
 	var/list/nametemp = list()
 	var/find
-	if(length(cam.aipictures) == 0)
-		to_chat(usr, SPAN_CLASS("userdanger", "No images saved"))
+	if(cam.aipictures.len == 0)
+		to_chat(usr, "<span class='userdanger'>No images saved</span>")
 		return
 	for(var/obj/item/photo/t in cam.aipictures)
 		nametemp += t.name
@@ -66,7 +66,7 @@
 		return
 
 	aipictures -= selection
-	to_chat(usr, SPAN_CLASS("unconscious", "Local image deleted"))
+	to_chat(usr, "<span class='unconscious'>Local image deleted</span>")
 //Capture Proc for AI / Robot
 /mob/living/silicon/ai/can_capture_turf(turf/T)
 	var/mob/living/silicon/ai = src
@@ -86,13 +86,14 @@
 	to_chat(usr, "<B>Camera Mode activated</B>")
 /obj/item/device/camera/siliconcam/ai_camera/printpicture(mob/user, obj/item/photo/p)
 	injectaialbum(p)
-	to_chat(usr, SPAN_CLASS("unconscious", "Image recorded"))
+	to_chat(usr, "<span class='unconscious'>Image recorded</span>")
 /obj/item/device/camera/siliconcam/robot_camera/printpicture(mob/user, obj/item/photo/p)
 	injectmasteralbum(p)
 
+/*
 /obj/item/device/camera/siliconcam/ai_camera/verb/take_image()
 	set category = "Silicon Commands"
-	set name = "Take Image"
+	set name = "PHOTO: Make"
 	set desc = "Takes an image"
 	set src in usr
 
@@ -100,16 +101,17 @@
 
 /obj/item/device/camera/siliconcam/ai_camera/verb/view_images()
 	set category = "Silicon Commands"
-	set name = "View Images"
+	set name = "PHOTO: View"
 	set desc = "View images"
 	set src in usr
 
 	viewpictures()
+*/
 
 /obj/item/device/camera/siliconcam/ai_camera/verb/delete_images()
 	set category = "Silicon Commands"
-	set name = "Delete Image"
-	set desc = "Delete image"
+	set name = "PHOTO: Delete"
+	set desc = "Delete Image"
 	set src in usr
 
 	deletepicture()
@@ -117,7 +119,7 @@
 /obj/item/device/camera/siliconcam/robot_camera/verb/take_image()
 	set category ="Silicon Commands"
 	set name = "Take Image"
-	set desc = "Takes an image"
+	set desc = "PHOTO: Make"
 	set src in usr
 
 	toggle_camera_mode()
@@ -125,20 +127,20 @@
 /obj/item/device/camera/siliconcam/robot_camera/verb/view_images()
 	set category ="Silicon Commands"
 	set name = "View Images"
-	set desc = "View images"
+	set desc = "PHOTO: View"
 	set src in usr
 
 	viewpictures()
 
 /obj/item/device/camera/siliconcam/robot_camera/verb/delete_images()
 	set category = "Silicon Commands"
-	set name = "Delete Image"
+	set name = "PHOTO: Delete"
 	set desc = "Delete a local image"
 	set src in usr
 
 	deletepicture(src)
 
-/obj/item/device/camera/siliconcam/proc/getsource()
+obj/item/device/camera/siliconcam/proc/getsource()
 	if(istype(src.loc, /mob/living/silicon/ai))
 		return src
 

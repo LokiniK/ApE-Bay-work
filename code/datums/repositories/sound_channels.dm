@@ -1,11 +1,10 @@
 GLOBAL_DATUM_INIT(sound_channels, /repository/sound_channels, new)
 GLOBAL_VAR_INIT(lobby_sound_channel, GLOB.sound_channels.RequestChannel("LOBBY"))
 GLOBAL_VAR_INIT(vote_sound_channel, GLOB.sound_channels.RequestChannel("VOTE"))
+GLOBAL_VAR_INIT(ambience_sound_channel, GLOB.sound_channels.RequestChannel("AMBIENCE"))
+GLOBAL_VAR_INIT(forced_ambience_sound_channel, GLOB.sound_channels.RequestChannel("FORCED_AMBIENCE"))//inf
+GLOBAL_VAR_INIT(environment_sound_channel, GLOB.sound_channels.RequestChannel("ENVIRONMENT"))//inf
 GLOBAL_VAR_INIT(admin_sound_channel, GLOB.sound_channels.RequestChannel("ADMIN_FUN"))
-
-GLOBAL_VAR_INIT(ambience_channel_vents, GLOB.sound_channels.RequestChannel("AMBIENCE_VENTS"))
-GLOBAL_VAR_INIT(ambience_channel_forced, GLOB.sound_channels.RequestChannel("AMBIENCE_FORCED"))
-GLOBAL_VAR_INIT(ambience_channel_common, GLOB.sound_channels.RequestChannel("AMBIENCE_COMMON"))
 
 /repository/sound_channels
 	var/datum/stack/available_channels
@@ -16,11 +15,11 @@ GLOBAL_VAR_INIT(ambience_channel_common, GLOB.sound_channels.RequestChannel("AMB
 	..()
 	available_channels = new()
 
-/repository/sound_channels/proc/RequestChannel(key)
+/repository/sound_channels/proc/RequestChannel(var/key)
 	. = RequestChannels(key, 1)
 	return LAZYLEN(.) && .[1]
 
-/repository/sound_channels/proc/RequestChannels(key, amount)
+/repository/sound_channels/proc/RequestChannels(var/key, var/amount)
 	if(!key)
 		CRASH("Invalid key given.")
 	. = list()
@@ -41,10 +40,10 @@ GLOBAL_VAR_INIT(ambience_channel_common, GLOB.sound_channels.RequestChannel("AMB
 		LAZYSET(keys_by_channel, "[channel]", key)
 	return .
 
-/repository/sound_channels/proc/ReleaseChannel(channel)
+/repository/sound_channels/proc/ReleaseChannel(var/channel)
 	ReleaseChannels(list(channel))
 
-/repository/sound_channels/proc/ReleaseChannels(list/channels)
+/repository/sound_channels/proc/ReleaseChannels(var/list/channels)
 	for(var/channel in channels)
 		LAZYREMOVE(keys_by_channel, "[channel]")
 		available_channels.Push(channel)

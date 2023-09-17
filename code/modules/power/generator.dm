@@ -1,15 +1,14 @@
 /obj/machinery/power/generator
 	name = "thermoelectric generator"
 	desc = "It's a high efficiency thermoelectric generator."
-	icon = 'icons/obj/machines/power/teg.dmi'
 	icon_state = "teg-unassembled"
 	density = TRUE
 	anchored = FALSE
 
 	use_power = POWER_USE_IDLE
-	idle_power_usage = 100 //Watts, I hope.  Just enough to do the computer and display things.
+	idle_power_usage = 100 //Watts, W hope.  Just enough to do the computer and display things.
 
-	var/max_power = 500000
+	var/max_power = 3 MEGAWATTS //INF, WAS 500000
 	var/thermal_efficiency = 0.65
 
 	var/obj/machinery/atmospherics/binary/circulator/circ1
@@ -68,24 +67,23 @@
 		circ1.temperature_overlay = null
 	if (circ2)
 		circ2.temperature_overlay = null
-	if (inoperable())
+	if (stat & (NOPOWER|BROKEN))
 		return 1
 	else
 		if (lastgenlev != 0)
-			overlays += emissive_appearance(icon, "teg-op[lastgenlev]")
-			overlays += image(icon, "teg-op[lastgenlev]")
+			overlays += image('icons/obj/power.dmi', "teg-op[lastgenlev]")
 			if (circ1 && circ2)
 				var/extreme = (lastgenlev > 9) ? "ex" : ""
 				if (circ1.last_temperature < circ2.last_temperature)
 					circ1.temperature_overlay = "circ-[extreme]cold"
 					circ2.temperature_overlay = "circ-[extreme]hot"
 				else
-					circ1.temperature_overlay = "circ-[extreme]cold"
-					circ2.temperature_overlay = "circ-[extreme]hot"
+					circ1.temperature_overlay = "circ-[extreme]hot"
+					circ2.temperature_overlay = "circ-[extreme]cold"
 		return 1
 
 /obj/machinery/power/generator/Process()
-	if(!circ1 || !circ2 || !anchored || inoperable())
+	if(!circ1 || !circ2 || !anchored || stat & (BROKEN|NOPOWER))
 		stored_energy = 0
 		return
 
@@ -130,6 +128,7 @@
 	if(circ2.network2)
 		circ2.network2.update = 1
 
+
 	//Exceeding maximum power leads to some power loss
 	if(effective_gen > max_power && prob(5))
 		var/datum/effect/effect/system/spark_spread/s = new /datum/effect/effect/system/spark_spread
@@ -138,6 +137,7 @@
 		stored_energy *= 0.5
 		if (powernet)
 			powernet.apcs_overload(0, 2, 5)
+
 
 	//Power
 	last_circ1_gen = circ1.return_stored_energy()
@@ -160,6 +160,7 @@
 	if(isWrench(W))
 		playsound(src.loc, 'sound/items/Ratchet.ogg', 75, 1)
 		anchored = !anchored
+		effective_gen = 0
 		user.visible_message("[user.name] [anchored ? "secures" : "unsecures"] the bolts holding [src.name] to the floor.", \
 					"You [anchored ? "secure" : "unsecure"] the bolts holding [src] to the floor.", \
 					"You hear a ratchet")
@@ -183,7 +184,7 @@
 	ui_interact(user)
 	return TRUE
 
-/obj/machinery/power/generator/ui_interact(mob/user, ui_key = "main", datum/nanoui/ui = null, force_open = 1)
+/obj/machinery/power/generator/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1)
 	// this is the data which will be sent to the ui
 	var/vertical = 0
 	if (dir == NORTH || dir == SOUTH)

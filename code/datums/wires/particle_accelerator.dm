@@ -2,25 +2,25 @@
 	wire_count = 5
 	holder_type = /obj/machinery/particle_accelerator/control_box
 	descriptions = list(
-		new /datum/wire_description(PARTICLE_TOGGLE_WIRE, "This wire seems to connect to the main power toggle.", SKILL_EXPERIENCED),
+		new /datum/wire_description(PARTICLE_TOGGLE_WIRE, "This wire seems to connect to the main power toggle.", SKILL_EXPERT),
 		new /datum/wire_description(PARTICLE_STRENGTH_WIRE, "This wire connects to the primary magnets."),
 		new /datum/wire_description(PARTICLE_INTERFACE_WIRE, "This wire appears connected to the user panel."),
 		new /datum/wire_description(PARTICLE_LIMIT_POWER_WIRE, "This wire connects to the primary magnets.")
 	)
 
-var/global/const/PARTICLE_TOGGLE_WIRE = 1 // Toggles whether the PA is on or not.
-var/global/const/PARTICLE_STRENGTH_WIRE = 2 // Determines the strength of the PA.
-var/global/const/PARTICLE_INTERFACE_WIRE = 4 // Determines the interface showing up.
-var/global/const/PARTICLE_LIMIT_POWER_WIRE = 8 // Determines how strong the PA can be.
+var/const/PARTICLE_TOGGLE_WIRE = 1 // Toggles whether the PA is on or not.
+var/const/PARTICLE_STRENGTH_WIRE = 2 // Determines the strength of the PA.
+var/const/PARTICLE_INTERFACE_WIRE = 4 // Determines the interface showing up.
+var/const/PARTICLE_LIMIT_POWER_WIRE = 8 // Determines how strong the PA can be.
 //var/const/PARTICLE_NOTHING_WIRE = 16 // Blank wire
 
-/datum/wires/particle_acc/control_box/CanUse(mob/living/L)
+/datum/wires/particle_acc/control_box/CanUse(var/mob/living/L)
 	var/obj/machinery/particle_accelerator/control_box/C = holder
 	if(C.construction_state == 2)
 		return 1
 	return 0
 
-/datum/wires/particle_acc/control_box/UpdatePulsed(index)
+/datum/wires/particle_acc/control_box/UpdatePulsed(var/index)
 	var/obj/machinery/particle_accelerator/control_box/C = holder
 	switch(index)
 
@@ -36,7 +36,7 @@ var/global/const/PARTICLE_LIMIT_POWER_WIRE = 8 // Determines how strong the PA c
 		if(PARTICLE_LIMIT_POWER_WIRE)
 			C.visible_message("[icon2html(C, viewers(get_turf(C)))]<b>[C]</b> makes a large whirring noise.")
 
-/datum/wires/particle_acc/control_box/UpdateCut(index, mended)
+/datum/wires/particle_acc/control_box/UpdateCut(var/index, var/mended)
 	var/obj/machinery/particle_accelerator/control_box/C = holder
 	switch(index)
 
@@ -56,3 +56,17 @@ var/global/const/PARTICLE_LIMIT_POWER_WIRE = 8 // Determines how strong the PA c
 			C.strength_upper_limit = (mended ? 2 : 3)
 			if(C.strength_upper_limit < C.strength)
 				C.remove_strength()
+
+/datum/wires/particle_acc/SolveWireFunction(var/function)
+	var/sf = ""
+	switch(function)
+		if(PARTICLE_TOGGLE_WIRE)
+			sf = "Port A"
+		if(PARTICLE_STRENGTH_WIRE)
+			sf = "Port B"
+		if(PARTICLE_INTERFACE_WIRE)
+			sf = "Port C"
+		if(PARTICLE_LIMIT_POWER_WIRE)
+			sf = "Port D"
+
+	return sf

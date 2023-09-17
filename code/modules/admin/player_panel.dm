@@ -71,19 +71,20 @@
 
 					body += "</td><td align='center'>";
 
-					body += "<span style='font-size: 13px'><b>"+job+" "+name+"</b><br><b>Real name "+real_name+"</b><br><b>Played by "+key+" ("+ip+")</b></span>"
+					body += "<font size='2'><b>"+job+" "+name+"</b><br><b>Real name "+real_name+"</b><br><b>Played by "+key+" ("+ip+")</b></font>"
 
 					body += "</td><td align='center'>";
 
 					body += "<a href='?src=\ref[src];adminplayeropts="+ref+"'>PP</a> - "
-					body += "<a href='?src=\ref[src];notes=show;mob="+ref+"'>N</a> - "
+					body += "<a href='?src=\ref[usr];shownoteckey="+ref+"'>N</a> - "
 					body += "<a href='?_src_=vars;Vars="+ref+"'>VV</a> - "
 					body += "<a href='?src=\ref[src];traitor="+ref+"'>TP</a> - "
 					body += "<a href='?src=\ref[usr];priv_msg=\ref"+ref+"'>PM</a> - "
 					body += "<a href='?src=\ref[src];narrateto="+ref+"'>DN</a> - "
 					body += "<a href='?src=\ref[src];adminplayerobservefollow="+ref+"'>JMP</a><br>"
+					body += "<a href='?src=\ref[src];playerexperience="+ref+"'>EXP</a><br>"
 					if(antagonist > 0)
-						body += "<span style='font-size: 13px'><a href='?src=\ref[src];check_antagonist=1'><span style='color: red'><b>Antagonist</b></span></a></span>";
+						body += "<font size='2'><a href='?src=\ref[src];check_antagonist=1'><font color='red'><b>Antagonist</b></font></a></font>";
 
 					body += "</td></tr></table>";
 
@@ -142,7 +143,7 @@
 						return;
 					locked_tabs.push(id);
 					var notice_span = document.getElementById(notice_span_id);
-					notice_span.innerHTML = "<span style='color: red'>Locked</span> ";
+					notice_span.innerHTML = "<font color='red'>Locked</font> ";
 					//link.setAttribute("onClick","attempt('"+id+"','"+link_id+"','"+notice_span_id+"');");
 					//document.write("removeFromLocked('"+id+"','"+link_id+"','"+notice_span_id+"')");
 					//document.write("aa - "+link.getAttribute("onClick"));
@@ -193,7 +194,7 @@
 		<table width='560' align='center' cellspacing='0' cellpadding='5' id='maintable'>
 			<tr id='title_tr'>
 				<td align='center'>
-					<span style='font-size: 24px'><b>Player panel</b></span><br>
+					<font size='5'><b>Player panel</b></font><br>
 					Hover over a line to see more information - <a href='?src=\ref[src];check_antagonist=1'>Check antagonists</a>
 					<p>
 				</td>
@@ -334,7 +335,7 @@
 		else
 			var/timeleft = evacuation_controller.get_eta()
 			if (evacuation_controller.waiting_to_leave())
-				dat += "ETA: [(timeleft / 60) % 60]:[pad_left(num2text(timeleft % 60), 2, "0")]<BR>"
+				dat += "ETA: [(timeleft / 60) % 60]:[add_zero(num2text(timeleft % 60), 2)]<BR>"
 				dat += "<a href='?src=\ref[src];call_shuttle=2'>Send Back</a><br>"
 
 		dat += "<a href='?src=\ref[src];delay_round_end=1'>[SSticker.delay_end ? "End Round Normally" : "Delay Round End"]</a><br>"

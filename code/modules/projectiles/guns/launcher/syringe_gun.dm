@@ -1,7 +1,7 @@
 /obj/item/syringe_cartridge
 	name = "syringe gun cartridge"
 	desc = "An impact-triggered compressed gas cartridge that can be fitted to a syringe for rapid injection."
-	icon = 'icons/obj/weapons/ammo.dmi'
+	icon = 'icons/obj/ammo.dmi'
 	icon_state = "syringe-cartridge"
 	var/icon_flight = "syringe-cartridge-flight" //so it doesn't look so weird when shot
 	matter = list(MATERIAL_STEEL = 125, MATERIAL_GLASS = 375)
@@ -21,14 +21,14 @@
 /obj/item/syringe_cartridge/attackby(obj/item/I, mob/user)
 	if(istype(I, /obj/item/reagent_containers/syringe) && user.unEquip(I, src))
 		syringe = I
-		to_chat(user, SPAN_NOTICE("You carefully insert [syringe] into [src]."))
+		to_chat(user, "<span class='notice'>You carefully insert [syringe] into [src].</span>")
 		sharp = TRUE
 		name = "syringe dart"
 		update_icon()
 
 /obj/item/syringe_cartridge/attack_self(mob/user)
 	if(syringe)
-		to_chat(user, SPAN_NOTICE("You remove [syringe] from [src]."))
+		to_chat(user, "<span class='notice'>You remove [syringe] from [src].</span>")
 		user.put_in_hands(syringe)
 		syringe = null
 		sharp = initial(sharp)
@@ -40,7 +40,7 @@
 	icon_state = icon_flight
 	underlays.Cut()
 
-/obj/item/syringe_cartridge/throw_impact(atom/hit_atom, datum/thrownthing/TT)
+/obj/item/syringe_cartridge/throw_impact(atom/hit_atom, var/datum/thrownthing/TT)
 	..() //handles embedding for us. Should have a decent chance if thrown fast enough
 	if(syringe)
 		//check speed to see if we hit hard enough to trigger the rapid injection
@@ -67,7 +67,6 @@
 	icon = 'icons/obj/guns/syringegun.dmi'
 	icon_state = "syringegun"
 	item_state = "syringegun"
-	w_class = ITEM_SIZE_LARGE
 	force = 7
 	matter = list(MATERIAL_STEEL = 2000)
 	slot_flags = SLOT_BELT
@@ -78,9 +77,15 @@
 	release_force = 10
 	throw_distance = 10
 
+	is_serial = 1
+	s_gun = "SG-4"
+
 	var/list/darts = list()
 	var/max_darts = 1
 	var/obj/item/syringe_cartridge/next
+
+	bulk = GUN_BULK_CARABINE //inf
+	w_class = ITEM_SIZE_LARGE
 
 /obj/item/gun/launcher/syringe/consume_next_projectile()
 	if(next)
@@ -95,50 +100,41 @@
 
 /obj/item/gun/launcher/syringe/attack_self(mob/living/user as mob)
 	if(next)
-		user.visible_message("[user] unlatches and carefully relaxes the bolt on [src].", SPAN_WARNING("You unlatch and carefully relax the bolt on [src], unloading the spring."))
+		user.visible_message("[user] unlatches and carefully relaxes the bolt on [src].", "<span class='warning'>You unlatch and carefully relax the bolt on [src], unloading the spring.</span>")
 		next = null
-	else if(length(darts))
+	else if(darts.len)
 		playsound(src.loc, 'sound/weapons/flipblade.ogg', 50, 1)
-		user.visible_message("[user] draws back the bolt on [src], clicking it into place.", SPAN_WARNING("You draw back the bolt on the [src], loading the spring!"))
+		user.visible_message("[user] draws back the bolt on [src], clicking it into place.", "<span class='warning'>You draw back the bolt on the [src], loading the spring!</span>")
 		next = darts[1]
 	add_fingerprint(user)
 
 /obj/item/gun/launcher/syringe/attack_hand(mob/living/user as mob)
 	if(user.get_inactive_hand() == src)
-		if(!length(darts))
-			to_chat(user, SPAN_WARNING("[src] is empty."))
+		if(!darts.len)
+			to_chat(user, "<span class='warning'>[src] is empty.</span>")
 			return
 		if(next)
-			to_chat(user, SPAN_WARNING("[src]'s cover is locked shut."))
+			to_chat(user, "<span class='warning'>[src]'s cover is locked shut.</span>")
 			return
 		var/obj/item/syringe_cartridge/C = darts[1]
 		darts -= C
 		user.put_in_hands(C)
-		user.visible_message("[user] removes \a [C] from [src].", SPAN_NOTICE("You remove \a [C] from [src]."))
+		user.visible_message("[user] removes \a [C] from [src].", "<span class='notice'>You remove \a [C] from [src].</span>")
 	else
 		..()
 
-
-/obj/item/gun/launcher/syringe/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Syringe Cartridge - Load ammo
-	if (istype(tool, /obj/item/syringe_cartridge))
-		if (length(darts) >= max_darts)
-			USE_FEEDBACK_FAILURE("\The [src] is full.")
-			return TRUE
-		if (!user.unEquip(tool, src))
-			FEEDBACK_UNEQUIP_FAILURE(user, tool)
-			return TRUE
-		darts += tool
-		user.visible_message(
-			SPAN_NOTICE("\The [user] loads \a [src] with \a [tool]."),
-			SPAN_NOTICE("You load \the [src] with \the [tool].")
-		)
-		if (max_darts > 1)
-			to_chat(user, SPAN_INFO("\The [src] now has [length(darts)]/[max_darts] dart\s loaded."))
-		return TRUE
-
-	return ..()
-
+/obj/item/gun/launcher/syringe/attackby(var/obj/item/A as obj, mob/user as mob)
+	if(istype(A, /obj/item/syringe_cartridge))
+		var/obj/item/syringe_cartridge/C = A
+		if(darts.len >= max_darts)
+			to_chat(user, "<span class='warning'>[src] is full!</span>")
+			return
+		if(!user.unEquip(C, src))
+			return
+		darts += C //add to the end
+		user.visible_message("[user] inserts \a [C] into [src].", "<span class='notice'>You insert \a [C] into [src].</span>")
+	else
+		..()
 
 /obj/item/gun/launcher/syringe/rapid
 	name = "syringe gun revolver"
@@ -146,7 +142,18 @@
 	icon_state = "rapidsyringegun"
 	item_state = "rapidsyringegun"
 	max_darts = 5
-
+	is_serial = 0
+//[INF]
+/*
+/obj/item/gun/launcher/syringe/rapid/
+	name = "Harlus MK4 Dart Rifle"
+	desc = "Special police rifle for shooting darts and syringes."
+	icon = 'infinity/icons/obj/guns.dmi'
+	icon_state = "stunrifle"
+	item_state = "gun"
+	is_serial = 0
+*/
+//[/INF]
 /obj/item/gun/launcher/syringe/disguised
 	name = "deluxe electronic cigarette"
 	desc = "A premium model eGavana MK3 electronic cigarette, shaped like a cigar."
@@ -157,6 +164,7 @@
 	force = 3
 	throw_distance = 7
 	release_force = 10
+	is_serial = 0
 
 /obj/item/gun/launcher/syringe/disguised/examine(mob/user, distance)
 	. = ..()

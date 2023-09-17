@@ -23,13 +23,13 @@
 		/datum/mob_descriptor/build = 1
 		)
 
-	appearance_flags = SPECIES_APPEARANCE_HAS_HAIR_COLOR | SPECIES_APPEARANCE_HAS_SKIN_TONE_GRAV | SPECIES_APPEARANCE_HAS_LIPS | SPECIES_APPEARANCE_HAS_UNDERWEAR | SPECIES_APPEARANCE_HAS_EYE_COLOR
+	appearance_flags = HAS_HAIR_COLOR | HAS_SKIN_TONE_GRAV | HAS_LIPS | HAS_UNDERWEAR | HAS_EYE_COLOR
 
 /datum/species/human/gravworlder/can_float(mob/living/carbon/human/H)
 	. = ..()
 	if(.)
-		return H.skill_check(SKILL_HAULING, SKILL_EXPERIENCED) //Hard for them to swim
-
+		return H.skill_check(SKILL_HAULING, SKILL_EXPERT) //Hard for them to swim
+	
 /datum/species/human/spacer
 	name = SPECIES_SPACER
 	name_plural = "Space-Adapted Humans"
@@ -53,7 +53,7 @@
 		/datum/mob_descriptor/build = -1
 		)
 
-	appearance_flags = SPECIES_APPEARANCE_HAS_HAIR_COLOR | SPECIES_APPEARANCE_HAS_SKIN_TONE_SPCR | SPECIES_APPEARANCE_HAS_LIPS | SPECIES_APPEARANCE_HAS_UNDERWEAR | SPECIES_APPEARANCE_HAS_EYE_COLOR
+	appearance_flags = HAS_HAIR_COLOR | HAS_SKIN_TONE_SPCR | HAS_LIPS | HAS_UNDERWEAR | HAS_EYE_COLOR
 	species_flags = SPECIES_FLAG_LOW_GRAV_ADAPTED
 
 	hazard_high_pressure = HAZARD_HIGH_PRESSURE * 0.8            // Dangerously high pressure.
@@ -76,8 +76,8 @@
 	with darker skin better display the dull, greenish hue resulting from their artificial growth. \
 	Vat-grown humans have no appendix and fewer inherited genetic disabilities but have a weakened \
 	metabolism."
-	icobase =     'icons/mob/human_races/species/human/subspecies/vatgrown_body.dmi'
-	preview_icon= 'icons/mob/human_races/species/human/subspecies/vatgrown_preview.dmi'
+	icobase = 'infinity/icons/mob/human_races/species/human/subspecies/vatgrown_body.dmi' //inf, was: 	icobase =     'icons/mob/human_races/species/human/subspecies/vatgrown_body.dmi'
+	preview_icon = 'infinity/icons/mob/human_races/species/human/subspecies/vatgrown_preview.dmi' //inf, was: 	preview_icon= 'icons/mob/human_races/species/human/subspecies/vatgrown_preview.dmi'
 
 	toxins_mod =   1.1
 	has_organ = list(
@@ -137,7 +137,17 @@
 		/datum/mob_descriptor/build = 1
 		)
 
-	appearance_flags = SPECIES_APPEARANCE_HAS_HAIR_COLOR | SPECIES_APPEARANCE_HAS_SKIN_TONE_TRITON | SPECIES_APPEARANCE_HAS_LIPS | SPECIES_APPEARANCE_HAS_UNDERWEAR | SPECIES_APPEARANCE_HAS_EYE_COLOR
+	has_organ = list(
+		BP_HEART =    /obj/item/organ/internal/heart,
+		BP_STOMACH =  /obj/item/organ/internal/stomach,
+		BP_LUNGS =    /obj/item/organ/internal/lungs/gills,
+		BP_LIVER =    /obj/item/organ/internal/liver,
+		BP_KIDNEYS =  /obj/item/organ/internal/kidneys,
+		BP_BRAIN =    /obj/item/organ/internal/brain,
+		BP_EYES =     /obj/item/organ/internal/eyes
+		)
+
+	appearance_flags = HAS_HAIR_COLOR | HAS_SKIN_TONE_TRITON | HAS_LIPS | HAS_UNDERWEAR | HAS_EYE_COLOR
 
 /datum/species/human/tritonian/can_float(mob/living/carbon/human/H)
 	if(!H.is_physically_disabled())
@@ -166,7 +176,7 @@
 	min_age =       18
 	max_age =       45
 
-/datum/species/human/mule/handle_post_spawn(mob/living/carbon/human/H)
+/datum/species/human/mule/handle_post_spawn(var/mob/living/carbon/human/H)
 	if(!H.psi)
 		H.psi = new(H)
 		var/list/faculties = list("[PSI_COERCION]", "[PSI_REDACTION]", "[PSI_ENERGISTICS]", "[PSI_PSYCHOKINESIS]")

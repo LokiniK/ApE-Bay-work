@@ -25,14 +25,14 @@
 
 /obj/effect/landmark/corpse/marooned_officer
 	name = "Horazy Warda"
-	corpse_outfits = list(/singleton/hierarchy/outfit/marooned_officer)
+	corpse_outfits = list(/decl/hierarchy/outfit/marooned_officer)
 	spawn_flags = ~CORPSE_SPAWNER_RANDOM_NAME
 
-/singleton/hierarchy/outfit/marooned_officer
+/decl/hierarchy/outfit/marooned_officer
 	name = "Dead Magnitka's fleet officer"
 	uniform = /obj/item/clothing/under/magintka_uniform
 	suit = /obj/item/clothing/suit/storage/hooded/wintercoat
-	shoes = /obj/item/clothing/shoes/jackboots
+	shoes = /obj/item/clothing/shoes/jungleboots
 	gloves = /obj/item/clothing/gloves/thick
 	head = /obj/item/clothing/head/beret
 	l_pocket = /obj/item/material/knife/folding/combat/switchblade
@@ -49,7 +49,7 @@
 	name = "\improper Crashed Dropship"
 	icon_state = "A"
 
-/obj/item/paper/marooned
+/obj/item/paper/marooned/
 	name = "diary page"
 	language = LANGUAGE_HUMAN_RUSSIAN
 /obj/item/paper/marooned/note01

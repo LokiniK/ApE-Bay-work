@@ -14,7 +14,7 @@ field_generator power level display
 
 #define field_generator_max_power 250000
 /obj/machinery/field_generator
-	name = "field generator"
+	name = "Field Generator"
 	desc = "A large thermal battery that projects a high amount of energy when powered."
 	icon = 'icons/obj/machines/field_generator.dmi'
 	icon_state = "Field_Gen"
@@ -41,18 +41,15 @@ field_generator power level display
 	overlays.Cut()
 	if(!active)
 		if(warming_up)
-			overlays += emissive_appearance(icon, "+a[warming_up]")
 			overlays += "+a[warming_up]"
-	if(length(fields))
-		overlays += emissive_appearance(icon, "+on")
+	if(fields.len)
 		overlays += "+on"
 	// Power level indicator
 	// Scale % power to % num_power_levels and truncate value
 	var/level = round(num_power_levels * power / field_generator_max_power)
 	// Clamp between 0 and num_power_levels for out of range power values
-	level = clamp(level, 0, num_power_levels)
+	level = between(0, level, num_power_levels)
 	if(level)
-		overlays += emissive_appearance(icon, "+p[level]")
 		overlays += "+p[level]"
 
 	return
@@ -91,7 +88,7 @@ field_generator power level display
 					"You turn on the [src.name].", \
 					"You hear heavy droning")
 				turn_on()
-				investigate_log("[SPAN_COLOR("green", "activated")] by [user.key].","singulo")
+				investigate_log("<font color='green'>activated</font> by [user.key].","singulo")
 
 				src.add_fingerprint(user)
 				return TRUE
@@ -120,13 +117,13 @@ field_generator power level display
 					"You hear ratchet")
 				src.anchored = FALSE
 			if(2)
-				to_chat(user, SPAN_WARNING(" The [src.name] needs to be unwelded from the floor."))
+				to_chat(user, "<span class='warning'> The [src.name] needs to be unwelded from the floor.</span>")
 				return
 	else if(isWelder(W))
 		var/obj/item/weldingtool/WT = W
 		switch(state)
 			if(0)
-				to_chat(user, SPAN_WARNING("The [src.name] needs to be wrenched to the floor."))
+				to_chat(user, "<span class='warning'>The [src.name] needs to be wrenched to the floor.</span>")
 				return
 			if(1)
 				if (WT.remove_fuel(0,user))
@@ -134,7 +131,7 @@ field_generator power level display
 					user.visible_message("[user.name] starts to weld the [src.name] to the floor.", \
 						"You start to weld the [src] to the floor.", \
 						"You hear welding")
-					if (do_after(user, (W.toolspeed * 2) SECONDS, src, DO_REPAIR_CONSTRUCT))
+					if (do_after(user,20,src))
 						if(!src || !WT.isOn()) return
 						state = 2
 						to_chat(user, "You weld the field generator to the floor.")
@@ -146,7 +143,7 @@ field_generator power level display
 					user.visible_message("[user.name] starts to cut the [src.name] free from the floor.", \
 						"You start to cut the [src] free from the floor.", \
 						"You hear welding")
-					if (do_after(user, (W.toolspeed * 2) SECONDS, src, DO_REPAIR_CONSTRUCT))
+					if (do_after(user,20,src))
 						if(!src || !WT.isOn()) return
 						state = 1
 						to_chat(user, "You cut the [src] free from the floor.")
@@ -158,9 +155,9 @@ field_generator power level display
 
 
 /obj/machinery/field_generator/emp_act()
-	return
+	return 0
 
-/obj/machinery/field_generator/bullet_act(obj/item/projectile/Proj)
+/obj/machinery/field_generator/bullet_act(var/obj/item/projectile/Proj)
 	if(istype(Proj, /obj/item/projectile/beam))
 		power += Proj.damage * EMITTER_DAMAGE_POWER_TRANSFER
 		update_icon()
@@ -212,14 +209,14 @@ field_generator power level display
 		return 1
 	else
 		for(var/mob/M in viewers(src))
-			M.show_message(SPAN_WARNING("\The [src] shuts down!"))
+			M.show_message("<span class='warning'>\The [src] shuts down!</span>")
 		turn_off()
-		investigate_log("ran out of power and [SPAN_COLOR("red", "deactivated")]","singulo")
+		investigate_log("ran out of power and <font color='red'>deactivated</font>","singulo")
 		src.power = 0
 		return 0
 
 //Tries to draw the needed power from our own power reserve, or connected generators if we can. Returns the amount of power we were able to get.
-/obj/machinery/field_generator/proc/draw_power(draw = 0, list/flood_list = list())
+/obj/machinery/field_generator/proc/draw_power(var/draw = 0, var/list/flood_list = list())
 	flood_list += src
 
 	if(src.power >= draw)//We have enough power
@@ -254,7 +251,7 @@ field_generator power level display
 	src.active = 2
 
 
-/obj/machinery/field_generator/proc/setup_field(NSEW)
+/obj/machinery/field_generator/proc/setup_field(var/NSEW)
 	var/turf/T = src.loc
 	var/obj/machinery/field_generator/G
 	var/steps = 0
@@ -338,5 +335,5 @@ field_generator power level display
 				if((world.time - O.last_warning) > 50) //to stop message-spam
 					temp = 0
 					message_admins("A singulo exists and a containment field has failed.",1)
-					investigate_log("has [SPAN_COLOR("red", "failed")] whilst a singulo exists.","singulo")
+					investigate_log("has <font color='red'>failed</font> whilst a singulo exists.","singulo")
 			O.last_warning = world.time

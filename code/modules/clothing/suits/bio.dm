@@ -2,6 +2,10 @@
 /obj/item/clothing/head/bio_hood
 	name = "bio hood"
 	icon_state = "bio"
+	icon = 'infinity/icons/obj/clothing/obj_head.dmi'
+	item_icons = list(slot_head_str = 'infinity/icons/mob/onmob/onmob_head.dmi',
+		slot_l_hand_str = 'icons/mob/onmob/items/lefthand_hats.dmi',
+		slot_r_hand_str = 'icons/mob/onmob/items/righthand_hats.dmi',)
 	item_state_slots = list(
 		slot_l_hand_str = "bio_hood",
 		slot_r_hand_str = "bio_hood",
@@ -9,18 +13,21 @@
 	desc = "A hood that protects the head and face from biological comtaminants."
 	permeability_coefficient = 0
 	armor = list(
-		bio = ARMOR_BIO_SHIELDED,
+		bio = ARMOR_BIO_SHIELDED, 
 		rad = ARMOR_RAD_MINOR
 		)
 	flags_inv = HIDEMASK|HIDEEARS|HIDEEYES|BLOCKHAIR
 	item_flags = ITEM_FLAG_THICKMATERIAL
 	body_parts_covered = HEAD|FACE|EYES
 	siemens_coefficient = 0.9
+	tint = 1
 
 /obj/item/clothing/suit/bio_suit
 	name = "bio suit"
 	desc = "A suit that protects against biological contamination."
 	icon_state = "bio"
+	icon = 'infinity/icons/obj/clothing/obj_suit.dmi'
+	item_icons = list(slot_wear_suit_str = 'infinity/icons/mob/onmob/onmob_suit.dmi')
 	item_state_slots = list(
 		slot_l_hand_str = "bio_suit",
 		slot_r_hand_str = "bio_suit",
@@ -29,28 +36,18 @@
 	gas_transfer_coefficient = 0
 	permeability_coefficient = 0
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|FEET|ARMS|HANDS
-	allowed = list(
-		/obj/item/tank/oxygen_emergency,
-		/obj/item/tank/oxygen_emergency_extended,
-		/obj/item/tank/nitrogen_emergency,
-		/obj/item/pen,
-		/obj/item/device/flashlight/pen,
-		/obj/item/device/scanner/health,
-		/obj/item/device/ano_scanner,
-		/obj/item/clothing/head/bio_hood,
-		/obj/item/clothing/mask/gas
-	)
+	allowed = list(/obj/item/tank/emergency,/obj/item/pen,/obj/item/device/flashlight/pen,/obj/item/device/scanner/health,/obj/item/device/ano_scanner,/obj/item/clothing/head/bio_hood,/obj/item/clothing/mask/gas)
 	armor = list(
-		bio = ARMOR_BIO_SHIELDED,
+		bio = ARMOR_BIO_SHIELDED, 
 		rad = ARMOR_RAD_MINOR
 		)
 	flags_inv = HIDEGLOVES|HIDESHOES|HIDEJUMPSUIT|HIDETAIL
 	item_flags = ITEM_FLAG_THICKMATERIAL
 	siemens_coefficient = 0.9
 
-/obj/item/clothing/suit/bio_suit/Initialize()
-	. = ..()
-	slowdown_per_slot[slot_wear_suit] = 0.75
+/obj/item/clothing/suit/bio_suit/New()
+	..()
+	slowdown_per_slot[slot_wear_suit] = 1.0
 
 //Standard biosuit, orange stripe
 /obj/item/clothing/head/bio_hood/general
@@ -111,7 +108,9 @@
 
 //Plague Dr mask can be found in clothing/masks/gasmask.dm
 /obj/item/clothing/suit/bio_suit/plaguedoctorsuit
-	name = "plague doctor suit"
+	name = "Plague doctor suit"
 	desc = "It protected doctors from the Black Death, back then. You bet your arse it's gonna help you against viruses."
+	icon = 'icons/obj/clothing/obj_suit.dmi'
+	item_icons = list(slot_wear_suit_str = 'icons/mob/onmob/onmob_suit.dmi')
 	icon_state = "plaguedoctor"
 	flags_inv = HIDEGLOVES|HIDEJUMPSUIT|HIDETAIL

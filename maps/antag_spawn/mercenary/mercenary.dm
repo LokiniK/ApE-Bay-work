@@ -6,10 +6,10 @@
 /obj/effect/overmap/visitable/sector/merc_base
 	name = "Tiny Asteroid"
 	desc = "Sensor array detects an small, insignificant asteroid. The core appears to be reflecting scans."
-	place_near_main = list(2, 4)
+	sector_flags = OVERMAP_SECTOR_IN_SPACE
+	known = 0
 	icon_state = "meteor4"
 	hide_from_reports = TRUE
-	sensor_visibility = 10
 	initial_generic_waypoints = list(
 		"nav_merc_start",
 		"nav_merc_1",
@@ -25,6 +25,7 @@
 	fore_dir = NORTH
 	vessel_size = SHIP_SIZE_SMALL
 	vessel_mass = 10000
+	contact_class = /decl/ship_contact_class/destroyer_escort
 
 /datum/shuttle/autodock/overmap/merc_shuttle
 	name = "Cyclopes"
@@ -36,7 +37,7 @@
 	warmup_time = 5
 	range = 2
 	fuel_consumption = 2
-	skill_needed = SKILL_UNSKILLED
+	skill_needed = SKILL_NONE
 
 /turf/simulated/floor/shuttle_ceiling/merc
 	color = COLOR_DARK_GUNMETAL
@@ -86,6 +87,14 @@
 	area_flags = AREA_FLAG_RAD_SHIELDED | AREA_FLAG_ION_SHIELDED
 	req_access = list(access_syndicate)
 
+/area/map_template/merc_shuttle/rear
+	name = "\improper Desperado Rear Compartment"
+	icon_state = "green"
+
+//[INF]
+/obj/machinery/vending/medical/torch
+	req_access = list(access_medical)
+//[/INF]
 
 //Flavorful reminders
 /obj/item/paper/merc

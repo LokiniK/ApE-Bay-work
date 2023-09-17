@@ -22,11 +22,18 @@
 	//Species-specific stuff.
 	species_restricted = list(SPECIES_HUMAN, SPECIES_IPC)
 	sprite_sheets = list(
-		SPECIES_UNATHI = 'icons/mob/species/unathi/onmob_head_unathi.dmi',
+		SPECIES_TAJARA = 'icons/mob/species/tajaran/helmet.dmi',
+		SPECIES_EROSAN = 'infinity/icons/mob/species/erosan/helmet.dmi',
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_head_resomi.dmi',
+		SPECIES_UNATHI = 'icons/mob/species/unathi/generated/onmob_head_unathi.dmi',
 		SPECIES_SKRELL = 'icons/mob/species/skrell/onmob_head_skrell.dmi',
 		)
 	sprite_sheets_obj = list(
-		SPECIES_UNATHI = 'icons/obj/clothing/species/unathi/obj_head_unathi.dmi',
+		SPECIES_TAJARA = 'icons/obj/clothing/species/tajaran/hats.dmi',
+		SPECIES_EROSAN = 'infinity/icons/obj/clothing/species/erosan/hats.dmi',
+		SPECIES_RESOMI = 'infinity/icons/obj/clothing/species/resomi/obj_head_resomi.dmi',
+//		SPECIES_UNATHI = 'icons/obj/clothing/species/unathi/obj_head_unathi.dmi',
+		SPECIES_UNATHI = 'infinity/icons/obj/clothing/species/erosan/hats.dmi',
 		SPECIES_SKRELL = 'icons/obj/clothing/species/skrell/obj_head_skrell.dmi',
 		)
 
@@ -55,11 +62,18 @@
 
 	species_restricted = list(SPECIES_HUMAN, SPECIES_SKRELL, SPECIES_IPC)
 	sprite_sheets = list(
-		SPECIES_UNATHI = 'icons/mob/species/unathi/onmob_suit_unathi.dmi',
+		SPECIES_TAJARA = 'icons/mob/species/tajaran/suit.dmi',
+		SPECIES_EROSAN = 'infinity/icons/mob/species/erosan/suit.dmi',
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_suit_resomi.dmi',
+		SPECIES_UNATHI = 'icons/mob/species/unathi/generated/onmob_suit_unathi.dmi',
 		SPECIES_SKRELL = 'icons/mob/species/skrell/onmob_suit_skrell.dmi',
 		)
 	sprite_sheets_obj = list(
-		SPECIES_UNATHI = 'icons/obj/clothing/species/unathi/obj_suit_unathi.dmi',
+		SPECIES_TAJARA = 'icons/obj/clothing/species/tajaran/suits.dmi',
+		SPECIES_EROSAN = 'infinity/icons/obj/clothing/species/erosan/suits.dmi',
+		SPECIES_RESOMI = 'infinity/icons/obj/clothing/species/resomi/obj_suit_resomi.dmi',
+//		SPECIES_UNATHI = 'icons/obj/clothing/species/unathi/obj_suit_unathi.dmi',
+		SPECIES_UNATHI = 'infinity/icons/obj/clothing/species/erosan/suits.dmi',
 		SPECIES_SKRELL = 'icons/obj/clothing/species/skrell/obj_suit_skrell.dmi',
 		)
 
@@ -85,24 +99,19 @@ else if(##equipment_var) {\
 	CRASH("[log_info_line(src)] has an invalid [#equipment_var] type: [log_info_line(##equipment_var)]");\
 }
 
-
 /obj/item/clothing/suit/space/void/Initialize()
 	. = ..()
-	slowdown_per_slot[slot_wear_suit] = 1
 	VOIDSUIT_INIT_EQUIPMENT(boots,  /obj/item/clothing/shoes/magboots)
 	VOIDSUIT_INIT_EQUIPMENT(helmet, /obj/item/clothing/head/helmet)
 	VOIDSUIT_INIT_EQUIPMENT(tank,   /obj/item/tank)
 
+#undef VOIDSUIT_INIT_EQUIPMENT
 
 /obj/item/clothing/suit/space/void/Destroy()
 	. = ..()
 	QDEL_NULL(boots)
 	QDEL_NULL(helmet)
 	QDEL_NULL(tank)
-
-
-#undef VOIDSUIT_INIT_EQUIPMENT
-
 
 /obj/item/clothing/suit/space/void/examine(user,distance)
 	. = ..()
@@ -111,9 +120,9 @@ else if(##equipment_var) {\
 		part_list += "\a [I]"
 	to_chat(user, "\The [src] has [english_list(part_list)] installed.")
 	if(tank && distance <= 1)
-		to_chat(user, SPAN_NOTICE("The wrist-mounted pressure gauge reads [max(round(tank.air_contents.return_pressure()),0)] kPa remaining in \the [tank]."))
+		to_chat(user, "<span class='notice'>The wrist-mounted pressure gauge reads [max(round(tank.air_contents.return_pressure()),0)] kPa remaining in \the [tank].</span>")
 
-/obj/item/clothing/suit/space/void/refit_for_species(target_species)
+/obj/item/clothing/suit/space/void/refit_for_species(var/target_species)
 	..()
 	if(istype(helmet))
 		helmet.refit_for_species(target_species)
@@ -192,19 +201,19 @@ else if(##equipment_var) {\
 	if(H.wear_suit != src) return
 
 	if(H.head == helmet)
-		to_chat(H, SPAN_NOTICE("You retract your suit helmet."))
+		to_chat(H, "<span class='notice'>You retract your suit helmet.</span>")
 		helmet.canremove = 1
 		playsound(loc, helmet_retract_sound, 30)
 		H.drop_from_inventory(helmet, src)
 	else
 		if(H.head)
-			to_chat(H, SPAN_DANGER("You cannot deploy your helmet while wearing \the [H.head]."))
+			to_chat(H, "<span class='danger'>You cannot deploy your helmet while wearing \the [H.head].</span>")
 			return
 		if(H.equip_to_slot_if_possible(helmet, slot_head))
 			helmet.pickup(H)
 			helmet.canremove = 0
 			playsound(loc, helmet_deploy_sound, 30)
-			to_chat(H, SPAN_INFO("You deploy your suit helmet, sealing you off from the world."))
+			to_chat(H, "<span class='info'>You deploy your suit helmet, sealing you off from the world.</span>")
 	helmet.update_light(H)
 
 /obj/item/clothing/suit/space/void/verb/eject_tank()
@@ -227,7 +236,7 @@ else if(##equipment_var) {\
 	if(slot != slot_wear_suit && slot != slot_l_hand && slot != slot_r_hand) return// let them eject those tanks when they're in hand or stuff for ease of use
 
 
-	to_chat(H, SPAN_INFO("You press the emergency release, ejecting \the [tank] from your suit."))
+	to_chat(H, "<span class='info'>You press the emergency release, ejecting \the [tank] from your suit.</span>")
 	tank.canremove = 1
 	H.drop_from_inventory(tank, src)
 	H.put_in_hands(tank)
@@ -243,7 +252,7 @@ else if(##equipment_var) {\
 
 	if(istype(W,/obj/item/screwdriver))
 		if(user.get_inventory_slot(src) == slot_wear_suit)//maybe I should make this into a proc?
-			to_chat(user, SPAN_WARNING("You cannot modify \the [src] while it is being worn."))
+			to_chat(user, "<span class='warning'>You cannot modify \the [src] while it is being worn.</span>")
 			return
 
 		if(helmet || boots || tank)
@@ -268,7 +277,7 @@ else if(##equipment_var) {\
 		return
 	else if(istype(W,/obj/item/clothing/head/helmet/space))
 		if(user.get_inventory_slot(src) == slot_wear_suit)
-			to_chat(user, SPAN_WARNING("You cannot modify \the [src] while it is being worn."))
+			to_chat(user, "<span class='warning'>You cannot modify \the [src] while it is being worn.</span>")
 			return
 		if(helmet)
 			to_chat(user, "\The [src] already has a helmet installed.")
@@ -281,7 +290,7 @@ else if(##equipment_var) {\
 		return
 	else if(istype(W,/obj/item/clothing/shoes/magboots))
 		if(user.get_inventory_slot(src) == slot_wear_suit)
-			to_chat(user, SPAN_WARNING("You cannot modify \the [src] while it is being worn."))
+			to_chat(user, "<span class='warning'>You cannot modify \the [src] while it is being worn.</span>")
 			return
 		if(boots)
 			to_chat(user, "\The [src] already has magboots installed.")
@@ -294,7 +303,7 @@ else if(##equipment_var) {\
 		return
 	else if(istype(W,/obj/item/tank))
 		if(user.get_inventory_slot(src) == slot_wear_suit)
-			to_chat(user, SPAN_WARNING("You cannot modify \the [src] while it is being worn."))
+			to_chat(user, "<span class='warning'>You cannot modify \the [src] while it is being worn.</span>")
 			return
 		if(tank)
 			to_chat(user, "\The [src] already has an airtank installed.")
@@ -325,26 +334,3 @@ else if(##equipment_var) {\
 	if(tank && slot == slot_back)
 		ret.overlays += tank.get_mob_overlay(user_mob, slot_back_str)
 	return ret
-
-/obj/item/clothing/suit/space/void/proc/forceDropEquipment(equipment)
-	var/mob/living/carbon/human/H
-	if(helmet && equipment == helmet)
-		H = helmet.loc
-		if(istype(H))
-			if(H.head == helmet)
-				helmet.canremove = TRUE
-				helmet.dropInto(loc)
-				helmet = null
-	if(boots && equipment == boots)
-		H = boots.loc
-		if(istype(H))
-			if(H.shoes == boots)
-				boots.canremove = TRUE
-				boots.dropInto(loc)
-				boots = null
-	if(tank && equipment == tank)
-		tank.canremove = TRUE
-		tank.dropInto(loc)
-		tank = null
-	else
-		return

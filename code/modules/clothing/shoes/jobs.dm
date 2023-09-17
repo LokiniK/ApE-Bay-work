@@ -8,7 +8,7 @@
 
 /obj/item/clothing/shoes/galoshes/Initialize()
 	. = ..()
-	slowdown_per_slot[slot_shoes] = 0.5
+	slowdown_per_slot[slot_shoes] = 1
 
 /obj/item/clothing/shoes/jackboots
 	name = "jackboots"
@@ -38,7 +38,7 @@
 	desc = "Modified pair of jackboots, particularly comfortable for those species whose toes hold claws."
 	item_state = "digiboots"
 	icon_state = "digiboots"
-	species_restricted = null
+	species_restricted = list("exclude", SPECIES_RESOMI)
 
 /obj/item/clothing/shoes/workboots
 	name = "workboots"
@@ -63,4 +63,4 @@
 	name = "toe-less workboots"
 	desc = "A pair of toeless work boots designed for use in industrial settings. Modified for species whose toes have claws."
 	icon_state = "workbootstoeless"
-	species_restricted = null
+	species_restricted = list("exclude", SPECIES_RESOMI)

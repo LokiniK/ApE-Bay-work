@@ -1,7 +1,6 @@
 /obj/item/clothing/ears/headphones
 	name = "headphones"
 	desc = "It's probably not in accordance with company policy to listen to music on the job... but fuck it."
-	icon = 'icons/obj/headphones.dmi'
 	icon_state = "headphones_off"
 	item_state = "headphones_off"
 	slot_flags = SLOT_EARS | SLOT_TWOEARS
@@ -38,3 +37,4 @@
 		icon_state = "headphones_off"
 		item_state = "headphones_off"
 	update_clothing_icon()
+	

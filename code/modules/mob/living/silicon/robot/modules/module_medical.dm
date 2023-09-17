@@ -7,13 +7,14 @@
 		NETWORK_MEDICAL
 	)
 	subsystems = list(
-		/datum/nano_module/crew_monitor
+		/datum/nano_module/crew_monitor,
+		/datum/nano_module/records //INF, cuz it's mediborg
 	)
 	can_be_pushed = 0
 
 /obj/item/robot_module/medical/build_equipment()
 	. = ..()
-	equipment += new /obj/item/robot_rack/roller_bed(src, 1)
+	equipment += new /obj/item/robot_rack/roller(src, 1)
 
 /obj/item/robot_module/medical/surgeon
 	name = "surgeon robot module"
@@ -22,14 +23,15 @@
 		"Basic" = "Medbot",
 		"Standard" = "surgeon",
 		"Advanced Droid" = "droid-medical",
-		"Needles" = "medicalrobot"
+		"Needles" = "medicalrobot",
+//cuz flying		"Ver 06" = "wer6-Surgeon" //inf
 		)
 	equipment = list(
 		/obj/item/device/flash,
 		/obj/item/borg/sight/hud/med,
 		/obj/item/device/scanner/health,
 		/obj/item/reagent_containers/borghypo/surgeon,
-		/obj/item/scalpel/ims,
+		/obj/item/scalpel/manager,
 		/obj/item/hemostat,
 		/obj/item/retractor,
 		/obj/item/cautery,
@@ -44,20 +46,19 @@
 		/obj/item/crowbar,
 		/obj/item/stack/nanopaste,
 		/obj/item/stack/medical/advanced/bruise_pack,
-		/obj/item/reagent_containers/dropper,
-		/obj/item/reagent_containers/spray/cleaner/drone,
-		/obj/item/reagent_containers/spray/sterilizine
+		/obj/item/reagent_containers/dropper
 	)
 	synths = list(
 		/datum/matter_synth/medicine = 10000,
 	)
 	emag = /obj/item/reagent_containers/spray
 	skills = list(
-		SKILL_ANATOMY     = SKILL_MASTER,
-		SKILL_MEDICAL     = SKILL_EXPERIENCED,
-		SKILL_CHEMISTRY   = SKILL_TRAINED,
-		SKILL_BUREAUCRACY = SKILL_TRAINED,
-		SKILL_DEVICES     = SKILL_EXPERIENCED
+		SKILL_ANATOMY     = SKILL_PROF,
+		SKILL_MEDICAL     = SKILL_PROF, //inf //was:		SKILL_MEDICAL     = SKILL_EXPERT,
+		SKILL_VIROLOGY    = SKILL_ADEPT, //inf
+		SKILL_CHEMISTRY   = SKILL_ADEPT,
+		SKILL_BUREAUCRACY = SKILL_ADEPT,
+		SKILL_DEVICES     = SKILL_EXPERT
 	)
 
 /obj/item/robot_module/medical/surgeon/finalize_equipment()
@@ -85,7 +86,7 @@
 		var/obj/item/stack/medical/stack = locate(thing) in equipment
 		stack.synths = list(medicine)
 
-/obj/item/robot_module/medical/surgeon/respawn_consumable(mob/living/silicon/robot/R, amount)
+/obj/item/robot_module/medical/surgeon/respawn_consumable(var/mob/living/silicon/robot/R, var/amount)
 	if(emag)
 		var/obj/item/reagent_containers/spray/PS = emag
 		PS.reagents.add_reagent(/datum/reagent/acid/polyacid, 2 * amount)
@@ -98,7 +99,8 @@
 		"Basic" = "Medbot",
 		"Standard" = "surgeon",
 		"Advanced Droid" = "droid-medical",
-		"Needles" = "medicalrobot"
+		"Needles" = "medicalrobot",
+		"Default" = "robotMedi"
 	)
 	equipment = list(
 		/obj/item/crowbar,
@@ -118,8 +120,7 @@
 		/obj/item/inflatable_dispenser/robot,
 		/obj/item/stack/medical/advanced/ointment,
 		/obj/item/stack/medical/advanced/bruise_pack,
-		/obj/item/stack/medical/splint,
-		/obj/item/reagent_containers/spray/cleaner/drone
+		/obj/item/stack/medical/splint
 	)
 	synths = list(
 		/datum/matter_synth/medicine = 15000
@@ -127,10 +128,10 @@
 	emag = /obj/item/reagent_containers/spray
 	skills = list(
 		SKILL_ANATOMY     = SKILL_BASIC,
-		SKILL_MEDICAL     = SKILL_MASTER,
-		SKILL_CHEMISTRY   = SKILL_TRAINED,
-		SKILL_BUREAUCRACY = SKILL_TRAINED,
-		SKILL_EVA         = SKILL_EXPERIENCED
+		SKILL_MEDICAL     = SKILL_PROF,
+		SKILL_CHEMISTRY   = SKILL_ADEPT,
+		SKILL_BUREAUCRACY = SKILL_ADEPT,
+		SKILL_EVA         = SKILL_EXPERT
 	)
 
 /obj/item/robot_module/medical/crisis/finalize_equipment()
@@ -160,7 +161,7 @@
 		var/obj/item/stack/medical/stack = locate(thing) in equipment
 		stack.synths = list(medicine)
 
-/obj/item/robot_module/medical/crisis/respawn_consumable(mob/living/silicon/robot/R, amount)
+/obj/item/robot_module/medical/crisis/respawn_consumable(var/mob/living/silicon/robot/R, var/amount)
 	var/obj/item/reagent_containers/syringe/S = locate() in equipment
 	if(S.mode == 2)
 		S.reagents.clear_reagents()

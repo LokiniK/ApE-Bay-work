@@ -1,26 +1,26 @@
-/mob/living/MiddleClickOn(atom/A)
+/mob/living/AltMiddleClickOn(atom/A)
 	if(get_preference_value(/datum/client_preference/hardsuit_activation) == GLOB.PREF_MIDDLE_CLICK)
 		if(HardsuitClickOn(A))
-			return TRUE
-	return ..()
+			return
+	..()
 
 /mob/living/AltClickOn(atom/A)
 	if(get_preference_value(/datum/client_preference/hardsuit_activation) == GLOB.PREF_ALT_CLICK)
 		if(HardsuitClickOn(A))
-			return TRUE
-	return ..()
+			return
+	..()
 
 /mob/living/CtrlClickOn(atom/A)
 	if(get_preference_value(/datum/client_preference/hardsuit_activation) == GLOB.PREF_CTRL_CLICK)
 		if(HardsuitClickOn(A))
-			return TRUE
-	return  ..()
+			return FALSE
+	. = ..()
 
 /mob/living/CtrlShiftClickOn(atom/A)
 	if(get_preference_value(/datum/client_preference/hardsuit_activation) == GLOB.PREF_CTRL_SHIFT_CLICK)
 		if(HardsuitClickOn(A))
-			return TRUE
-	return ..()
+			return
+	..()
 
 /mob/living/proc/can_use_rig()
 	return 0
@@ -37,7 +37,7 @@
 /mob/living/silicon/pai/can_use_rig()
 	return loc == card
 
-/mob/living/proc/HardsuitClickOn(atom/A, alert_ai = 0)
+/mob/living/proc/HardsuitClickOn(var/atom/A, var/alert_ai = 0)
 	if(!can_use_rig() || !canClick())
 		return 0
 	var/obj/item/rig/rig = get_rig()

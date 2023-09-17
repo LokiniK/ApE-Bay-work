@@ -27,7 +27,7 @@
 
 
 /obj/item/storage/box/donut
-	icon = 'icons/obj/food/food.dmi'
+	icon = 'icons/obj/food.dmi'
 	icon_state = "donutbox"
 	name = "donut box"
 	can_hold = list(/obj/item/reagent_containers/food/snacks/donut)
@@ -39,10 +39,7 @@
 	overlays.Cut()
 	var/i = 0
 	for(var/obj/item/reagent_containers/food/snacks/donut/D in contents)
-		var/image/I = image('icons/obj/food/food.dmi', "[i][D.overlay_state]")
-		if(D.overlay_state == "box-donut1")
-			I.color = D.filling_color
-		overlays += I
+		overlays += image('icons/obj/food.dmi', "[i][D.overlay_state]")
 		i++
 
 /obj/item/storage/box/donut/empty
@@ -55,17 +52,12 @@
 	icon = 'icons/obj/cigarettes.dmi'
 	icon_state = "cigpaperbook"
 	item_state = "cigpacket"
-	w_class = ITEM_SIZE_TINY
+	w_class = ITEM_SIZE_SMALL
 	max_w_class = ITEM_SIZE_TINY
 	max_storage_space = 10
 	throwforce = 2
 	slot_flags = SLOT_BELT
 	startswith = list(/obj/item/paper/cig = 10)
-	can_hold = list(
-		/obj/item/paper/cig,
-		/obj/item/clothing/mask/smokable/cigarette,
-		/obj/item/storage/cigpaper/filters
-	)
 
 /obj/item/storage/cigpaper/fancy
 	name = "\improper Trident cigarette paper"
@@ -93,11 +85,12 @@
 	throwforce = 2
 	slot_flags = SLOT_BELT
 	startswith = list(/obj/item/clothing/mask/chewable/tobacco = 6)
+	make_exact_fit()
 
 //loose leaf
 /obj/item/storage/chewables/rollable
 	name = "bag of tobacco"
-	max_storage_space = 10
+	max_storage_space = 8
 
 /obj/item/storage/chewables/rollable/bad
 	name = "bag of Men at Arms tobacco"
@@ -116,16 +109,6 @@
 	desc = "A exclusive brand of overpriced tobacco, allegedly grown at a lagrange point station in Sol system."
 	startswith = list(/obj/item/reagent_containers/food/snacks/grown/dried_tobacco/fine = 8)
 	icon_state = "rollfine"
-
-/obj/item/storage/chewables/rollable/rollingkit
-	name = "bag of Crewman's First tobacco"
-	desc = "Generic middling quality tobacco for the recently enlisted and cost-conscious smokers. This bag comes with rolling papers and filters!"
-	startswith = list(
-	/obj/item/reagent_containers/food/snacks/grown/dried_tobacco = 8,
-	/obj/item/storage/cigpaper = 1,
-	/obj/item/storage/cigpaper/filters = 1
-	)
-	icon_state = "rollgeneric"
 
 //chewing tobacco
 /obj/item/storage/chewables/tobacco
@@ -155,6 +138,7 @@
 	icon_state = "cookiebag"
 	max_storage_space = 6
 	startswith = list(/obj/item/reagent_containers/food/snacks/cookie = 6)
+	make_exact_fit()
 
 /obj/item/storage/chewables/candy/gum
 	name = "pack of Rainbo-Gums"
@@ -162,6 +146,7 @@
 	icon_state = "gumpack"
 	max_storage_space = 8
 	startswith = list(/obj/item/clothing/mask/chewable/candy/gum = 8)
+	make_exact_fit()
 
 /obj/item/storage/chewables/candy/medicallollis
 	name = "pack of medicinal lollipops"
@@ -169,18 +154,63 @@
 	icon_state = "lollipack"
 	max_storage_space = 20
 	startswith = list(/obj/item/clothing/mask/chewable/candy/lolli/meds = 20)
+	make_exact_fit()
 
 /obj/item/storage/medical_lolli_jar
 	name = "lollipops jar"
 	desc = "A mixed pack of flavored medicinal lollipops. Perfect for small boo-boos."
-	icon = 'icons/obj/jars.dmi'
 	icon_state = "lollijar"
 	max_storage_space = 20
 	startswith = list(/obj/item/clothing/mask/chewable/candy/lolli/weak_meds = 15)
 
 /obj/item/storage/medical_lolli_jar/on_update_icon()
 	. = ..()
-	if(length(contents))
+	if(contents.len)
 		icon_state = "lollijar"
 	else
 		icon_state = "lollijar_empty"
+
+
+/obj/item/storage/bar_fruit_jar
+	name = "Fruit jar"
+	desc = "Jar with fresh fruit. They are definitely edible and never plastic."
+	icon_state = "fruitjar"
+	max_storage_space = 20
+	startswith = list(
+		/obj/item/reagent_containers/food/snacks/grown/apple = 2,
+		/obj/item/reagent_containers/food/snacks/grown/orange = 2,
+		/obj/item/reagent_containers/food/snacks/grown/lime = 2,
+		/obj/item/reagent_containers/food/snacks/grown/lemon = 2
+	)
+
+/obj/item/storage/bar_fruit_jar/on_update_icon()
+	. = ..()
+	if(contents.len)
+		icon_state = "fruitjar"
+	else
+		icon_state = "fruitjar_empty"
+
+/obj/item/storage/music_tape_holder
+	name = "Tape holder"
+	desc = "It can hold a few tapes and screwdriwer."
+	icon_state = "tape_holder"
+	w_class = ITEM_SIZE_SMALL
+	max_w_class = ITEM_SIZE_SMALL //Don't worry, see can_hold[]
+	max_storage_space = 5
+	can_hold = list(
+		/obj/item/music_tape,
+		/obj/item/device/flashlight/pen,
+		/obj/item/device/tape,
+		/obj/item/material/coin,
+		/obj/item/dice,
+		/obj/item/disk,
+		/obj/item/paper,
+		/obj/item/paper_bundle,
+		/obj/item/pen,
+		/obj/item/photo,
+		/obj/item/screwdriver
+	)
+	startswith = list(
+		/obj/item/music_tape/custom = 2,
+		/obj/item/screwdriver = 1
+	)

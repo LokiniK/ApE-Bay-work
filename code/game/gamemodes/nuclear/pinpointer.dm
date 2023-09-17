@@ -1,6 +1,6 @@
 /obj/item/pinpointer
 	name = "pinpointer"
-	icon = 'icons/obj/tools/pinpointer.dmi'
+	icon = 'icons/obj/pinpointer.dmi'
 	icon_state = "pinoff"
 	obj_flags = OBJ_FLAG_CONDUCTIBLE
 	slot_flags = SLOT_BELT
@@ -126,7 +126,7 @@
 		new_mode = "Authentication Disk Locator"
 	if(new_mode)
 		playsound(loc, 'sound/machines/twobeep.ogg', 50, 1)
-		visible_message(SPAN_NOTICE("[new_mode] active."))
+		visible_message("<span class='notice'>[new_mode] active.</span>")
 		target = acquire_target()
 	..()
 

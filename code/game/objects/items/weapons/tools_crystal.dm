@@ -3,21 +3,17 @@
 	desc = "A crystalline welding tool of an alien make."
 	icon_state = "crystal_welder"
 	item_state = "crystal_tool"
-	icon = 'icons/obj/tools/welder.dmi'
+	icon = 'icons/obj/crystal_tools.dmi'
 	matter = list(MATERIAL_CRYSTAL = 1250)
 	cell = null
 	fuel_cost_multiplier = 1
-	atom_flags = ATOM_FLAG_NO_TEMP_CHANGE | ATOM_FLAG_NO_TOOLS
+
+/obj/item/weldingtool/electric/crystal/attackby(var/obj/item/W, var/mob/user)
+	return
 
 /obj/item/weldingtool/electric/crystal/on_update_icon()
-	if(welding)
-		icon_state = "crystal_welder_on"
-		item_state = "crystal_tool_lit"
-		set_light(0.6, 0.5, 2.5, l_color = COLOR_LIGHT_CYAN)
-	else
-		icon_state = "crystal_welder"
-		item_state = "crystal_tool"
-		set_light(0)
+	icon_state = welding ? "crystal_welder_on" : "crystal_welder"
+	item_state = welding ? "crystal_tool_lit"  : "crystal_tool"
 	var/mob/M = loc
 	if(istype(M))
 		M.update_inv_l_hand()
@@ -31,7 +27,7 @@
 			if(!cell.is_broken())
 				. += cell.get_charge()
 
-/obj/item/weldingtool/electric/crystal/spend_charge(amount)
+/obj/item/weldingtool/electric/crystal/spend_charge(var/amount)
 	var/mob/living/carbon/human/adherent = loc
 	if(istype(adherent))
 		for(var/obj/item/organ/internal/cell/cell in adherent.internal_organs)
@@ -47,7 +43,7 @@
 	desc = "A crystalline shearing tool of an alien make."
 	icon_state = "crystal_wirecutter"
 	item_state = "crystal_tool"
-	icon = 'icons/obj/tools/wirecutter.dmi'
+	icon = 'icons/obj/crystal_tools.dmi'
 	matter = list(MATERIAL_CRYSTAL = 1250)
 	build_from_parts = FALSE
 
@@ -61,7 +57,7 @@
 	desc = "A crystalline screwdriving tool of an alien make."
 	icon_state = "crystal_screwdriver"
 	item_state = "crystal_tool"
-	icon = 'icons/obj/tools/screwdriver.dmi'
+	icon = 'icons/obj/crystal_tools.dmi'
 	matter = list(MATERIAL_CRYSTAL = 1250)
 	build_from_parts = FALSE
 
@@ -75,7 +71,7 @@
 	desc = "A crystalline prying tool of an alien make."
 	icon_state = "crystal_crowbar"
 	item_state = "crystal_tool"
-	icon = 'icons/obj/tools/crowbar.dmi'
+	icon = 'icons/obj/crystal_tools.dmi'
 	matter = list(MATERIAL_CRYSTAL = 1250)
 
 /obj/item/crowbar/crystal/Initialize()
@@ -88,7 +84,7 @@
 	desc = "A crystalline wrenching tool of an alien make."
 	icon_state = "crystal_wrench"
 	item_state = "crystal_tool"
-	icon = 'icons/obj/tools/wrench.dmi'
+	icon = 'icons/obj/crystal_tools.dmi'
 	matter = list(MATERIAL_CRYSTAL = 1250)
 
 /obj/item/wrench/crystal/Initialize()
@@ -101,13 +97,12 @@
 	desc = "A crystalline energy patterning tool of an alien make."
 	icon_state = "crystal_multitool"
 	item_state = "crystal_tool"
-	icon = 'icons/obj/tools/multitool.dmi'
+	icon = 'icons/obj/crystal_tools.dmi'
 	matter = list(MATERIAL_CRYSTAL = 1250)
 
 /obj/item/storage/belt/utility/crystal
 	name = "crystalline tool harness"
 	desc = "A segmented belt of strange crystalline material."
-	icon = 'icons/obj/clothing/obj_belt.dmi'
 	icon_state = "utilitybelt_crystal"
 	item_state = "utilitybelt_crystal"
 
@@ -124,7 +119,6 @@
 /obj/item/storage/toolbox/crystal
 	name = "crystalline toolbox"
 	desc = "A translucent toolbox made out of an odd crystalline material that is surprisingly light."
-	icon = 'icons/obj/tools/toolboxes.dmi'
 	icon_state = "crystal"
 	item_state = "toolbox_crystal"
 	origin_tech = list(TECH_COMBAT = 1, TECH_MATERIAL = 3)

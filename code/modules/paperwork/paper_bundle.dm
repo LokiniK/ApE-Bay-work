@@ -25,12 +25,12 @@
 	if (istype(W, /obj/item/paper/carbon))
 		var/obj/item/paper/carbon/C = W
 		if (!C.iscopy && !C.copied)
-			to_chat(user, SPAN_NOTICE("Take off the carbon copy first."))
+			to_chat(user, "<span class='notice'>Take off the carbon copy first.</span>")
 			add_fingerprint(user)
 			return
 	// adding sheets
 	if(istype(W, /obj/item/paper) || istype(W, /obj/item/photo))
-		insert_sheet_at(user, length(pages)+1, W)
+		insert_sheet_at(user, pages.len+1, W)
 
 	// burning
 	else if(istype(W, /obj/item/flame))
@@ -43,7 +43,7 @@
 			O.add_fingerprint(user)
 			pages.Add(O)
 
-		to_chat(user, SPAN_NOTICE("You add \the [W.name] to [(src.name == "paper bundle") ? "the paper bundle" : src.name]."))
+		to_chat(user, "<span class='notice'>You add \the [W.name] to [(src.name == "paper bundle") ? "the paper bundle" : src.name].</span>")
 		qdel(W)
 	else
 		if(istype(W, /obj/item/tape_roll))
@@ -58,7 +58,7 @@
 	add_fingerprint(user)
 	return
 
-/obj/item/paper_bundle/proc/insert_sheet_at(mob/user, index, obj/item/sheet)
+/obj/item/paper_bundle/proc/insert_sheet_at(mob/user, var/index, obj/item/sheet)
 	if (!user.unEquip(sheet, src))
 		return
 	var/bundle_name = "paper bundle"
@@ -66,7 +66,7 @@
 	bundle_name = (bundle_name == name) ? "the [bundle_name]" : name
 	sheet_name = (sheet_name == sheet.name) ? "the [sheet_name]" : sheet.name
 
-	to_chat(user, SPAN_NOTICE("You add [sheet_name] to [bundle_name]."))
+	to_chat(user, "<span class='notice'>You add [sheet_name] to [bundle_name].</span>")
 	pages.Insert(index, sheet)
 	if(index <= page)
 		page++
@@ -78,13 +78,13 @@
 		if(istype(P, /obj/item/flame/lighter/zippo))
 			class = "rose>"
 
-		user.visible_message(SPAN_CLASS("[class]", "[user] holds \the [P] up to \the [src], it looks like \he's trying to burn it!"), \
-		SPAN_CLASS("[class]", "You hold \the [P] up to \the [src], burning it slowly."))
+		user.visible_message("<span class='[class]'>[user] holds \the [P] up to \the [src], it looks like \he's trying to burn it!</span>", \
+		"<span class='[class]'>You hold \the [P] up to \the [src], burning it slowly.</span>")
 
 		spawn(20)
 			if(get_dist(src, user) < 2 && user.get_active_hand() == P && P.lit)
-				user.visible_message(SPAN_CLASS("[class]", "[user] burns right through \the [src], turning it to ash. It flutters through the air before settling on the floor in a heap."), \
-				SPAN_CLASS("[class]", "You burn right through \the [src], turning it to ash. It flutters through the air before settling on the floor in a heap."))
+				user.visible_message("<span class='[class]'>[user] burns right through \the [src], turning it to ash. It flutters through the air before settling on the floor in a heap.</span>", \
+				"<span class='[class]'>You burn right through \the [src], turning it to ash. It flutters through the air before settling on the floor in a heap.</span>")
 
 				if(user.get_inactive_hand() == src)
 					user.drop_from_inventory(src)
@@ -93,14 +93,14 @@
 				qdel(src)
 
 			else
-				to_chat(user, SPAN_WARNING("You must hold \the [P] steady to burn \the [src]."))
+				to_chat(user, "<span class='warning'>You must hold \the [P] steady to burn \the [src].</span>")
 
 /obj/item/paper_bundle/examine(mob/user, distance)
 	. = ..()
 	if(distance <= 1)
 		src.show_content(user)
 	else
-		to_chat(user, SPAN_NOTICE("It is too far away."))
+		to_chat(user, "<span class='notice'>It is too far away.</span>")
 
 /obj/item/paper_bundle/proc/show_content(mob/user as mob)
 	var/dat
@@ -112,7 +112,7 @@
 		dat+= "<DIV STYLE='float:left; text-align:center; width:33.33333%'><A href='?src=\ref[src];remove=1'>Remove [(istype(W, /obj/item/paper)) ? "paper" : "photo"]</A></DIV>"
 		dat+= "<DIV STYLE='float:left; text-align:right; width:33.33333%'><A href='?src=\ref[src];next_page=1'>Next Page</A></DIV><BR><HR>"
 	// last
-	else if(page == length(pages))
+	else if(page == pages.len)
 		dat+= "<DIV STYLE='float:left; text-align:left; width:33.33333%'><A href='?src=\ref[src];prev_page=1'>Previous Page</A></DIV>"
 		dat+= "<DIV STYLE='float:left; text-align:center; width:33.33333%'><A href='?src=\ref[src];remove=1'>Remove [(istype(W, /obj/item/paper)) ? "paper" : "photo"]</A></DIV>"
 		dat+= "<DIV STYLE='float;left; text-align:right; with:33.33333%'><A href='?src=\ref[src];next_page=1'>Back</A></DIV><BR><HR>"
@@ -124,11 +124,11 @@
 
 	if(istype(pages[page], /obj/item/paper))
 		var/obj/item/paper/P = W
-		dat+= "<HTML><HEAD><TITLE>[P.name]</TITLE></HEAD><BODY>[P.show_info(user)][P.stamps]</BODY></HTML>"
+		dat+= "<HTML><meta charset=\"UTF-8\"><HEAD><TITLE>[P.name]</TITLE></HEAD><BODY>[P.show_info(user)][P.stamps]</BODY></HTML>"
 		show_browser(user, dat, "window=[name]")
 	else if(istype(pages[page], /obj/item/photo))
 		var/obj/item/photo/P = W
-		dat += "<html><head><title>[P.name]</title></head><body style='overflow:hidden'>"
+		dat += "<html><meta charset=\"UTF-8\"><head><title>[P.name]</title></head><body style='overflow:hidden'>"
 		dat += "<div> <img src='tmp_photo.png' width = '180'[P.scribble ? "<div> Written on the back:<br><i>[P.scribble]</i>" : null ]</body></html>"
 		send_rsc(user, P.img, "tmp_photo.png")
 		show_browser(user, JOINTEXT(dat), "window=[name]")
@@ -148,7 +148,7 @@
 		if(href_list["next_page"])
 			if(in_hand && (istype(in_hand, /obj/item/paper) || istype(in_hand, /obj/item/photo)))
 				insert_sheet_at(usr, page+1, in_hand)
-			else if(page != length(pages))
+			else if(page != pages.len)
 				page++
 				playsound(src.loc, "pageturn", 50, 1)
 		if(href_list["prev_page"])
@@ -162,9 +162,9 @@
 			usr.put_in_hands(W)
 			pages.Remove(pages[page])
 
-			to_chat(usr, SPAN_NOTICE("You remove the [W.name] from the bundle."))
+			to_chat(usr, "<span class='notice'>You remove the [W.name] from the bundle.</span>")
 
-			if(length(pages) <= 1)
+			if(pages.len <= 1)
 				var/obj/item/paper/P = src[1]
 				usr.drop_from_inventory(src)
 				usr.put_in_hands(P)
@@ -172,15 +172,15 @@
 
 				return
 
-			if(page > length(pages))
-				page = length(pages)
+			if(page > pages.len)
+				page = pages.len
 
 			update_icon()
 
 		src.attack_self(usr)
 		updateUsrDialog()
 	else
-		to_chat(usr, SPAN_NOTICE("You need to hold it in hands!"))
+		to_chat(usr, "<span class='notice'>You need to hold it in hands!</span>")
 
 /obj/item/paper_bundle/verb/rename()
 	set name = "Rename bundle"
@@ -199,7 +199,7 @@
 	set category = "Object"
 	set src in usr
 
-	to_chat(usr, SPAN_NOTICE("You loosen the bundle."))
+	to_chat(usr, "<span class='notice'>You loosen the bundle.</span>")
 	for(var/obj/O in src)
 		O.dropInto(usr.loc)
 		O.reset_plane_and_layer()

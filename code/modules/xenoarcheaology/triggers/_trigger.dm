@@ -1,7 +1,6 @@
 /datum/artifact_trigger
 	var/name = "nothing ever"
-	var/toggle = TRUE  //TRUE - effect is toggled between on and off when triggered. FALSE - effects is on when triggered, off if not triggered.
-	var/trigger_type = TRIGGER_SIMPLE
+	var/toggle = TRUE  //TRUE - effect is toggled between on and off when triggered. FALSE - effects is on when triggered, off if not triggered. 
 
 //There procs should return TRUE if trigger is activated, FALSE if nothing happens
 

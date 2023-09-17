@@ -3,9 +3,10 @@
 
 /obj/effect/overmap/visitable/sector/lost_supply_base
 	name = "supply station"
+	scanner_name = "supply station"
 	desc = "This looks like abandoned and heavy damaged supply station."
 	icon_state = "object"
-
+	known = 0
 
 	initial_generic_waypoints = list(
 		"nav_lost_supply_base_1",
@@ -19,7 +20,7 @@
 	id = "awaysite_lost_supply_base"
 	description = "An abandoned supply base."
 	suffixes = list("lost_supply_base/lost_supply_base.dmm")
-	spawn_cost = 1
+	spawn_cost = 0.5 // INF, WAS 1
 	generate_mining_by_z = 1
 	area_usage_test_exempted_root_areas = list(/area/lost_supply_base)
 	apc_test_exempt_areas = list(

@@ -36,12 +36,14 @@
 			skillset.obtain_from_client(job, my_client, 1)
 	skillset.open_ui()
 
-/datum/antag_skill_setter/station/renegade
-	nm_type = /datum/nano_module/skill_ui/antag/rene
-
 //This will obtain skills from the job selection before giving additional buffs.
 /datum/antag_skill_setter/station/offstation
 	nm_type = /datum/nano_module/skill_ui/antag/station/offstation
 
 //Placeholder for ai; defaults to experienced in everything like usual.
 /datum/antag_skill_setter/ai
+
+/datum/antag_skill_setter/alien
+	nm_type = /datum/nano_module/skill_ui/antag
+	default_value = SKILL_BASIC
+	base_skill_list = list(SKILL_COMBAT = SKILL_PROF, SKILL_HAULING = SKILL_PROF, SKILL_EVA = SKILL_PROF)  //Format: list(path = value).

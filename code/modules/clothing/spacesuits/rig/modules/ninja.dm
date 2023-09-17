@@ -17,7 +17,7 @@
 	disruptive = 0
 
 	use_power_cost = 250 KILOWATTS
-	active_power_cost = 30 KILOWATTS
+	active_power_cost = 25 KILOWATTS
 	passive_power_cost = 0
 	module_cooldown = 10 SECONDS
 	origin_tech = list(TECH_MATERIAL = 5, TECH_POWER = 6, TECH_MAGNET = 6, TECH_ESOTERIC = 6, TECH_ENGINEERING = 7)
@@ -36,6 +36,15 @@
 		return 0
 
 	var/mob/living/carbon/human/H = holder.wearer
+
+	// infinity ahead
+	if(istype(H.get_active_hand(), /obj/item/melee/energy/blade/))
+		H.drop_item()
+
+	if(istype(H.get_inactive_hand(), /obj/item/melee/energy/blade))
+		H.swap_hand()
+		H.drop_item()
+	//infinity end
 
 	if(H.add_cloaking_source(src))
 		anim(H, 'icons/effects/effects.dmi', "electricity",null,20,null)
@@ -70,23 +79,23 @@
 	interface_name = "VOID-shift phase projector"
 	interface_desc = "An advanced teleportation system. It is capable of pinpoint precision or random leaps forward."
 
-/obj/item/rig_module/teleporter/proc/phase_in(mob/M,turf/T)
+/obj/item/rig_module/teleporter/proc/phase_in(var/mob/M,var/turf/T)
 	if(!M || !T)
 		return
 	holder.spark_system.start()
 	M.phase_in(T)
 
-/obj/item/rig_module/teleporter/proc/phase_out(mob/M,turf/T)
+/obj/item/rig_module/teleporter/proc/phase_out(var/mob/M,var/turf/T)
 	if(!M || !T)
 		return
 	M.phase_out(T)
 
-/obj/item/rig_module/teleporter/engage(atom/target, notify_ai)
+/obj/item/rig_module/teleporter/engage(var/atom/target, var/notify_ai)
 
 	var/mob/living/carbon/human/H = holder.wearer
 
 	if(!istype(H.loc, /turf))
-		to_chat(H, SPAN_WARNING("You cannot teleport out of your current location."))
+		to_chat(H, "<span class='warning'>You cannot teleport out of your current location.</span>")
 		return 0
 
 	var/turf/T
@@ -96,23 +105,23 @@
 		T = get_teleport_loc(get_turf(H), H, 6, 1, 1, 1)
 
 	if(!T)
-		to_chat(H, SPAN_WARNING("No valid teleport target found."))
+		to_chat(H, "<span class='warning'>No valid teleport target found.</span>")
 		return 0
 
 	if(T.density)
-		to_chat(H, SPAN_WARNING("You cannot teleport into solid walls."))
+		to_chat(H, "<span class='warning'>You cannot teleport into solid walls.</span>")
 		return 0
 
 	if(T.z in GLOB.using_map.admin_levels)
-		to_chat(H, SPAN_WARNING("You cannot use your teleporter on this Z-level."))
+		to_chat(H, "<span class='warning'>You cannot use your teleporter on this Z-level.</span>")
 		return 0
 
 	if(T.contains_dense_objects())
-		to_chat(H, SPAN_WARNING("You cannot teleport to a location with solid objects."))
+		to_chat(H, "<span class='warning'>You cannot teleport to a location with solid objects.</span>")
 		return 0
 
 	if(T.z != H.z || get_dist(T, get_turf(H)) > world.view)
-		to_chat(H, SPAN_WARNING("You cannot teleport to such a distant object."))
+		to_chat(H, "<span class='warning'>You cannot teleport to such a distant object.</span>")
 		return 0
 
 	if(!..()) return 0
@@ -169,8 +178,7 @@
 
 	interface_name = "dead man's switch"
 	interface_desc = "An integrated automatic self-destruct module. When the wearer dies, so does the surrounding area. Can be triggered manually."
-	var/explosion_radius = 7
-	var/explosion_max_power = EX_ACT_DEVASTATING
+	var/list/explosion_values = list(1,2,4,5)
 	var/blinking = 0
 	var/blink_mode = 0
 	var/blink_delay = 10
@@ -181,8 +189,7 @@
 	var/self_destructing = 0 //used to prevent toggling the switch, then dying and having it toggled again
 
 /obj/item/rig_module/self_destruct/small
-	explosion_radius = 3
-	explosion_max_power = EX_ACT_LIGHT
+	explosion_values = list(0,0,3,4)
 
 
 /obj/item/rig_module/self_destruct/activate()
@@ -190,7 +197,7 @@
 	if(!..())
 		return 0
 
-/obj/item/rig_module/self_destruct/engage(skip_check = FALSE)
+/obj/item/rig_module/self_destruct/engage(var/skip_check = FALSE)
 	set waitfor = 0
 
 	if(self_destructing) //prevents repeat calls
@@ -205,24 +212,24 @@
 			return
 
 		if(usr == holder.wearer)
-			holder.wearer.visible_message(SPAN_WARNING(" \The [src.holder.wearer] flicks a small switch on the back of \the [src.holder]."),1)
+			holder.wearer.visible_message("<span class='warning'> \The [src.holder.wearer] flicks a small switch on the back of \the [src.holder].</span>",1)
 			sleep(blink_delay)
 
 	self_destructing = 1
 	src.blink_mode = 1
 	src.blink()
-	holder.visible_message(SPAN_NOTICE("\The [src.holder] begins beeping."),SPAN_NOTICE(" You hear beeping."))
+	holder.visible_message("<span class='notice'>\The [src.holder] begins beeping.</span>","<span class='notice'> You hear beeping.</span>")
 	sleep(blink_time)
 	src.blink_mode = 2
-	holder.visible_message(SPAN_WARNING("\The [src.holder] beeps rapidly!"),SPAN_WARNING(" You hear rapid beeping!"))
+	holder.visible_message("<span class='warning'>\The [src.holder] beeps rapidly!</span>","<span class='warning'> You hear rapid beeping!</span>")
 	sleep(blink_rapid_time)
 	src.blink_mode = 3
-	holder.visible_message(SPAN_DANGER("\The [src.holder] emits a shrill tone!"),SPAN_DANGER(" You hear a shrill tone!"))
+	holder.visible_message("<span class='danger'>\The [src.holder] emits a shrill tone!</span>","<span class='danger'> You hear a shrill tone!</span>")
 	sleep(blink_solid_time)
 	src.blink_mode = 0
 	src.holder.set_light(0, 0, 0, 2, "#000000")
 
-	explosion(get_turf(src), explosion_radius, explosion_max_power)
+	explosion(get_turf(src), explosion_values[1], explosion_values[2], explosion_values[3], explosion_values[4])
 	if(holder && holder.wearer)
 		holder.wearer.gib()
 		qdel(holder)

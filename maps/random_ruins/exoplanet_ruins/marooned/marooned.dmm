@@ -44,7 +44,8 @@
 /area/map_template/marooned)
 "al" = (
 /obj/effect/floor_decal/corner/red{
-	dir = 9
+	dir = 9;
+	icon_state = "corner_white"
 	},
 /obj/machinery/atmospherics/binary/oxyregenerator,
 /turf/simulated/floor/tiled/techfloor,
@@ -65,7 +66,8 @@
 	},
 /obj/structure/table/steel_reinforced,
 /obj/effect/floor_decal/corner/red{
-	dir = 6
+	dir = 6;
+	icon_state = "corner_white"
 	},
 /obj/item/paper/marooned/note09,
 /turf/simulated/floor/tiled/techfloor,
@@ -86,7 +88,8 @@
 	},
 /obj/structure/table/steel_reinforced,
 /obj/effect/floor_decal/corner/red{
-	dir = 9
+	dir = 9;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/tiled/techfloor,
 /area/map_template/marooned)
@@ -103,7 +106,8 @@
 	},
 /obj/structure/table/steel_reinforced,
 /obj/effect/floor_decal/corner/red{
-	dir = 6
+	dir = 6;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/tiled/techfloor,
 /area/map_template/marooned)
@@ -114,7 +118,8 @@
 "at" = (
 /obj/structure/closet/crate/freezer,
 /obj/structure/handrail{
-	dir = 4
+	dir = 4;
+	icon_state = "handrail"
 	},
 /obj/effect/floor_decal/industrial/outline,
 /turf/simulated/floor/tiled/techfloor,
@@ -148,7 +153,8 @@
 	pixel_y = 1
 	},
 /obj/structure/handrail{
-	dir = 4
+	dir = 4;
+	icon_state = "handrail"
 	},
 /obj/effect/floor_decal/industrial/outline,
 /turf/simulated/floor/tiled/techfloor,
@@ -181,10 +187,12 @@
 /area/template_noop)
 "aD" = (
 /obj/structure/handrail{
-	dir = 4
+	dir = 4;
+	icon_state = "handrail"
 	},
 /obj/structure/bed/chair{
-	dir = 4
+	dir = 4;
+	icon_state = "chair_preview"
 	},
 /obj/item/trash/liquidfood,
 /obj/item/trash/liquidfood,
@@ -205,10 +213,12 @@
 /area/map_template/marooned)
 "aH" = (
 /obj/structure/handrail{
-	dir = 4
+	dir = 4;
+	icon_state = "handrail"
 	},
 /obj/structure/bed/chair{
-	dir = 4
+	dir = 4;
+	icon_state = "chair_preview"
 	},
 /obj/effect/floor_decal/industrial/outline,
 /turf/simulated/floor/tiled/techfloor,
@@ -230,7 +240,8 @@
 "aL" = (
 /obj/structure/inflatable/wall,
 /obj/structure/handrail{
-	dir = 4
+	dir = 4;
+	icon_state = "handrail"
 	},
 /obj/effect/floor_decal/industrial/warning,
 /turf/simulated/floor/tiled/dark,
@@ -247,7 +258,8 @@
 "aN" = (
 /obj/structure/inflatable/wall,
 /obj/structure/handrail{
-	dir = 8
+	dir = 8;
+	icon_state = "handrail"
 	},
 /obj/effect/floor_decal/industrial/warning,
 /turf/simulated/floor/tiled/techfloor/grid,
@@ -270,6 +282,7 @@
 "aQ" = (
 /obj/structure/inflatable/wall,
 /obj/structure/cable{
+	dir = 2;
 	icon_state = "2-5"
 	},
 /obj/effect/landmark/scorcher,
@@ -306,7 +319,8 @@
 /area/template_noop)
 "aW" = (
 /obj/item/stock_parts/computer/battery_module{
-	pixel_x = -7
+	pixel_x = -7;
+	pixel_y = 0
 	},
 /obj/item/melee/baton/cattleprod{
 	desc = "Metal rod with wire attached to it.";
@@ -332,7 +346,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/effect/landmark/scorcher,
 /obj/effect/landmark/clear,

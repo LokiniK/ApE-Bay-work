@@ -1,11 +1,11 @@
 /datum/extension/interactive/ntos/console
 	expected_type = /obj/machinery
-	screen_icon_file = 'icons/obj/machines/modular_console.dmi'
-
+	screen_icon_file = 'icons/obj/modular_console.dmi'
+	
 /datum/extension/interactive/ntos/console/get_hardware_flag()
 	return PROGRAM_CONSOLE
 
-/datum/extension/interactive/ntos/console/get_component(part_type)
+/datum/extension/interactive/ntos/console/get_component(var/part_type)
 	var/obj/machinery/M = holder
 	return M.get_component_of_type(part_type)
 
@@ -35,11 +35,11 @@
 	..()
 	var/obj/machinery/M = holder
 	M.update_use_power(POWER_USE_IDLE)
-
+/*UNF
 /datum/extension/interactive/ntos/console/host_status()
 	var/obj/machinery/M = holder
-	return M.is_powered()
-
+	return !(M.stat & NOPOWER)
+INF*/
 /datum/extension/interactive/ntos/console/extension_act(href, href_list, user)
 	. = ..()
 	var/obj/machinery/M = holder
@@ -58,5 +58,5 @@
 	var/datum/extension/interactive/ntos/os = get_extension(src, /datum/extension/interactive/ntos)
 	if(os)
 		return os.check_eye()
-	else
+	else 
 		return ..()

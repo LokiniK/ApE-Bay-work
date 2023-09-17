@@ -3,15 +3,14 @@
 /obj/machinery/power/emitter
 	name = "emitter"
 	desc = "A massive, heavy-duty industrial laser. This design is a fixed installation, capable of shooting in only one direction."
-	icon = 'icons/obj/machines/power/emitter.dmi'
+	icon = 'icons/obj/singularity.dmi'
 	icon_state = "emitter"
 	anchored = FALSE
 	density = TRUE
+	req_access = list(access_engine_equip)
 	active_power_usage = 100 KILOWATTS
 	obj_flags = OBJ_FLAG_ROTATABLE
 
-	/// Access required to lock or unlock the emitter. Separate variable to prevent `req_access` from blocking use of the emitter while unlocked.
-	var/list/req_lock_access = list(access_engine_equip)
 	var/efficiency = 0.3	// Energy efficiency. 30% at this time, so 100kW load means 30kW laser pulses.
 	var/active = FALSE
 	var/powered = FALSE
@@ -30,13 +29,15 @@
 		/obj/item/stock_parts/power/apc
 	)
 	public_variables = list(
-		/singleton/public_access/public_variable/emitter_active,
-		/singleton/public_access/public_variable/emitter_locked
+		/decl/public_access/public_variable/emitter_active,
+		/decl/public_access/public_variable/emitter_locked
 	)
 	public_methods = list(
-		/singleton/public_access/public_method/toggle_emitter
+		/decl/public_access/public_method/toggle_emitter
 	)
-	stock_part_presets = list(/singleton/stock_part_preset/radio/receiver/emitter = 1)
+	stock_part_presets = list(/decl/stock_part_preset/radio/receiver/emitter = 1)
+	construct_state = /decl/machine_construction/default/panel_closed //inf
+	base_type = /obj/machinery/power/emitter
 
 /obj/machinery/power/emitter/anchored
 	anchored = TRUE
@@ -53,7 +54,7 @@
 
 /obj/machinery/power/emitter/Destroy()
 	log_and_message_admins("deleted \the [src]")
-	investigate_log("[SPAN_COLOR("red", "deleted")] at ([x],[y],[z])","singulo")
+	investigate_log("<font color='red'>deleted</font> at ([x],[y],[z])","singulo")
 	return ..()
 
 /obj/machinery/power/emitter/examine(mob/user)
@@ -67,14 +68,14 @@
 			if (EMITTER_WELDED)
 				state_message = "It is firmly secured in place."
 		to_chat(user, SPAN_NOTICE(state_message))
-		if (emagged && (user.skill_check(core_skill, SKILL_TRAINED) || is_observer))
+		if (emagged && (user.skill_check(core_skill, SKILL_ADEPT) || is_observer))
 			to_chat(user, SPAN_WARNING("Its control locks have been fried."))
 
 /obj/machinery/power/emitter/on_update_icon()
-	overlays.Cut()
-	if(active && powernet && avail(active_power_usage))
-		overlays += emissive_appearance(icon, "[icon_state]_lights")
-		overlays += "[icon_state]_lights"
+	if (active && powernet && avail(active_power_usage))
+		icon_state = "emitter_+a"
+	else
+		icon_state = "emitter"
 
 /obj/machinery/power/emitter/interface_interact(mob/user)
 	if (!CanInteract(user, DefaultTopicState()))
@@ -104,7 +105,7 @@
 					visible_message(SPAN_NOTICE("\The [src] turns off."))
 				playsound(src, "switch", 50)
 				log_and_message_admins("turned off \the [src] in [A.name]", user, src)
-				investigate_log("turned [SPAN_COLOR("red", "off")] by [key_name_admin(user || usr)] in [A.name]","singulo")
+				investigate_log("turned <font color='red'>off</font> by [key_name_admin(user || usr)] in [A.name]","singulo")
 			else
 				active = TRUE
 				if (user)
@@ -122,7 +123,7 @@
 				shot_number = 0
 				fire_delay = get_initial_fire_delay()
 				log_and_message_admins("turned on \the [src] in [A.name]", user, src)
-				investigate_log("turned [SPAN_COLOR("green", "on")] by [key_name_admin(user || usr)] in [A.name]","singulo")
+				investigate_log("turned <font color='green'>on</font> by [key_name_admin(user || usr)] in [A.name]","singulo")
 			update_icon()
 		else
 			to_chat(user, SPAN_WARNING("The controls are locked!"))
@@ -137,11 +138,11 @@
 	var/skill_modifier = 0.8 * (SKILL_MAX - operator_skill)/(SKILL_MAX - SKILL_MIN) //How much randomness is added
 	efficiency *= 1 + (rand() - 1) * skill_modifier //subtract off between 0.8 and 0, depending on skill and luck.
 
-/obj/machinery/power/emitter/emp_act(severity)
-	return
+/obj/machinery/power/emitter/emp_act(var/severity)
+	return 1
 
 /obj/machinery/power/emitter/Process()
-	if (MACHINE_IS_BROKEN(src))
+	if (stat & (BROKEN))
 		return
 	if (state != EMITTER_WELDED || (!powernet && active_power_usage))
 		active = FALSE
@@ -155,13 +156,13 @@
 				powered = TRUE
 				update_icon()
 				visible_message(SPAN_WARNING("\The [src] powers up!"))
-				investigate_log("regained power and turned [SPAN_COLOR("green", "on")]","singulo")
+				investigate_log("regained power and turned <font color='green'>on</font>","singulo")
 		else
 			if (powered)
 				powered = FALSE
 				update_icon()
 				visible_message(SPAN_WARNING("\The [src] powers down!"))
-				investigate_log("lost power and turned [SPAN_COLOR("red", "off")]","singulo")
+				investigate_log("lost power and turned <font color='red'>off</font>","singulo")
 			return
 
 		last_shot = world.time
@@ -231,7 +232,7 @@
 						SPAN_NOTICE("You start to weld \the [src] to the floor."),
 						SPAN_ITALIC("You hear welding.")
 					)
-					if (do_after(user, (W.toolspeed * 2) SECONDS, src, DO_REPAIR_CONSTRUCT))
+					if (do_after(user, 20, src))
 						if (!WT.isOn())
 							return
 						state = EMITTER_WELDED
@@ -252,7 +253,7 @@
 						SPAN_NOTICE("You start to cut \the [src] free from the floor."),
 						SPAN_ITALIC("You hear welding.")
 					)
-					if (do_after(user, (W.toolspeed * 2) SECONDS, src, DO_REPAIR_CONSTRUCT))
+					if (do_after(user, 20, src))
 						if (!WT.isOn())
 							return
 						state = EMITTER_WRENCHED
@@ -271,7 +272,7 @@
 		if (emagged)
 			to_chat(user, SPAN_WARNING("The control lock seems to be broken."))
 			return
-		if (has_access(req_lock_access, W.GetAccess()))
+		if (allowed(user))
 			locked = !locked
 			user.visible_message(
 				SPAN_NOTICE("\The [user] [locked ? "locks" : "unlocks"] \the [src]'s controls."),
@@ -283,12 +284,11 @@
 	..()
 	return
 
-/obj/machinery/power/emitter/emag_act(remaining_charges, mob/user)
+/obj/machinery/power/emitter/emag_act(var/remaining_charges, var/mob/user)
 	if (!emagged)
 		locked = FALSE
 		emagged = TRUE
 		req_access.Cut()
-		req_lock_access.Cut()
 		user.visible_message(SPAN_WARNING("\The [user] messes with \the [src]'s controls."), SPAN_WARNING("You short out the control lock."))
 		user.playsound_local(loc, "sparks", 50, TRUE)
 		return TRUE
@@ -305,31 +305,31 @@
 /obj/machinery/power/emitter/proc/get_emitter_beam()
 	return new /obj/item/projectile/beam/emitter(get_turf(src))
 
-/singleton/public_access/public_method/toggle_emitter
+/decl/public_access/public_method/toggle_emitter
 	name = "toggle emitter"
 	desc = "Toggles whether or not the emitter is active. It must be unlocked to work."
 	call_proc = /obj/machinery/power/emitter/proc/activate
 
-/singleton/public_access/public_variable/emitter_active
+/decl/public_access/public_variable/emitter_active
 	expected_type = /obj/machinery/power/emitter
 	name = "emitter active"
 	desc = "Whether or not the emitter is firing."
 	can_write = FALSE
 	has_updates = FALSE
 
-/singleton/public_access/public_variable/emitter_active/access_var(obj/machinery/power/emitter/emitter)
+/decl/public_access/public_variable/emitter_active/access_var(obj/machinery/power/emitter/emitter)
 	return emitter.active
 
-/singleton/public_access/public_variable/emitter_locked
+/decl/public_access/public_variable/emitter_locked
 	expected_type = /obj/machinery/power/emitter
 	name = "emitter locked"
 	desc = "Whether or not the emitter is locked. Being locked prevents one from changing the active state."
 	can_write = FALSE
 	has_updates = FALSE
 
-/singleton/public_access/public_variable/emitter_locked/access_var(obj/machinery/power/emitter/emitter)
+/decl/public_access/public_variable/emitter_locked/access_var(obj/machinery/power/emitter/emitter)
 	return emitter.locked
 
-/singleton/stock_part_preset/radio/receiver/emitter
+/decl/stock_part_preset/radio/receiver/emitter
 	frequency = BUTTON_FREQ
-	receive_and_call = list("button_active" = /singleton/public_access/public_method/toggle_emitter)
+	receive_and_call = list("button_active" = /decl/public_access/public_method/toggle_emitter)

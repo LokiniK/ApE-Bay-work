@@ -9,25 +9,32 @@
 	var/board = list()
 	var/selected = -1
 
-/obj/item/board/AltClick(mob/user)
-	if (CanPhysicallyInteract(user))
+/obj/item/board/ShiftClick(mob/user)
+	if(CanPhysicallyInteract(user))
+		user.set_machine(src)
 		interact(user)
-		return TRUE
-	return ..()
+	else
+		..()
 
-/obj/item/board/attackby(obj/item/I as obj, mob/user as mob)
+/obj/item/board/attack_hand(mob/living/carbon/human/M as mob)
+	if(M.machine == src)
+		return ..()
+	else
+		M.examinate(src)
+
+obj/item/board/attackby(obj/item/I as obj, mob/user as mob)
 	if(!addPiece(I,user))
 		..()
 
-/obj/item/board/proc/addPiece(obj/item/I as obj, mob/user as mob, tile = 0)
+/obj/item/board/proc/addPiece(obj/item/I as obj, mob/user as mob, var/tile = 0)
 	if(I.w_class != ITEM_SIZE_TINY) //only small stuff
-		user.show_message(SPAN_WARNING("\The [I] is too big to be used as a board piece."))
+		user.show_message("<span class='warning'>\The [I] is too big to be used as a board piece.</span>")
 		return 0
 	if(num == 64)
-		user.show_message(SPAN_WARNING("\The [src] is already full!"))
+		user.show_message("<span class='warning'>\The [src] is already full!</span>")
 		return 0
 	if(tile > 0 && board["[tile]"])
-		user.show_message(SPAN_WARNING("That space is already filled!"))
+		user.show_message("<span class='warning'>That space is already filled!</span>")
 		return 0
 	if(!user.Adjacent(src))
 		return 0

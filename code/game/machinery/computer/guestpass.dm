@@ -34,8 +34,8 @@
 	to_chat(usr, SPAN_NOTICE("Issuing reason: [reason]."))
 
 /obj/item/card/id/guest/proc/expire()
-	color = COLOR_GRAY20
-	detail_color = COLOR_GRAY15
+	color = COLOR_BLACK
+	detail_color = COLOR_BLACK
 	update_icon()
 
 	expired = TRUE
@@ -59,9 +59,26 @@
 	var/giv_name = "NOT SPECIFIED"
 	var/reason = "NOT SPECIFIED"
 	var/duration = 5
+	var/image/overlay
 
 	var/list/internal_log = list()
 	var/mode = 0  // 0 - making pass, 1 - viewing logs
+
+/obj/machinery/computer/guestpass/on_update_icon()
+	if(!overlay)
+		overlay = image(icon, "pass")
+		overlay.plane = EFFECTS_ABOVE_LIGHTING_PLANE
+		overlay.layer = ABOVE_LIGHTING_LAYER
+
+	overlays.Cut()
+	if(stat & (NOPOWER|BROKEN))
+		overlay.icon_state = "guest_broken"
+		overlays += overlay
+		set_light(0)
+	else
+		overlay.icon_state = "pass"
+		overlays += overlay
+		set_light(0.8, 0.1, 1, 2,"#0099FF")
 
 /obj/machinery/computer/guestpass/New()
 	..()
@@ -78,11 +95,11 @@
 		return
 	..()
 
-/obj/machinery/computer/guestpass/interface_interact(mob/user)
+/obj/machinery/computer/guestpass/interface_interact(var/mob/user)
 	ui_interact(user)
 	return TRUE
 
-/obj/machinery/computer/guestpass/ui_interact(mob/user, ui_key = "main", datum/nanoui/ui = null, force_open=1)
+/obj/machinery/computer/guestpass/ui_interact(var/mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open=1)
 	var/list/data = list()
 
 	data["mode"] = mode
@@ -110,7 +127,7 @@
 		ui.set_initial_data(data)
 		ui.open()
 
-/obj/machinery/computer/guestpass/OnTopic(mob/user, href_list, state)
+/obj/machinery/computer/guestpass/OnTopic(var/mob/user, href_list, state)
 	if (href_list["mode"])
 		mode = text2num(href_list["mode"])
 		. = TOPIC_REFRESH
@@ -130,8 +147,8 @@
 	else if (href_list["duration"])
 		var/dur = input(user, "Duration (in minutes) during which pass is valid (up to 60 minutes).", "Duration") as num|null
 		if (dur && CanUseTopic(user, state))
-			if (dur > 0 && dur <= 60)
-				duration = dur
+			if (dur > 0 && dur <= 60) //INF WAS if (dur > 0 && dur <= 30)
+				duration = round(dur,1) //INF WAS duration = dur
 				. = TOPIC_REFRESH
 			else
 				to_chat(user, SPAN_WARNING("Invalid duration."))
@@ -168,8 +185,8 @@
 		. = TOPIC_REFRESH
 
 	else if (href_list["issue"])
-		if (giver && length(accesses))
-			var/number = pad_left(random_id("guestpass_id_number", 1, 9999), 6, "0")
+		if (giver && accesses.len)
+			var/number = add_zero(random_id("guestpass_id_number",1000,9999), 4)
 			var/entry = "\[[stationtime2text()]\] Pass #[number] issued by [giver.registered_name] ([giver.assignment]) to [giv_name]. Reason: [reason]. Granted access to following areas: "
 			var/list/access_descriptors = list()
 			for (var/A in accesses)
@@ -186,10 +203,10 @@
 			pass.reason = reason
 			pass.SetName("guest pass #[number]")
 			pass.assignment = "Guest"
-			addtimer(new Callback(pass, /obj/item/card/id/guest/proc/expire), duration MINUTES, TIMER_UNIQUE)
+			addtimer(CALLBACK(pass, /obj/item/card/id/guest/proc/expire), duration MINUTES, TIMER_UNIQUE)
 			playsound(src.loc, 'sound/machines/ping.ogg', 25, 0)
 			. = TOPIC_REFRESH
 		else if(!giver)
 			to_chat(user, SPAN_WARNING("Cannot issue pass without issuing ID."))
-		else if(!length(accesses))
+		else if(!accesses.len)
 			to_chat(user, SPAN_WARNING("Cannot issue pass without at least one granted access permission."))

@@ -4,7 +4,7 @@
 
 /obj/item/fossil
 	name = "Fossil"
-	icon = 'icons/obj/xenoarchaeology_finds.dmi'
+	icon = 'icons/obj/xenoarchaeology.dmi'
 	icon_state = "bone"
 	desc = "It's a fossil."
 	var/animal = 1
@@ -50,7 +50,7 @@
 
 /obj/skeleton
 	name = "Incomplete skeleton"
-	icon = 'icons/obj/xenoarchaeology_finds.dmi'
+	icon = 'icons/obj/xenoarchaeology.dmi'
 	icon_state = "uskel"
 	desc = "Incomplete skeleton."
 	var/bnum = 1
@@ -58,8 +58,7 @@
 	var/bstate = 0
 	var/plaque_contents = "Unnamed alien creature"
 
-/obj/skeleton/Initialize()
-	. = ..()
+/obj/skeleton/New()
 	src.breq = rand(6)+3
 	src.desc = "An incomplete skeleton, looks like it could use [src.breq-src.bnum] more bones."
 
@@ -73,10 +72,10 @@
 				src.bstate = 1
 				src.set_density(1)
 				src.SetName("alien skeleton display")
-				if(src.contents.Find(/obj/item/fossil/skull/horned))
-					src.desc = "A creature made of [length(src.contents)-1] assorted bones and a horned skull. The plaque reads \'[plaque_contents]\'."
+				if(list_find(src.contents, /obj/item/fossil/skull/horned))
+					src.desc = "A creature made of [src.contents.len-1] assorted bones and a horned skull. The plaque reads \'[plaque_contents]\'."
 				else
-					src.desc = "A creature made of [length(src.contents)-1] assorted bones and a skull. The plaque reads \'[plaque_contents]\'."
+					src.desc = "A creature made of [src.contents.len-1] assorted bones and a skull. The plaque reads \'[plaque_contents]\'."
 			else
 				src.desc = "Incomplete skeleton, looks like it could use [src.breq-src.bnum] more bones."
 				to_chat(user, "Looks like it could use [src.breq-src.bnum] more bones.")
@@ -85,10 +84,10 @@
 	else if(istype(W,/obj/item/pen))
 		plaque_contents = sanitize(input("What would you like to write on the plaque:","Skeleton plaque",""))
 		user.visible_message("[user] writes something on the base of [icon2html(src, viewers(get_turf(src)))] [src].","You relabel the plaque on the base of [icon2html(src, user)] [src].")
-		if(src.contents.Find(/obj/item/fossil/skull/horned))
-			src.desc = "A creature made of [length(src.contents)-1] assorted bones and a horned skull. The plaque reads \'[plaque_contents]\'."
+		if(list_find(src.contents, /obj/item/fossil/skull/horned))
+			src.desc = "A creature made of [src.contents.len-1] assorted bones and a horned skull. The plaque reads \'[plaque_contents]\'."
 		else
-			src.desc = "A creature made of [length(src.contents)-1] assorted bones and a skull. The plaque reads \'[plaque_contents]\'."
+			src.desc = "A creature made of [src.contents.len-1] assorted bones and a skull. The plaque reads \'[plaque_contents]\'."
 	else
 		..()
 
@@ -104,6 +103,5 @@
 	desc = " A fossilised shred of alien plant matter."
 	animal = 0
 
-/obj/item/fossil/plant/Initialize()
-	. = ..()
+/obj/item/fossil/plant/New()
 	icon_state = "plant[rand(1,4)]"

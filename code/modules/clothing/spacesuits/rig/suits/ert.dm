@@ -9,7 +9,7 @@
 	boot_type = /obj/item/clothing/shoes/magboots/rig/ert
 	glove_type = /obj/item/clothing/gloves/rig/ert
 
-	req_access = list(access_cent_specops)
+	req_access = list(access_cent_general)
 
 	armor = list(
 		melee = ARMOR_MELEE_MAJOR,
@@ -20,53 +20,50 @@
 		bio = ARMOR_BIO_SHIELDED,
 		rad = ARMOR_RAD_SHIELDED
 		)
+	allowed = list(/obj/item/device/flashlight, /obj/item/tank,/obj/item/ammo_magazine,/obj/item/ammo_casing,/obj/item/handcuffs, /obj/item/device/t_scanner, /obj/item/rcd, /obj/item/rpd, /obj/item/crowbar, \
+	/obj/item/screwdriver, /obj/item/weldingtool, /obj/item/wirecutters, /obj/item/wrench, /obj/item/device/multitool, \
+	/obj/item/device/radio, /obj/item/device/scanner/gas,/obj/item/storage/briefcase/inflatable, /obj/item/melee/baton, /obj/item/gun, \
+	/obj/item/storage/firstaid, /obj/item/reagent_containers/hypospray, /obj/item/roller)
 
 	initial_modules = list(
-		/obj/item/rig_module/ai_container,
+//INF		/obj/item/rig_module/ai_container,
 		/obj/item/rig_module/maneuvering_jets,
 		/obj/item/rig_module/datajack,
 		/obj/item/rig_module/cooling_unit
 		)
 
+	sprite_sheets = list(
+		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/rig_back.dmi'
+		)
+
 /obj/item/clothing/head/helmet/space/rig/ert
 	light_overlay = "helmet_light_dual"
 	camera = /obj/machinery/camera/network/ert
-	species_restricted = list(SPECIES_HUMAN,SPECIES_SKRELL,SPECIES_UNATHI,SPECIES_IPC)
+	species_restricted = list(SPECIES_HUMAN, SPECIES_SKRELL, SPECIES_UNATHI, SPECIES_TAJARA, SPECIES_IPC)
+	sprite_sheets = list(
+		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/head.dmi',
+		SPECIES_TAJARA = 'icons/mob/species/tajaran/helmet.dmi'
+		)
 
 /obj/item/clothing/suit/space/rig/ert
-	species_restricted = list(SPECIES_HUMAN,SPECIES_SKRELL,SPECIES_UNATHI,SPECIES_IPC)
-	allowed = list(
-		/obj/item/device/flashlight,
-		/obj/item/tank,
-		/obj/item/ammo_magazine,
-		/obj/item/ammo_casing,
-		/obj/item/handcuffs,
-		/obj/item/device/t_scanner,
-		/obj/item/rcd,
-		/obj/item/rpd,
-		/obj/item/crowbar,
-		/obj/item/screwdriver,
-		/obj/item/weldingtool,
-		/obj/item/wirecutters,
-		/obj/item/wrench,
-		/obj/item/device/multitool,
-		/obj/item/device/radio,
-		/obj/item/device/scanner/gas,
-		/obj/item/storage/briefcase/inflatable,
-		/obj/item/melee/baton,
-		/obj/item/gun,
-		/obj/item/storage/firstaid,
-		/obj/item/reagent_containers/hypospray,
-		/obj/item/roller_bed
-	)
+	species_restricted = list(SPECIES_HUMAN, SPECIES_SKRELL, SPECIES_UNATHI, SPECIES_TAJARA, SPECIES_IPC)
+	sprite_sheets = list(
+		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/suit.dmi',
+//		SPECIES_TAJARA = 'icons/mob/species/tajaran/suit.dmi'
+		)
 
 /obj/item/clothing/shoes/magboots/rig/ert
-	species_restricted = list(SPECIES_HUMAN,SPECIES_SKRELL,SPECIES_UNATHI,SPECIES_IPC)
+	species_restricted = list(SPECIES_HUMAN, SPECIES_SKRELL, SPECIES_UNATHI, SPECIES_TAJARA, SPECIES_IPC)
+	sprite_sheets = list(
+		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/feet.dmi'
+		)
 
 /obj/item/clothing/gloves/rig/ert
 	item_flags = ITEM_FLAG_THICKMATERIAL | ITEM_FLAG_NOCUFFS
-	species_restricted = list(SPECIES_HUMAN,SPECIES_SKRELL,SPECIES_UNATHI,SPECIES_IPC)
-
+	species_restricted = list(SPECIES_HUMAN, SPECIES_SKRELL, SPECIES_UNATHI, SPECIES_TAJARA, SPECIES_IPC)
+	sprite_sheets = list(
+		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/hands.dmi'
+		)
 
 /obj/item/rig/ert/engineer
 	name = "emergency response engineering hardsuit control module"
@@ -77,7 +74,7 @@
 	glove_type = /obj/item/clothing/gloves/rig/ert/engineer
 
 	initial_modules = list(
-		/obj/item/rig_module/ai_container,
+//INF		/obj/item/rig_module/ai_container,
 		/obj/item/rig_module/maneuvering_jets,
 		/obj/item/rig_module/mounted/plasmacutter,
 		/obj/item/rig_module/device/rcd,
@@ -94,7 +91,7 @@
 	icon_state = "ert_janitor_rig"
 
 	initial_modules = list(
-		/obj/item/rig_module/ai_container,
+//INF		/obj/item/rig_module/ai_container,
 		/obj/item/rig_module/maneuvering_jets,
 		/obj/item/rig_module/fabricator/wf_sign,
 		/obj/item/rig_module/grenade_launcher/cleaner,
@@ -109,7 +106,7 @@
 	icon_state = "ert_medical_rig"
 
 	initial_modules = list(
-		/obj/item/rig_module/ai_container,
+//INF		/obj/item/rig_module/ai_container,
 		/obj/item/rig_module/maneuvering_jets,
 		/obj/item/rig_module/device/healthscanner,
 		/obj/item/rig_module/chem_dispenser/injector,
@@ -123,18 +120,18 @@
 	icon_state = "ert_security_rig"
 
 	initial_modules = list(
-		/obj/item/rig_module/ai_container,
+//INF		/obj/item/rig_module/ai_container,
 		/obj/item/rig_module/maneuvering_jets,
 		/obj/item/rig_module/grenade_launcher,
 		/obj/item/rig_module/mounted/egun,
 		/obj/item/rig_module/cooling_unit
 		)
 
-/obj/item/rig/ert/fleet
-	name = "emergency response hardsuit control module"
-	desc = "A hardsuit utilised especially by Fleet combat teams. Has navy blue highlights and Sol-patterned crests on the shoulders."
-	suit_type = "emergency response fleet"
-	icon_state = "ert_fleet_rig"
+/obj/item/rig/ert/assetprotection
+	name = "heavy emergency response suit control module"
+	desc = "A heavy, modified version of a common emergency response hardsuit. Has blood red highlights.  Armoured and space ready."
+	suit_type = "heavy emergency response"
+	icon_state = "asset_protection_rig"
 	armor = list(
 		melee = ARMOR_MELEE_VERY_HIGH,
 		bullet = ARMOR_BALLISTIC_RESISTANT,
@@ -145,11 +142,20 @@
 		rad = ARMOR_RAD_SHIELDED
 		)
 
+	glove_type = /obj/item/clothing/gloves/rig/ert/assetprotection
+
 	initial_modules = list(
-		/obj/item/rig_module/ai_container,
+//INF		/obj/item/rig_module/ai_container,
 		/obj/item/rig_module/maneuvering_jets,
 		/obj/item/rig_module/grenade_launcher,
+		/obj/item/rig_module/vision/multi,
 		/obj/item/rig_module/mounted/egun,
-		/obj/item/rig_module/cooling_unit,
-		/obj/item/rig_module/datajack
+		/obj/item/rig_module/chem_dispenser/combat,
+		/obj/item/rig_module/mounted/plasmacutter,
+		/obj/item/rig_module/device/rcd,
+		/obj/item/rig_module/datajack,
+		/obj/item/rig_module/cooling_unit
 		)
+
+/obj/item/clothing/gloves/rig/ert/assetprotection
+	siemens_coefficient = 0

@@ -75,7 +75,7 @@
 								/obj/item/stock_parts/circuitboard/broken                     = TRADER_BLACKLIST,
 								/obj/item/stack/cable_coil                               = TRADER_SUBTYPES_ONLY,
 								/obj/item/stack/cable_coil/cyborg                        = TRADER_BLACKLIST,
-								/obj/random/single/color/cable_coil                        = TRADER_BLACKLIST,
+								/obj/item/stack/cable_coil/random                        = TRADER_BLACKLIST,
 								/obj/item/stack/cable_coil/cut                           = TRADER_BLACKLIST,
 								/obj/item/airalarm_electronics                    = TRADER_THIS_TYPE,
 								/obj/item/airlock_electronics                     = TRADER_ALL,
@@ -122,6 +122,7 @@
 								/obj/item/clothing/under/ert              = TRADER_BLACKLIST,
 								/obj/item/clothing/under/gimmick          = TRADER_BLACKLIST_ALL,
 								/obj/item/clothing/under/lawyer           = TRADER_BLACKLIST,
+								/obj/item/clothing/under/pj               = TRADER_BLACKLIST,
 								/obj/item/clothing/under/rank             = TRADER_BLACKLIST,
 								/obj/item/clothing/under/shorts           = TRADER_BLACKLIST,
 								/obj/item/clothing/under/stripper         = TRADER_BLACKLIST_ALL,
@@ -175,6 +176,7 @@
 								/obj/item/clothing/head/helmet            = TRADER_BLACKLIST_ALL,
 								/obj/item/clothing/head/lightrig          = TRADER_BLACKLIST_ALL,
 								/obj/item/clothing/head/radiation         = TRADER_BLACKLIST,
+								/obj/item/clothing/head/xeno           = TRADER_BLACKLIST,
 								/obj/item/clothing/head/warden            = TRADER_BLACKLIST,
 								/obj/item/clothing/head/welding           = TRADER_BLACKLIST)
 
@@ -192,6 +194,7 @@ Sells devices, odds and ends, and medical stuff
 								/obj/item/device/kit/paint                 = TRADER_SUBTYPES_ONLY,
 								/obj/item/aicard                    = TRADER_THIS_TYPE,
 								/obj/item/device/binoculars                = TRADER_THIS_TYPE,
+								/obj/item/device/cable_painter             = TRADER_THIS_TYPE,
 								/obj/item/device/flash                     = TRADER_THIS_TYPE,
 								/obj/item/device/paint_sprayer             = TRADER_THIS_TYPE,
 								/obj/item/device/multitool                 = TRADER_THIS_TYPE,
@@ -299,7 +302,7 @@ Sells devices, odds and ends, and medical stuff
 				)
 
 	possible_wanted_items = list(/mob/living/simple_animal/tindalos    = TRADER_THIS_TYPE,
-								/mob/living/simple_animal/passive/tomato      = TRADER_THIS_TYPE,
+								/mob/living/simple_animal/friendly/tomato      = TRADER_THIS_TYPE,
 								/mob/living/simple_animal/yithian     = TRADER_THIS_TYPE,
 								/mob/living/simple_animal/hostile/retaliate/beast/diyaab = TRADER_THIS_TYPE,
 								/mob/living/simple_animal/hostile/retaliate/beast/shantak= TRADER_THIS_TYPE,
@@ -339,7 +342,7 @@ Sells devices, odds and ends, and medical stuff
 								/obj/item/organ/internal/kidneys = TRADER_THIS_TYPE,
 								/obj/item/organ/internal/lungs = TRADER_THIS_TYPE,
 								/obj/item/organ/internal/heart = TRADER_THIS_TYPE,
-								/obj/item/storage/fancy/smokable = TRADER_ALL
+								/obj/item/storage/fancy/cigarettes = TRADER_ALL
 								)
 
 	possible_trading_items = list(/obj/item/storage/pill_bottle = TRADER_SUBTYPES_ONLY,
@@ -352,8 +355,8 @@ Sells devices, odds and ends, and medical stuff
 								  /obj/item/hemostat = TRADER_THIS_TYPE,
 								  /obj/item/cautery = TRADER_THIS_TYPE,
 								  /obj/item/surgicaldrill = TRADER_THIS_TYPE,
-								  /obj/item/scalpel/basic = TRADER_THIS_TYPE,
-								  /obj/item/scalpel/ims = TRADER_THIS_TYPE,
+								  /obj/item/scalpel = TRADER_THIS_TYPE,
+								  /obj/item/scalpel/manager = TRADER_THIS_TYPE,
 								  /obj/item/circular_saw = TRADER_THIS_TYPE,
 								  /obj/item/bonegel = TRADER_THIS_TYPE,
 								  /obj/item/bonesetter = TRADER_THIS_TYPE,
@@ -362,7 +365,7 @@ Sells devices, odds and ends, and medical stuff
 								  /obj/item/reagent_containers/glass/bottle/antitoxin = TRADER_THIS_TYPE,
 								  /obj/item/reagent_containers/glass/bottle/inaprovaline = TRADER_THIS_TYPE,
 								  /obj/item/bodybag/cryobag = TRADER_THIS_TYPE,
-								  /obj/item/reagent_containers/chem_disp_cartridge/small/dexalin = TRADER_THIS_TYPE,
+								  /obj/item/reagent_containers/chem_disp_cartridge/dexalin/small = TRADER_THIS_TYPE,
 								  /obj/item/sign/medipolma = TRADER_THIS_TYPE
 								)
 

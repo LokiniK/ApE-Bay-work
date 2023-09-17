@@ -4,12 +4,13 @@
 
 /obj/item/tray
 	name = "tray"
-	icon = 'icons/obj/food/food.dmi'
+	icon = 'icons/obj/food.dmi'
 	icon_state = "tray"
 	desc = "A metal tray to lay food on."
 	force = 5
 	throw_speed = 1
 	throw_range = 5
+	layer = STRUCTURE_LAYER
 	w_class = ITEM_SIZE_NORMAL
 	obj_flags = OBJ_FLAG_CONDUCTIBLE
 	matter = list(MATERIAL_ALUMINIUM = 3000)
@@ -48,7 +49,7 @@
 /obj/item/tray/attackby(obj/item/W, mob/living/user)
 	if(istype(W, /obj/item/material/kitchen/rollingpin) && user.a_intent == I_HURT)
 		if(bash_cooldown < world.time)
-			user.visible_message(SPAN_WARNING("[user] bashes [src] with [W]!"))
+			user.visible_message("<span class='warning'>[user] bashes [src] with [W]!</span>")
 			playsound(user.loc, 'sound/effects/shieldbash.ogg', 50, 1)
 			bash_cooldown = world.time + 25
 		return TRUE
@@ -99,7 +100,7 @@
 	var/grab_intent = ishuman(user) ? I_GRAB : I_HELP
 	if (user.a_intent != grab_intent || istype(A, /obj/item/storage) || istype(A, /obj/screen/storage))
 		return ..()
-
+	
 	var/turf/T = get_turf(A)
 
 	if (LAZYLEN(carrying))
@@ -139,12 +140,12 @@
 			if (can_add_item(I))
 				pickup_item(item)
 				added_items++
-
+	
 		if (!added_items)
 			to_chat(user, SPAN_WARNING("You fail to pick anything up with \the [src]."))
 		else
 			user.visible_message(SPAN_NOTICE("[user] scoops up some things with \the [src]."), SPAN_NOTICE("You put everything you could onto \the [src]."))
-
+		
 		return FALSE
 
 

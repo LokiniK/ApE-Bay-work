@@ -11,7 +11,7 @@
 
 	var/proj_trail = 0 //if it leaves a trail
 	var/proj_trail_lifespan = 0 //deciseconds
-	var/proj_trail_icon = 'icons/obj/cult.dmi'
+	var/proj_trail_icon = 'icons/obj/wizard.dmi'
 	var/proj_trail_icon_state = "trail"
 	var/list/trails = new()
 
@@ -35,13 +35,13 @@
 			trails -= trail
 			qdel(trail)
 
-/obj/item/projectile/spell_projectile/proc/prox_cast(list/targets)
+/obj/item/projectile/spell_projectile/proc/prox_cast(var/list/targets)
 	if(loc)
 		carried.prox_cast(targets, src)
 		qdel(src)
 	return
 
-/obj/item/projectile/spell_projectile/Bump(atom/A, forced=0)
+/obj/item/projectile/spell_projectile/Bump(var/atom/A, forced=0)
 	if(loc && carried)
 		prox_cast(carried.choose_prox_targets(user = carried.holder, spell_holder = src))
 	return 1

@@ -1,30 +1,30 @@
 #define AI_NO_PROCESS 0
-#define AI_PROCESSING FLAG(0)
-#define AI_FASTPROCESSING FLAG(1)
+#define AI_PROCESSING (1<<0)
+#define AI_FASTPROCESSING (1<<1)
 
 
 #define START_AIPROCESSING(datum) \
 if (!(datum.process_flags & AI_PROCESSING)) { \
 	datum.process_flags |= AI_PROCESSING; \
-	SSai.ai_holders += datum \
+	SSai.active += datum \
 }
 
 
 #define STOP_AIPROCESSING(datum) \
 	datum.process_flags &= ~AI_PROCESSING; \
-	SSai.ai_holders -= datum
+	SSai.active -= datum
 
 
 #define START_AIFASTPROCESSING(datum) \
 if (!(datum.process_flags & AI_FASTPROCESSING)) { \
 	datum.process_flags |= AI_FASTPROCESSING; \
-	SSaifast.ai_holders += datum \
+	SSaifast.active += datum \
 }
 
 
 #define STOP_AIFASTPROCESSING(datum) \
 	datum.process_flags &= ~AI_FASTPROCESSING; \
-	SSaifast.ai_holders -= datum
+	SSaifast.active -= datum
 
 
 /mob/living
@@ -35,7 +35,7 @@ if (!(datum.process_flags & AI_FASTPROCESSING)) { \
 /mob/living/Initialize()
 	. = ..()
 	if (ispath(ai_holder))
-		ai_holder = new ai_holder (src)
+		ai_holder= new ai_holder(src)
 		if (ishuman(src))
 			InitializeHud()
 		ai_status_image = image('icons/misc/buildmode.dmi', src, "ai_0") //:anguish:
@@ -77,7 +77,7 @@ if (!(datum.process_flags & AI_FASTPROCESSING)) { \
 	var/process_flags = 0
 	/// A list used in mass-editing of AI datums, holding a snapshot of the 'before' state
 	var/list/snapshot = null
-	var/static/list/fastprocess_stances = list(
+	var/list/static/fastprocess_stances = list(
 		STANCE_ALERT,
 		STANCE_APPROACH,
 		STANCE_FIGHT,
@@ -88,7 +88,7 @@ if (!(datum.process_flags & AI_FASTPROCESSING)) { \
 		STANCE_FLEE,
 		STANCE_DISABLED
 	)
-	var/static/list/noprocess_stances = list(
+	var/list/static/noprocess_stances = list(
 		STANCE_SLEEP
 	)
 
@@ -138,7 +138,7 @@ if (!(datum.process_flags & AI_FASTPROCESSING)) { \
 /// Set the AI as 'busy' for a specific length of time.
 /datum/ai_holder/proc/set_busy_delay(time)
 	set_busy(TRUE)
-	addtimer(new Callback(src, .proc/set_busy, FALSE), time)
+	addtimer(CALLBACK(src, .proc/set_busy, FALSE), time)
 
 /**
  * Makes this ai holder not get processed.

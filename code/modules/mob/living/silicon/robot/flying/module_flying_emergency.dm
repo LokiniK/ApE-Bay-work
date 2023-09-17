@@ -6,7 +6,8 @@
 	subsystems = list(/datum/nano_module/crew_monitor)
 	sprites = list(
 		"Drone" = "drone-medical",
-		"Eyebot" = "eyebot-medical"
+		"Eyebot" = "eyebot-medical",
+		"Ver 06" = "wer6-Surgeon" //INF
 	)
 	equipment = list(
 		/obj/item/device/flash,
@@ -27,19 +28,19 @@
 		/obj/item/stack/medical/advanced/ointment,
 		/obj/item/stack/medical/advanced/bruise_pack,
 		/obj/item/stack/medical/splint,
-		/obj/item/robot_rack/roller_bed,
+		/obj/item/robot_rack/roller,
 		/obj/item/gripper/auto_cpr,
-		/obj/item/gripper/ivbag,
-		/obj/item/reagent_containers/spray/cleaner/drone
+		/obj/item/gripper/ivbag
 	)
 	synths = list(/datum/matter_synth/medicine = 15000)
 	emag = /obj/item/reagent_containers/spray
 	skills = list(
 		SKILL_ANATOMY      = SKILL_BASIC,
-		SKILL_MEDICAL      = SKILL_MASTER,
-		SKILL_EVA          = SKILL_EXPERIENCED,
-		SKILL_CONSTRUCTION = SKILL_EXPERIENCED,
-		SKILL_ELECTRICAL   = SKILL_EXPERIENCED
+		SKILL_MEDICAL      = SKILL_PROF,
+		SKILL_EVA          = SKILL_EXPERT,
+		SKILL_CONSTRUCTION = SKILL_EXPERT,
+		SKILL_ELECTRICAL   = SKILL_EXPERT,
+		SKILL_PILOT        = SKILL_EXPERT //INF
 	)
 
 /obj/item/robot_module/flying/emergency/finalize_emag()
@@ -58,12 +59,11 @@
 		stack.uses_charge = 1
 		stack.charge_costs = list(1000)
 	// Start out equipped with a roller bed
-	var/obj/item/robot_rack/roller_bed/roller_rack = locate() in equipment
-	roller_rack.held += new /obj/item/roller_bed()
+	var/obj/item/robot_rack/roller/roller_rack = locate() in equipment
+	roller_rack.held += new /obj/item/roller()
 	// and an auto-compressor
 	var/obj/item/gripper/auto_cpr/cpr_gripper = locate() in equipment
 	cpr_gripper.wrapped = new /obj/item/auto_cpr()
-	cpr_gripper.update_icon()
 
 /obj/item/robot_module/flying/emergency/finalize_synths()
 	. = ..()
@@ -76,7 +76,7 @@
 		var/obj/item/stack/medical/stack = locate(thing) in equipment
 		stack.synths = list(medicine)
 
-/obj/item/robot_module/flying/emergency/respawn_consumable(mob/living/silicon/robot/R, amount)
+/obj/item/robot_module/flying/emergency/respawn_consumable(var/mob/living/silicon/robot/R, var/amount)
 	var/obj/item/reagent_containers/spray/PS = emag
 	if(PS && PS.reagents.total_volume < PS.volume)
 		var/adding = min(PS.volume-PS.reagents.total_volume, 2*amount)

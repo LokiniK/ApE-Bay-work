@@ -10,9 +10,7 @@
 	var/next_meteor_upper = 20
 
 /datum/event/meteor_wave/get_skybox_image()
-	var/image/res = overlay_image('icons/skybox/rockbox.dmi', "rockbox", COLOR_ASTEROID_ROCK, RESET_COLOR)
-	res.blend_mode = BLEND_OVERLAY
-	return res
+	return overlay_image('icons/skybox/rockbox.dmi', "rockbox", COLOR_ASTEROID_ROCK, RESET_COLOR)
 
 /datum/event/meteor_wave/setup()
 	waves = 0
@@ -25,9 +23,9 @@
 /datum/event/meteor_wave/announce()
 	switch(severity)
 		if(EVENT_LEVEL_MAJOR)
-			command_announcement.Announce(replacetext(GLOB.using_map.meteor_detected_message, "%STATION_NAME%", location_name()), "[location_name()] Sensor Array", new_sound = GLOB.using_map.meteor_detected_sound, zlevels = affecting_z)
+			priority_announcement.Announce(replacetext(GLOB.using_map.meteor_detected_message, "%STATION_NAME%", location_name()), "Сенсоры [location_name()]", new_sound = GLOB.using_map.meteor_detected_sound, zlevels = affecting_z)
 		else
-			command_announcement.Announce("The [location_name()] is now in a meteor shower.", "[location_name()] Sensor Array", zlevels = affecting_z)
+			priority_announcement.Announce("Объект [location_name()] проходит через метеоритный дождь.", "Сенсоры [location_name()]", zlevels = affecting_z)
 
 /datum/event/meteor_wave/tick()
 	// Begin sending the alarm signals to shield diffusers so the field is already regenerated (if it exists) by the time actual meteors start flying around.
@@ -55,9 +53,9 @@
 /datum/event/meteor_wave/end()
 	switch(severity)
 		if(EVENT_LEVEL_MAJOR)
-			command_announcement.Announce("The [location_name()] has cleared the meteor storm.", "[location_name()] Sensor Array", zlevels = affecting_z)
+			priority_announcement.Announce("Объект [location_name()] покинул зону метеоритного шторма.", "Сенсоры [location_name()]", zlevels = affecting_z)
 		else
-			command_announcement.Announce("The [location_name()] has cleared the meteor shower", "[location_name()] Sensor Array", zlevels = affecting_z)
+			priority_announcement.Announce("Объект [location_name()] покинул зону метеоритного дождя.", "Сенсоры [location_name()]", zlevels = affecting_z)
 
 /datum/event/meteor_wave/proc/get_meteors()
 	switch(severity)
@@ -68,7 +66,7 @@
 		else
 			return meteors_minor
 
-var/global/list/meteors_minor = list(
+/var/list/meteors_minor = list(
 	/obj/effect/meteor/medium     = 80,
 	/obj/effect/meteor/dust       = 30,
 	/obj/effect/meteor/irradiated = 30,
@@ -78,7 +76,7 @@ var/global/list/meteors_minor = list(
 	/obj/effect/meteor/silver     = 10,
 )
 
-var/global/list/meteors_moderate = list(
+/var/list/meteors_moderate = list(
 	/obj/effect/meteor/medium     = 80,
 	/obj/effect/meteor/big        = 30,
 	/obj/effect/meteor/dust       = 30,
@@ -89,7 +87,7 @@ var/global/list/meteors_moderate = list(
 	/obj/effect/meteor/emp        = 10,
 )
 
-var/global/list/meteors_major = list(
+/var/list/meteors_major = list(
 	/obj/effect/meteor/medium     = 80,
 	/obj/effect/meteor/big        = 30,
 	/obj/effect/meteor/dust       = 30,
@@ -107,14 +105,14 @@ var/global/list/meteors_major = list(
 	next_meteor = 0
 	var/obj/effect/overmap/visitable/ship/victim
 
-/datum/event/meteor_wave/overmap/Destroy()
-	victim = null
+/datum/event/meteor_wave/overmap/kill()
 	. = ..()
+	victim = null
 
 /datum/event/meteor_wave/overmap/tick()
 	if(!victim)
 		return
-	if (victim.is_still() || victim.get_helm_skill() >= SKILL_TRAINED) //Unless you're standing or good at your job..
+	if (victim.is_still() || victim.get_helm_skill() >= SKILL_ADEPT) //Unless you're standing or good at your job..
 		start_side = pick(GLOB.cardinal)
 	else //..Meteors mostly fly in your face
 		start_side = prob(90) ? victim.fore_dir : pick(GLOB.cardinal)
@@ -126,12 +124,12 @@ var/global/list/meteors_major = list(
 		return
 	var/skill = victim.get_helm_skill()
 	var/speed = victim.get_speed()
-	if (skill < SKILL_EXPERIENCED)
+	if (skill < SKILL_EXPERT)
 		if(victim.is_still() || speed < SHIP_SPEED_SLOW) //Standing still or being slow means less shit flies your way
 			. = round(. * 0.7)
 		if(speed > SHIP_SPEED_FAST) //Sanic stahp
 			. *= 2
-	if (skill == SKILL_EXPERIENCED)
+	if (skill == SKILL_EXPERT)
 		if (victim.is_still())
 			. = round(. * 0.2)
 		if (speed < SHIP_SPEED_SLOW)
@@ -140,7 +138,7 @@ var/global/list/meteors_major = list(
 			. = round(. * 0.7)
 		if (speed > SHIP_SPEED_FAST)
 			. = round(. * 1.2)
-	if (skill > SKILL_EXPERIENCED)
+	if (skill > SKILL_EXPERT)
 		if (victim.is_still())
 			. = round(. * 0.1)
 		if (speed < SHIP_SPEED_SLOW)
@@ -150,9 +148,9 @@ var/global/list/meteors_major = list(
 
 	//Smol ship evasion
 	if(victim.vessel_size < SHIP_SIZE_LARGE && speed < SHIP_SPEED_FAST)
-		var/skill_needed = SKILL_MASTER
+		var/skill_needed = SKILL_PROF
 		if(speed < SHIP_SPEED_SLOW)
-			skill_needed = SKILL_TRAINED
+			skill_needed = SKILL_ADEPT
 		if(victim.vessel_size < SHIP_SIZE_SMALL)
 			skill_needed = skill_needed - 1
 		if(skill >= max(skill_needed, victim.skill_needed))

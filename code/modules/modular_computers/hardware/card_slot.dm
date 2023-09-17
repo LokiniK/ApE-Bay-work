@@ -1,8 +1,8 @@
 /obj/item/stock_parts/computer/card_slot
-	name = "\improper RFID card slot"
+	name = "RFID card slot"
 	desc = "Slot that allows this computer to write data on RFID cards. Necessary for some programs to run properly."
 	power_usage = 10 //W
-	critical = FALSE
+	critical = 0
 	icon_state = "cardreader"
 	hardware_size = 1
 	origin_tech = list(TECH_DATA = 2)
@@ -18,7 +18,7 @@
 	. += "[name] status: [stored_card ? "Card Inserted" : "Card Not Present"]\n"
 	if(stored_card)
 		. += "Testing card read...\n"
-		if( is_failing() )
+		if( damage >= damage_failure )
 			. += "...FAILURE!\n"
 		else
 			var/read_string_stability
@@ -53,7 +53,7 @@
 	set src in view(1)
 
 	if(!CanPhysicallyInteract(usr))
-		to_chat(usr, SPAN_WARNING("You can't reach it."))
+		to_chat(usr, "<span class='warning'>You can't reach it.</span>")
 		return
 
 	var/obj/item/stock_parts/computer/card_slot/device = src
@@ -72,8 +72,10 @@
 		return FALSE
 
 	if(user)
-		to_chat(user, "You remove [stored_card] from [src].")
-		user.put_in_hands(stored_card)
+		if(loc.Adjacent(user))//inf
+			to_chat(user, "You remove [stored_card] from [src].")
+			user.put_in_hands(stored_card)
+		else stored_card.dropInto(get_turf(loc)) //inf
 	else
 		dropInto(loc)
 	stored_card = null
@@ -84,7 +86,7 @@
 	loc.verbs -= /obj/item/stock_parts/computer/card_slot/proc/verb_eject_id
 	return TRUE
 
-/obj/item/stock_parts/computer/card_slot/proc/insert_id(obj/item/card/id/I, mob/user)
+/obj/item/stock_parts/computer/card_slot/proc/insert_id(var/obj/item/card/id/I, mob/user)
 	if(!istype(I))
 		return FALSE
 
@@ -108,7 +110,7 @@
 	return TRUE
 
 /obj/item/stock_parts/computer/card_slot/broadcaster // read only
-	name = "\improper RFID card broadcaster"
+	name = "RFID card broadcaster"
 	desc = "Reads and broadcasts the RFID signal of an inserted card."
 	can_write = FALSE
 	can_broadcast = TRUE
@@ -116,7 +118,7 @@
 	usage_flags = PROGRAM_PDA
 
 /obj/item/stock_parts/computer/card_slot/Destroy()
-	if (loc)
+	if(loc) //INF
 		loc.verbs -= /obj/item/stock_parts/computer/card_slot/proc/verb_eject_id
 	if(stored_card)
 		QDEL_NULL(stored_card)

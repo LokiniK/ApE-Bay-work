@@ -12,7 +12,7 @@
 	maxHealth = 40
 	health = 40
 
-	movement_cooldown = 3	// A bit faster so that they can inject the eggs easier.
+	movement_cooldown = 5	// A bit faster so that they can inject the eggs easier.
 
 	poison_per_bite = 5
 	poison_type = /datum/reagent/soporific
@@ -26,28 +26,22 @@
 	var/egg_inject_chance = 25 // One in four chance to get eggs.
 	var/egg_type = /obj/effect/spider/eggcluster
 	var/web_type = /obj/effect/spider/stickyweb/dark
+	var/obj/effect/spider/spiderling/spiderling_target
+	var/left_to_feed = 2 //number of spiderlings we can make giant
 
 	var/mob/living/simple_animal/hostile/giant_spider/guard/paired_guard
-
-	/// The next time the spider can lay. This is set to a random time between the minimum and maximum times.
-	var/next_egg_time = 0
-
-	/// The minimum amount of time the spider must wait before laying eggs again.
-	var/minimum_disturbed_time = 5 MINUTES
-
-	/// The maximum amount of time the spider can wait before laying eggs again.
-	var/maximum_disturbed_time = 10 MINUTES
 
 /obj/item/natural_weapon/bite/spider/nurse
 	force = 10
 
+/mob/living/simple_animal/hostile/giant_spider/nurse/Initialize(mapload, atom/parent)
+	. = ..()
+	if (prob(20))
+		fed = 1
+
 /datum/ai_holder/simple_animal/melee/nurse_spider
 	mauling = TRUE		// The nurse puts mobs into webs by attacking, so it needs to attack in crit
 	handle_corpse = TRUE	// Lets the nurse wrap dead things
-
-/mob/living/simple_animal/hostile/giant_spider/nurse/Initialize(mapload, atom/parent)
-	. = ..()
-	next_egg_time = world.time + (rand(3, 8) MINUTES)
 
 /mob/living/simple_animal/hostile/giant_spider/nurse/inject_poison(mob/living/L, target_zone)
 	..() // Inject the stoxin here.
@@ -61,7 +55,7 @@
 			if(!eggcount)
 				var/eggs = new egg_type(O, src)
 				O.implants += eggs
-				to_chat(H, SPAN_CLASS("critical", "\The [src] injects something into your [O.name]!")) // Oh god its laying eggs in me!
+				to_chat(H, "<span class='critical'>\The [src] injects something into your [O.name]!</span>") // Oh god its laying eggs in me!
 
 // Webs target in a web if able to.
 /mob/living/simple_animal/hostile/giant_spider/nurse/attack_target(atom/A)
@@ -73,7 +67,6 @@
 
 	if(isliving(A))
 		var/mob/living/L = A
-		next_egg_time = world.time + rand(minimum_disturbed_time, maximum_disturbed_time)
 		if(!L.stat)
 			return ..()
 
@@ -84,6 +77,11 @@
 	if(AM.anchored)
 		return ..()
 
+	if (istype(A, /obj/effect/spider/spiderling))
+		if (left_to_feed)
+			feed_spiderling(A)
+			handle_attack_delay(A, melee_attack_delay)
+		return
 
 	return spin_cocoon(AM)
 
@@ -99,7 +97,7 @@
 	// Get our AI to stay still.
 	set_AI_busy(TRUE)
 
-	if(!do_after(src, 5 SECONDS, AM, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
+	if(!do_after(src, 5 SECONDS, AM))
 		set_AI_busy(FALSE)
 		return FALSE
 
@@ -111,13 +109,19 @@
 	// Finally done with the checks.
 	var/obj/effect/spider/cocoon/C = new(AM.loc)
 	var/large_cocoon = FALSE
-	for(var/mob/living/L in C.contents)
+	for(var/mob/living/L in C.loc)
 		if(istype(L, /mob/living/simple_animal/hostile/giant_spider)) // Cannibalism is bad.
 			continue
 		fed++
 		visible_message(SPAN_WARNING("\The [src] sticks a proboscis into \the [L], and sucks a viscous substance out."))
+		L.forceMove(C)
 		large_cocoon = TRUE
 		break
+
+	// This part's pretty stupid.
+	for(var/obj/O in C.loc)
+		if(!O.anchored)
+			O.forceMove(C)
 
 	if(large_cocoon)
 		C.icon_state = pick("cocoon_large1","cocoon_large2","cocoon_large3")
@@ -126,10 +130,16 @@
 
 	return TRUE
 
+/mob/living/simple_animal/hostile/giant_spider/nurse/proc/feed_spiderling(obj/effect/spider/spiderling/S)
+	visible_message(SPAN_WARNING("\The [src] secretes a strange green substance over \the [S], causing it to grow rapidly!."))
+	S.amount_grown += 2
+	spiderling_target = null
+	left_to_feed--
+
 /mob/living/simple_animal/hostile/giant_spider/nurse/handle_special()
 	set waitfor = FALSE
-	if (get_AI_stance() == STANCE_IDLE && !is_AI_busy() && isturf(loc))
-		if (fed || next_egg_time < world.time)
+	if(get_AI_stance() == STANCE_IDLE && !is_AI_busy() && isturf(loc))
+		if(fed)
 			lay_eggs(loc)
 		else
 			web_tile(loc)
@@ -146,7 +156,7 @@
 	// Get our AI to stay still.
 	set_AI_busy(TRUE)
 
-	if(!do_after(src, 5 SECONDS, T, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
+	if(!do_after(src, 5 SECONDS, T))
 		set_AI_busy(FALSE)
 		return FALSE
 
@@ -163,8 +173,7 @@
 	if(!istype(T))
 		return FALSE
 
-	if (GLOB.SPIDER_COUNT >= GLOB.MAX_SPIDER_COUNT)
-		next_egg_time = world.time + rand(minimum_disturbed_time, maximum_disturbed_time)
+	if(!fed)
 		return FALSE
 
 	var/obj/effect/spider/eggcluster/E = locate() in T
@@ -177,7 +186,7 @@
 	// Stop players from spamming eggs.
 	laying_eggs = TRUE
 
-	if(!do_after(src, 5 SECONDS, T, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
+	if(!do_after(src, 5 SECONDS, T))
 		set_AI_busy(FALSE)
 		return FALSE
 
@@ -188,10 +197,6 @@
 	set_AI_busy(FALSE)
 	new egg_type(T)
 	fed--
-	if (fed < 0)
-		fed = 0
-
-	next_egg_time = world.time + rand(minimum_disturbed_time, maximum_disturbed_time)
 	laying_eggs = FALSE
 	return TRUE
 
@@ -222,7 +227,11 @@
 /datum/ai_holder/simple_animal/melee/nurse_spider/list_targets()
 	. = ..()
 
-	var/static/alternative_targets = typecacheof(list(/obj/structure))
+	var/static/alternative_targets = typecacheof(list(/obj/structure, /obj/effect/spider/spiderling))
+
+	var/mob/living/simple_animal/hostile/giant_spider/nurse/N = holder
+	if (!N.left_to_feed)
+		alternative_targets -= /obj/effect/spider/spiderling
 
 	for(var/AT in typecache_filter_list(range(vision_range, holder), alternative_targets))
 		var/obj/O = AT
@@ -237,6 +246,12 @@
 			if(!isliving(A))
 				targets -= A
 
+	var/mob/living/simple_animal/hostile/giant_spider/nurse/N = holder
+	if (!N.left_to_feed)
+		for (var/A in targets)
+			if (istype(A, /obj/effect/spider/spiderling))
+				targets -= A
+
 	return ..(targets)
 
 /datum/ai_holder/simple_animal/melee/nurse_spider/can_attack(atom/movable/the_target, vision_required = TRUE)
@@ -246,3 +261,9 @@
 			var/obj/O = the_target
 			if (!O.anchored)
 				return TRUE
+
+		if (istype(the_target, /obj/effect/spider/spiderling))
+			var/mob/living/simple_animal/hostile/giant_spider/nurse/N = holder
+			if (!N.left_to_feed)
+				lose_target()
+				return FALSE

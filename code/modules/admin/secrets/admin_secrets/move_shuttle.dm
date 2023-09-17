@@ -1,11 +1,11 @@
 /datum/admin_secret_item/admin_secret/move_shuttle
 	name = "Move a Shuttle"
 
-/datum/admin_secret_item/admin_secret/move_shuttle/can_execute(mob/user)
+/datum/admin_secret_item/admin_secret/move_shuttle/can_execute(var/mob/user)
 	if(!SSshuttle) return 0
 	return ..()
 
-/datum/admin_secret_item/admin_secret/move_shuttle/execute(mob/user)
+/datum/admin_secret_item/admin_secret/move_shuttle/execute(var/mob/user)
 	. = ..()
 	if(!.)
 		return

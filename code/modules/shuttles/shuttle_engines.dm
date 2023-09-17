@@ -4,7 +4,7 @@
 
 /obj/structure/shuttle/window
 	name = "shuttle window"
-	icon = 'icons/obj/structures/podwindows.dmi'
+	icon = 'icons/obj/podwindows.dmi'
 	icon_state = "1"
 	density = TRUE
 	opacity = 0
@@ -31,7 +31,7 @@
 /obj/structure/shuttle/engine/propulsion
 	name = "propulsion"
 	icon_state = "propulsion"
-	opacity = 1
+	opacity = TRUE
 
 /obj/structure/shuttle/engine/propulsion/burst
 	name = "burst"

@@ -16,8 +16,7 @@ GLOBAL_LIST_INIT(weighted_minerals_sparse, \
 		MATERIAL_ROCK_SALT =    3, \
 		MATERIAL_POTASH =       3, \
 		MATERIAL_BAUXITE =      3, \
-		MATERIAL_RUTILE = 		3, \
-		MATERIAL_BORAX = 5
+		MATERIAL_RUTILE = 		3
 	))
 
 GLOBAL_LIST_INIT(weighted_minerals_rich, \
@@ -38,8 +37,7 @@ GLOBAL_LIST_INIT(weighted_minerals_rich, \
 		MATERIAL_ROCK_SALT =    1, \
 		MATERIAL_POTASH =       1, \
 		MATERIAL_BAUXITE =      1, \
-		MATERIAL_RUTILE = 		1, \
-		MATERIAL_BORAX = 2
+		MATERIAL_RUTILE = 		1
 	))
 
 /datum/random_map/automata/cave_system
@@ -59,7 +57,7 @@ GLOBAL_LIST_INIT(weighted_minerals_rich, \
 	if(!minerals_rich)   minerals_rich =   GLOB.weighted_minerals_rich
 	..()
 
-/datum/random_map/automata/cave_system/get_appropriate_path(value)
+/datum/random_map/automata/cave_system/get_appropriate_path(var/value)
 	switch(value)
 		if(DOOR_CHAR, EMPTY_CHAR)
 			return mineral_turf
@@ -68,7 +66,7 @@ GLOBAL_LIST_INIT(weighted_minerals_rich, \
 		if(WALL_CHAR)
 			return wall_type
 
-/datum/random_map/automata/cave_system/get_map_char(value)
+/datum/random_map/automata/cave_system/get_map_char(var/value)
 	switch(value)
 		if(DOOR_CHAR)
 			return "x"
@@ -85,11 +83,11 @@ GLOBAL_LIST_INIT(weighted_minerals_rich, \
 			if (CELL_ALIVE(map[tmp_cell]))
 				ore_turfs += tmp_cell
 
-	game_log("ASGEN", "Found [length(ore_turfs)] ore turfs.")
-	var/ore_count = round(length(map)/20)
+	game_log("ASGEN", "Found [ore_turfs.len] ore turfs.")
+	var/ore_count = round(map.len/20)
 	var/door_count = 0
 	var/empty_count = 0
-	while((ore_count>0) && (length(ore_turfs)>0))
+	while((ore_count>0) && (ore_turfs.len>0))
 
 		if(!priority_process)
 			CHECK_TICK

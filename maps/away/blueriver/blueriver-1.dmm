@@ -56,7 +56,7 @@
 /turf/simulated/floor/away/blueriver/alienfloor,
 /area/bluespaceriver/underground)
 "n" = (
-/obj/item/roller_bed,
+/obj/item/roller,
 /turf/simulated/floor/asteroid,
 /area/bluespaceriver/underground)
 "o" = (
@@ -130,6 +130,7 @@
 "z" = (
 /obj/machinery/artifact{
 	alpha = 123;
+	anchored = 0;
 	color = "BLUE"
 	},
 /turf/simulated/floor/away/blueriver/alienfloor,

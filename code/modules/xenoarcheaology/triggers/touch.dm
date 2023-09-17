@@ -26,7 +26,6 @@
 
 /datum/artifact_trigger/touch/synth
 	name = "robotic touch"
-	trigger_type = TRIGGER_COMPLEX
 
 /datum/artifact_trigger/touch/synth/can_touch(mob/living/L, bodypart)
 	if(issilicon(L))
@@ -39,3 +38,4 @@
 		if(E && BP_IS_ROBOTIC(E))
 			return TRUE
 		return FALSE
+		

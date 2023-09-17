@@ -5,9 +5,9 @@ RSF
 */
 
 /obj/item/rsf
-	name = "rapid service fabricator"
+	name = "\improper Rapid-Service-Fabricator"
 	desc = "A device used to rapidly deploy service items."
-	icon = 'icons/obj/tools/rcd.dmi'
+	icon = 'icons/obj/tools.dmi'
 	icon_state = "rcd"
 	opacity = 0
 	density = FALSE
@@ -96,7 +96,7 @@ RSF
 			used_energy = 200
 
 	to_chat(user, "Dispensing [product ? product : "product"]...")
-	product.dropInto(A.loc)
+	product.dropInto(A)
 
 	if(isrobot(user))
 		var/mob/living/silicon/robot/R = user

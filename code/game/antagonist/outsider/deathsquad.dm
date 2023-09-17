@@ -4,7 +4,7 @@ GLOBAL_DATUM_INIT(deathsquad, /datum/antagonist/deathsquad, new)
 	id = MODE_DEATHSQUAD
 	role_text = "Death Commando"
 	role_text_plural = "Death Commandos"
-	welcome_text = "You work in the service of corporate Asset Protection, answering directly to the Board of Directors."
+	welcome_text = "Вы работаете в службе защиты корпоративных активов, подчиняясь непосредственно Совету директоров."
 	landmark_id = "Commando"
 	flags = ANTAG_OVERRIDE_JOB | ANTAG_OVERRIDE_MOB | ANTAG_HAS_LEADER | ANTAG_RANDOM_EXCEPTED
 	default_access = list(access_cent_general, access_cent_specops, access_cent_living, access_cent_storage)
@@ -16,15 +16,15 @@ GLOBAL_DATUM_INIT(deathsquad, /datum/antagonist/deathsquad, new)
 	initial_spawn_target = 6
 
 	faction = "deathsquad"
-	no_prior_faction = TRUE
 
 	var/deployed = 0
+	ambitious = 0 //INF
 
 /datum/antagonist/deathsquad/attempt_spawn()
 	if(..())
 		deployed = 1
 
-/datum/antagonist/deathsquad/equip(mob/living/carbon/human/player)
+/datum/antagonist/deathsquad/equip(var/mob/living/carbon/human/player)
 	if(!..())
 		return
 
@@ -43,7 +43,7 @@ GLOBAL_DATUM_INIT(deathsquad, /datum/antagonist/deathsquad, new)
 		player.equip_to_slot_or_del(new /obj/item/plastique(player), slot_l_store)
 	player.equip_to_slot_or_del(new /obj/item/gun/projectile/revolver(player), slot_belt)
 	player.equip_to_slot_or_del(new /obj/item/gun/energy/pulse_rifle(player), slot_r_hand)
-	player.equip_to_slot_or_del(new /obj/item/rig/combat(player), slot_back)
+	player.equip_to_slot_or_del(new /obj/item/rig/ert/assetprotection(player), slot_back)
 	player.equip_to_slot_or_del(new /obj/item/melee/energy/sword(player), slot_l_hand)
 	player.implant_loyalty(player)
 
@@ -53,15 +53,15 @@ GLOBAL_DATUM_INIT(deathsquad, /datum/antagonist/deathsquad, new)
 		id.icon_state = "centcom"
 	create_radio(DTH_FREQ, player)
 
-/datum/antagonist/deathsquad/update_antag_mob(datum/mind/player)
+/datum/antagonist/deathsquad/update_antag_mob(var/datum/mind/player)
 
 	..()
 
 	var/syndicate_commando_rank
 	if(leader && player == leader)
-		syndicate_commando_rank = pick("Corporal", "Sergeant", "Staff Sergeant", "Sergeant 1st Class", "Master Sergeant", "Sergeant Major")
+		syndicate_commando_rank = pick("Мл. сержант", "Сержант", "Штаб-сержант", "Сержант 1 класса", "Мастер-сержант", "Сержант-майор")
 	else
-		syndicate_commando_rank = pick("Lieutenant", "Captain", "Major")
+		syndicate_commando_rank = pick("Лейтенант", "Капитан", "Майор")
 
 	var/syndicate_commando_name = pick(GLOB.last_names)
 

@@ -1,7 +1,7 @@
 /obj/machinery/psi_meter
 	name = "psi-meter"
 	desc = "A bulky psi-meter for conducting assays of psi-operants."
-	icon = 'icons/obj/machines/research/psimeter.dmi'
+	icon = 'icons/obj/machines/psimeter.dmi'
 	icon_state = "meter_on"
 	use_power = POWER_USE_ACTIVE
 	anchored = TRUE
@@ -12,16 +12,16 @@
 	var/mob/living/last_assayed
 
 /obj/machinery/psi_meter/on_update_icon()
-	if(use_power && operable())
+	if(use_power && !(stat & (NOPOWER|BROKEN)))
 		icon_state = "meter_on"
 	else
 		icon_state = "meter_off"
 
-/obj/machinery/psi_meter/interface_interact(mob/user)
+/obj/machinery/psi_meter/interface_interact(var/mob/user)
 	interact(user)
 	return TRUE
 
-/obj/machinery/psi_meter/interact(mob/user)
+/obj/machinery/psi_meter/interact(var/mob/user)
 
 	if(!use_power) return
 
@@ -54,7 +54,7 @@
 			if(last_assay)
 				var/obj/item/paper/P = new(loc)
 				P.name = "paper - Psi-Assay ([last_assayed.name])"
-				P.info = jointext(last_assay - last_assay[length(last_assay)],null) // Last line is 'print | clear' link line.
+				P.info = jointext(last_assay - last_assay[last_assay.len],null) // Last line is 'print | clear' link line.
 				return TRUE
 
 		if(href_list["clear"])

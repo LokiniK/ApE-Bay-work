@@ -2,7 +2,7 @@
 /obj/item/cell
 	name = "power cell"
 	desc = "A rechargable electrochemical power cell."
-	icon = 'icons/obj/powercells.dmi'
+	icon = 'icons/obj/power.dmi'
 	icon_state = "cell"
 	item_state = "cell"
 	origin_tech = list(TECH_POWER = 1)
@@ -25,7 +25,7 @@
 		charge = maxcharge
 	update_icon()
 
-/obj/item/cell/drain_power(drain_check, surge, power = 0)
+/obj/item/cell/drain_power(var/drain_check, var/surge, var/power = 0)
 
 	if(drain_check)
 		return 1
@@ -52,7 +52,7 @@
 		overlay_state = new_overlay_state
 		overlays.Cut()
 		if(overlay_state)
-			overlays += image('icons/obj/powercells.dmi', overlay_state)
+			overlays += image('icons/obj/power.dmi', overlay_state)
 
 /obj/item/cell/proc/percent()		// return % charge of cell
 	return maxcharge && (100.0*charge/maxcharge)
@@ -61,11 +61,11 @@
 	return (charge == maxcharge)
 
 // checks if the power cell is able to provide the specified amount of charge
-/obj/item/cell/proc/check_charge(amount)
+/obj/item/cell/proc/check_charge(var/amount)
 	return (charge >= amount)
 
 // use power from a cell, returns the amount actually used
-/obj/item/cell/proc/use(amount)
+/obj/item/cell/proc/use(var/amount)
 	var/used = min(charge, amount)
 	charge -= used
 	update_icon()
@@ -73,13 +73,13 @@
 
 // Checks if the specified amount can be provided. If it can, it removes the amount
 // from the cell and returns 1. Otherwise does nothing and returns 0.
-/obj/item/cell/proc/checked_use(amount)
+/obj/item/cell/proc/checked_use(var/amount)
 	if(!check_charge(amount))
 		return 0
 	use(amount)
 	return 1
 
-/obj/item/cell/proc/give(amount)
+/obj/item/cell/proc/give(var/amount)
 	var/amount_used = min(maxcharge-charge,amount)
 	charge += amount_used
 	update_icon()
@@ -146,13 +146,13 @@
 
 /obj/item/cell/device/standard
 	name = "standard device power cell"
-	maxcharge = 25
+	maxcharge = 100 //inf, was: maxcharge = 25
 
 /obj/item/cell/device/high
 	name = "advanced device power cell"
 	desc = "A small power cell designed to power more energy-demanding devices."
 	icon_state = "hdevice"
-	maxcharge = 100
+	maxcharge = 200 //inf, was: maxcharge = 100
 	matter = list(MATERIAL_STEEL = 70, MATERIAL_GLASS = 6)
 
 /obj/item/cell/crap
@@ -224,7 +224,7 @@
 	name = "potato battery"
 	desc = "A rechargable starch based power cell."
 	origin_tech = list(TECH_POWER = 1)
-	icon = 'icons/obj/powercells.dmi' //'icons/obj/harvest.dmi'
+	icon = 'icons/obj/power.dmi' //'icons/obj/harvest.dmi'
 	icon_state = "potato_cell" //"potato_battery"
 	maxcharge = 20
 
@@ -232,8 +232,44 @@
 /obj/item/cell/slime
 	name = "charged slime core"
 	desc = "A yellow slime core infused with phoron, it crackles with power."
-	origin_tech = list(TECH_POWER = 2, TECH_BIO = 4)
+	origin_tech = list(TECH_POWER = 4, TECH_BIO = 4)
 	icon = 'icons/mob/simple_animal/slimes.dmi' //'icons/obj/harvest.dmi'
 	icon_state = "yellow slime extract" //"potato_battery"
-	maxcharge = 200
+	maxcharge = 2500
 	matter = null
+	var/recharge_amount = 10
+
+
+/obj/item/cell/slime/Initialize()
+	START_PROCESSING(SSobj, src)
+	. = ..()
+
+/obj/item/cell/slime/Destroy()
+	STOP_PROCESSING(SSobj, src)
+	. = ..()
+
+/obj/item/cell/slime/Process()
+	if(charge < maxcharge)
+		give(recharge_amount)
+
+// Self-charging power cell.
+/obj/item/cell/mantid
+	name = "mantid microfusion plant"
+	desc = "An impossibly tiny fusion reactor of mantid design."
+	icon = 'icons/obj/ascent.dmi'
+	icon_state = "plant"
+	maxcharge = 1500
+	w_class = ITEM_SIZE_NORMAL
+	var/recharge_amount = 12
+
+/obj/item/cell/mantid/Initialize()
+	START_PROCESSING(SSobj, src)
+	. = ..()
+
+/obj/item/cell/mantid/Destroy()
+	STOP_PROCESSING(SSobj, src)
+	. = ..()
+
+/obj/item/cell/mantid/Process()
+	if(charge < maxcharge)
+		give(recharge_amount)

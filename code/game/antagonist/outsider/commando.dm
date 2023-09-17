@@ -5,19 +5,18 @@ GLOBAL_DATUM_INIT(commandos, /datum/antagonist/deathsquad/mercenary, new)
 	landmark_id = "Syndicate-Commando"
 	role_text = "Syndicate Commando"
 	role_text_plural = "Commandos"
-	welcome_text = "You are in the employ of a criminal syndicate hostile to corporate interests."
-	id_type = /obj/item/card/id/centcom/ERT
+	welcome_text = "Вы работаете на преступный синдикат, который враждебено относится к корпоративным интересам."
+	id_type = /obj/item/card/id/syndicate_command  // INF was /obj/item/card/id/centcom/ERT/commando
+
 	flags = ANTAG_RANDOM_EXCEPTED
 
 	hard_cap = 4
 	hard_cap_round = 8
 	initial_spawn_req = 4
 	initial_spawn_target = 6
-	faction = "commando"
-	no_prior_faction = TRUE
+	ambitious = 0 //INF
 
-
-/datum/antagonist/deathsquad/mercenary/equip(mob/living/carbon/human/player)
+/datum/antagonist/deathsquad/mercenary/equip(var/mob/living/carbon/human/player)
 
 	player.equip_to_slot_or_del(new /obj/item/clothing/under/syndicate(player), slot_w_uniform)
 	player.equip_to_slot_or_del(new /obj/item/clothing/shoes/swat(player), slot_shoes)

@@ -47,7 +47,6 @@
 	playsound(src, 'sound/effects/snap.ogg', 100, 1)
 	SET_FLAGS(boombox_flags, BOOMBOX_BROKEN)
 	jukebox.Stop()
-	..()
 
 
 /obj/item/boombox/examine(mob/user, distance)
@@ -109,19 +108,109 @@
 		if (!GET_FLAGS(boombox_flags, BOOMBOX_BROKEN))
 			to_chat(user, SPAN_WARNING("\The [src] is not broken."))
 			return TRUE
-		var/obj/item/stack/paste = item
-		if (!paste.use(1))
-			to_chat(user, SPAN_WARNING("\The [paste] is empty."))
-			return TRUE
-		user.visible_message(
-			SPAN_ITALIC("\The [user] uses \the [item] to repair \the [src]."),
-			SPAN_NOTICE("You repair \the [src] with \the [item]."),
-			range = 3
-		)
-		CLEAR_FLAGS(boombox_flags, BOOMBOX_BROKEN)
-		return TRUE
-	. = ..()
+/*		else if(panel)
+			user.visible_message(SPAN_NOTICE("\The [user] unhinges \the [src]'s front panel with \the [W]."), SPAN_NOTICE("You unhinge \the [src]'s front panel."))
+			playsound(src.loc, 'sound/items/Screwdriver.ogg', 50, 1)
+			panel = FALSE */
+	if(istype(item,/obj/item/stack/nanopaste))
+		var/obj/item/stack/S = item
+		if(GET_FLAGS(boombox_flags, BOOMBOX_BROKEN)/* && !panel*/)
+			if(S.use(1))
+				user.visible_message(SPAN_NOTICE("\The [user] pours some of \the [S] onto \the [src]."), SPAN_NOTICE("You pour some of \the [S] over \the [src]'s internals and watch as it retraces and resolders paths."))
+				CLEAR_FLAGS(boombox_flags, BOOMBOX_BROKEN)
+			else
+				to_chat(user, SPAN_NOTICE("\The [S] is empty."))
+	if(istype(item,/obj/item/stack/cable_coil))
+		var/obj/item/stack/S = item
+		if(GET_FLAGS(boombox_flags, BOOMBOX_BROKEN)/* && !panel*/)
+			if(user.skill_check(SKILL_ELECTRICAL, SKILL_BASIC))
+				if(S.use(5))
+					user.visible_message(SPAN_NOTICE("\The [user] starts replace burned out wires in \the [src]."), SPAN_NOTICE("You are replacing burned out wires in \the [src]'."))
+					if(!do_after(user, 60, src))
+						return
+					user.visible_message(SPAN_NOTICE("\The [user] replaces burned out wires in \the [src]."), SPAN_NOTICE("You replace burned out wires in \the [src]."))
+					CLEAR_FLAGS(boombox_flags, BOOMBOX_BROKEN)
+				else
+					to_chat(user, SPAN_NOTICE("You need more [S] to fix \the [src]."))
 
+			else
+				to_chat(user, SPAN_NOTICE("You don't know how to fix \the [src]."))
+	else
+		. = ..()
+
+/* /obj/item/device/boombox/proc/AdjustFrequency(var/obj/item/W, var/mob/user)
+	var/const/MIN_FREQUENCY = 0.5
+	var/const/MAX_FREQUENCY = 1.5
+
+	if(!MayAdjust(user))
+		return FALSE
+
+	var/list/options = list()
+	var/tighten = "Tighten (play slower)"
+	var/loosen  = "Loosen (play faster)"
+
+	if(frequency > MIN_FREQUENCY)
+		options += tighten
+	if(frequency < MAX_FREQUENCY)
+		options += loosen
+
+	var/operation = input(user, "How do you wish to adjust the player head?", "Adjust player", options[1]) as null|anything in options
+	if(!operation)
+		return FALSE
+	if(!MayAdjust(user))
+		return FALSE
+	if(W != user.get_active_hand())
+		return FALSE
+
+	if(!CanPhysicallyInteract(user))
+		return FALSE
+
+	if(operation == loosen)
+		frequency += 0.1
+	else if(operation == tighten)
+		frequency -= 0.1
+	frequency = Clamp(frequency, MIN_FREQUENCY, MAX_FREQUENCY)
+
+	user.visible_message(SPAN_NOTICE("\The [user] adjusts \the [src]'s player head."), SPAN_NOTICE("You adjust \the [src]'s player head."))
+	playsound(src.loc, 'sound/items/Screwdriver.ogg', 50, 1)
+
+	if(frequency > 1.0)
+		to_chat(user, SPAN_NOTICE("\The [src] should be playing faster than usual."))
+	else if(frequency < 1.0)
+		to_chat(user, SPAN_NOTICE("\The [src] should be playing slower than usual."))
+	else
+		to_chat(user, SPAN_NOTICE("\The [src] should be playing as fast as usual."))
+
+	return TRUE
+
+/obj/item/device/boombox/proc/MayAdjust(var/mob/user)
+	if(playing)
+		to_chat(user, "<span class='warning'>You can only adjust \the [src] when it's not playing.</span>")
+		return FALSE
+	return TRUE
+
+/obj/item/device/boombox/on_update_icon()
+	icon_state = playing ? "on" : "off"
+
+/obj/item/device/boombox/proc/stop()
+	playing = 0
+	update_icon()
+	QDEL_NULL(sound_token)
+
+/obj/item/device/boombox/proc/start()
+	QDEL_NULL(sound_token)
+	var/datum/track/T = tracks[track_num]
+	sound_token = GLOB.sound_player.PlayLoopingSound(src, sound_id, T.GetTrack(), volume = volume, frequency = frequency, range = 7, falloff = 4, prefer_mute = TRUE, preference = /datum/client_preference/play_boomboxes)
+	playing = 1
+	update_icon()
+	if(prob(break_chance))
+		boombox_break() 
+
+/obj/item/device/boombox/proc/boombox_break()
+	audible_message(SPAN_WARNING("\The [src]'s speakers pop with a sharp crack!"))
+	playsound(src.loc, 'sound/effects/snap.ogg', 100, 1)
+	broken = TRUE
+	stop() */
 
 
 /obj/random_multi/single_item/boombox

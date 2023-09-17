@@ -26,7 +26,7 @@
 		return
 	if(isScrewdriver(W))
 		status = !status
-		to_chat(user, SPAN_NOTICE("[src] is now [status ? "secured" : "unsecured"]!"))
+		to_chat(user, "<span class='notice'>[src] is now [status ? "secured" : "unsecured"]!</span>")
 	add_fingerprint(user)
 	return
 

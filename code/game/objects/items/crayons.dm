@@ -46,6 +46,11 @@
 	color_description = "purple crayon"
 	crayon_reagent = /datum/reagent/crayon_dust/purple
 
+/obj/item/pen/crayon/random/Initialize()
+	..()
+	var/crayon_type = pick(subtypesof(/obj/item/pen/crayon) - /obj/item/pen/crayon/random)
+	new crayon_type(loc)
+	return INITIALIZE_HINT_QDEL
 
 /obj/item/pen/crayon/mime
 	icon_state = "crayonmime"
@@ -85,28 +90,26 @@
 /obj/item/pen/crayon/afterattack(atom/target, mob/user as mob, proximity)
 	if(!proximity) return
 	if(istype(target,/turf/simulated/floor))
-		var/drawtype = input("Choose what you'd like to draw.", "Crayon scribbles") in list("graffiti","rune","letter","arrow", "defector graffiti")
+		var/drawtype = input("Choose what you'd like to draw.", "Crayon scribbles") in list("graffiti","rune","letter","arrow")
 		switch(drawtype)
 			if("letter")
 				drawtype = input("Choose the letter.", "Crayon scribbles") in list("a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z")
 				to_chat(user, "You start drawing a letter on the [target.name].")
-			if("graffiti", "Fleet defector graffiti")
+			if("graffiti")
 				to_chat(user, "You start drawing graffiti on the [target.name].")
 			if("rune")
 				to_chat(user, "You start drawing a rune on the [target.name].")
 			if("arrow")
 				drawtype = input("Choose the arrow.", "Crayon scribbles") in list("left", "right", "up", "down")
 				to_chat(user, "You start drawing an arrow on the [target.name].")
-			if("defector graffiti")
-				to_chat(user, "You start drawing defector graffiti on the [target.name].")
-		if(instant || do_after(user, 5 SECONDS, target, DO_PUBLIC_UNIQUE))
+		if(instant || do_after(user, 50))
 			new /obj/effect/decal/cleanable/crayon(target,colour,shadeColour,drawtype)
 			to_chat(user, "You finish drawing.")
 			target.add_fingerprint(user)		// Adds their fingerprints to the floor the crayon is drawn on.
 			if(uses)
 				uses--
 				if(!uses)
-					to_chat(user, SPAN_WARNING("You used up your crayon!"))
+					to_chat(user, "<span class='warning'>You used up your crayon!</span>")
 					qdel(src)
 	return
 
@@ -118,18 +121,7 @@
 		if(uses)
 			uses -= 5
 			if(uses <= 0)
-				to_chat(M, SPAN_WARNING("You ate your crayon!"))
+				to_chat(M, "<span class='warning'>You ate your crayon!</span>")
 				qdel(src)
 	else
 		..()
-
-
-/obj/random/crayon
-	name = "Random Crayon"
-	desc = "This is a random crayon."
-	icon = 'icons/obj/crayons.dmi'
-	icon_state = "crayonrainbow"
-
-
-/obj/random/crayon/spawn_choices()
-	return subtypesof(/obj/item/pen/crayon)

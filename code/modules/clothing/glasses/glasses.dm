@@ -3,7 +3,9 @@
 	icon = 'icons/obj/clothing/obj_eyes.dmi'
 	sprite_sheets = list(
 		SPECIES_VOX = 'icons/mob/species/vox/onmob_eyes_vox.dmi',
-		SPECIES_UNATHI = 'icons/mob/species/unathi/onmob_eyes_unathi.dmi'
+		SPECIES_VOX_ARMALIS = 'icons/mob/species/vox/onmob_eyes_vox_armalis.dmi',
+		SPECIES_UNATHI = 'icons/mob/species/unathi/generated/onmob_eyes_unathi.dmi',
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_eyes_resomi.dmi'
 		)
 	var/hud_type
 	var/prescription = FALSE
@@ -36,7 +38,9 @@
 
 /obj/item/clothing/glasses/proc/activate(mob/user)
 	if(toggleable && !active)
+		var/datum/extension/base_icon_state/BIS = get_extension(src, /datum/extension/base_icon_state)
 		active = TRUE
+		icon_state = BIS.base_icon_state
 		flash_protection = initial(flash_protection)
 		tint = initial(tint)
 		if(user)
@@ -49,13 +53,13 @@
 			else
 				to_chat(user, "You activate the optical matrix on \the [src].")
 
-		update_icon()
 		update_clothing_icon()
 		update_vision()
 
 /obj/item/clothing/glasses/proc/deactivate(mob/user, manual = TRUE)
 	if(toggleable && active)
 		active = FALSE
+		icon_state = off_state
 		if(user)
 			if(manual)
 				if(toggle_off_message)
@@ -69,7 +73,6 @@
 
 		flash_protection = FLASH_PROTECTION_NONE
 		tint = TINT_NONE
-		update_icon()
 		update_clothing_icon()
 		update_vision()
 
@@ -90,7 +93,6 @@
 						M.disabilities &= ~NEARSIGHTED
 			if(toggleable)
 				deactivate(M, FALSE)
-	..()
 
 /obj/item/clothing/glasses/attack_self(mob/user)
 	if(toggleable && !user.incapacitated())
@@ -108,7 +110,7 @@
 			off_state = citem.additional_data["icon_off"]
 
 /obj/item/clothing/glasses/meson
-	name = "meson goggles"
+	name = "optical meson scanner"
 	desc = "Used for seeing walls, floors, and stuff through anything."
 	gender = NEUTER
 	icon_state = "meson"
@@ -125,15 +127,16 @@
 	overlay = GLOB.global_hud.meson
 
 /obj/item/clothing/glasses/meson/prescription
-	name = "meson goggles"
-	desc = "Used for seeing walls, floors, and stuff through anything. This set has corrective lenses."
-	prescription = 5
+	name = "prescription mesons"
+	desc = "Optical meson scanner with prescription lenses."
+	prescription = 6
 
 /obj/item/clothing/glasses/science
 	name = "science goggles"
 	desc = "Goggles fitted with a portable analyzer capable of determining the fabricator training potential of an item or components of a machine. Sensitive to EMP."
 	icon_state = "purple"
 	item_state = "glasses"
+	action_button_name = "Toggle Goggles"
 	hud_type = HUD_SCIENCE
 	toggleable = TRUE
 	action_button_name = "Toggle Goggles"
@@ -142,7 +145,7 @@
 /obj/item/clothing/glasses/science/prescription
 	name = "prescription science goggles"
 	desc = "Science goggles with prescription lenses."
-	prescription = 5
+	prescription = 6
 
 /obj/item/clothing/glasses/science/Initialize()
 	. = ..()
@@ -170,12 +173,13 @@
 	desc = "Self-polarizing goggles with light amplification for dark environments. Made from durable synthetic."
 	icon_state = "swatgoggles"
 	origin_tech = list(TECH_MAGNET = 2, TECH_COMBAT = 4)
-	darkness_view = 5
+	darkness_view = 4 //inf, was 5
 	action_button_name = "Toggle Goggles"
 	toggleable = TRUE
 	see_invisible = SEE_INVISIBLE_NOLIGHTING
 	siemens_coefficient = 0.6
 	electric = TRUE
+	tint = 1 //INF, WAS NOTHING
 
 /obj/item/clothing/glasses/monocle
 	name = "monocle"
@@ -183,11 +187,10 @@
 	icon_state = "monocle"
 	item_state = "headset" // lol
 	body_parts_covered = 0
-	prescription = 5
 
 /obj/item/clothing/glasses/material
 	name = "optical material scanner"
-	desc = "Very confusing goggles."
+	desc = "Very confusing glasses."
 	gender = NEUTER
 	icon_state = "material"
 	item_state = "glasses"
@@ -198,10 +201,11 @@
 	electric = TRUE
 
 
-/obj/item/clothing/glasses/material/prescription
-	desc = "Very confusing goggles. This set has corrective lenses."
-	prescription = 5
-
+/obj/item/clothing/glasses/hybrid/proc/update_state(mob/user)
+	update_icon()
+	sound_to(user, activation_sound)
+	user.update_inv_glasses()
+	user.update_action_buttons()
 
 /obj/item/clothing/glasses/threedglasses
 	name = "3D glasses"
@@ -265,8 +269,8 @@
 	icon_state = "welding-g"
 	item_state = "welding-g"
 	use_alt_layer = TRUE
-	flash_protection = FLASH_PROTECTION_MODERATE
-	darkness_view = -1
+	flash_protection = FLASH_PROTECTION_MAJOR
+	tint = TINT_HEAVY
 
 /obj/item/clothing/glasses/augment_binoculars
 	name = "adaptive binoculars"

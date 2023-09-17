@@ -3,16 +3,16 @@
 	random = 1
 	wire_count = 7
 	descriptions = list(
-		new /datum/wire_description(NUCLEARBOMB_WIRE_LIGHT, "This wire seems to connect to the small light on the device.", SKILL_EXPERIENCED),
+		new /datum/wire_description(NUCLEARBOMB_WIRE_LIGHT, "This wire seems to connect to the small light on the device.", SKILL_EXPERT),
 		new /datum/wire_description(NUCLEARBOMB_WIRE_TIMING, "This wire connects to the time display."),
 		new /datum/wire_description(NUCLEARBOMB_WIRE_SAFETY, "This wire connects to a safety override.")
 	)
 
-var/global/const/NUCLEARBOMB_WIRE_LIGHT		= 1
-var/global/const/NUCLEARBOMB_WIRE_TIMING		= 2
-var/global/const/NUCLEARBOMB_WIRE_SAFETY		= 4
+var/const/NUCLEARBOMB_WIRE_LIGHT		= 1
+var/const/NUCLEARBOMB_WIRE_TIMING		= 2
+var/const/NUCLEARBOMB_WIRE_SAFETY		= 4
 
-/datum/wires/nuclearbomb/CanUse(mob/living/L)
+/datum/wires/nuclearbomb/CanUse(var/mob/living/L)
 	var/obj/machinery/nuclearbomb/N = holder
 	return N.panel_open && N.extended
 
@@ -23,7 +23,7 @@ var/global/const/NUCLEARBOMB_WIRE_SAFETY		= 4
 	. += "The device is is [N.safety ? "quiet" : "whirring"].<BR>"
 	. += "The lights are [N.lighthack ? "static" : "functional"].<BR>"
 
-/datum/wires/nuclearbomb/UpdatePulsed(index)
+/datum/wires/nuclearbomb/UpdatePulsed(var/index)
 	var/obj/machinery/nuclearbomb/N = holder
 	switch(index)
 		if(NUCLEARBOMB_WIRE_LIGHT)
@@ -42,12 +42,12 @@ var/global/const/NUCLEARBOMB_WIRE_SAFETY		= 4
 			spawn(100)
 				N.safety = !N.safety
 				if(N.safety == 1)
-					N.visible_message(SPAN_NOTICE("\The [N] quiets down."))
+					N.visible_message("<span class='notice'>\The [N] quiets down.</span>")
 					N.secure_device()
 				else
-					N.visible_message(SPAN_NOTICE("\The [N] emits a quiet whirling noise!"))
+					N.visible_message("<span class='notice'>\The [N] emits a quiet whirling noise!</span>")
 
-/datum/wires/nuclearbomb/UpdateCut(index, mended)
+/datum/wires/nuclearbomb/UpdateCut(var/index, var/mended)
 	var/obj/machinery/nuclearbomb/N = holder
 	switch(index)
 		if(NUCLEARBOMB_WIRE_SAFETY)
@@ -61,3 +61,14 @@ var/global/const/NUCLEARBOMB_WIRE_SAFETY		= 4
 		if(NUCLEARBOMB_WIRE_LIGHT)
 			N.lighthack = !mended
 			N.update_icon()
+
+/datum/wires/nuclearbomb/SolveWireFunction(var/function)
+	var/sf = ""
+	switch(function)
+		if(NUCLEARBOMB_WIRE_LIGHT)
+			sf = "Port A"
+		if(NUCLEARBOMB_WIRE_TIMING)
+			sf = "Port B"
+		if(NUCLEARBOMB_WIRE_SAFETY)
+			sf = "Port C"
+	return sf

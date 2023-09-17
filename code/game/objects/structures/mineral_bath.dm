@@ -17,15 +17,15 @@
 	venus.adjust_multi(GAS_CHLORINE, MOLES_N2STANDARD, GAS_PHORON, MOLES_O2STANDARD)
 	return venus
 
+/obj/structure/adherent_bath/attackby(var/obj/item/thing, var/mob/user)
+	if(istype(thing, /obj/item/grab))
+		var/obj/item/grab/G = thing
+		if(enter_bath(G.affecting))
+			qdel(G)
+		return
+	. = ..()
 
-/obj/structure/adherent_bath/use_grab(obj/item/grab/grab, list/click_params)
-	// Put victim in bath
-	if (enter_bath(grab.affecting, grab.assailant))
-		grab.affecting.remove_grabs_and_pulls()
-	return TRUE
-
-
-/obj/structure/adherent_bath/proc/enter_bath(mob/living/patient, mob/user)
+/obj/structure/adherent_bath/proc/enter_bath(var/mob/living/patient, var/mob/user)
 
 	if(!istype(patient))
 		return FALSE
@@ -36,28 +36,28 @@
 		return FALSE
 
 	if(occupant)
-		to_chat(user, SPAN_WARNING("\The [src] is occupied."))
+		to_chat(user, "<span class='warning'>\The [src] is occupied.</span>")
 		return FALSE
 
 	if(self_drop)
-		user.visible_message(SPAN_NOTICE("\The [user] begins climbing into \the [src]."))
+		user.visible_message("<span class='notice'>\The [user] begins climbing into \the [src].</span>")
 	else
-		user.visible_message(SPAN_NOTICE("\The [user] begins pushing \the [patient] into \the [src]."))
+		user.visible_message("<span class='notice'>\The [user] begins pushing \the [patient] into \the [src].</span>")
 
-	if(!do_after(user, 3 SECONDS, src, DO_PUBLIC_UNIQUE))
+	if(!do_after(user, 3 SECONDS, src))
 		return FALSE
 
 	if(!user.Adjacent(src) || !(self_drop || user.Adjacent(patient)))
 		return FALSE
 
 	if(occupant)
-		to_chat(user, SPAN_WARNING("\The [src] is occupied."))
+		to_chat(user, "<span class='warning'>\The [src] is occupied.</span>")
 		return FALSE
 
 	if(self_drop)
-		user.visible_message(SPAN_NOTICE("\The [user] climbs into \the [src]."))
+		user.visible_message("<span class='notice'>\The [user] climbs into \the [src].</span>")
 	else
-		user.visible_message(SPAN_NOTICE("\The [user] pushes \the [patient] into \the [src]."))
+		user.visible_message("<span class='notice'>\The [user] pushes \the [patient] into \the [src].</span>")
 
 	playsound(loc, 'sound/effects/slosh.ogg', 50, 1)
 	patient.forceMove(src)
@@ -65,15 +65,7 @@
 	START_PROCESSING(SSobj, src)
 	return TRUE
 
-/obj/structure/adherent_bath/slam_into(mob/living/L)
-	L.forceMove(src)
-	occupant = L
-	L.Weaken(2)
-	L.visible_message(SPAN_WARNING("\The [L] falls into \the [src]!"))
-	playsound(L, "punch", 25, 1, FALSE)
-	START_PROCESSING(SSobj, src)
-
-/obj/structure/adherent_bath/attack_hand(mob/user)
+/obj/structure/adherent_bath/attack_hand(var/mob/user)
 	eject_occupant()
 
 /obj/structure/adherent_bath/proc/eject_occupant()
@@ -88,11 +80,11 @@
 			occupant = null
 			STOP_PROCESSING(SSobj, src)
 
-/obj/structure/adherent_bath/MouseDrop_T(atom/movable/O, mob/user)
+/obj/structure/adherent_bath/MouseDrop_T(var/atom/movable/O, var/mob/user)
 	enter_bath(O, user)
 
-/obj/structure/adherent_bath/relaymove(mob/user)
-	if (!user.incapacitated() && (user == occupant))
+/obj/structure/adherent_bath/relaymove(var/mob/user)
+	if(user == occupant)
 		eject_occupant()
 
 /obj/structure/adherent_bath/Process()
@@ -125,7 +117,7 @@
 					var/obj/item/organ/O = new limb_path(H)
 					organ_data["descriptor"] = O.name
 					H.species.post_organ_rejuvenate(O, H)
-					to_chat(occupant, SPAN_NOTICE("You feel your [O.name] reform in the crystal bath."))
+					to_chat(occupant, "<span class='notice'>You feel your [O.name] reform in the crystal bath.</span>")
 					H.update_body()
 					repaired_organ = TRUE
 					break
@@ -137,7 +129,7 @@
 				if(BP_IS_CRYSTAL(I) && I.damage)
 					I.heal_damage(rand(3,5))
 					if(prob(25))
-						to_chat(H, SPAN_NOTICE("The mineral-rich bath mends your [I.name]."))
+						to_chat(H, "<span class='notice'>The mineral-rich bath mends your [I.name].</span>")
 
 		// Repair robotic external organs.
 		if(!repaired_organ && prob(25))
@@ -147,13 +139,13 @@
 					for(var/obj/implanted_object in E.implants)
 						if(!istype(implanted_object,/obj/item/implant) && !istype(implanted_object,/obj/item/organ/internal/augment) && prob(25))	// We don't want to remove REAL implants. Just shrapnel etc.
 							E.implants -= implanted_object
-							to_chat(H, SPAN_NOTICE("The mineral-rich bath dissolves the [implanted_object.name]."))
+							to_chat(H, "<span class='notice'>The mineral-rich bath dissolves the [implanted_object.name].</span>")
 							qdel(implanted_object)
 					if(E.brute_dam || E.burn_dam)
 						E.heal_damage(rand(3,5), rand(3,5), robo_repair = 1)
 						if(prob(25))
-							to_chat(H, SPAN_NOTICE("The mineral-rich bath mends your [E.name]."))
+							to_chat(H, "<span class='notice'>The mineral-rich bath mends your [E.name].</span>")
 						if(!BP_IS_CRYSTAL(E) && !BP_IS_BRITTLE(E))
 							E.status |= ORGAN_BRITTLE
-							to_chat(H, SPAN_WARNING("It feels a bit brittle, though..."))
+							to_chat(H, "<span class='warning'>It feels a bit brittle, though...</span>")
 						break

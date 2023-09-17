@@ -1,6 +1,5 @@
-/mob/living/carbon
+/mob/living/carbon/
 	gender = MALE
-	pronouns = PRONOUNS_THEY_THEM
 	var/datum/species/species //Contains icon generation and language information, set during New().
 
 	var/life_tick = 0      // The amount of life ticks that have processed on this mob.
@@ -29,6 +28,8 @@
 	//the second is the message in question.
 	var/last_taste_time = 0
 	var/last_taste_text = ""
+
+	var/is_sleeping = 0
 
 	// organ-related variables, see organ.dm and human_organs.dm
 	var/list/internal_organs = list()

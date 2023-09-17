@@ -1,10 +1,15 @@
 /obj/item/stock_parts/circuitboard/disperser
-	name = "circuit board (obstruction field disperser control)"
+	name = T_BOARD("obstruction field disperser control")
 	build_path = /obj/machinery/computer/ship/disperser
 	origin_tech = list(TECH_ENGINEERING = 2, TECH_COMBAT = 2, TECH_BLUESPACE = 2)
 
+/obj/item/stock_parts/circuitboard/disperser/military
+	name = T_BOARD("impulse cannon control")
+	build_path = /obj/machinery/computer/ship/disperser/military
+	origin_tech = list(TECH_ENGINEERING = 7, TECH_COMBAT = 7, TECH_BLUESPACE = 7)
+
 /obj/item/stock_parts/circuitboard/disperserfront
-	name = "circuit board (obstruction field disperser beam generator)"
+	name = T_BOARD("obstruction field disperser beam generator")
 	build_path = /obj/machinery/disperser/front
 	board_type = "machine"
 	origin_tech = list(TECH_ENGINEERING = 2, TECH_COMBAT = 2, TECH_BLUESPACE = 2)
@@ -13,7 +18,7 @@
 	)
 
 /obj/item/stock_parts/circuitboard/dispersermiddle
-	name = "circuit board (obstruction field disperser fusor)"
+	name = T_BOARD("obstruction field disperser fusor")
 	build_path = /obj/machinery/disperser/middle
 	board_type = "machine"
 	origin_tech = list(TECH_ENGINEERING = 2, TECH_COMBAT = 2, TECH_BLUESPACE = 2)
@@ -22,7 +27,7 @@
 	)
 
 /obj/item/stock_parts/circuitboard/disperserback
-	name = "circuit board (obstruction field disperser material deconstructor)"
+	name = T_BOARD("obstruction field disperser material deconstructor")
 	build_path = /obj/machinery/disperser/back
 	board_type = "machine"
 	origin_tech = list(TECH_ENGINEERING = 2, TECH_COMBAT = 2, TECH_BLUESPACE = 2)

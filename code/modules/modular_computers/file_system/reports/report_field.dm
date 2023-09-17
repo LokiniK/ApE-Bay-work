@@ -188,7 +188,7 @@ Basic field subtypes.
 
 //Signature field; ask_value will obtain the user's signature.
 /datum/report_field/signature/get_value()
-	return "<span style='font-family: Times New Roman'><i>[value]</i></span>"
+	return "<font face=\"Times New Roman\"><i>[value]</i></font>"
 
 /datum/report_field/signature/ask_value(mob/user)
 	set_value((user && user.real_name) ? user.real_name : "Anonymous")

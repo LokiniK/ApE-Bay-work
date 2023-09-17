@@ -1,6 +1,6 @@
-/singleton/ai_icon
+/datum/ai_icon
 	var/name
-	var/icon = 'icons/mob/AI.dmi'
+	var/icon = 'infinity/icons/mob/AI.dmi'
 	var/alive_icon
 	var/alive_light = COLOR_WHITE
 	var/nopower_icon = "4"
@@ -8,164 +8,257 @@
 	var/dead_icon = "ai-crash"
 	var/dead_light = "#000099"
 
-/singleton/ai_icon/New(name, alive_icon, dead_icon, dead_light, icon)
+/datum/ai_icon/New(var/name, var/alive_icon, var/dead_icon, var/dead_light, var/icon)
 	src.name          = name       || src.name
 	src.icon          = icon       || src.icon
 	src.alive_icon    = alive_icon || src.alive_icon
 	src.dead_icon     = dead_icon  || src.dead_icon
 	src.dead_light    = dead_light || src.dead_light
 
-/singleton/ai_icon/proc/may_used_by_ai(mob/user)
+/datum/ai_icon/proc/may_used_by_ai(var/mob/user)
 	return TRUE
 
-/singleton/ai_icon/malf
+/datum/ai_icon/malf
 	name = "Unlawed"
 	alive_icon = "ai-malf"
 	alive_light = "#45644b"
 
-/singleton/ai_icon/malf/New()
+/datum/ai_icon/malf/New()
 	..()
 	name = "[name] (Malf)"
 
-/singleton/ai_icon/malf/may_used_by_ai(mob/living/silicon/ai/AI)
+/datum/ai_icon/malf/may_used_by_ai(var/mob/living/silicon/ai/AI)
 	return istype(AI) && AI.is_malf_or_traitor()
 
-/singleton/ai_icon/red
+/datum/ai_icon/red
 	name = "Red"
 	alive_icon = "ai-red"
 	alive_light = "#f04848"
+	dead_icon = "ai-malf-crash"
 
-/singleton/ai_icon/green
+/datum/ai_icon/green
 	name = "Green"
 	alive_icon = "ai-wierd"
 	alive_light = "#00ff99"
+	dead_icon = "ai-wierd-crash"
 
-/singleton/ai_icon/blue
+/datum/ai_icon/blue
 	name = "Blue"
 	alive_icon = "ai"
 	alive_light = "#81ddff"
 
-/singleton/ai_icon/angry
+/datum/ai_icon/angry
 	name = "Angry"
 	alive_icon = "ai-angryface"
 	alive_light = "#ffff33"
 
-/singleton/ai_icon/bliss
+/datum/ai_icon/bliss
 	name = "Bliss"
 	alive_icon = "ai-bliss"
 	alive_light = "#5c7a4a"
 
-/singleton/ai_icon/chatterbox
+/datum/ai_icon/chatterbox
 	name = "Chatterbox"
 	alive_icon = "ai-president"
 	alive_light = "#40666b"
 
-/singleton/ai_icon/database
+/datum/ai_icon/database
 	name = "Database"
 	alive_icon = "ai-database"
+	dead_icon = "ai-database-crash"
 
-/singleton/ai_icon/dorf
+/datum/ai_icon/dorf
 	name = "Dorf"
 	alive_icon = "ai-dorf"
 
-/singleton/ai_icon/dugtodeep
+/datum/ai_icon/dugtodeep
 	name = "Dug Too Deep"
 	alive_icon = "ai-toodeep"
 	alive_light = "#81ddff"
 
-/singleton/ai_icon/firewall
+/datum/ai_icon/firewall
 	name = "Firewall"
 	alive_icon = "ai-magma"
 	alive_light = "#ff4126"
 
-/singleton/ai_icon/glitchman
+/datum/ai_icon/glitchman
 	name = "Glitchman"
 	alive_icon = "ai-glitchman"
+	dead_icon = "ai-glitchman-crash"
 
-/singleton/ai_icon/goon
+/datum/ai_icon/goon
 	name = "Goon"
 	alive_icon = "ai-goon"
 	alive_light = "#3e5c80"
+	dead_icon = "ai-goon-crash"
 
-/singleton/ai_icon/heartline
+/datum/ai_icon/heartline
 	name = "Heartline"
 	alive_icon = "ai-heartline"
 	dead_icon = "ai-heartline_dead"
 
-/singleton/ai_icon/helios
+/datum/ai_icon/helios
 	name = "Helios"
 	alive_icon = "ai-helios"
 	alive_light = "#f2cf73"
 
-/singleton/ai_icon/inverted
+/datum/ai_icon/inverted
 	name = "Inverted"
 	alive_icon = "ai-u"
 	alive_light = "#81ddff"
 
-/singleton/ai_icon/lonestar
+/datum/ai_icon/lonestar
 	name = "Lonestar"
 	alive_icon = "ai-lonestar"
 	alive_light = "#58751c"
 
-/singleton/ai_icon/matrix
+/datum/ai_icon/matrix
 	name = "Matrix"
 	alive_icon = "ai-matrix"
 	alive_light = "#449944"
 
-/singleton/ai_icon/monochrome
+/datum/ai_icon/monochrome
 	name = "Monochrome"
 	alive_icon = "ai-mono"
 	alive_light = "#585858"
 
-/singleton/ai_icon/nanotrasen
+/datum/ai_icon/nanotrasen
 	name = "NanoTrasen"
 	alive_icon = "ai-nanotrasen"
 	alive_light = "#000029"
 
-/singleton/ai_icon/rainbow
+/datum/ai_icon/rainbow
 	name = "Rainbow"
 	alive_icon = "ai-clown"
 	alive_light = "#e50213"
 
-/singleton/ai_icon/smiley
+/datum/ai_icon/smiley
 	name = "Smiley"
 	alive_icon = "ai-smiley"
 	alive_light = "#f3dd00"
 
-/singleton/ai_icon/soviet
+/datum/ai_icon/soviet
 	name = "Soviet"
 	alive_icon = "ai-redoctober"
 	alive_light = "#ff4307"
+	dead_icon = "ai-soviet-crash"
 
-/singleton/ai_icon/Static
+/datum/ai_icon/Static
 	name = "Static"
 	alive_icon = "ai-static"
 	alive_light = "#4784c1"
+	dead_icon = "ai-static-crash"
 
-/singleton/ai_icon/text
+/datum/ai_icon/text
 	name = "Text"
 	alive_icon = "ai-text"
 
-/singleton/ai_icon/trapped
+/datum/ai_icon/trapped
 	name = "Trapped"
 	alive_icon = "ai-hades"
+	dead_icon = "ai-hades-crash"
 
-/singleton/ai_icon/triumvirate_static
+/datum/ai_icon/triumvirate
 	name = "Triumvirate"
 	alive_icon = "ai-triumvirate"
 	alive_light = "#020b2b"
 
-/singleton/ai_icon/triumvirate_static
+/datum/ai_icon/triumvirate_static
 	name = "Triumvirate Static"
 	alive_icon = "ai-static"
 	alive_light = "#020b2b"
 
-/singleton/ai_icon/hotdogger
+/datum/ai_icon/hotdogger
 	name = "Dancing Hotdog"
 	alive_icon = "ai-hotdog"
 	alive_light = "#81ddff"
 
-/singleton/ai_icon/malf/clown
+/datum/ai_icon/malf/clown
 	name = "Clown"
 	alive_icon = "ai-clown2"
 	alive_light = "#e50213"
+	dead_icon = "ai-clown2-crash"
+
+//infinity Changes: Icons from VG station
+/datum/ai_icon/fabulous
+	name = "VG_Fabulous"
+	alive_icon = "ai-fabulous"
+	alive_light = "#001542"
+
+/datum/ai_icon/girl
+	name = "VG_Girl"
+	alive_icon = "ai-girl"
+
+/datum/ai_icon/malf/girl
+	name = "VG_Girl_malf"
+	alive_icon = "ai-girl-malf"
+
+/datum/ai_icon/boy
+	name = "VG_boy"
+	alive_icon = "ai-boy"
+	alive_light = "#81ddff"
+
+/datum/ai_icon/malf/boy
+	name = "VG_Boy_malf"
+	alive_icon = "ai-boy-malf"
+	alive_light = "#81ddff"
+
+/datum/ai_icon/alien
+	name = "VG_Alien"
+	alive_icon = "ai-alien"
+	alive_light = "#31003e"
+	dead_icon = "ai-alien-crash"
+
+/datum/ai_icon/SindiKot
+	name = "VG_SindiCat"
+	alive_icon = "ai-syndicatmeow"
+	alive_light = "#ff008d"
+
+/datum/ai_icon/wasp
+	name = "VG_Wasp"
+	alive_icon = "ai-wasp"
+	alive_light = "#ffce00"
+
+/datum/ai_icon/presid
+	name = "VG_President"
+	alive_icon = "ai-pres"
+	alive_light = "#009630"
+
+/datum/ai_icon/angel
+	name = "VG_Angel"
+	alive_icon = "ai-angel"
+	alive_light = "#faffae"
+	dead_icon = "ai-angel-crash"
+
+//TG Icons
+/datum/ai_icon/thinking
+	name = "TG_thinking"
+	alive_icon = "ai-thinking"
+	dead_icon = "ai-thinking_dead"
+
+/datum/ai_icon/random
+	name = "TG_random"
+	alive_icon = "ai-random"
+
+/datum/ai_icon/gondola
+	name = "TG_gondola"
+	alive_icon = "ai-gondola"
+
+//Elar Icons
+/datum/ai_icon/citadel
+	name = "Citadel AI"
+	alive_icon = "citadel"
+	alive_light = "#5600ff"
+
+/datum/ai_icon/vega
+	name = "Vega"
+	alive_icon = "ai-vega"
+	alive_light = "#6000ff"
+	dead_icon = "ai-vega-dead"
+
+//Bay Custom Icons
+/datum/ai_icon/atlantiscze
+	name = "Atlantiscze"
+	alive_icon = "atlantiscze-ai"
+	alive_light = "#009c27"
+	dead_icon = "atlantiscze-ai-crash"

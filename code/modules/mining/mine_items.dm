@@ -2,7 +2,7 @@
 
 /obj/structure/closet/secure_closet/miner
 	name = "miner's equipment"
-	closet_appearance = /singleton/closet_appearance/secure_closet/mining
+	closet_appearance = /decl/closet_appearance/secure_closet/mining
 	req_access = list(access_mining)
 
 /obj/structure/closet/secure_closet/miner/WillContain()
@@ -28,7 +28,7 @@
 /obj/item/pickaxe
 	name = "mining drill"
 	desc = "The most basic of mining drills, for short excavations and small mineral extractions."
-	icon = 'icons/obj/tools/mining_drills.dmi'
+	icon = 'icons/obj/tools.dmi'
 	obj_flags = OBJ_FLAG_CONDUCTIBLE
 	slot_flags = SLOT_BELT
 	force = 15.0
@@ -58,7 +58,6 @@
 	name = "sledgehammer"
 	desc = "A mining hammer made of reinforced metal. You feel like smashing your boss in the face with this."
 	icon = 'icons/obj/weapons/melee_physical.dmi'
-	icon_state = "sledgehammer"
 
 /obj/item/pickaxe/drill
 	name = "advanced mining drill" // Can dig sand as well!
@@ -137,7 +136,7 @@
 /obj/item/shovel
 	name = "shovel"
 	desc = "A large tool for digging and moving dirt."
-	icon = 'icons/obj/tools/shovels.dmi'
+	icon = 'icons/obj/tools.dmi'
 	icon_state = "shovel"
 	obj_flags = OBJ_FLAG_CONDUCTIBLE
 	slot_flags = SLOT_BELT
@@ -191,29 +190,29 @@
 	. = ..()
 	update_icon()
 
-/obj/item/stack/flag/attackby(obj/item/W, mob/user)
+/obj/item/stack/flag/attackby(var/obj/item/W, var/mob/user)
 	if(upright)
 		attack_hand(user)
 		return
 	return ..()
 
-/obj/item/stack/flag/attack_hand(mob/user)
+/obj/item/stack/flag/attack_hand(var/mob/user)
 	if(upright)
 		knock_down()
 		user.visible_message("\The [user] knocks down \the [singular_name].")
 		return
 	return ..()
 
-/obj/item/stack/flag/attack_self(mob/user)
+/obj/item/stack/flag/attack_self(var/mob/user)
 	var/turf/T = get_turf(src)
 
 	if(istype(T, /turf/space) || istype(T, /turf/simulated/open))
-		to_chat(user, SPAN_WARNING("There's no solid surface to plant \the [singular_name] on."))
+		to_chat(user, "<span class='warning'>There's no solid surface to plant \the [singular_name] on.</span>")
 		return
 
 	for(var/obj/item/stack/flag/F in T)
 		if(F.upright)
-			to_chat(user, SPAN_WARNING("\The [F] is already planted here."))
+			to_chat(user, "<span class='warning'>\The [F] is already planted here.</span>")
 			return
 
 	if(use(1)) // Don't skip use() checks even if you only need one! Stacks with the amount of 0 are possible, e.g. on synthetics!
@@ -240,7 +239,7 @@
 		addon.layer = ABOVE_LIGHTING_LAYER
 		addon.plane = EFFECTS_ABOVE_LIGHTING_PLANE
 		overlays += addon
-		set_light(0.5, 0.5, 3)
+		set_light(0.5, 0.5, 3) 
 	else
 		pixel_x = rand(-randpixel, randpixel)
 		pixel_y = rand(-randpixel, randpixel)

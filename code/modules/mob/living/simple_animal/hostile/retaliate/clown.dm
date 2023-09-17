@@ -22,7 +22,7 @@
 	unsuitable_atmos_damage = 10
 	natural_weapon = /obj/item/natural_weapon/clown
 
-	ai_holder = /datum/ai_holder/simple_animal/retaliate/clown
+	ai_holder = /datum/ai_holder/simple_animal/clown
 	say_list = /datum/say_list/clown
 
 /obj/item/natural_weapon/clown
@@ -30,9 +30,8 @@
 	force = 10
 	hitsound = 'sound/items/bikehorn.ogg'
 
-/datum/ai_holder/simple_animal/retaliate/clown
+/datum/ai_holder/simple_animal/clown
 	speak_chance = 1
-
 /datum/say_list/clown
 	speak = list("HONK", "Honk!", "Welcome to clown planet!")
 	emote_see = list("honks")

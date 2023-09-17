@@ -9,14 +9,9 @@ SUBSYSTEM_DEF(codex)
 	var/list/index_file =        list()
 	var/list/search_cache =      list()
 
-
-/datum/controller/subsystem/codex/UpdateStat(time)
-	return
-
-
-/datum/controller/subsystem/codex/Initialize(start_uptime)
-	// Codex link syntax is such:
-	// <l>keyword</l> when keyword is mentioned verbatim,
+/datum/controller/subsystem/codex/Initialize()
+	// Codex link syntax is such: 
+	// <l>keyword</l> when keyword is mentioned verbatim, 
 	// <span codexlink='keyword'>whatever</span> when shit gets tricky
 	linkRegex = regex(@"<(span|l)(\s+codexlink='([^>]*)'|)>([^<]+)</(span|l)>","g")
 
@@ -47,22 +42,22 @@ SUBSYSTEM_DEF(codex)
 		var/datum/codex_entry/entry = SScodex.entries_by_string[thing]
 		index_file[entry.display_name] = entry
 	index_file = sortAssoc(index_file)
-
+	. = ..()
 
 /datum/controller/subsystem/codex/proc/parse_links(string, viewer)
-	while(linkRegex.Find_char(string))
+	while(regex_find(linkRegex, string))
 		var/key = linkRegex.group[4]
 		if(linkRegex.group[2])
 			key = linkRegex.group[3]
-		key = lowertext(trimtext(key))
+		key = lowertext(trim(key))
 		var/datum/codex_entry/linked_entry = get_entry_by_string(key)
 		var/replacement = linkRegex.group[4]
 		if(linked_entry)
 			replacement = "<a href='?src=\ref[SScodex];show_examined_info=\ref[linked_entry];show_to=\ref[viewer]'>[replacement]</a>"
-		string = replacetextEx(string, linkRegex.match, replacement)
+		string = replacetextEx_char(string, linkRegex.match, replacement)
 	return string
 
-/datum/controller/subsystem/codex/proc/get_codex_entry(entry)
+/datum/controller/subsystem/codex/proc/get_codex_entry(var/entry)
 	if(istype(entry, /atom))
 		var/atom/entity = entry
 		if(entity.get_specific_codex_entry())
@@ -73,24 +68,24 @@ SUBSYSTEM_DEF(codex)
 	else if(entries_by_string[lowertext(entry)])
 		return entries_by_string[lowertext(entry)]
 
-/datum/controller/subsystem/codex/proc/add_entry_by_string(string, entry)
-	entries_by_string[lowertext(trimtext(string))] = entry
+/datum/controller/subsystem/codex/proc/add_entry_by_string(var/string, var/entry)
+	entries_by_string[lowertext(trim(string))] = entry
 
-/datum/controller/subsystem/codex/proc/get_entry_by_string(string)
-	return entries_by_string[lowertext(trimtext(string))]
+/datum/controller/subsystem/codex/proc/get_entry_by_string(var/string)
+	return entries_by_string[lowertext(trim(string))]
 
-/datum/controller/subsystem/codex/proc/present_codex_entry(mob/presenting_to, datum/codex_entry/entry)
+/datum/controller/subsystem/codex/proc/present_codex_entry(var/mob/presenting_to, var/datum/codex_entry/entry)
 	if(entry && istype(presenting_to) && presenting_to.client)
 		var/datum/browser/popup = new(presenting_to, "codex", "Codex", nheight=425)
 		popup.set_content(parse_links(entry.get_text(presenting_to), presenting_to))
 		popup.open()
 
-/datum/controller/subsystem/codex/proc/retrieve_entries_for_string(searching)
+/datum/controller/subsystem/codex/proc/retrieve_entries_for_string(var/searching)
 
 	if(!initialized)
 		return list()
 
-	searching = sanitize(lowertext(trimtext(searching)))
+	searching = sanitize(lowertext(trim(searching)))
 	if(!searching)
 		return list()
 	if(!search_cache[searching])
@@ -114,7 +109,7 @@ SUBSYSTEM_DEF(codex)
 	if(!. && href_list["show_examined_info"] && href_list["show_to"])
 		var/mob/showing_mob =   locate(href_list["show_to"])
 		if(!istype(showing_mob) || !showing_mob.can_use_codex())
-			return
+			return 
 		var/atom/showing_atom = locate(href_list["show_examined_info"])
 		var/entry
 		if(istype(showing_atom, /datum/codex_entry))

@@ -42,12 +42,13 @@
 /obj/item/storage/bag/trash
 	name = "trash bag"
 	desc = "It's the heavy-duty black polymer kind. Time to take out the trash!"
-	icon = 'icons/obj/bags.dmi'
+	icon = 'icons/obj/janitor.dmi'
 	icon_state = "trashbag"
 	item_state = "trashbag"
 
 	w_class = ITEM_SIZE_SMALL
-	max_w_class = ITEM_SIZE_HUGE //can fit a backpack inside a trash bag, seems right
+//	max_w_class = ITEM_SIZE_HUGE //can fit a backpack inside a trash bag, seems right
+	max_w_class = ITEM_SIZE_SMALL
 	max_storage_space = DEFAULT_BACKPACK_STORAGE
 	can_hold = list() // any
 
@@ -70,7 +71,7 @@
 
 /obj/item/storage/bag/trash/bluespace/attackby(obj/item/W as obj, mob/user as mob)
 	if(istype(W, /obj/item/storage/backpack/holding) || istype(W, /obj/item/storage/bag/trash/bluespace))
-		to_chat(user, SPAN_WARNING("The Bluespace interfaces of the two devices conflict and malfunction."))
+		to_chat(user, "<span class='warning'>The Bluespace interfaces of the two devices conflict and malfunction.</span>")
 		qdel(W)
 		return 1
 	return ..()
@@ -97,7 +98,7 @@
 
 /obj/item/storage/bag/cash
 	name = "cash bag"
-	icon = 'icons/obj/bags.dmi'
+	icon = 'icons/obj/storage.dmi'
 	icon_state = "cashbag"
 	desc = "A bag for carrying lots of cash. It's got a big dollar sign printed on the front."
 	max_storage_space = 100

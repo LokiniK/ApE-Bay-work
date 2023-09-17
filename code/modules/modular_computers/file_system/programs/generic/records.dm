@@ -24,6 +24,7 @@
 	if(active_record)
 		send_rsc(user, active_record.photo_front, "front_[active_record.uid].png")
 		send_rsc(user, active_record.photo_side, "side_[active_record.uid].png")
+		data["creation"] = check_access(user, access_bridge)
 		data["pic_edit"] = check_access(user, access_bridge) || check_access(user, access_security)
 		data += active_record.generate_nano_data(user_access)
 	else
@@ -49,7 +50,7 @@
 		ui.open()
 
 
-/datum/nano_module/records/proc/get_record_access(mob/user)
+/datum/nano_module/records/proc/get_record_access(var/mob/user)
 	var/list/user_access = using_access || user.GetAccess()
 
 	var/obj/PC = nano_host()
@@ -60,7 +61,7 @@
 
 	return user_access
 
-/datum/nano_module/records/proc/edit_field(mob/user, field_ID)
+/datum/nano_module/records/proc/edit_field(var/mob/user, var/field_ID)
 	var/datum/computer_file/report/crew_record/R = active_record
 	if(!R)
 		return
@@ -68,7 +69,7 @@
 	if(!F)
 		return
 	if(!F.verify_access_edit(get_record_access(user)))
-		to_chat(user, SPAN_NOTICE("\The [nano_host()] flashes an \"Access Denied\" warning."))
+		to_chat(user, "<span class='notice'>\The [nano_host()] flashes an \"Access Denied\" warning.</span>")
 		return
 	F.ask_value(user)
 
@@ -95,6 +96,19 @@
 		active_record = new/datum/computer_file/report/crew_record()
 		GLOB.all_crew_records.Add(active_record)
 		return 1
+	if(href_list["delete_record"])
+		if(!active_record)
+			return
+		if(!check_access(usr, access_change_ids))
+			to_chat(usr, "Access Denied.")
+			return
+		var/confirm = alert("Are you sure you want to delete it?", "DB Updating", "Yes", "No")
+		if(confirm == "Yes")
+			GLOB.all_crew_records.Remove(active_record)
+			qdel(active_record)
+			active_record = null
+			return 1
+		else return
 	if(href_list["print_active"])
 		if(!active_record)
 			return
@@ -130,7 +144,7 @@
 		edit_field(usr, text2num(href_list["edit_field"]))
 		return 1
 
-/datum/nano_module/records/proc/get_photo(mob/user)
+/datum/nano_module/records/proc/get_photo(var/mob/user)
 	if(istype(user.get_active_hand(), /obj/item/photo))
 		var/obj/item/photo/photo = user.get_active_hand()
 		return photo.img

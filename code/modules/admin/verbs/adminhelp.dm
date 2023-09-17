@@ -1,11 +1,17 @@
 
 //This is a list of words which are ignored by the parser when comparing message contents for names. MUST BE IN LOWER CASE!
-var/global/list/adminhelp_ignored_words = list("unknown","the","a","an","of","monkey","alien","as")
+var/list/adminhelp_ignored_words = list("unknown","the","a","an","of","monkey","alien","as")
 
-/proc/generate_ahelp_key_words(mob/mob, msg)
+/client/proc/generate_ahelp_key_words(var/mob/mob, var/msg)
 	var/list/surnames = list()
 	var/list/forenames = list()
 	var/list/ckeys = list()
+
+	msg = emoji_parse_by_user(msg, src)//inf
+
+	if(config.ahelp_allowed == 0)
+		to_chat(src, "<font color='red'>Error: Admin-Help: Adminhelp is currently off for everyone.</font>")
+		return
 
 	//explode the input msg into a list
 	var/list/msglist = splittext(msg, " ")
@@ -18,7 +24,7 @@ var/global/list/adminhelp_ignored_words = list("unknown","the","a","an","of","mo
 			var/list/L = splittext(string, " ")
 			var/surname_found = 0
 			//surnames
-			for(var/i=length(L), i>=1, i--)
+			for(var/i=L.len, i>=1, i--)
 				var/word = ckey(L[i])
 				if(word)
 					surnames[word] = M
@@ -68,7 +74,7 @@ var/global/list/adminhelp_ignored_words = list("unknown","the","a","an","of","mo
 
 	//handle muting and automuting
 	if(prefs.muted & MUTE_ADMINHELP)
-		to_chat(src, SPAN_COLOR("red", "Error: Admin-PM: You cannot send adminhelps (Muted)."))
+		to_chat(src, "<font color='red'>Error: Admin-PM: You cannot send adminhelps (Muted).</font>")
 		return
 
 	adminhelped = 1 //Determines if they get the message to reply by clicking the name.
@@ -104,37 +110,42 @@ var/global/list/adminhelp_ignored_words = list("unknown","the","a","an","of","mo
 				src.cmd_admin_pm(admin_client, original_msg, ticket)
 				break
 		if(!admin_found)
-			to_chat(src, SPAN_WARNING("Error: Private-Message: Client not found. They may have lost connection, so please be patient!"))
+			to_chat(src, "<span class='warning'>Error: Private-Message: Client not found. They may have lost connection, so please be patient!</span>")
 		return
 
-	ticket.last_message_time = world.time
 	ticket.msgs += new /datum/ticket_msg(src.ckey, null, original_msg)
+	if(establish_db_connection())
+		var/sql_text = "HELP [src.ckey]: [sanitizeSQL(original_msg)]\n"
+		var/DBQuery/ticket_text = dbcon.NewQuery("UPDATE erro_admin_tickets SET text = '[sql_text]' WHERE round = '[game_id]' AND inround_id = '[ticket.id]';")
+		ticket_text.Execute()
 	update_ticket_panels()
 
 
 	//Options bar:  mob, details ( admin = 2, dev = 3, character name (0 = just ckey, 1 = ckey and character name), link? (0 no don't make it a link, 1 do so),
 	//		highlight special roles (0 = everyone has same looking name, 1 = antags / special roles get a golden name)
 
-	msg = SPAN_NOTICE("<b>[SPAN_COLOR("red", "HELP: ")][get_options_bar(mob, 2, 1, 1, 1, ticket)] (<a href='?_src_=holder;take_ticket=\ref[ticket]'>[(ticket.status == TICKET_OPEN) ? "TAKE" : "JOIN"]</a>) (<a href='?src=\ref[usr];close_ticket=\ref[ticket]'>CLOSE</a>):</b> [msg]")
+	msg = "<span class='notice'><b><font color=red>HELP: </font>[get_options_bar(mob, 2, 1, 1, 1, ticket)] (<a href='?_src_=holder;take_ticket=\ref[ticket]'>[(ticket.status == TICKET_OPEN) ? "TAKE" : "JOIN"]</a>) (<a href='?src=\ref[usr];close_ticket=\ref[ticket]'>CLOSE</a>):</b> [msg]</span>"
 
 	var/admin_number_afk = 0
 
-	for(var/client/X as anything in GLOB.admins)
+	for(var/client/X in GLOB.admins)
 		if((R_ADMIN|R_MOD) & X.holder.rights)
 			if(X.is_afk())
 				admin_number_afk++
 			if(X.get_preference_value(/datum/client_preference/staff/play_adminhelp_ping) == GLOB.PREF_HEAR)
-				sound_to(X, sound('sound/ui/pm-notify.ogg', volume = 40))
+				sound_to(X, 'sound/effects/adminhelp.ogg')
 			to_chat(X, msg)
+	//Emoji Parse for staff log
+	original_msg = emoji_parse_by_user(original_msg, src)//inf
 	//show it to the person adminhelping too
-	to_chat(src, SPAN_CLASS("staff_pm", "PM to-<b>Staff</b> (<a href='?src=\ref[usr];close_ticket=\ref[ticket]'>CLOSE</a>): [original_msg]"))
-	var/admin_number_present = length(GLOB.admins) - admin_number_afk
+	to_chat(src, "<font color='blue'>PM to-<b>Staff</b> (<a href='?src=\ref[usr];close_ticket=\ref[ticket]'>CLOSE</a>): [original_msg]</font>")
+	var/admin_number_present = GLOB.admins.len - admin_number_afk
 	log_admin("HELP: [key_name(src)]: [original_msg] - heard by [admin_number_present] non-AFK admins.")
 	if(admin_number_present <= 0)
 		adminmsg2adminirc(src, null, "[html_decode(original_msg)] - !![admin_number_afk ? "All admins AFK ([admin_number_afk])" : "No admins online"]!!")
+		send2admindiscord("**Help**: [key_name(src)]: `[original_msg]` - **[admin_number_afk ? "All admins AFK ([admin_number_afk])" : "No admins online"]** {ADMIN_PING}")
 	else
 		adminmsg2adminirc(src, null, "[html_decode(original_msg)]")
 
-
-	send_to_admin_discord(EXCOM_MSG_AHELP, "HELP: [key_name(src, highlight_special_characters = FALSE)]: [original_msg]")
+	SSstatistics.add_field_details("admin_verb","AH") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 	return

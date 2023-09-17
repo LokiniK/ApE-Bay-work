@@ -25,20 +25,20 @@
 	var/auth = 0 // Are they authenticated?
 
 /obj/machinery/computer/message_monitor/attackby(obj/item/O as obj, mob/living/user as mob)
-	if(inoperable())
+	if(stat & (NOPOWER|BROKEN))
 		..()
 		return
 	if(!istype(user))
 		return
 	if(isScrewdriver(O) && emag)
 		//Stops people from just unscrewing the monitor and putting it back to get the console working again.
-		to_chat(user, SPAN_WARNING("It is too hot to mess with!"))
+		to_chat(user, "<span class='warning'>It is too hot to mess with!</span>")
 		return
 
 	..()
 	return
 
-/obj/machinery/computer/message_monitor/emag_act(remaining_charges, mob/user)
+/obj/machinery/computer/message_monitor/emag_act(var/remaining_charges, var/mob/user)
 	// Will create sparks and print out the console's password. You will then have to wait a while for the console to be back online.
 	// It'll take more time if there's more characters in the password..
 	if(!emag && operable())
@@ -50,13 +50,13 @@
 			var/obj/item/paper/monitorkey/MK = new/obj/item/paper/monitorkey
 			MK.dropInto(loc)
 			// Will help make emagging the console not so easy to get away with.
-			MK.info += "<br><br>[SPAN_COLOR("red", "£%@%(*$%&(£&?*(%&£/{}")]"
+			MK.info += "<br><br><font color='red'>£%@%(*$%&(£&?*(%&£/{}</font>"
 			spawn(100*length(src.linkedServer.decryptkey)) UnmagConsole()
 			message = rebootmsg
 			update_icon()
 			return 1
 		else
-			to_chat(user, SPAN_NOTICE("A no server error appears on the screen."))
+			to_chat(user, "<span class='notice'>A no server error appears on the screen.</span>")
 
 /obj/machinery/computer/message_monitor/on_update_icon()
 	if(emag || hacking)
@@ -68,7 +68,7 @@
 /obj/machinery/computer/message_monitor/Initialize()
 	//Is the server isn't linked to a server, and there's a server available, default it to the first one in the list.
 	if(!linkedServer)
-		if(message_servers && length(message_servers) > 0)
+		if(message_servers && message_servers.len > 0)
 			linkedServer = message_servers[1]
 	return ..()
 
@@ -76,26 +76,26 @@
 	interact(user)
 	return TRUE
 
-/obj/machinery/computer/message_monitor/interact(mob/living/user)
+/obj/machinery/computer/message_monitor/interact(var/mob/living/user)
 	//If the computer is being hacked or is emagged, display the reboot message.
 	if(hacking || emag)
 		message = rebootmsg
 	var/list/dat = list()
-	dat += "<head><title>Message Monitor Console</title></head><body>"
+	dat += "<meta charset=\"UTF-8\"><head><title>Message Monitor Console</title></head><body>"
 	dat += "<center><h2>Message Monitor Console</h2></center><hr>"
-	dat += "<center><h4 style='color: blue'>[message]</h4></center>"
+	dat += "<center><h4><font color='blue'[message]</h5></center>"
 
 	if(auth)
-		dat += "<h4><dd><A href='?src=\ref[src];auth=1'>&#09;[SPAN_COLOR("green", "\[Authenticated\]")]</a>&#09;/"
-		dat += " Server Power: <A href='?src=\ref[src];active=1'>[src.linkedServer && src.linkedServer.active ? SPAN_COLOR("green", "\[On\]") : SPAN_COLOR("red", "\[Off\]")]</a></h4>"
+		dat += "<h4><dd><A href='?src=\ref[src];auth=1'>&#09;<font color='green'>\[Authenticated\]</font></a>&#09;/"
+		dat += " Server Power: <A href='?src=\ref[src];active=1'>[src.linkedServer && src.linkedServer.active ? "<font color='green'>\[On\]</font>":"<font color='red'>\[Off\]</font>"]</a></h4>"
 	else
-		dat += "<h4><dd><A href='?src=\ref[src];auth=1'>&#09;[SPAN_COLOR("red", "\[Unauthenticated\]")]</a>&#09;/"
-		dat += " Server Power: <u>[src.linkedServer && src.linkedServer.active ? SPAN_COLOR("green", "\[On\]") : SPAN_COLOR("red", "\[Off\]")]</u></h4>"
+		dat += "<h4><dd><A href='?src=\ref[src];auth=1'>&#09;<font color='red'>\[Unauthenticated\]</font></a>&#09;/"
+		dat += " Server Power: <u>[src.linkedServer && src.linkedServer.active ? "<font color='green'>\[On\]</font>":"<font color='red'>\[Off\]</font>"]</u></h4>"
 
 	if(hacking || emag)
 		screen = 2
-	else if(!auth || !linkedServer || (linkedServer.inoperable()))
-		if(!linkedServer || (linkedServer.inoperable())) message = noserver
+	else if(!auth || !linkedServer || (linkedServer.stat & (NOPOWER|BROKEN)))
+		if(!linkedServer || (linkedServer.stat & (NOPOWER|BROKEN))) message = noserver
 		screen = 0
 
 	switch(screen)
@@ -105,17 +105,17 @@
 			var/i = 0
 			dat += "<dd><A href='?src=\ref[src];find=1'>&#09;[++i]. Link To A Server</a></dd>"
 			if(auth)
-				if(!linkedServer || (linkedServer.inoperable()))
+				if(!linkedServer || (linkedServer.stat & (NOPOWER|BROKEN)))
 					dat += "<dd><A>&#09;ERROR: Server not found!</A><br></dd>"
 				else
 					dat += "<dd><A href='?src=\ref[src];viewr=1'>&#09;[++i]. View Request Console Logs </a></br></dd>"
 					dat += "<dd><A href='?src=\ref[src];clearr=1'>&#09;[++i]. Clear Request Console Logs</a><br></dd>"
 					dat += "<dd><A href='?src=\ref[src];pass=1'>&#09;[++i]. Set Custom Key</a><br></dd>"
 			else
-				dat += "<br><hr><dd>[SPAN_NOTICE("Please authenticate with the server in order to show additional options.")]"
+				dat += "<br><hr><dd><span class='notice'>Please authenticate with the server in order to show additional options.</span>"
 			if((istype(user, /mob/living/silicon/ai) || istype(user, /mob/living/silicon/robot)) && (user.mind.special_role && user.mind.original == user))
 				//Malf/Traitor AIs can bruteforce into the system to gain the Key.
-				dat += "<dd><A href='?src=\ref[src];hack=1'>[SPAN_COLOR("red", "<i>*&@#. Bruteforce Key</i>")]</a></dd>"
+				dat += "<dd><A href='?src=\ref[src];hack=1'><i><font color='Red'>*&@#. Bruteforce Key</font></i></font></a></dd>"
 
 		//Hacking screen.
 		if(2)
@@ -195,10 +195,10 @@
 
 /obj/machinery/computer/message_monitor/proc/BruteForce(mob/user as mob)
 	if(isnull(linkedServer))
-		to_chat(user, SPAN_WARNING("Could not complete brute-force: Linked Server Disconnected!"))
+		to_chat(user, "<span class='warning'>Could not complete brute-force: Linked Server Disconnected!</span>")
 	else
 		var/currentKey = src.linkedServer.decryptkey
-		to_chat(user, SPAN_WARNING("Brute-force completed! The key is '[currentKey]'."))
+		to_chat(user, "<span class='warning'>Brute-force completed! The key is '[currentKey]'.</span>")
 	src.hacking = 0
 	update_icon()
 	src.screen = 0 // Return the screen back to normal
@@ -217,7 +217,7 @@
 			auth = 0
 			screen = 0
 		else
-			var/dkey = trimtext(input(usr, "Please enter the decryption key.") as text|null)
+			var/dkey = trim(input(usr, "Please enter the decryption key.") as text|null)
 			if(dkey && dkey != "")
 				if(src.linkedServer.decryptkey == dkey)
 					auth = 1
@@ -229,40 +229,40 @@
 		if(auth) linkedServer.active = !linkedServer.active
 	//Find a server
 	if (href_list["find"])
-		if(message_servers && length(message_servers) > 1)
+		if(message_servers && message_servers.len > 1)
 			src.linkedServer = input(usr,"Please select a server.", "Select a server.", null) as null|anything in message_servers
-			message = SPAN_CLASS("alert", "NOTICE: Server selected.")
-		else if(message_servers && length(message_servers) > 0)
+			message = "<span class='alert'>NOTICE: Server selected.</span>"
+		else if(message_servers && message_servers.len > 0)
 			linkedServer = message_servers[1]
-			message =  SPAN_NOTICE("NOTICE: Only Single Server Detected - Server selected.")
+			message =  "<span class='notice'>NOTICE: Only Single Server Detected - Server selected.</span>"
 		else
 			message = noserver
 
 	//Clears the request console logs - KEY REQUIRED
 	if (href_list["clearr"])
-		if(!linkedServer || (src.linkedServer.inoperable()))
+		if(!linkedServer || (src.linkedServer.stat & (NOPOWER|BROKEN)))
 			message = noserver
 		else
 			if(auth)
 				src.linkedServer.rc_msgs = list()
-				message = SPAN_NOTICE("NOTICE: Logs cleared.")
+				message = "<span class='notice'>NOTICE: Logs cleared.</span>"
 	//Change the password - KEY REQUIRED
 	if (href_list["pass"])
-		if(!linkedServer || (src.linkedServer.inoperable()))
+		if(!linkedServer || (src.linkedServer.stat & (NOPOWER|BROKEN)))
 			message = noserver
 		else
 			if(auth)
-				var/dkey = trimtext(input(usr, "Please enter the decryption key.") as text|null)
+				var/dkey = trim(input(usr, "Please enter the decryption key.") as text|null)
 				if(dkey && dkey != "")
 					if(src.linkedServer.decryptkey == dkey)
-						var/newkey = trimtext(input(usr,"Please enter the new key (3 - 16 characters max):"))
-						if(length(newkey) <= 3)
-							message = SPAN_NOTICE("NOTICE: Decryption key too short!")
+						var/newkey = trim(input(usr,"Please enter the new key (3 - 16 characters max):"))
+						if(length(newkey) < 3)
+							message = "<span class='notice'>NOTICE: Decryption key too short!</span>"
 						else if(length(newkey) > 16)
-							message = SPAN_NOTICE("NOTICE: Decryption key too long!")
+							message = "<span class='notice'>NOTICE: Decryption key too long!</span>"
 						else if(newkey && newkey != "")
 							src.linkedServer.decryptkey = newkey
-						message = SPAN_NOTICE("NOTICE: Decryption key set.")
+							message = "<span class='notice'>NOTICE: Decryption key set.</span>"
 					else
 						message = incorrectkey
 
@@ -281,15 +281,15 @@
 	if (href_list["deleter"])
 		//Are they on the view logs screen?
 		if(screen == 4)
-			if(!linkedServer || (src.linkedServer.inoperable()))
+			if(!linkedServer || (src.linkedServer.stat & (NOPOWER|BROKEN)))
 				message = noserver
 			else //if(istype(href_list["delete"], /datum/data_pda_msg))
 				src.linkedServer.rc_msgs -= locate(href_list["deleter"])
-				message = SPAN_NOTICE("NOTICE: Log Deleted!")
+				message = "<span class='notice'>NOTICE: Log Deleted!</span>"
 
 	//Request Console Logs - KEY REQUIRED
 	if(href_list["viewr"])
-		if(src.linkedServer == null || (src.linkedServer.inoperable()))
+		if(src.linkedServer == null || (src.linkedServer.stat & (NOPOWER|BROKEN)))
 			message = noserver
 		else
 			if(auth)
@@ -303,7 +303,7 @@
 
 /obj/item/paper/monitorkey
 	//..()
-	name = "Monitor Decryption Key"
+	name = "Monitor and airlocks Decryption Keys"//inf
 	var/obj/machinery/message_server/server = null
 
 /obj/item/paper/monitorkey/New()
@@ -317,3 +317,8 @@
 						info_links = info
 						icon_state = "paper_words"
 						break
+		//[inf]
+		if(ntnet_global)
+			if(!isnull(ntnet_global.airlock_override_key))
+				info += "<hr><center><h2>Daily Airlocks' access Override Key Reset</h2></center><br>The new NTNet airlocks override key is '[ntnet_global.airlock_override_key]'.<br>This key need to be maximaly hidden from not autorised personel.<br>The override of the access system to the airlocks' can be carried out only during the red and orange code."
+		//[/inf]

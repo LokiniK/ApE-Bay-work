@@ -1,33 +1,37 @@
 /obj/item/folder
 	name = "folder"
 	desc = "A folder."
-	icon = 'icons/obj/bureaucracy.dmi'
+	icon = 'infinity/icons/obj/bureaucracy.dmi'
 	icon_state = "folder"
 	w_class = ITEM_SIZE_SMALL
 
 /obj/item/folder/blue
+	name = "blue folder"
 	desc = "A blue folder."
 	icon_state = "folder_blue"
 
 /obj/item/folder/red
+	name = "red folder"
 	desc = "A red folder."
 	icon_state = "folder_red"
 
 /obj/item/folder/yellow
+	name = "yellow folder"
 	desc = "A yellow folder."
 	icon_state = "folder_yellow"
 
 /obj/item/folder/white
+	name = "white folder"
 	desc = "A white folder."
 	icon_state = "folder_white"
 
 /obj/item/folder/nt
-	desc = "A corporate folder."
+	name = "corporative folder"
+	desc = "A NanoTrasen folder."
 	icon_state = "folder_nt"
-
 /obj/item/folder/on_update_icon()
 	overlays.Cut()
-	if(length(contents))
+	if(contents.len)
 		overlays += "folder_paper"
 	return
 
@@ -35,7 +39,8 @@
 	if(istype(W, /obj/item/paper) || istype(W, /obj/item/photo) || istype(W, /obj/item/paper_bundle))
 		if(!user.unEquip(W, src))
 			return
-		to_chat(user, SPAN_NOTICE("You put the [W] into \the [src]."))
+		playsound(src,'sound/effects/Paper_Shake.ogg',40,1)
+		to_chat(user, "<span class='notice'>You put the [W] into \the [src].</span>")
 		update_icon()
 	else if(istype(W, /obj/item/pen))
 		var/n_name = sanitizeSafe(input(usr, "What would you like to label the folder?", "Folder Labelling", null)  as text, MAX_NAME_LEN)
@@ -44,7 +49,7 @@
 	return
 
 /obj/item/folder/attack_self(mob/user as mob)
-	var/dat = "<title>[name]</title>"
+	var/dat = "<meta charset=\"UTF-8\"><title>[name]</title>"
 	for(var/obj/item/paper/P in src)
 		dat += "<A href='?src=\ref[src];remove=\ref[P]'>Remove</A> <A href='?src=\ref[src];rename=\ref[P]'>Rename</A> - <A href='?src=\ref[src];read=\ref[P]'>[P.name]</A><BR>"
 	for(var/obj/item/photo/Ph in src)
@@ -66,16 +71,18 @@
 		if(href_list["remove"])
 			var/obj/item/P = locate(href_list["remove"])
 			if(P && (P.loc == src) && istype(P))
+				playsound(src,'sound/effects/Paper_Remove.ogg',40,1)
 				usr.put_in_hands(P)
 
 		else if(href_list["read"])
 			var/obj/item/paper/P = locate(href_list["read"])
+			playsound(src,'sound/effects/Paper_Shake.ogg',40,1)
 			if(P && (P.loc == src) && istype(P))
 				if(!(istype(usr, /mob/living/carbon/human) || isghost(usr) || istype(usr, /mob/living/silicon)))
-					show_browser(usr, "<HTML><HEAD><TITLE>[P.name]</TITLE></HEAD><BODY>[stars(P.show_info(usr))][P.stamps]</BODY></HTML>", "window=[P.name]")
+					show_browser(usr, "<HTML><meta charset=\"UTF-8\"><HEAD><TITLE>[P.name]</TITLE></HEAD><BODY>[stars(P.show_info(usr))][P.stamps]</BODY></HTML>", "window=[P.name]")
 					onclose(usr, "[P.name]")
 				else
-					show_browser(usr, "<HTML><HEAD><TITLE>[P.name]</TITLE></HEAD><BODY>[P.show_info(usr)][P.stamps]</BODY></HTML>", "window=[P.name]")
+					show_browser(usr, "<HTML><meta charset=\"UTF-8\"><HEAD><TITLE>[P.name]</TITLE></HEAD><BODY>[P.show_info(usr)][P.stamps]</BODY></HTML>", "window=[P.name]")
 					onclose(usr, "[P.name]")
 		else if(href_list["look"])
 			var/obj/item/photo/P = locate(href_list["look"])
@@ -117,7 +124,7 @@
 	if(sealed)
 		icon_state = "envelope_sealed"
 	else
-		icon_state = "envelope[length(contents) > 0]"
+		icon_state = "envelope[contents.len > 0]"
 
 /obj/item/folder/envelope/examine(mob/user)
 	. = ..()

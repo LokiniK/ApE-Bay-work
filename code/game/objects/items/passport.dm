@@ -13,13 +13,13 @@
 /obj/item/passport/proc/set_info(mob/living/carbon/human/H)
 	if(!istype(H))
 		return
-	var/singleton/cultural_info/culture = H.get_cultural_value(TAG_HOMEWORLD)
+	var/decl/cultural_info/culture = H.get_cultural_value(TAG_HOMEWORLD)
 	var/pob = culture ? culture.name : "Unset"
 	if(H.dna)
 		fingerprint = md5(H.dna.uni_identity)
 	else
 		fingerprint = "N/A"
-	info = "\icon[src] [src]:\nName: [H.real_name]\nSpecies: [H.get_species()]\nPronouns: [H.pronouns]\nAge: [H.age]\nPlace of Birth: [pob]\nFingerprint: [fingerprint]"
+	info = "\icon[src] [src]:\nName: [H.real_name]\nSpecies: [H.get_species()]\nGender: [gender2text(H.gender)]\nAge: [H.age]\nPlace of Birth: [pob]\nFingerprint: [fingerprint]"
 
 /obj/item/passport/attack_self(mob/user as mob)
 	user.visible_message(
@@ -51,7 +51,7 @@
 	desc = "A passport from Luna, within Sol Central Government space."
 
 /obj/item/passport/mars
-	name = "\improper Mars passport"
+	name = "\improper Martian passport"
 	icon_state = "passport_scg2"
 	desc = "A passport from Mars, within Sol Central Government space."
 
@@ -66,7 +66,7 @@
 	desc = "A passport from Ceres, within Sol Central Government space."
 
 /obj/item/passport/pluto
-	name = "\improper Pluto passport"
+	name = "\improper Plutonian passport"
 	icon_state = "passport_scg2"
 	desc = "A passport from Pluto, within Sol Central Government space."
 
@@ -81,39 +81,51 @@
 	desc = "A passport from Eos, within Sol Central Government space."
 
 /obj/item/passport/ceti_epsilon
-	name = "\improper Ceti Epsilon passport"
+	name = "\improper Cetite passport"
 	icon_state = "passport_scg2"
 	desc = "A passport from Ceti Epsilon, within Sol Central Government space."
 
-/obj/item/passport/iolaus
-	name = "\improper Iolaus passport"
+/obj/item/passport/lordania
+	name = "\improper Lordanian passport"
 	icon_state = "passport_scg2"
-	desc = "A passport from Iolaus, within Sol Central Government space."
+	desc = "A passport from Lordania, within Sol Central Government space."
 
-/obj/item/passport/pirx
-	name = "\improper Pirx passport"
+/obj/item/passport/kingston
+	name = "\improper Kingstonian passport"
 	icon_state = "passport_scg2"
-	desc = "A passport from Pirx, within Sol Central Government space."
+	desc = "A passport from Kingston, within Sol Central Government space."
 
-/obj/item/passport/tadmor
-	name = "\improper Tadmor passport"
+/obj/item/passport/cinu
+	name = "\improper Cinusian passport"
 	icon_state = "passport_scg2"
-	desc = "A passport from Tadmor, within Sol Central Government space."
+	desc = "A passport from Cinu, within Sol Central Government space."
 
-/obj/item/passport/brahe
-	name = "\improper Brahe passport"
+/obj/item/passport/yuklid
+	name = "\improper Yuklid V passport"
 	icon_state = "passport_scg2"
-	desc = "A passport from Brahe, within Sol Central Government space."
+	desc = "A passport from Yuklid V, within Sol Central Government space."
 
-/obj/item/passport/saffar
-	name = "\improper Saffar passport"
+/obj/item/passport/lorriman
+	name = "\improper Lorriman passport"
 	icon_state = "passport_scg2"
-	desc = "A passport from Saffar, within Sol Central Government space."
+	desc = "A passport from Yuklid V, within Sol Central Government space."
+
+/obj/item/passport/tersten
+	name = "\improper Tersten passport"
+	icon_state = "passport_scg2"
+	desc = "A passport from Tersten, within Sol Central Government space."
+
+//[inf]
+/obj/item/passport/birdcage
+	name = "\improper Colchis passport"
+	icon_state = "passport_scg2"
+	desc = "A passport from Colchis habitat within SCG space, commonly known as Birdcage."
+// [/inf]
 
 /obj/item/passport/south_gaia
-	name = "\improper Gaian Administrative Area passport"
+	name = "\improper Southern Gaian passport"
 	icon_state = "passport_scg2"
-	desc = "A passport from the southern part of Gaia, under military occupation of the Sol Central Government."
+	desc = "A passport from the southern part of Gaia, under control of the Sol Central Government."
 
 /obj/item/passport/iccg
 	name = "\improper ICCG passport"
@@ -121,17 +133,12 @@
 	desc = "A passport from the Independent Colonial Confederation of Gilgamesh."
 
 /obj/item/passport/north_gaia
-	name = "\improper Protectorate of Gaia passport"
+	name = "\improper Northern Gaian passport"
 	icon_state = "passport_iccg2"
-	desc = "A passport from the northern part of Gaia, under the control of the GCC supervised Protectorate of Gaia."
-
-/obj/item/passport/old_gaia
-	name = "\improper Republic of Gaia passport"
-	icon_state = "passport"
-	desc = "A passport from the Republic of Gaia. Issued before it's de-facto dissolusion in 2292, it is today backed by the International City of New Venice."
+	desc = "A passport from the northern part of Gaia, under control of the Independent Colonial Confederation of Gilgamesh."
 
 /obj/item/passport/terra
-	name = "\improper Terra passport"
+	name = "\improper Terran passport"
 	icon_state = "passport_iccg2"
 	desc = "A passport from Terra, within ICCG space."
 
@@ -146,11 +153,24 @@
 	desc = "A passport from Saveel, an isolationist frontier colony."
 
 /obj/item/passport/magnitka
-	name = "\improper Magnitka passport"
+	name = "\improper Magnitkan passport"
 	icon_state = "passport"
 	desc = "A passport from Magnitka, an independant colony."
 
 /obj/item/passport/empiremohranda
-	name = "\improper Mohranda passport"
+	name = "\improper Mohrandade passport"
 	icon_state = "passport"
 	desc = "A passport from the Empire of Mohranda, a frontier empire established on Lohrene and Mohranda, in the Luggust system."
+
+//[inf]
+
+/obj/item/passport/eremus
+	name = "\improper Eremus passport"
+	icon_state = "passport"
+	desc = "A passport from Eremus, the most populated system bordering Resomi Empire."
+
+/obj/item/passport/asranda
+	name = "\improper Randian passport"
+	icon_state = "passport"
+	desc = "A passport issued by the Republic of Asranda, an isolated colony resembling long-gone Resomi Republic."
+//[/inf]

@@ -1,13 +1,13 @@
 /obj/machinery/acting/wardrobe
 	name = "wardrobe dispenser"
 	desc = "A machine that dispenses holo-clothing for those in need."
-	icon = 'icons/obj/machines/vending.dmi'
+	icon = 'icons/obj/vending.dmi'
 	icon_state = "cart"
 	anchored = TRUE
 	density = TRUE
 	var/active = 1
 
-/obj/machinery/acting/wardrobe/attack_hand(mob/user as mob)
+/obj/machinery/acting/wardrobe/attack_hand(var/mob/user as mob)
 	user.show_message("You push a button and watch patiently as the machine begins to hum.")
 	if(active)
 		active = 0
@@ -17,17 +17,17 @@
 			active = 1
 
 /obj/machinery/acting/changer
-	name = "\improper Quickee's Plastic Surgeon"
+	name = "Quickee's Plastic Surgeon"
 	desc = "For when you need to be someone else right now."
-	icon = 'icons/obj/machines/fabricators/organprinters.dmi'
+	icon = 'icons/obj/surgery.dmi'
 	icon_state = "bioprinter"
 	anchored = TRUE
 	density = TRUE
 
-/obj/machinery/acting/changer/attack_hand(mob/user as mob)
+/obj/machinery/acting/changer/attack_hand(var/mob/user as mob)
 	if(ishuman(user))
 		var/mob/living/carbon/human/H = user
-		H.change_appearance(APPEARANCE_COMMON, state = GLOB.z_state)
+		H.change_appearance(APPEARANCE_COMMON, TRUE, state = GLOB.z_state)
 		var/getName = sanitize(input(H, "Would you like to change your name to something else?", "Name change") as null|text, MAX_NAME_LEN)
 		if(getName)
 			H.real_name = getName
@@ -37,9 +37,9 @@
 				H.mind.name = H.name
 
 /obj/machinery/acting/changer/mirror
-	name = "\improper Mirror of Many Faces"
+	name = "Mirror of Many Faces"
 	desc = "For when you need to be someone else right now."
-	icon = 'icons/obj/structures/mirror.dmi'
+	icon = 'icons/obj/watercloset.dmi'
 	icon_state = "mirror_broke"
 	anchored = TRUE
 	density = FALSE

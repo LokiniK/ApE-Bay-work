@@ -66,7 +66,7 @@
 
 /datum/stack_recipe/blade
 	title = "knife"
-	result_type = /obj/item/material/small_blade
+	result_type = /obj/item/material/butterflyblade
 	req_amount = 6
 	time = 20
 	on_floor = 1
@@ -80,15 +80,6 @@
 	time = 20
 	on_floor = 1
 	difficulty = 1
-	send_material_data = 1
-
-/datum/stack_recipe/large_blade
-	title = "large blade"
-	result_type = /obj/item/material/large_blade
-	req_amount = 10
-	time = 30
-	on_floor = 1
-	difficulty = 2
 	send_material_data = 1
 
 /datum/stack_recipe/key
@@ -156,18 +147,6 @@
 	req_amount = 2
 	difficulty = 2
 
-/datum/stack_recipe/intercom
-	title = "intercom frame"
-	result_type = /obj/item/frame/intercom
-	req_amount = 2
-	difficulty = 2
-
-/datum/stack_recipe/supermatter_alarm
-	title = "supermatter alarm frame"
-	result_type = /obj/item/frame/supermatter_alarm
-	req_amount = 1
-	difficulty = 2
-
 /datum/stack_recipe/computer/telescreen
 	title = "modular telescreen frame"
 	result_type = /obj/item/modular_computer/telescreen
@@ -219,9 +198,21 @@
 	modifier = "large"
 	req_amount = 5
 
-/datum/stack_recipe/sandal
+/datum/stack_recipe/sandals
 	title = "sandals"
 	result_type = /obj/item/clothing/shoes/sandal
+
+/datum/stack_recipe/zipgunframe
+	title = "zip gun frame"
+	result_type = /obj/item/zipgunframe
+	req_amount = 5
+	difficulty = 3
+
+/datum/stack_recipe/coilgun
+	title = "coilgun stock"
+	result_type = /obj/item/coilgun_assembly
+	req_amount = 5
+	difficulty = 3
 
 /datum/stack_recipe/stick
 	title = "stick"
@@ -229,17 +220,9 @@
 	send_material_data = 1
 	difficulty = 0
 
-/datum/stack_recipe/shield
-	title = "Buckler"
-	result_type = /obj/item/shield/buckler
-	req_amount = 5
-	send_material_data = TRUE
-	time = 20
-	difficulty = 2
-
-/datum/stack_recipe/weapon_frame
-	title = "weapon frame"
-	result_type = /obj/item/weapon_frame
+/datum/stack_recipe/crossbowframe
+	title = "crossbow frame"
+	result_type = /obj/item/crossbowframe
 	req_amount = 5
 	time = 25
 	difficulty = 3
@@ -294,59 +277,3 @@
 	req_amount = 2
 	on_floor = 1
 	send_material_data = 1
-
-/datum/stack_recipe/toolbelt
-	title = "tool belt"
-	result_type = /obj/item/storage/belt/utility
-	req_amount = 5
-	difficulty = 2
-	time = 15
-
-/datum/stack_recipe/pockets
-	title = "pockets"
-	result_type = /obj/item/clothing/accessory/storage/pockets
-	req_amount = 2
-	difficulty = 1
-	time = 5
-
-/datum/stack_recipe/large_webbing
-	title = "large webbing"
-	result_type = /obj/item/clothing/accessory/storage/webbing_large
-	req_amount = 7
-	difficulty = 3
-	time = 20
-
-/datum/stack_recipe/bandolier
-	title = "bandolier"
-	result_type = /obj/item/clothing/accessory/storage/bandolier
-	req_amount = 7
-	difficulty = 3
-	time = 20
-
-/datum/stack_recipe/holster
-	title = "holster"
-	result_type = /obj/item/clothing/accessory/storage/holster
-	req_amount = 5
-	difficulty = 2
-	time = 15
-
-/datum/stack_recipe/holster_machete
-	title = "machete sheath"
-	result_type = /obj/item/clothing/accessory/storage/holster/machete
-	req_amount = 5
-	difficulty = 2
-	time = 15
-
-/datum/stack_recipe/holster_knife
-	title = "knife sheath"
-	result_type = /obj/item/clothing/accessory/storage/holster/knife
-	req_amount = 2
-	difficulty = 1
-	time = 5
-
-/datum/stack_recipe/woodenstaff
-	title = "staff"
-	result_type = /obj/item/cane/staff
-	req_amount = 5
-	difficulty = 0
-	time = 25

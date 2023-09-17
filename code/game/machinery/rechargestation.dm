@@ -1,20 +1,20 @@
 /obj/machinery/recharge_station
 	name = "cyborg recharging station"
 	desc = "A heavy duty rapid charging system, designed to quickly recharge cyborg power reserves."
-	icon = 'icons/obj/machines/robot_charger.dmi'
-	icon_state = "borgcharger"
+	icon = 'icons/obj/objects.dmi'
+	icon_state = "borgcharger0"
 	density = TRUE
 	anchored = TRUE
 	idle_power_usage = 50
 	base_type = /obj/machinery/recharge_station
 	uncreated_component_parts = null
 	stat_immune = 0
-	construct_state = /singleton/machine_construction/default/panel_closed
+	construct_state = /decl/machine_construction/default/panel_closed
 
 	machine_name = "cyborg recharging station"
 	machine_desc = "A station for recharging robots, cyborgs, and silicon-based humanoids such as IPCs and full-body prosthetics."
 
-	var/overlay_icon = 'icons/obj/machines/robot_charger.dmi'
+	var/overlay_icon = 'icons/obj/objects.dmi'
 	var/mob/living/occupant = null
 	var/charging = 0
 	var/last_overlay_state
@@ -31,7 +31,7 @@
 	update_icon()
 
 /obj/machinery/recharge_station/Process()
-	if(inoperable())
+	if(stat & (BROKEN | NOPOWER))
 		return
 
 	//First, recharge/repair/etc the occupant
@@ -48,10 +48,10 @@
 		return
 
 	// If we have repair capabilities, repair any damage.
-	if(weld_rate && occupant.getBruteLoss())
+	if(weld_rate)
 		var/repair = weld_rate - use_power_oneoff(weld_power_use * weld_rate, LOCAL) / weld_power_use
 		occupant.adjustBruteLoss(-repair)
-	if(wire_rate && occupant.getFireLoss())
+	if(wire_rate)
 		var/repair = wire_rate - use_power_oneoff(wire_power_use * wire_rate, LOCAL) / wire_power_use
 		occupant.adjustFireLoss(-repair)
 
@@ -63,7 +63,7 @@
 			R.module.respawn_consumable(R, charging_power * CELLRATE / 250) //consumables are magical, apparently
 		// If we are capable of repairing damage, reboot destroyed components and allow them to be repaired for very large power spike.
 		var/list/damaged = R.get_damaged_components(1,1,1)
-		if(length(damaged) && wire_rate && weld_rate)
+		if(damaged.len && wire_rate && weld_rate)
 			for(var/datum/robot_component/C in damaged)
 				if((C.installed == -1) && use_power_oneoff(100 KILOWATTS, LOCAL) <= 0)
 					C.repair()
@@ -119,8 +119,8 @@
 
 /obj/machinery/recharge_station/RefreshParts()
 	..()
-	var/man_rating = clamp(total_component_rating_of_type(/obj/item/stock_parts/manipulator), 0, 10)
-	var/cap_rating = clamp(total_component_rating_of_type(/obj/item/stock_parts/capacitor), 0, 10)
+	var/man_rating = Clamp(total_component_rating_of_type(/obj/item/stock_parts/manipulator), 0, 10)
+	var/cap_rating = Clamp(total_component_rating_of_type(/obj/item/stock_parts/capacitor), 0, 10)
 
 	charging_power = 40000 + 40000 * cap_rating
 	weld_rate = max(0, man_rating - 3)
@@ -151,27 +151,25 @@
 
 /obj/machinery/recharge_station/on_update_icon()
 	..()
-	overlays.Cut()
-
-	if(panel_open)
-		overlays += "[icon_state]_panel"
+	if(stat & BROKEN)
+		icon_state = "borgcharger0"
+		return
 
 	if(occupant)
-		icon_state = "borgcharger_closed"
-		if(is_powered())
-			overlays += "borgcharger_lights_working"
-			overlays += emissive_appearance(icon, "borgcharger_lights_working")
+		if(stat & NOPOWER)
+			icon_state = "borgcharger2"
+		else
+			icon_state = "borgcharger1"
 	else
-		icon_state = "borgcharger"
+		icon_state = "borgcharger0"
 
 	last_overlay_state = overlay_state()
-	overlays += list(image(overlay_icon, overlay_state()))
-	overlays += emissive_appearance(icon, "statn_c100")
+	overlays = list(image(overlay_icon, overlay_state()))
 
-/obj/machinery/recharge_station/Bumped(mob/living/silicon/robot/R)
+/obj/machinery/recharge_station/Bumped(var/mob/living/silicon/robot/R)
 	go_in(R)
 
-/obj/machinery/recharge_station/proc/go_in(mob/M)
+/obj/machinery/recharge_station/proc/go_in(var/mob/M)
 
 
 	if(occupant)
@@ -187,7 +185,7 @@
 	update_icon()
 	return 1
 
-/obj/machinery/recharge_station/proc/hascell(mob/M)
+/obj/machinery/recharge_station/proc/hascell(var/mob/M)
 	if(isrobot(M))
 		var/mob/living/silicon/robot/R = M
 		return (R.cell)
@@ -226,7 +224,5 @@
 	set category = "Object"
 	set name = "Enter Recharger"
 	set src in oview(1)
-	if (usr.buckled())
-		return
 
 	go_in(usr)

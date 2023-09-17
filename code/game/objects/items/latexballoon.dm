@@ -1,7 +1,6 @@
 /obj/item/latexballon
 	name = "latex glove"
 	desc = "A latex glove, usually used as a balloon."
-	icon = 'icons/obj/toy.dmi'
 	icon_state = "latexballon"
 	item_state = "lgloves"
 	force = 0
@@ -30,9 +29,9 @@
 /obj/item/latexballon/ex_act(severity)
 	burst()
 	switch(severity)
-		if (EX_ACT_DEVASTATING)
+		if (1)
 			qdel(src)
-		if (EX_ACT_HEAVY)
+		if (2)
 			if (prob(50))
 				qdel(src)
 

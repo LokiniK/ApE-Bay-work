@@ -1,5 +1,4 @@
 /proc/get_turf_pixel(atom/movable/AM)
-	RETURN_TYPE(/turf)
 	if(!istype(AM))
 		return
 
@@ -30,12 +29,11 @@
 
 // Walks up the loc tree until it finds a holder of the given holder_type
 /proc/get_holder_of_type(atom/A, holder_type)
-	RETURN_TYPE(/atom)
 	if(!istype(A)) return
 	for(A, A && !istype(A, holder_type), A=A.loc);
 	return A
 
-/atom/movable/proc/throw_at_random(include_own_turf, maxrange, speed)
+/atom/movable/proc/throw_at_random(var/include_own_turf, var/maxrange, var/speed)
 	var/list/turfs = trange(maxrange, src)
 	if(!maxrange)
 		maxrange = 1
@@ -45,17 +43,16 @@
 	if (length(turfs))
 		throw_at(pick(turfs), maxrange, speed)
 
-/atom/movable/proc/do_simple_ranged_interaction(mob/user)
+/atom/movable/proc/do_simple_ranged_interaction(var/mob/user)
 	return FALSE
 
-/atom/movable/hitby(atom/movable/AM)
+/atom/movable/hitby(var/atom/movable/AM)
 	..()
 	if(density && prob(50))
 		do_simple_ranged_interaction()
 
-/proc/get_atom_closest_to_atom(atom/a, list/possibilities)
-	RETURN_TYPE(/atom)
-	if(!possibilities || !length(possibilities))
+/proc/get_atom_closest_to_atom(var/atom/a, var/list/possibilities)
+	if(!possibilities || !possibilities.len)
 		return null
 	var/closest_distance = get_dist(a, possibilities[1])
 	. = possibilities[1]

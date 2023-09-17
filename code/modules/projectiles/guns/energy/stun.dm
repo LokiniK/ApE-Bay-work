@@ -13,12 +13,16 @@
 		list(mode_name="shock", projectile_type=/obj/item/projectile/beam/stun/shock),
 		)
 
+	bulk = GUN_BULK_PISTOL
+
+	is_serial = 1
+	s_gun = "NT-MK30-NL"
+
 /obj/item/gun/energy/taser/carbine
 	name = "electrolaser carbine"
 	desc = "The NT Mk44 NL is a high capacity gun used for non-lethal takedowns. It can switch between high and low intensity stun shots."
 	icon = 'icons/obj/guns/taser_carbine.dmi'
 	icon_state = "tasercarbine"
-	w_class = ITEM_SIZE_LARGE
 	slot_flags = SLOT_BELT|SLOT_BACK
 	one_hand_penalty = 3
 	origin_tech = list(TECH_COMBAT = 4, TECH_MATERIAL = 3, TECH_POWER = 3)
@@ -33,6 +37,9 @@
 		list(mode_name="shock", projectile_type=/obj/item/projectile/beam/stun/shock/heavy),
 		)
 
+	one_hand_penalty = 3
+	s_gun = "NT-MK44-NL"
+
 /obj/item/gun/energy/taser/mounted
 	name = "mounted electrolaser"
 	self_recharge = 1
@@ -46,7 +53,7 @@
 
 
 /obj/item/gun/energy/stunrevolver
-	name = "stun revolver"
+	name = "X6 stun revolver"
 	desc = "An A&M X6 Zeus. Designed by al-Maliki & Mosley, but produced under the wing of the Free Trade Union. Industry spies have been trying to get a hold of the blueprints for half a decade."
 	icon = 'icons/obj/guns/stunrevolver.dmi'
 	icon_state = "stunrevolver"
@@ -56,8 +63,13 @@
 	max_shots = 6
 	combustion = 0
 
+	bulk = GUN_BULK_REVOLVER
+
+	is_serial = 1
+	s_gun = "X6"
+
 /obj/item/gun/energy/stunrevolver/rifle
-	name = "stun rifle"
+	name = "X10 stun rifle"
 	desc = "An A&M X10 Thor. A vastly oversized variant of the A&M X6 Zeus. Fires overcharged electrodes to obliterate pain receptors without harming them too much."
 	icon = 'icons/obj/guns/stunrifle.dmi'
 	icon_state = "stunrifle"
@@ -71,13 +83,17 @@
 	accuracy = 1
 	projectile_type = /obj/item/projectile/energy/electrode/stunshot
 	wielded_item_state = "stunrifle-wielded"
+//[INF]
+	bulk = GUN_BULK_RIFLE
+	s_gun = "X10"
+//[/INF]
 
 /obj/item/gun/energy/crossbow
-	name = "mini energy crossbow"
+	name = "mini energy-crossbow"
 	desc = "A weapon favored by many mercenary stealth specialists."
 	icon = 'icons/obj/guns/energy_crossbow.dmi'
 	icon_state = "crossbow"
-	w_class = ITEM_SIZE_NORMAL
+	w_class = ITEM_SIZE_SMALL //INF was ITEM_SIZE_NORMAL
 	item_state = "crossbow"
 	origin_tech = list(TECH_COMBAT = 2, TECH_MAGNET = 2, TECH_ESOTERIC = 5)
 	matter = list(MATERIAL_STEEL = 2000)
@@ -89,6 +105,8 @@
 	self_recharge = 1
 	charge_meter = 0
 	combustion = 0
+
+	bulk = GUN_BULK_PISTOL //inf
 
 /obj/item/gun/energy/crossbow/ninja
 	name = "energy dart thrower"
@@ -108,8 +126,10 @@
 	matter = list(MATERIAL_STEEL = 200000)
 	projectile_type = /obj/item/projectile/energy/bolt/large
 
+	bulk = GUN_BULK_RIFLE //inf
+
 /obj/item/gun/energy/plasmastun
-	name = "plasma pulse projector"
+	name = "MA21 plasma pulse projector"
 	desc = "The Mars Military Industries MA21 Selkie is a weapon that uses a laser pulse to ionise the local atmosphere, creating a disorienting pulse of plasma and deafening shockwave as the wave expands."
 	icon = 'icons/obj/guns/plasma_stun.dmi'
 	icon_state = "plasma_stun"
@@ -119,6 +139,8 @@
 	max_shots = 4
 	projectile_type = /obj/item/projectile/energy/plasmastun
 	combustion = 0
+
+	bulk = GUN_BULK_RIFLE //inf
 
 /obj/item/gun/energy/confuseray
 	name = "disorientator"
@@ -131,3 +153,5 @@
 	max_shots = 4
 	projectile_type = /obj/item/projectile/beam/confuseray
 	combustion = 0
+
+	bulk = GUN_BULK_PISTOL //inf

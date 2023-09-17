@@ -21,15 +21,17 @@
 	var/list/exude_gasses          // The plant will exude these gasses during its life.
 	var/kitchen_tag                // Used by the reagent grinder.
 	var/trash_type                 // Garbage item produced when eaten.
-	var/splat_type = /obj/effect/decal/cleanable/fruit_smudge // Graffiti decal
-	/// Used when product isn't under /food/snacks/grown (e.g. simplemobs, aquaculture).
-	var/product_type
-	/// If mob, whether players can possess
-	var/possessable = FALSE
-
+	var/splat_type = /obj/effect/decal/cleanable/fruit_smudge // Graffiti decal.
+	var/has_mob_product
 	var/force_layer
 	var/req_CO2_moles    = 1.0// Moles of CO2 required for photosynthesis.
 	var/fruit_size = ITEM_SIZE_SMALL
+
+//[INF]
+	var/growing_icon	=	'icons/obj/hydroponics_growing.dmi'
+	var/vines_icon		=	'icons/obj/hydroponics_vines.dmi'
+	var/large_icon		=	'icons/obj/hydroponics_large.dmi'
+//[/INF]
 
 /datum/seed/New()
 
@@ -72,15 +74,15 @@
 
 	update_growth_stages()
 
-	uid = sequential_id(/datum/seed)
+	uid = sequential_id(/datum/seed/)
 
-/datum/seed/proc/get_trait(trait)
+/datum/seed/proc/get_trait(var/trait)
 	return traits["[trait]"]
 
 /datum/seed/proc/get_trash_type()
 	return trash_type
 
-/datum/seed/proc/set_trait(trait,nval,ubound,lbound, degrade)
+/datum/seed/proc/set_trait(var/trait,var/nval,var/ubound,var/lbound, var/degrade)
 	if(!isnull(degrade)) nval *= degrade
 	if(!isnull(ubound))  nval = min(nval,ubound)
 	if(!isnull(lbound))  nval = max(nval,lbound)
@@ -89,7 +91,7 @@
 	if(trait == TRAIT_PLANT_ICON)
 		update_growth_stages()
 
-/datum/seed/proc/create_spores(turf/T)
+/datum/seed/proc/create_spores(var/turf/T)
 	if(!T)
 		return
 	if(!istype(T))
@@ -109,16 +111,16 @@
 	qdel(R)
 
 // Does brute damage to a target.
-/datum/seed/proc/do_thorns(mob/living/carbon/human/target, obj/item/fruit, target_limb)
+/datum/seed/proc/do_thorns(var/mob/living/carbon/human/target, var/obj/item/fruit, var/target_limb)
 
 	if(!get_trait(TRAIT_CARNIVOROUS))
 		return
 
 	if(!istype(target))
-		if(istype(target, /mob/living/simple_animal/passive/mouse))
+		if(istype(target, /mob/living/simple_animal/friendly/mouse))
 			new /obj/item/remains/mouse(get_turf(target))
 			qdel(target)
-		else if(istype(target, /mob/living/simple_animal/passive/lizard))
+		else if(istype(target, /mob/living/simple_animal/friendly/lizard))
 			new /obj/item/remains/lizard(get_turf(target))
 			qdel(target)
 		return
@@ -128,31 +130,31 @@
 	var/obj/item/organ/external/affecting = target.get_organ(target_limb)
 
 	if((target.species && target.species.species_flags & (SPECIES_FLAG_NO_EMBED|SPECIES_FLAG_NO_MINOR_CUT)))
-		to_chat(target, SPAN_DANGER("\The [fruit]'s thorns scratch against the armour on your [affecting.name]!"))
+		to_chat(target, "<span class='danger'>\The [fruit]'s thorns scratch against the armour on your [affecting.name]!</span>")
 		return
 
 	var/damage = 0
 	var/has_edge = 0
 	if(get_trait(TRAIT_CARNIVOROUS) >= 2)
 		if(affecting)
-			to_chat(target, SPAN_DANGER("\The [fruit]'s thorns pierce your [affecting.name] greedily!"))
+			to_chat(target, "<span class='danger'>\The [fruit]'s thorns pierce your [affecting.name] greedily!</span>")
 		else
-			to_chat(target, SPAN_DANGER("\The [fruit]'s thorns pierce your flesh greedily!"))
+			to_chat(target, "<span class='danger'>\The [fruit]'s thorns pierce your flesh greedily!</span>")
 		damage = max(5, round(15*get_trait(TRAIT_POTENCY)/100, 1))
 		has_edge = prob(get_trait(TRAIT_POTENCY)/2)
 	else
 		if(affecting)
-			to_chat(target, SPAN_DANGER("\The [fruit]'s thorns dig deeply into your [affecting.name]!"))
+			to_chat(target, "<span class='danger'>\The [fruit]'s thorns dig deeply into your [affecting.name]!</span>")
 		else
-			to_chat(target, SPAN_DANGER("\The [fruit]'s thorns dig deeply into your flesh!"))
+			to_chat(target, "<span class='danger'>\The [fruit]'s thorns dig deeply into your flesh!</span>")
 		damage = max(1, round(5*get_trait(TRAIT_POTENCY)/100, 1))
 		has_edge = prob(get_trait(TRAIT_POTENCY)/5)
 
-	var/damage_flags = DAMAGE_FLAG_SHARP|(has_edge? DAMAGE_FLAG_EDGE : 0)
-	target.apply_damage(damage, DAMAGE_BRUTE, target_limb, damage_flags, used_weapon = "Thorns")
+	var/damage_flags = DAM_SHARP|(has_edge? DAM_EDGE : 0)
+	target.apply_damage(damage, BRUTE, target_limb, damage_flags, used_weapon = "Thorns")
 
 // Adds reagents to a target.
-/datum/seed/proc/do_sting(mob/living/carbon/human/target, obj/item/fruit)
+/datum/seed/proc/do_sting(var/mob/living/carbon/human/target, var/obj/item/fruit)
 	if(!get_trait(TRAIT_STINGS))
 		return
 
@@ -165,20 +167,19 @@
 		for(var/obj/item/clothing/C in list(target.head, target.wear_mask, target.wear_suit, target.w_uniform, target.gloves, target.shoes))
 			if(C && (C.body_parts_covered & affecting.body_part) && (C.item_flags & ITEM_FLAG_THICKMATERIAL))
 				affecting = null
-				break
 
 		if(!(target.species && target.species.species_flags & (SPECIES_FLAG_NO_EMBED|SPECIES_FLAG_NO_MINOR_CUT)))
 			affecting = null
 
 		if(affecting)
-			to_chat(target, SPAN_DANGER("You are stung by \the [fruit] in your [affecting.name]!"))
+			to_chat(target, "<span class='danger'>You are stung by \the [fruit] in your [affecting.name]!</span>")
 			for(var/rid in chems)
 				var/injecting = min(5,max(1,get_trait(TRAIT_POTENCY)/5))
 				target.reagents.add_reagent(rid,injecting)
 		else
-			to_chat(target, SPAN_DANGER("Sharp spines scrape against your armour!"))
+			to_chat(target, "<span class='danger'>Sharp spines scrape against your armour!</span>")
 
-/datum/seed/proc/do_photosynthesis(turf/current_turf, datum/gas_mixture/environment, light_supplied)
+/datum/seed/proc/do_photosynthesis(var/turf/current_turf, var/datum/gas_mixture/environment, var/light_supplied)
 	// Photosynthesis - *very* simplified process.
 	// For now, only light-dependent reactions are available (no Calvin cycle).
 	// It's active only for those plants which doesn't consume nor exude gasses.
@@ -195,7 +196,7 @@
 		environment.adjust_gas(GAS_OXYGEN, req_CO2_moles, 1)
 
 //Splatter a turf.
-/datum/seed/proc/splatter(turf/T,obj/item/thrown)
+/datum/seed/proc/splatter(var/turf/T,var/obj/item/thrown)
 	if(splat_type && !(locate(/obj/effect/vine) in T))
 		var/obj/effect/vine/splat = new splat_type(T, src)
 		if(!istype(splat)) // Plants handle their own stuff.
@@ -215,7 +216,7 @@
 				continue
 			var/body_coverage = HEAD|FACE|EYES|UPPER_TORSO|LOWER_TORSO|LEGS|FEET|ARMS|HANDS
 			for(var/obj/item/clothing/clothes in M)
-				if (M.IsHolding(clothes))
+				if(M.l_hand == clothes || M.r_hand == clothes)
 					continue
 				body_coverage &= ~(clothes.body_parts_covered)
 			if(!body_coverage)
@@ -229,7 +230,7 @@
 					R.add_reagent(chem,min(5,max(1,get_trait(TRAIT_POTENCY)/3)))
 
 //Applies an effect to a target atom.
-/datum/seed/proc/thrown_at(obj/item/thrown,atom/target, force_explode)
+/datum/seed/proc/thrown_at(var/obj/item/thrown,var/atom/target, var/force_explode)
 
 	var/splatted
 	var/turf/origin_turf = get_turf(target)
@@ -245,7 +246,7 @@
 		open_turfs |= origin_turf
 
 		// Flood fill to get affected turfs.
-		while(length(open_turfs))
+		while(open_turfs.len)
 			var/turf/T = pick(open_turfs)
 			open_turfs -= T
 			closed_turfs |= T
@@ -278,7 +279,7 @@
 				apply_special_effect(M)
 			splatter(T,thrown)
 		if(origin_turf)
-			origin_turf.visible_message(SPAN_DANGER("The [thrown.name] explodes!"))
+			origin_turf.visible_message("<span class='danger'>The [thrown.name] explodes!</span>")
 		qdel(thrown)
 		return
 
@@ -292,14 +293,14 @@
 	if(get_trait(TRAIT_JUICY) && splatted)
 		splatter(origin_turf,thrown)
 		if(origin_turf)
-			origin_turf.visible_message(SPAN_DANGER("The [thrown.name] splatters against [target]!"))
+			origin_turf.visible_message("<span class='danger'>The [thrown.name] splatters against [target]!</span>")
 		qdel(thrown)
 
-/datum/seed/proc/handle_environment(turf/current_turf, datum/gas_mixture/environment, light_supplied, check_only)
+/datum/seed/proc/handle_environment(var/turf/current_turf, var/datum/gas_mixture/environment, var/light_supplied, var/check_only)
 
 	var/health_change = 0
 	// Handle gas consumption.
-	if(consume_gasses && length(consume_gasses))
+	if(consume_gasses && consume_gasses.len)
 		var/missing_gas = 0
 		for(var/gas in consume_gasses)
 			if(environment && environment.gas && environment.gas[gas] && \
@@ -321,9 +322,9 @@
 		health_change += rand(1,3) * HYDRO_SPEED_MULTIPLIER
 
 	// Handle gas production.
-	if(exude_gasses && length(exude_gasses) && !check_only)
+	if(exude_gasses && exude_gasses.len && !check_only)
 		for(var/gas in exude_gasses)
-			environment.adjust_gas(gas, max(1,round((exude_gasses[gas]*(get_trait(TRAIT_POTENCY)/5))/length(exude_gasses))))
+			environment.adjust_gas(gas, max(1,round((exude_gasses[gas]*(get_trait(TRAIT_POTENCY)/5))/exude_gasses.len)))
 
 	//Handle temperature change.
 	if(get_trait(TRAIT_ALTER_TEMP) != 0 && !check_only)
@@ -355,7 +356,7 @@
 
 	return health_change
 
-/datum/seed/proc/apply_special_effect(mob/living/target,obj/item/thrown)
+/datum/seed/proc/apply_special_effect(var/mob/living/target,var/obj/item/thrown)
 
 	var/impact = 1
 	do_sting(target,thrown)
@@ -419,13 +420,8 @@
 	seed_name = name
 	display_name = name
 
-/**
- * Creates a random seed. MAKE SURE THE LINE HAS DIVERGED BEFORE THIS IS CALLED.
- *
- * **Parameters**:
- * - `native_gasses` - List of `GAS_*` entries used to randomize `consume_gasses` and `exude_gasses`. This parameter is modified by the proc so make sure you pass `.Copy()` as relevant if you don't want gasses removed from your lists.
- */
-/datum/seed/proc/randomize(list/native_gasses = list(GAS_OXYGEN, GAS_NITROGEN, GAS_PHORON, GAS_CO2))
+//Creates a random seed. MAKE SURE THE LINE HAS DIVERGED BEFORE THIS IS CALLED.
+/datum/seed/proc/randomize()
 
 	roundstart = 0
 	mysterious = 1
@@ -460,13 +456,15 @@
 
 	if(prob(5))
 		consume_gasses = list()
-		var/gas = pick_n_take(native_gasses)
+		var/gas = pick(GAS_OXYGEN,GAS_NITROGEN,GAS_PHORON,GAS_CO2)
 		consume_gasses[gas] = rand(3,9)
+		set_trait(TRAIT_CONSUME_GASSES, consume_gasses) //INF
 
 	if(prob(5))
 		exude_gasses = list()
-		var/gas = pick_n_take(native_gasses)
+		var/gas = pick(GAS_OXYGEN,GAS_NITROGEN,GAS_PHORON,GAS_CO2)
 		exude_gasses[gas] = rand(3,9)
+		set_trait(TRAIT_EXUDE_GASSES, exude_gasses) //INF
 
 	chems = list()
 	if(prob(80))
@@ -558,15 +556,15 @@
 
 //Returns a key corresponding to an entry in the global seed list.
 /datum/seed/proc/get_mutant_variant()
-	if(!mutants || !length(mutants) || get_trait(TRAIT_IMMUTABLE) > 0) return 0
+	if(!mutants || !mutants.len || get_trait(TRAIT_IMMUTABLE) > 0) return 0
 	return pick(mutants)
 
 //Mutates the plant overall (randomly).
-/datum/seed/proc/mutate(degree,turf/source_turf)
+/datum/seed/proc/mutate(var/degree,var/turf/source_turf)
 
 	if(!degree || get_trait(TRAIT_IMMUTABLE) > 0) return
 
-	source_turf.visible_message(SPAN_NOTICE("\The [display_name] quivers!"))
+	source_turf.visible_message("<span class='notice'>\The [display_name] quivers!</span>")
 
 	//This looks like shit, but it's a lot easier to read/change this way.
 	var/total_mutations = rand(1,1+degree)
@@ -574,7 +572,7 @@
 		switch(rand(0,11))
 			if(0) //Plant cancer!
 				set_trait(TRAIT_ENDURANCE,get_trait(TRAIT_ENDURANCE)-rand(10,20),null,0)
-				source_turf.visible_message(SPAN_DANGER("\The [display_name] withers rapidly!"))
+				source_turf.visible_message("<span class='danger'>\The [display_name] withers rapidly!</span>")
 			if(1)
 				set_trait(TRAIT_NUTRIENT_CONSUMPTION,get_trait(TRAIT_NUTRIENT_CONSUMPTION)+rand(-(degree*0.1),(degree*0.1)),5,0)
 				set_trait(TRAIT_WATER_CONSUMPTION,   get_trait(TRAIT_WATER_CONSUMPTION)   +rand(-degree,degree),50,0)
@@ -596,7 +594,7 @@
 				if(prob(degree*5))
 					set_trait(TRAIT_CARNIVOROUS,     get_trait(TRAIT_CARNIVOROUS)+rand(-degree,degree),2, 0)
 					if(get_trait(TRAIT_CARNIVOROUS))
-						source_turf.visible_message(SPAN_NOTICE("\The [display_name] shudders hungrily."))
+						source_turf.visible_message("<span class='notice'>\The [display_name] shudders hungrily.</span>")
 			if(6)
 				set_trait(TRAIT_WEED_TOLERANCE,      get_trait(TRAIT_WEED_TOLERANCE)+(rand(-2,2)*degree),10, 0)
 				if(prob(degree*5))
@@ -610,7 +608,7 @@
 				set_trait(TRAIT_POTENCY,             get_trait(TRAIT_POTENCY)+(rand(-20,20)*degree),200, 0)
 				if(prob(degree*5))
 					set_trait(TRAIT_SPREAD,          get_trait(TRAIT_SPREAD)+rand(-1,1),2, 0)
-					source_turf.visible_message(SPAN_NOTICE("\The [display_name] spasms visibly, shifting in the tray."))
+					source_turf.visible_message("<span class='notice'>\The [display_name] spasms visibly, shifting in the tray.</span>")
 			if(9)
 				set_trait(TRAIT_MATURATION,          get_trait(TRAIT_MATURATION)+(rand(-1,1)*degree),30, 0)
 				if(prob(degree*5))
@@ -619,19 +617,42 @@
 				if(prob(degree*2))
 					set_trait(TRAIT_BIOLUM,         !get_trait(TRAIT_BIOLUM))
 					if(get_trait(TRAIT_BIOLUM))
-						source_turf.visible_message(SPAN_NOTICE("\The [display_name] begins to glow!"))
+						source_turf.visible_message("<span class='notice'>\The [display_name] begins to glow!</span>")
 						if(prob(degree*2))
 							set_trait(TRAIT_BIOLUM_COLOUR,get_random_colour(0,75,190))
-							source_turf.visible_message("[SPAN_NOTICE("\The [display_name]'s glow ")][SPAN_COLOR(get_trait(TRAIT_BIOLUM_COLOUR), "changes colour")]!")
+							source_turf.visible_message("<span class='notice'>\The [display_name]'s glow </span><font color='[get_trait(TRAIT_BIOLUM_COLOUR)]'>changes colour</font>!")
 					else
-						source_turf.visible_message(SPAN_NOTICE("\The [display_name]'s glow dims..."))
+						source_turf.visible_message("<span class='notice'>\The [display_name]'s glow dims...</span>")
+//INF START
+				if(prob(degree*5))
+					if(prob(60))
+						if(!exude_gasses || prob(90))
+							exude_gasses = list()
+						var/gas = pickweight(list(GAS_METHYL_BROMIDE = 5,
+										GAS_OXYGEN = 10,
+										GAS_NITROGEN = 5,
+										GAS_CO2 = 10,
+										GAS_N2O = 5,
+										GAS_METHANE = 5,
+										GAS_CHLORINE = 5,
+										GAS_AMMONIA = 3,
+										GAS_ALIEN = 1,
+										GAS_HYDROGEN = 3,
+										GAS_HELIUM = 1,
+										GAS_PHORON = 1
+											))
+						exude_gasses[gas] = rand(1,10)
+					else
+						exude_gasses = null
+					set_trait(TRAIT_EXUDE_GASSES, exude_gasses)
+//INF END
 			if(11)
 				set_trait(TRAIT_TELEPORTING,1)
 
 	return
 
 //Mutates a specific trait/set of traits.
-/datum/seed/proc/apply_gene(datum/plantgene/gene)
+/datum/seed/proc/apply_gene(var/datum/plantgene/gene)
 
 	if(!gene || !gene.values || get_trait(TRAIT_IMMUTABLE) > 0) return
 
@@ -653,7 +674,7 @@
 					chems[rid] = gene_chem.Copy()
 					continue
 
-				for(var/i=1;i<=length(gene_chem);i++)
+				for(var/i=1;i<=gene_chem.len;i++)
 
 					if(isnull(gene_chem[i])) gene_chem[i] = 0
 
@@ -662,6 +683,7 @@
 					else
 						chems[rid][i] = gene_chem[i]
 
+		if(GENE_OUTPUT) //INF added row
 			var/list/new_gasses = gene.values["[TRAIT_EXUDE_GASSES]"]
 			if(islist(new_gasses))
 				if(!exude_gasses) exude_gasses = list()
@@ -669,16 +691,16 @@
 				for(var/gas in exude_gasses)
 					exude_gasses[gas] = max(1,round(exude_gasses[gas]*0.8))
 
-			gene.values["[TRAIT_EXUDE_GASSES]"] = null
-			gene.values["[TRAIT_CHEMS]"] = null
+//			gene.values["[TRAIT_EXUDE_GASSES]"] = null //INF commented out this
+//			gene.values["[TRAIT_CHEMS]"] = null //INF commented out this
 
 		if(GENE_DIET)
 			var/list/new_gasses = gene.values["[TRAIT_CONSUME_GASSES]"]
 			consume_gasses |= new_gasses
-			gene.values["[TRAIT_CONSUME_GASSES]"] = null
+//			gene.values["[TRAIT_CONSUME_GASSES]"] = null //INF commented out this
 		if(GENE_METABOLISM)
-			product_type = gene.values["product_type"]
-			gene.values["product_type"] = null
+			has_mob_product = gene.values["mob_product"]
+//			gene.values["mob_product"] = null //INF commented out this
 
 	for(var/trait in gene.values)
 		set_trait(trait,gene.values["[trait]"])
@@ -686,7 +708,7 @@
 	update_growth_stages()
 
 //Returns a list of the desired trait values.
-/datum/seed/proc/get_gene(genetype)
+/datum/seed/proc/get_gene(var/genetype)
 
 	if(!genetype) return 0
 
@@ -698,16 +720,16 @@
 	switch(genetype)
 		if(GENE_BIOCHEMISTRY)
 			P.values["[TRAIT_CHEMS]"] =        chems
-			P.values["[TRAIT_EXUDE_GASSES]"] = exude_gasses
 			traits_to_copy = list(TRAIT_POTENCY)
 		if(GENE_OUTPUT)
+			P.values["[TRAIT_EXUDE_GASSES]"] = exude_gasses //INF place changed, was in GENE_BIOCHEMISTRY
 			traits_to_copy = list(TRAIT_PRODUCES_POWER,TRAIT_BIOLUM)
 		if(GENE_ATMOSPHERE)
 			traits_to_copy = list(TRAIT_HEAT_TOLERANCE,TRAIT_LOWKPA_TOLERANCE,TRAIT_HIGHKPA_TOLERANCE)
 		if(GENE_HARDINESS)
 			traits_to_copy = list(TRAIT_TOXINS_TOLERANCE,TRAIT_PEST_TOLERANCE,TRAIT_WEED_TOLERANCE,TRAIT_ENDURANCE)
 		if(GENE_METABOLISM)
-			P.values["product_type"] = product_type
+			P.values["mob_product"] = has_mob_product
 			traits_to_copy = list(TRAIT_REQUIRES_NUTRIENTS,TRAIT_REQUIRES_WATER,TRAIT_ALTER_TEMP)
 		if(GENE_VIGOUR)
 			traits_to_copy = list(TRAIT_PRODUCTION,TRAIT_MATURATION,TRAIT_YIELD,TRAIT_SPREAD)
@@ -730,18 +752,18 @@
 	return (P ? P : 0)
 
 //Place the plant products at the feet of the user.
-/datum/seed/proc/harvest(mob/user,yield_mod,harvest_sample,force_amount)
+/datum/seed/proc/harvest(var/mob/user,var/yield_mod,var/harvest_sample,var/force_amount)
 
 	if(!user)
 		return
 
 	if(!force_amount && get_trait(TRAIT_YIELD) == 0 && !harvest_sample)
-		if(istype(user)) to_chat(user, SPAN_DANGER("You fail to harvest anything useful."))
+		if(istype(user)) to_chat(user, "<span class='danger'>You fail to harvest anything useful.</span>")
 	else
 		if(istype(user)) to_chat(user, "You [harvest_sample ? "take a sample" : "harvest"] from the [display_name].")
 		//This may be a new line. Update the global if it is.
 		if(name == "new line" || !(name in SSplants.seeds))
-			uid = length(SSplants.seeds) + 1
+			uid = sequential_id(/datum/seed/) // inf
 			name = "[uid]"
 			SSplants.seeds[name] = src
 
@@ -766,18 +788,19 @@
 		. = list()
 		for(var/i = 0;i<total_yield;i++)
 			var/obj/item/product
-			if(product_type)
-				product = new product_type(get_turf(user),name)
+			if(has_mob_product)
+				product = new has_mob_product(get_turf(user),name)
 			else
 				product = new /obj/item/reagent_containers/food/snacks/grown(get_turf(user),name)
 				product.w_class = fruit_size
 			. += product
 
 			if(get_trait(TRAIT_PRODUCT_COLOUR))
-				if(istype(product,/obj/item/reagent_containers/food/snacks/grown))
+				if(!istype(product, /mob))
 					product.color = get_trait(TRAIT_PRODUCT_COLOUR)
-					var/obj/item/reagent_containers/food/food = product
-					food.filling_color = get_trait(TRAIT_PRODUCT_COLOUR)
+					if(istype(product,/obj/item/reagent_containers/food))
+						var/obj/item/reagent_containers/food/food = product
+						food.filling_color = get_trait(TRAIT_PRODUCT_COLOUR)
 
 			if(mysterious)
 				product.name += "?"
@@ -791,20 +814,16 @@
 
 			//Handle spawning in living, mobile products (like dionaea).
 			if(istype(product,/mob/living))
-				if(seed_noun == SEED_NOUN_NODES)
-					product.visible_message(SPAN_NOTICE("The pod disgorges \a [product]!"))
-				else
-					product.visible_message(SPAN_NOTICE("\The [product] skitters away!"))
-				if(possessable)
-					handle_living_product(product)
-					if(istype(product,/mob/living/simple_animal/passive/mushroom)) // Gross.
-						var/mob/living/simple_animal/passive/mushroom/mush = product
-						mush.seed = src
+				product.visible_message("<span class='notice'>The pod disgorges [product]!</span>")
+				handle_living_product(product)
+				if(istype(product,/mob/living/simple_animal/friendly/mushroom)) // Gross.
+					var/mob/living/simple_animal/friendly/mushroom/mush = product
+					mush.seed = src
 
 // When the seed in this machine mutates/is modified, the tray seed value
 // is set to a new datum copied from the original. This datum won't actually
 // be put into the global datum list until the product is harvested, though.
-/datum/seed/proc/diverge(modified)
+/datum/seed/proc/diverge(var/modified)
 
 	if(get_trait(TRAIT_IMMUTABLE) > 0) return
 
@@ -816,7 +835,7 @@
 	new_seed.can_self_harvest = can_self_harvest
 	new_seed.kitchen_tag =      kitchen_tag
 	new_seed.trash_type =       trash_type
-	new_seed.product_type =  product_type
+	new_seed.has_mob_product =  has_mob_product
 	//Copy over everything else.
 	if(mutants)        new_seed.mutants = mutants.Copy()
 	if(chems)          new_seed.chems = chems.Copy()
@@ -851,19 +870,19 @@
 
 /datum/seed/proc/get_icon(growth_stage)
 	var/plant_icon = get_trait(TRAIT_PLANT_ICON)
-	var/image/res = image('icons/obj/flora/hydroponics_growing.dmi', "[plant_icon]-[growth_stage]")
+	var/image/res = image(growing_icon, "[plant_icon]-[growth_stage]") //inf //was `var/image/res = image('icons/obj/hydroponics_growing.dmi', "[plant_icon]-[growth_stage]")`
 	if(get_growth_type())
 		res.icon_state = "[get_growth_type()]-[growth_stage]"
 	else
 		res.icon_state = "[plant_icon]-[growth_stage]"
 
 	if(get_growth_type())
-		res.icon = 'icons/obj/flora/hydroponics_vines.dmi'
+		res.icon = vines_icon //inf //was `res.icon = 'icons/obj/hydroponics_vines.dmi'`
 
 	res.color = get_trait(TRAIT_PLANT_COLOUR)
 
 	if(get_trait(TRAIT_LARGE))
-		res.icon = 'icons/obj/flora/hydroponics_large.dmi'
+		res.icon = large_icon //inf //was `res.icon = 'icons/obj/hydroponics_large.dmi'
 		res.pixel_x = -8
 		res.pixel_y = -16
 
@@ -871,7 +890,7 @@
 	if(leaves)
 		var/image/I = image(res.icon, "[plant_icon]-[growth_stage]-leaves")
 		I.color = leaves
-		I.appearance_flags = DEFAULT_APPEARANCE_FLAGS | RESET_COLOR
+		I.appearance_flags = RESET_COLOR
 		res.overlays += I
 
 	return res

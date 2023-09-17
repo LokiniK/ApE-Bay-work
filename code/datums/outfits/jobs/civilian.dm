@@ -1,11 +1,17 @@
-/singleton/hierarchy/outfit/job/assistant
+/decl/hierarchy/outfit/job/assistant
 	name = OUTFIT_JOB_NAME("Assistant")
 
-/singleton/hierarchy/outfit/job/service
+/decl/hierarchy/outfit/job/service
 	l_ear = /obj/item/device/radio/headset/headset_service
-	hierarchy_type = /singleton/hierarchy/outfit/job/service
+	hierarchy_type = /decl/hierarchy/outfit/job/service
 
-/singleton/hierarchy/outfit/job/service/chef
+/decl/hierarchy/outfit/job/service/bartender
+	name = OUTFIT_JOB_NAME("Bartender")
+	uniform = /obj/item/clothing/under/rank/bartender
+	id_types = list(/obj/item/card/id/civilian/bartender)
+	pda_type = /obj/item/modular_computer/pda
+
+/decl/hierarchy/outfit/job/service/chef
 	name = OUTFIT_JOB_NAME("Chef")
 	uniform = /obj/item/clothing/under/rank/chef
 	suit = /obj/item/clothing/suit/chef
@@ -13,7 +19,7 @@
 	id_types = list(/obj/item/card/id/civilian/chef)
 	pda_type = /obj/item/modular_computer/pda
 
-/singleton/hierarchy/outfit/job/service/gardener
+/decl/hierarchy/outfit/job/service/gardener
 	name = OUTFIT_JOB_NAME("Gardener")
 	uniform = /obj/item/clothing/under/rank/hydroponics
 	suit = /obj/item/clothing/suit/apron
@@ -22,25 +28,25 @@
 	id_types = list(/obj/item/card/id/civilian/botanist)
 	pda_type = /obj/item/modular_computer/pda
 
-/singleton/hierarchy/outfit/job/service/gardener/New()
+/decl/hierarchy/outfit/job/service/gardener/New()
 	..()
-	backpack_overrides[/singleton/backpack_outfit/backpack]      = /obj/item/storage/backpack/hydroponics
-	backpack_overrides[/singleton/backpack_outfit/satchel]       = /obj/item/storage/backpack/satchel/hyd
-	backpack_overrides[/singleton/backpack_outfit/messenger_bag] = /obj/item/storage/backpack/messenger/hyd
+	backpack_overrides[/decl/backpack_outfit/backpack]      = /obj/item/storage/backpack/hydroponics
+	backpack_overrides[/decl/backpack_outfit/satchel]       = /obj/item/storage/backpack/satchel/hyd
+	backpack_overrides[/decl/backpack_outfit/messenger_bag] = /obj/item/storage/backpack/messenger/hyd
 
-/singleton/hierarchy/outfit/job/service/janitor
+/decl/hierarchy/outfit/job/service/janitor
 	name = OUTFIT_JOB_NAME("Janitor")
 	uniform = /obj/item/clothing/under/rank/janitor
 	id_types = list(/obj/item/card/id/civilian/janitor)
 	pda_type = /obj/item/modular_computer/pda
 
-/singleton/hierarchy/outfit/job/librarian
+/decl/hierarchy/outfit/job/librarian
 	name = OUTFIT_JOB_NAME("Librarian")
 	uniform = /obj/item/clothing/under/suit_jacket/red
 	id_types = list(/obj/item/card/id/civilian/librarian)
 	pda_type = /obj/item/modular_computer/pda
 
-/singleton/hierarchy/outfit/job/internal_affairs_agent
+/decl/hierarchy/outfit/job/internal_affairs_agent
 	name = OUTFIT_JOB_NAME("Internal affairs agent")
 	l_ear = /obj/item/device/radio/headset/ia
 	uniform = /obj/item/clothing/under/rank/internalaffairs
@@ -51,7 +57,7 @@
 	id_types = list(/obj/item/card/id/civilian/internal_affairs_agent)
 	pda_type = /obj/item/modular_computer/pda/heads/paperpusher
 
-/singleton/hierarchy/outfit/job/chaplain
+/decl/hierarchy/outfit/job/chaplain
 	name = OUTFIT_JOB_NAME("Chaplain")
 	uniform = /obj/item/clothing/under/rank/chaplain
 	l_hand = /obj/item/storage/bible

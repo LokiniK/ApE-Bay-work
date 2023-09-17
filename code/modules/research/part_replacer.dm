@@ -1,7 +1,6 @@
 /obj/item/storage/part_replacer
 	name = "rapid part exchange device"
 	desc = "Special mechanical module made to store, sort, and apply standard machine parts."
-	icon = 'icons/obj/tools/part_replacer.dmi'
 	icon_state = "RPED"
 	item_state = "RPED"
 	w_class = ITEM_SIZE_HUGE
@@ -13,7 +12,6 @@
 	collection_mode = 1
 	max_w_class = ITEM_SIZE_NORMAL
 	max_storage_space = 100
-	origin_tech = list(TECH_ENGINEERING = 4, TECH_MATERIAL = 3)
 
 /obj/item/research
 	name = "research debugging device"

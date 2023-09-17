@@ -13,10 +13,13 @@
 	access = list(access_medical, access_medical_equip, access_morgue, access_bridge, access_heads,
 			access_chemistry, access_virology, access_cmo, access_surgery, access_RC_announce,
 			access_keycard_auth, access_sec_doors, access_psychiatrist, access_eva, access_maint_tunnels, access_external_airlocks)
+	minimal_access = list(access_medical, access_medical_equip, access_morgue, access_bridge, access_heads,
+			access_chemistry, access_virology, access_cmo, access_surgery, access_RC_announce,
+			access_keycard_auth, access_sec_doors, access_psychiatrist, access_eva, access_maint_tunnels, access_external_airlocks)
 
 	minimal_player_age = 14
 	ideal_character_age = 50
-	outfit_type = /singleton/hierarchy/outfit/job/medical/cmo
+	outfit_type = /decl/hierarchy/outfit/job/medical/cmo
 
 /datum/job/doctor
 	title = "Medical Doctor"
@@ -30,12 +33,13 @@
 	selection_color = "#013d3b"
 	economic_power = 7
 	access = list(access_medical, access_medical_equip, access_morgue, access_surgery, access_chemistry, access_virology)
+	minimal_access = list(access_medical, access_medical_equip, access_morgue, access_surgery, access_virology)
 	alt_titles = list(
-		"Surgeon" = /singleton/hierarchy/outfit/job/medical/doctor/surgeon,
-		"Emergency Physician" = /singleton/hierarchy/outfit/job/medical/doctor/emergency_physician,
-		"Nurse" = /singleton/hierarchy/outfit/job/medical/doctor/nurse,
-		"Virologist" = /singleton/hierarchy/outfit/job/medical/doctor/virologist)
-	outfit_type = /singleton/hierarchy/outfit/job/medical/doctor
+		"Surgeon" = /decl/hierarchy/outfit/job/medical/doctor/surgeon,
+//		"Emergency Physician" = /decl/hierarchy/outfit/job/medical/doctor/emergency_physician,
+		"Nurse" = /decl/hierarchy/outfit/job/medical/doctor/nurse,
+		"Virologist" = /decl/hierarchy/outfit/job/medical/doctor/virologist)
+	outfit_type = /decl/hierarchy/outfit/job/medical/doctor
 
 //Chemist is a medical job damnit	//YEAH FUCK YOU SCIENCE	-Pete	//Guys, behave -Erro
 /datum/job/chemist
@@ -50,7 +54,8 @@
 	selection_color = "#013d3b"
 	economic_power = 5
 	access = list(access_medical, access_medical_equip, access_morgue, access_surgery, access_chemistry, access_virology)
-	outfit_type = /singleton/hierarchy/outfit/job/medical/chemist
+	minimal_access = list(access_medical, access_medical_equip, access_chemistry)
+	outfit_type = /decl/hierarchy/outfit/job/medical/chemist
 
 /datum/job/geneticist
 	title = "Geneticist"
@@ -64,7 +69,8 @@
 	selection_color = "#013d3b"
 	economic_power = 7
 	access = list(access_medical, access_morgue, access_surgery, access_chemistry, access_virology, access_research)
-	outfit_type = /singleton/hierarchy/outfit/job/medical/geneticist
+	minimal_access = list(access_medical, access_morgue, access_research)
+	outfit_type = /decl/hierarchy/outfit/job/medical/geneticist
 
 /datum/job/psychiatrist
 	title = "Psychiatrist"
@@ -78,7 +84,8 @@
 	supervisors = "the chief medical officer"
 	selection_color = "#013d3b"
 	access = list(access_medical, access_medical_equip, access_morgue, access_surgery, access_chemistry, access_virology, access_psychiatrist)
-	outfit_type = /singleton/hierarchy/outfit/job/medical/psychiatrist
+	minimal_access = list(access_medical, access_medical_equip, access_psychiatrist)
+	outfit_type = /decl/hierarchy/outfit/job/medical/psychiatrist
 
 /datum/job/Paramedic
 	title = "Paramedic"
@@ -92,5 +99,6 @@
 	economic_power = 4
 	minimal_player_age = 7
 	access = list(access_medical, access_medical_equip, access_morgue, access_surgery, access_chemistry, access_virology, access_eva, access_maint_tunnels, access_external_airlocks, access_psychiatrist)
-	alt_titles = list("Emergency Medical Technician" = /singleton/hierarchy/outfit/job/medical/paramedic/emt)
-	outfit_type = /singleton/hierarchy/outfit/job/medical/paramedic
+	minimal_access = list(access_medical, access_medical_equip, access_morgue, access_eva, access_maint_tunnels, access_external_airlocks)
+	alt_titles = list("Emergency Medical Technician" = /decl/hierarchy/outfit/job/medical/paramedic/emt)
+	outfit_type = /decl/hierarchy/outfit/job/medical/paramedic

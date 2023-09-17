@@ -1,10 +1,10 @@
-/singleton/flooring
+/decl/flooring
 	var/psi_null
 
-/singleton/flooring/proc/is_psi_null()
+/decl/flooring/proc/is_psi_null()
 	return psi_null
 
-/singleton/flooring/tiling/nullglass
+/decl/flooring/tiling/nullglass
 	name = "nullglass plating"
 	desc = "You can hear the tiles whispering..."
 	icon_base = "nullglass"

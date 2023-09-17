@@ -4,7 +4,7 @@
 
 /obj/machinery/computer/atmoscontrol
 	name = "\improper Central Atmospherics Computer"
-	icon = 'icons/obj/machines/computer.dmi'
+	icon = 'icons/obj/computer.dmi'
 	icon_keyboard = "generic_key"
 	icon_screen = "comm_logs"
 	light_color = "#00b000"
@@ -23,22 +23,19 @@
 	icon_screen = "atmoslaptop"
 	density = FALSE
 
-/obj/machinery/computer/atmoscontrol/laptop/research
-	req_access = list(list(access_research, access_atmospherics, access_engine_equip))
-
 /obj/machinery/computer/atmoscontrol/interface_interact(user)
 	ui_interact(user)
 	return TRUE
 
-/obj/machinery/computer/atmoscontrol/emag_act(remaining_carges, mob/user)
+/obj/machinery/computer/atmoscontrol/emag_act(var/remaining_carges, var/mob/user)
 	if(!emagged)
-		user.visible_message(SPAN_WARNING("\The [user] does something \the [src], causing the screen to flash!"),\
-			SPAN_WARNING("You cause the screen to flash as you gain full control."),\
+		user.visible_message("<span class='warning'>\The [user] does something \the [src], causing the screen to flash!</span>",\
+			"<span class='warning'>You cause the screen to flash as you gain full control.</span>",\
 			"You hear an electronic warble.")
 		atmos_control.emagged = TRUE
 		return 1
 
-/obj/machinery/computer/atmoscontrol/ui_interact(mob/user)
+/obj/machinery/computer/atmoscontrol/ui_interact(var/mob/user)
 	if(!atmos_control)
 		atmos_control = new(src, req_access, monitored_alarm_ids)
 	atmos_control.ui_interact(user)

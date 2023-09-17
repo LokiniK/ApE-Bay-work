@@ -6,6 +6,14 @@
 	var/list/interact_sounds = list("keyboard", "keystroke")
 	var/obj/item/stock_parts/computer/hard_drive/portable/portable_drive
 
+/obj/machinery/computer/modular/examine(mob/user)
+	. = ..()
+	if(hasHUD(user, HUD_IT))
+		var/datum/extension/interactive/ntos/os = get_extension(src, /datum/extension/interactive/ntos)
+		var/obj/item/stock_parts/computer/network_card/network_card = os.get_component(PART_NETWORK)
+		if(istype(network_card) && network_card.check_functionality() && os.on)
+			to_chat(user, SPAN_INFO(SPAN_ITALIC("You may notice a small hologram that says: [network_card.get_network_tag()].")))
+
 /obj/machinery/computer/modular/Initialize()
 	set_extension(src, /datum/extension/interactive/ntos/console)
 	. = ..()
@@ -18,7 +26,7 @@
 	. = ..()
 
 /obj/machinery/computer/modular/Process()
-	if(!is_powered())
+	if(stat & NOPOWER)
 		return
 	var/datum/extension/interactive/ntos/os = get_extension(src, /datum/extension/interactive/ntos)
 	if(os)
@@ -26,7 +34,7 @@
 
 /obj/machinery/computer/modular/power_change()
 	. = ..()
-	if(. && (!is_powered()))
+	if(. && (stat & NOPOWER))
 		var/datum/extension/interactive/ntos/os = get_extension(src, /datum/extension/interactive/ntos)
 		if(os)
 			os.event_powerfailure()
@@ -55,19 +63,18 @@
 /obj/machinery/computer/modular/get_screen_overlay()
 	var/datum/extension/interactive/ntos/os = get_extension(src, /datum/extension/interactive/ntos)
 	if(os)
-		return os.get_screen_overlay()
+		return os.get_screen_overlay(density)
 
 /obj/machinery/computer/modular/get_keyboard_overlay()
 	var/datum/extension/interactive/ntos/os = get_extension(src, /datum/extension/interactive/ntos)
 	if(os)
-		icon_keyboard = os.get_keyboard_state()
 		return os.get_keyboard_overlay()
 
-/obj/machinery/computer/modular/emag_act(remaining_charges, mob/user)
+/obj/machinery/computer/modular/emag_act(var/remaining_charges, var/mob/user)
 	var/obj/item/stock_parts/circuitboard/modular_computer/MB = get_component_of_type(/obj/item/stock_parts/circuitboard/modular_computer)
 	return MB && MB.emag_act(remaining_charges, user)
 
-/obj/machinery/computer/modular/components_are_accessible(path)
+/obj/machinery/computer/modular/components_are_accessible(var/path)
 	. = ..()
 	if(.)
 		return
@@ -94,7 +101,7 @@
 	set src in view(1)
 
 	if(!CanPhysicallyInteract(usr))
-		to_chat(usr, SPAN_WARNING("You can't reach it."))
+		to_chat(usr, "<span class='warning'>You can't reach it.</span>")
 		return
 
 	if(ismob(usr))
@@ -106,7 +113,7 @@
 	portable_drive = null
 	verbs -= /obj/machinery/computer/modular/proc/eject_usb
 
-/obj/machinery/computer/modular/CouldUseTopic(mob/user)
+/obj/machinery/computer/modular/CouldUseTopic(var/mob/user)
 	..()
 	if(LAZYLEN(interact_sounds) && CanPhysicallyInteract(user))
 		playsound(src, pick(interact_sounds), 40)
@@ -121,12 +128,11 @@
 
 /obj/machinery/computer/modular/CtrlAltClick(mob/user)
 	if(!CanPhysicallyInteract(user))
-		return FALSE
+		return 0
 	var/datum/extension/interactive/ntos/os = get_extension(src, /datum/extension/interactive/ntos)
 	if(os)
 		os.open_terminal(user)
-		return TRUE
-	return FALSE
+		return 1
 
 /obj/machinery/computer/modular/verb/emergency_shutdown()
 	set name = "Forced Shutdown"

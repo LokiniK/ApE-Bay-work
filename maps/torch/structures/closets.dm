@@ -5,7 +5,7 @@
 /obj/structure/closet/toolcloset/excavation
 	name = "excavation equipment closet"
 	desc = "It's a storage unit for excavation equipment."
-	closet_appearance = /singleton/closet_appearance/secure_closet/engineering/tools
+	closet_appearance = /decl/closet_appearance/secure_closet/engineering/tools
 
 /obj/structure/closet/toolcloset/excavation/WillContain()
 	return list(
@@ -17,6 +17,7 @@
 		/obj/item/device/core_sampler,
 		/obj/item/device/gps,
 		/obj/item/pinpointer/radio,
+		/obj/item/device/radio/beacon,
 		/obj/item/clothing/glasses/meson,
 		/obj/item/clothing/glasses/science,
 		/obj/item/pickaxe,
@@ -30,7 +31,7 @@
 
 /obj/structure/closet/wardrobe/ptgear
 	name = "pt gear wardrobe"
-	closet_appearance = /singleton/closet_appearance/wardrobe/white
+	closet_appearance = /decl/closet_appearance/wardrobe/white
 
 /obj/structure/closet/wardrobe/ptgear/WillContain()
 	return list(
@@ -44,7 +45,7 @@
 
 /obj/random/torchcloset/spawn_choices()
 	return list(/obj/structure/closet,
-				/obj/structure/closet/firecloset,
+				/obj/structure/closet/walllocker/firecloset,
 				/obj/structure/closet/emcloset,
 				/obj/structure/closet/jcloset_torch,
 				/obj/structure/closet/athletic_mixed,

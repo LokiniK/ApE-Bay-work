@@ -1,6 +1,6 @@
 /turf
 	icon = 'icons/turf/floors.dmi'
-	level = ATOM_LEVEL_UNDER_TILE
+	level = 1
 
 	layer = TURF_LAYER
 
@@ -22,6 +22,7 @@
 	var/icon_old = null
 	var/pathweight = 1          // How much does it cost to pathfind over this turf?
 	var/blessed = 0             // Has the turf been blessed?
+	var/is_prying = 0
 
 	var/list/decals
 
@@ -34,7 +35,7 @@
 	var/height = 0 // Determines if fluids can overflow onto next turf
 	var/footstep_type
 
-	var/changing_turf
+	var/tmp/changing_turf
 
 	/// List of 'dangerous' objs that the turf holds that can cause something bad to happen when stepped on, used for AI mobs.
 	var/list/dangerous_objects
@@ -42,8 +43,6 @@
 	var/has_dense_atom
 	var/has_opaque_atom
 
-	/// Reference to the turf fire on the turf
-	var/obj/effect/turf_fire/turf_fire
 
 /turf/Initialize(mapload, ...)
 	. = ..()
@@ -77,7 +76,7 @@
 
 	changing_turf = FALSE
 
-	remove_cleanables(FALSE)
+	remove_cleanables()
 	fluid_update()
 	REMOVE_ACTIVE_FLUID_SOURCE(src)
 
@@ -92,7 +91,10 @@
 		QDEL_NULL(mimic_proxy)
 
 	..()
-	return QDEL_HINT_LETMELIVE
+	return QDEL_HINT_IWILLGC
+
+/turf/ex_act(severity)
+	return 0
 
 /turf/proc/is_solid_structure()
 	return 1
@@ -113,7 +115,7 @@
 	if (!.)
 		return 1
 
-/turf/proc/handle_hand_interception(mob/user)
+/turf/proc/handle_hand_interception(var/mob/user)
 	var/datum/extension/turf_hand/THE
 	for (var/A in src)
 		var/datum/extension/turf_hand/TH = get_extension(A, /datum/extension/turf_hand)
@@ -123,11 +125,11 @@
 	if (THE)
 		return THE.OnHandInterception(user)
 
-/turf/attack_robot(mob/user)
+/turf/attack_robot(var/mob/user)
 	if(Adjacent(user))
 		attack_hand(user)
 
-/turf/attackby(obj/item/W as obj, mob/user as mob)
+turf/attackby(obj/item/W as obj, mob/user as mob)
 	if(istype(W, /obj/item/storage))
 		var/obj/item/storage/S = W
 		if(S.use_to_pickup && S.collection_mode)
@@ -175,8 +177,8 @@
 				return 0
 	return 1 //Nothing found to block so return success!
 
-var/global/const/enterloopsanity = 100
-/turf/Entered(atom/atom, atom/old_loc)
+var/const/enterloopsanity = 100
+/turf/Entered(var/atom/atom, var/atom/old_loc)
 
 	..()
 
@@ -189,7 +191,14 @@ var/global/const/enterloopsanity = 100
 
 	if(ismob(A))
 		var/mob/M = A
-		M.make_floating(0) //we know we're not on solid ground so skip the checks to save a bit of processing
+		if(!M.check_solid_ground())
+			inertial_drift(M)
+			//we'll end up checking solid ground again but we still need to check the other things.
+			//Ususally most people aren't in space anyways so hopefully this is acceptable.
+			M.update_floating()
+		else
+			M.inertia_dir = 0
+			M.make_floating(0) //we know we're not on solid ground so skip the checks to save a bit of processing
 
 	var/objects = 0
 	if(A && (A.movable_flags & MOVABLE_FLAG_PROXMOVE))
@@ -198,25 +207,39 @@ var/global/const/enterloopsanity = 100
 			objects++
 			spawn(0)
 				if(A)
-					A.HasProximity(thing)
+					A.HasProximity(thing, 1)
 					if ((thing && A) && (thing.movable_flags & MOVABLE_FLAG_PROXMOVE))
-						thing.HasProximity(A)
+						thing.HasProximity(A, 1)
 	return
 
-/turf/proc/adjacent_fire_act(turf/simulated/floor/adj_turf, datum/gas_mixture/adj_air, adj_temp, adj_volume)
+/turf/proc/adjacent_fire_act(turf/simulated/floor/source, exposed_temperature, exposed_volume)
 	return
 
 /turf/proc/is_plating()
 	return 0
 
-/turf/proc/protects_atom(atom/A)
+/turf/proc/protects_atom(var/atom/A)
 	return FALSE
+
+/turf/proc/inertial_drift(atom/movable/A)
+	if(!(A.last_move))	return
+	if((istype(A, /mob/) && src.x > 2 && src.x < (world.maxx - 1) && src.y > 2 && src.y < (world.maxy-1)))
+		var/mob/M = A
+		if(M.Allow_Spacemove(1)) //if this mob can control their own movement in space then they shouldn't be drifting
+			M.inertia_dir  = 0
+			return
+		spawn(5)
+			if(M && !(M.anchored) && !(M.pulledby) && (M.loc == src))
+				if(!M.inertia_dir)
+					M.inertia_dir = M.last_move
+				step(M, M.inertia_dir)
+	return
 
 /turf/proc/levelupdate()
 	for(var/obj/O in src)
 		O.hide(O.hides_under_flooring() && !is_plating())
 
-/turf/proc/AdjacentTurfs(check_blockage = TRUE)
+/turf/proc/AdjacentTurfs(var/check_blockage = TRUE)
 	. = list()
 	for(var/turf/t in (trange(1,src) - src))
 		if(check_blockage)
@@ -226,7 +249,7 @@ var/global/const/enterloopsanity = 100
 		else
 			. += t
 
-/turf/proc/CardinalTurfs(check_blockage = TRUE)
+/turf/proc/CardinalTurfs(var/check_blockage = TRUE)
 	. = list()
 	for(var/ad in AdjacentTurfs(check_blockage))
 		var/turf/T = ad
@@ -258,53 +281,48 @@ var/global/const/enterloopsanity = 100
 	return 0
 
 //expects an atom containing the reagents used to clean the turf
-/turf/proc/clean(atom/source, mob/user = null, time = null, message = null)
+/turf/proc/clean(atom/source, mob/user = null, var/time = null, var/message = null)
 	if(source.reagents.has_reagent(/datum/reagent/water, 1) || source.reagents.has_reagent(/datum/reagent/space_cleaner, 1))
-		if(user && time && !do_after(user, time, src, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
+		if(user && time && !do_after(user, time, src))
 			return
 		clean_blood()
 		remove_cleanables()
 		if(message)
 			to_chat(user, message)
 	else
-		to_chat(user, SPAN_WARNING("\The [source] is too dry to wash that."))
+		to_chat(user, "<span class='warning'>\The [source] is too dry to wash that.</span>")
 	source.reagents.trans_to_turf(src, 1, 10)	//10 is the multiplier for the reaction effect. probably needed to wet the floor properly.
 
-/turf/proc/remove_cleanables(skip_blood = TRUE)
+/turf/proc/remove_cleanables()
 	for(var/obj/effect/O in src)
-		if(istype(O,/obj/effect/rune) || (istype(O,/obj/effect/decal/cleanable) && (!skip_blood || !istype(O, /obj/effect/decal/cleanable/blood))))
+		if(istype(O,/obj/effect/rune) || istype(O,/obj/effect/decal/cleanable))
 			qdel(O)
 
 /turf/proc/update_blood_overlays()
 	return
 
 /turf/proc/remove_decals()
-	if(decals && length(decals))
+	if(decals && decals.len)
 		decals.Cut()
 		decals = null
 
 // Called when turf is hit by a thrown object
-/turf/hitby(atom/movable/AM as mob|obj, datum/thrownthing/TT)
+/turf/hitby(atom/movable/AM as mob|obj, var/datum/thrownthing/TT)
 	if(src.density)
 		if(isliving(AM))
 			var/mob/living/M = AM
 			M.turf_collision(src, TT.speed)
-			if(length(M.pinned))
+			if(M.pinned.len)
 				return
 
-			if(M.pinned)
-				return
-		addtimer(new Callback(src, /turf/proc/bounce_off, AM, TT.init_dir), 2)
-
-	..()
-
-/turf/proc/bounce_off(atom/movable/AM, direction)
-	step(AM, turn(direction, 180))
+		var/intial_dir = TT.init_dir
+		spawn(2)
+			step(AM, turn(intial_dir, 180))
 
 /turf/proc/can_engrave()
 	return FALSE
 
-/turf/proc/try_graffiti(mob/vandal, obj/item/tool)
+/turf/proc/try_graffiti(var/mob/vandal, var/obj/item/tool)
 
 	if(!tool.sharp || !can_engrave() || vandal.a_intent != I_HELP)
 		return FALSE
@@ -317,7 +335,7 @@ var/global/const/enterloopsanity = 100
 	for(var/obj/effect/decal/writing/W in src)
 		too_much_graffiti++
 	if(too_much_graffiti >= 5)
-		to_chat(vandal, SPAN_WARNING("There's too much graffiti here to add more."))
+		to_chat(vandal, "<span class='warning'>There's too much graffiti here to add more.</span>")
 		return FALSE
 
 	var/message = sanitize(input("Enter a message to engrave.", "Graffiti") as null|text, trim = TRUE)
@@ -327,19 +345,19 @@ var/global/const/enterloopsanity = 100
 	if(!vandal || vandal.incapacitated() || !Adjacent(vandal) || !tool.loc == vandal)
 		return FALSE
 
-	vandal.visible_message(SPAN_WARNING("\The [vandal] begins carving something into \the [src]."))
+	vandal.visible_message("<span class='warning'>\The [vandal] begins carving something into \the [src].</span>")
 
-	if(!do_after(vandal, max(20, length(message)), src, DO_PUBLIC_UNIQUE))
+	if(!do_after(vandal, max(20, length(message)), src))
 		return FALSE
 
-	vandal.visible_message(SPAN_DANGER("\The [vandal] carves some graffiti into \the [src]."))
+	vandal.visible_message("<span class='danger'>\The [vandal] carves some graffiti into \the [src].</span>")
 	var/obj/effect/decal/writing/graffiti = new(src)
 	graffiti.message = message
 	graffiti.author = vandal.ckey
 	vandal.update_personal_goal(/datum/goal/achievement/graffiti, TRUE)
 
 	if(lowertext(message) == "elbereth")
-		to_chat(vandal, SPAN_NOTICE("You feel much safer."))
+		to_chat(vandal, "<span class='notice'>You feel much safer.</span>")
 
 	return TRUE
 
@@ -355,7 +373,7 @@ var/global/const/enterloopsanity = 100
 /turf/proc/get_obstruction()
 	if (density)
 		LAZYADD(., src)
-	if (length(contents) > 100 || length(contents) <= !!lighting_overlay)
+	if (contents.len > 100 || contents.len <= !!lighting_overlay)
 		return    // fuck it, too/not-enough much shit here
 	for (var/thing in src)
 		var/atom/movable/AM = thing
@@ -428,6 +446,3 @@ var/global/const/enterloopsanity = 100
 	else
 		has_dense_atom = null
 		has_opaque_atom = null
-
-/turf/proc/IgniteTurf(power, fire_colour)
-	return

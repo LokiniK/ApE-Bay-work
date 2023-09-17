@@ -3,21 +3,13 @@
 */
 GLOBAL_DATUM_INIT(contained_state, /datum/topic_state/contained_state, new)
 
-/datum/topic_state/contained_state/can_use_topic(atom/src_object, mob/user)
+/datum/topic_state/contained_state/can_use_topic(var/atom/src_object, var/mob/user)
 	if(!src_object.contains(user))
 		return STATUS_CLOSE
 
 	return user.shared_nano_interaction()
 
-/**
- * Recursively checks if this atom contains another atom in its contents, or contents of its contents.
- *
- * **Parameters**:
- * - `location` - The atom to check for in contents.
- *
- * Returns boolean.
- */
-/atom/proc/contains(atom/location)
+/atom/proc/contains(var/atom/location)
 	if(!location)
 		return 0
 	if(location == src)

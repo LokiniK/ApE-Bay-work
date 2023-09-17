@@ -1,10 +1,10 @@
 /obj/machinery/mining
-	icon = 'icons/obj/machines/mining/mining_drill.dmi'
+	icon = 'icons/obj/mining_drill.dmi'
 	anchored = FALSE
 	use_power = POWER_USE_OFF //The drill takes power directly from a cell.
 	density = TRUE
 	layer = ABOVE_HUMAN_LAYER //So it draws over mobs in the tile north of it.
-	construct_state = /singleton/machine_construction/default/panel_closed
+	construct_state = /decl/machine_construction/default/panel_closed
 	uncreated_component_parts = null
 	stat_immune = 0
 
@@ -58,7 +58,7 @@
 		system_error("system configuration error")
 		return
 
-	if(!is_powered())
+	if(stat & NOPOWER)
 		system_error("insufficient charge")
 		return
 
@@ -83,17 +83,17 @@
 			T.diggable = 0
 	else if(istype(get_turf(src), /turf/simulated/floor))
 		var/turf/simulated/floor/T = get_turf(src)
-		T.ex_act(EX_ACT_HEAVY)
+		T.ex_act(2.0)
 
 	//Dig out the tasty ores.
-	if(length(resource_field))
+	if(resource_field.len)
 		var/turf/simulated/harvesting = pick(resource_field)
 
-		while(length(resource_field) && !harvesting.resources)
+		while(resource_field.len && !harvesting.resources)
 			harvesting.has_resources = 0
 			harvesting.resources = null
 			resource_field -= harvesting
-			if(length(resource_field))
+			if(resource_field.len)
 				harvesting = pick(resource_field)
 
 		if(!harvesting || !harvesting.resources)
@@ -104,15 +104,15 @@
 
 		for(var/metal in ore_types)
 
-			if(length(contents) >= capacity)
+			if(contents.len >= capacity)
 				system_error("insufficient storage space")
 				set_active(FALSE)
 				need_player_check = 1
 				update_icon()
 				return
 
-			if(length(contents) + total_harvest >= capacity)
-				total_harvest = capacity - length(contents)
+			if(contents.len + total_harvest >= capacity)
+				total_harvest = capacity - contents.len
 
 			if(total_harvest <= 0) break
 			if(harvesting.resources[metal])
@@ -142,7 +142,7 @@
 		need_player_check = 1
 		update_icon()
 
-/obj/machinery/mining/drill/proc/set_active(new_active)
+/obj/machinery/mining/drill/proc/set_active(var/new_active)
 	if(active != new_active)
 		active = new_active
 		update_use_power(active ? POWER_USE_ACTIVE : POWER_USE_OFF)
@@ -167,35 +167,27 @@
 		update_icon()
 		return TRUE
 	if(supported && !panel_open)
-		if(is_powered())
+		if(!(stat & NOPOWER))
 			set_active(!active)
 			if(active)
-				visible_message(SPAN_NOTICE("\The [src] lurches downwards, grinding noisily."))
+				visible_message("<span class='notice'>\The [src] lurches downwards, grinding noisily.</span>")
 				need_update_field = 1
 			else
-				visible_message(SPAN_NOTICE("\The [src] shudders to a grinding halt."))
+				visible_message("<span class='notice'>\The [src] shudders to a grinding halt.</span>")
 		else
-			to_chat(user, SPAN_NOTICE("The drill is unpowered."))
+			to_chat(user, "<span class='notice'>The drill is unpowered.</span>")
 	else
-		to_chat(user, SPAN_NOTICE("Turning on a piece of industrial machinery without sufficient bracing or wires exposed is a bad idea."))
+		to_chat(user, "<span class='notice'>Turning on a piece of industrial machinery without sufficient bracing or wires exposed is a bad idea.</span>")
 
 	update_icon()
 	return TRUE
 
 /obj/machinery/mining/drill/on_update_icon()
-	overlays.Cut()
-	if(panel_open)
-		overlays += "mining_drill_panel"
 	if(need_player_check)
-		overlays += emissive_appearance(icon, "mining_drill_lights_error")
-		overlays += "mining_drill_lights_error"
-		icon_state = "mining_drill_braced"
+		icon_state = "mining_drill_error"
 	else if(active)
-		icon_state = "mining_drill_braced"
-		icon_state = "[icon_state]_active"
-		var/status = clamp(round( (length(contents) / capacity) * 4 ), 0, 3)
-		overlays += emissive_appearance(icon, "mining_drill_lights_[status]")
-		overlays += "mining_drill_lights_[status]"
+		var/status = Clamp(round( (contents.len / capacity) * 4 ), 0, 3)
+		icon_state = "mining_drill_active[status]"
 	else if(supported)
 		icon_state = "mining_drill_braced"
 	else
@@ -204,30 +196,30 @@
 
 /obj/machinery/mining/drill/RefreshParts()
 	..()
-	harvest_speed = clamp(total_component_rating_of_type(/obj/item/stock_parts/micro_laser), 0, 10)
-	capacity = 200 * clamp(total_component_rating_of_type(/obj/item/stock_parts/matter_bin), 0, 10)
-	var/charge_multiplier = clamp(total_component_rating_of_type(/obj/item/stock_parts/capacitor), 0.1, 10)
+	harvest_speed = Clamp(total_component_rating_of_type(/obj/item/stock_parts/micro_laser), 0, 10)
+	capacity = 200 * Clamp(total_component_rating_of_type(/obj/item/stock_parts/matter_bin), 0, 10)
+	var/charge_multiplier = Clamp(total_component_rating_of_type(/obj/item/stock_parts/capacitor), 0.1, 10)
 	change_power_consumption(initial(active_power_usage) / charge_multiplier, POWER_USE_ACTIVE)
 
 /obj/machinery/mining/drill/proc/check_supports()
 
 	supported = 0
 
-	if((!supports || !length(supports)) && initial(anchored) == 0)
+	if((!supports || !supports.len) && initial(anchored) == 0)
 		anchored = FALSE
 		set_active(FALSE)
 	else
 		anchored = TRUE
 
-	if(supports && length(supports) >= braces_needed)
+	if(supports && supports.len >= braces_needed)
 		supported = 1
 
 	update_icon()
 
-/obj/machinery/mining/drill/proc/system_error(error)
+/obj/machinery/mining/drill/proc/system_error(var/error)
 
 	if(error)
-		src.visible_message(SPAN_NOTICE("\The [src] flashes a '[error]' warning."))
+		src.visible_message("<span class='notice'>\The [src] flashes a '[error]' warning.</span>")
 	need_player_check = 1
 	set_active(FALSE)
 	update_icon()
@@ -254,9 +246,9 @@
 	if(B)
 		for(var/obj/item/ore/O in contents)
 			O.forceMove(B)
-		to_chat(usr, SPAN_NOTICE("You unload the drill's storage cache into the ore box."))
+		to_chat(usr, "<span class='notice'>You unload the drill's storage cache into the ore box.</span>")
 	else
-		to_chat(usr, SPAN_NOTICE("You must move an ore box up to the drill before you can unload it."))
+		to_chat(usr, "<span class='notice'>You must move an ore box up to the drill before you can unload it.</span>")
 
 
 /obj/machinery/mining/brace
@@ -265,7 +257,7 @@
 	icon_state = "mining_brace"
 	obj_flags = OBJ_FLAG_ROTATABLE
 	interact_offline = 1
-
+	
 	machine_name = "mining drill brace"
 	machine_desc = "A mobile support strut that provides support for the head of a mining drill when anchored. Placed on either side of the drill head."
 
@@ -278,18 +270,18 @@
 
 /obj/machinery/mining/brace/attackby(obj/item/W as obj, mob/user as mob)
 	if(connected && connected.active)
-		to_chat(user, SPAN_NOTICE("You can't work with the brace of a running drill!"))
+		to_chat(user, "<span class='notice'>You can't work with the brace of a running drill!</span>")
 		return TRUE
 	if(component_attackby(W, user))
 		return TRUE
 	if(isWrench(W))
 
 		if(istype(get_turf(src), /turf/space))
-			to_chat(user, SPAN_NOTICE("You can't anchor something to empty space. Idiot."))
+			to_chat(user, "<span class='notice'>You can't anchor something to empty space. Idiot.</span>")
 			return
 
 		playsound(src.loc, 'sound/items/Ratchet.ogg', 100, 1)
-		to_chat(user, SPAN_NOTICE("You [anchored ? "un" : ""]anchor the brace."))
+		to_chat(user, "<span class='notice'>You [anchored ? "un" : ""]anchor the brace.</span>")
 
 		anchored = !anchored
 		if(anchored)

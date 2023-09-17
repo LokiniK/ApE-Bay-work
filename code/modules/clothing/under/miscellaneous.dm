@@ -1,4 +1,4 @@
-/obj/item/clothing/under/redpyjamas
+/obj/item/clothing/under/pj/red
 	name = "red pj's"
 	desc = "Sleepwear."
 	icon_state = "red_pyjamas"
@@ -6,7 +6,7 @@
 	item_state = "w_suit"
 	gender_icons = 1
 
-/obj/item/clothing/under/bluepyjamas
+/obj/item/clothing/under/pj/blue
 	name = "blue pj's"
 	desc = "Sleepwear."
 	icon_state = "blue_pyjamas"
@@ -77,7 +77,7 @@
 
 /obj/item/clothing/under/rank/centcom_officer
 	desc = "Gold trim on space-black cloth, this uniform displays the rank of \"Admiral.\"."
-	name = "officer's dress uniform"
+	name = "\improper Officer's Dress Uniform"
 	icon_state = "officer"
 	item_state = "lawyer_black"
 	worn_state = "officer"
@@ -85,14 +85,14 @@
 
 /obj/item/clothing/under/rank/centcom_captain
 	desc = "Gold trim on space-black cloth, this uniform displays the rank of \"Admiral-Executive.\"."
-	name = "officer's dress uniform"
+	name = "\improper Officer's Dress Uniform"
 	icon_state = "centcom"
 	item_state = "lawyer_black"
 	worn_state = "centcom"
 	displays_id = 0
 
 /obj/item/clothing/under/ert
-	name = "\improper ERT tactical uniform"
+	name = "ERT tactical uniform"
 	desc = "A short-sleeved black uniform, paired with grey digital-camo cargo pants. It looks very tactical."
 	icon_state = "ert_uniform"
 	item_state = "bl_suit"
@@ -105,9 +105,9 @@
 /obj/item/clothing/under/space
 	name = "\improper NASA jumpsuit"
 	desc = "It has a NASA logo on it and is made of space-proofed materials."
-	icon_state = "syndicate"
+	icon_state = "black"
 	item_state = "bl_suit"
-	worn_state = "syndicate"
+	worn_state = "black"
 	w_class = ITEM_SIZE_HUGE//bulky item
 	gas_transfer_coefficient = 0.01
 	permeability_coefficient = 0.02
@@ -166,7 +166,7 @@
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|FEET|ARMS|HANDS
 
 /obj/item/clothing/under/gentlesuit
-	name = "gentleman's suit"
+	name = "gentlemans suit"
 	desc = "A silk black shirt with a white tie and a matching gray vest and slacks. Feels proper."
 	icon_state = "gentlesuit"
 	item_state = "gy_suit"
@@ -217,6 +217,14 @@
 	icon_state = "red_suit"
 	item_state = "r_suit"
 	worn_state = "red_suit"
+
+/obj/item/clothing/under/blackskirt
+	name = "black skirt"
+	desc = "A black skirt, very fancy!"
+	icon_state = "blackskirt"
+	item_state = "bl_suit"
+	worn_state = "blackskirt"
+	body_parts_covered = UPPER_TORSO|LOWER_TORSO|ARMS
 
 /obj/item/clothing/under/schoolgirl
 	name = "schoolgirl uniform"
@@ -362,8 +370,28 @@
 	worn_state = "huresource"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|ARMS
 
+/obj/item/clothing/under/dress/plaid_blue
+	name = "blue plaid skirt"
+	desc = "A preppy blue skirt with a white blouse."
+	icon_state = "plaid_blue"
+	worn_state = "plaid_blue"
+
+/obj/item/clothing/under/dress/plaid_red
+	name = "red plaid skirt"
+	desc = "A preppy red skirt with a white blouse."
+	icon_state = "plaid_red"
+	item_state = "kilt"
+	worn_state = "plaid_red"
+
+/obj/item/clothing/under/dress/plaid_purple
+	name = "blue purple skirt"
+	desc = "A preppy purple skirt with a white blouse."
+	icon_state = "plaid_purple"
+	item_state = "kilt"
+	worn_state = "plaid_purple"
+
 //wedding stuff
-/obj/item/clothing/under/wedding
+/obj/item/clothing/under/wedding/
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS
 
 /obj/item/clothing/under/wedding/bride_orange
@@ -468,29 +496,32 @@
 /obj/item/clothing/under/suit_jacket/charcoal
 	name = "charcoal suit"
 	desc = "A charcoal suit and red tie. Very professional."
+	item_icons = list(slot_w_uniform_str = 'infinity/icons/mob/onmob/onmob_under.dmi')
 	icon_state = "charcoal_suit"
 	item_state = "bl_suit"
 	worn_state = "charcoal_suit"
 	gender_icons = 1
-	accessories = list(/obj/item/clothing/accessory/navy, /obj/item/clothing/accessory/toggleable/charcoal_jacket)
+	starting_accessories = list(/obj/item/clothing/accessory/navy, /obj/item/clothing/accessory/toggleable/charcoal_jacket)
 
 /obj/item/clothing/under/suit_jacket/navy
 	name = "navy suit"
 	desc = "A navy suit and red tie, intended for the galaxy's finest."
+	item_icons = list(slot_w_uniform_str = 'infinity/icons/mob/onmob/onmob_under.dmi')
 	icon_state = "navy_suit"
 	item_state = "bl_suit"
 	worn_state = "navy_suit"
 	gender_icons = 1
-	accessories = list(/obj/item/clothing/accessory/red, /obj/item/clothing/accessory/toggleable/navy_jacket)
+	starting_accessories = list(/obj/item/clothing/accessory/red, /obj/item/clothing/accessory/toggleable/navy_jacket)
 
 /obj/item/clothing/under/suit_jacket/burgundy
 	name = "burgundy suit"
 	desc = "A burgundy suit and black tie. Somewhat formal."
+	item_icons = list(slot_w_uniform_str = 'infinity/icons/mob/onmob/onmob_under.dmi')
 	icon_state = "burgundy_suit"
 	item_state = "r_suit"
 	worn_state = "burgundy_suit"
 	gender_icons = 1
-	accessories = list(/obj/item/clothing/accessory/black, /obj/item/clothing/accessory/toggleable/burgundy_jacket)
+	starting_accessories = list(/obj/item/clothing/accessory/black, /obj/item/clothing/accessory/toggleable/burgundy_jacket)
 
 /obj/item/clothing/under/suit_jacket/checkered
 	name = "checkered suit"
@@ -499,7 +530,7 @@
 	item_state = "gy_suit"
 	worn_state = "checkered_suit"
 	gender_icons = 1
-	accessories = list(/obj/item/clothing/accessory/black, /obj/item/clothing/accessory/toggleable/checkered_jacket)
+	starting_accessories = list(/obj/item/clothing/accessory/black, /obj/item/clothing/accessory/toggleable/checkered_jacket)
 
 /obj/item/clothing/under/suit_jacket/tan
 	name = "tan suit"
@@ -508,11 +539,12 @@
 	item_state = "lb_suit"
 	worn_state = "tan_suit"
 	gender_icons = 1
-	accessories = list(/obj/item/clothing/accessory/yellow, /obj/item/clothing/accessory/toggleable/tan_jacket)
+	starting_accessories = list(/obj/item/clothing/accessory/yellow, /obj/item/clothing/accessory/toggleable/tan_jacket)
 
 /obj/item/clothing/under/serviceoveralls
 	name = "workman outfit"
 	desc = "The very image of a working man. Not that you're probably doing work."
+	icon = 'infinity/icons/obj/clothing/obj_under.dmi'
 	icon_state = "mechanic"
 	item_state = "lb_suit"
 	worn_state = "mechanic"
@@ -649,7 +681,6 @@
 	worn_state = "punpun"
 	species_restricted = list(SPECIES_MONKEY)
 	sprite_sheets = list("Monkey" = 'icons/mob/species/monkey/onmob_under_monkey.dmi')
-	item_flags = ITEM_FLAG_WASHER_ALLOWED | ITEM_FLAG_INVALID_FOR_CHAMELEON
 
 /obj/item/clothing/under/punpants
 	name = "monkey pants"
@@ -658,7 +689,6 @@
 	worn_state = "jeansmustang"
 	species_restricted = list(SPECIES_MONKEY)
 	sprite_sheets = list("Monkey" = 'icons/mob/species/monkey/onmob_under_monkey.dmi')
-	item_flags = ITEM_FLAG_WASHER_ALLOWED | ITEM_FLAG_INVALID_FOR_CHAMELEON
 
 /obj/item/clothing/under/rank/psych/turtleneck/sweater
 	desc = "A warm looking sweater and a pair of dark blue slacks."
@@ -717,9 +747,9 @@
 /obj/item/clothing/under/sterile/emrs
 	name = "medical uniform"
 	desc = "An uniform worn in emergency medical and reanimation services across human space."
-	icon_state = "medical_uniform"
-	item_state = "medical_uniform"
-	worn_state = "medical_uniform"
+	icon_state = "medical_Uniform"
+	item_state = "medical_Uniform"
+	worn_state = "medical_Uniform"
 
 /obj/item/clothing/under/kimono
 	desc = "A traditional robe with remarkably long sleeves, mostly worn by women. <i>Sugoi.</i>"
@@ -727,3 +757,356 @@
 	icon_state = "kimono"
 	worn_state = "kimono"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
+
+/obj/item/clothing/under/taj_old_uniform
+	desc = "A loose-fitting uniform with lots of pockets made of canvas or similar material, very comfortable. Widely used by tajaran revolutionaries during slave's uprising, remained as favored uniform for a short period of time after the uprising and now just a reminder of dark age or a reason for pride. There is a tailhole on the back of the pants!"
+	name = "vintage uniform"
+	item_icons = list(slot_w_uniform_str = 'icons/mob/onmob/onmob_under.dmi')
+	worn_state = "taj_old_uniform"
+	icon_state = "taj_old_uniform"
+	item_state = "taj_old_uniform"
+
+/obj/item/clothing/under/taj_new_fatigues
+	desc = "A tight-fitting union suit made of modern synthetic materials and features CCA markings, sleek. This uniform is one of the numerous variants, but the layout is somewhat similar. This one is provided by CCA Armed Forces for numerous PMC's when they sent over CCA control. There is a tailhole on the back of the pants!"
+	name = "CCA fatigues"
+	item_icons = list(slot_w_uniform_str = 'icons/mob/onmob/onmob_under.dmi')
+	worn_state = "taj_new_fatigues"
+	icon_state = "taj_new_fatigues"
+	item_state = "taj_new_fatigues"
+
+
+/obj/item/clothing/under/medic/paramedic
+    name = "first responder uniform"
+    desc = "Light and bulky paramedic jumpsuit with bright markings. It's too big to fit anyone, but unathi."
+    species_restricted  = list(SPECIES_UNATHI)
+    item_icons = list(slot_w_uniform_str = 'icons/mob/species/unathi/generated/onmob_under_unathi.dmi')
+    icon_state = "unathi_paramedic"
+    item_state = "unathi_paramedic"
+    worn_state = "unathi_paramedic"
+    //rolled_sleeves = 0
+
+/obj/item/clothing/under/inf
+	name = "antiquated skirt"
+	desc = "Some really old fashioned skirt. Presumably a piece of Avalonian craftsmanship."
+	icon = 'infinity/icons/obj/clothing/obj_under.dmi'
+	item_icons = list(slot_w_uniform_str = 'infinity/icons/mob/onmob/onmob_under.dmi')
+	icon_state = "antiquated_skirt"
+	item_state = "antiquated_skirt"
+
+/obj/item/clothing/under/inf/vice
+	name = "vice uniform"
+	desc = "Casual set of black suit and red t-shirt."
+	icon_state = "vice2"
+	item_state = "vice2"
+
+/obj/item/clothing/under/inf/detective
+	name = "red 'n black suit."
+	desc = "A set of black slacks and red shirt."
+	icon_state = "detective"
+	item_state = "detective"
+	worn_state = "detective"
+
+/obj/item/clothing/under/inf/chain_with_shirt
+	name = "black and white with style"
+	desc = "Some weird combination of starched shirt and studded jeans with a chain hanging off the belt."
+	icon_state = "chain_with_shirt"
+	item_state = "chain_with_shirt"
+	worn_state = "chain_with_shirt"
+
+/obj/item/clothing/under/inf/cuttop
+	name = "grey cuttop"
+	desc = "Loose fitting grey shirt with a broad neckline, accompained with some skinny jeans. Obviously worn by women."
+	icon_state = "cuttop"
+	item_state = "cuttop"
+	worn_state = "cuttop"
+
+/obj/item/clothing/under/inf/cuttop_red
+	name = "red cuttop"
+	desc = "Loose fitting red shirt with a broad neckline, accompained with some skinny jeans. Obviously worn by women."
+	icon_state = "cuttop_red"
+	item_state = "cuttop_red"
+	worn_state = "cuttop_red"
+
+/obj/item/clothing/under/inf/pinstripe
+	name = "pinstripe"
+	desc = "You ain't one to be afraid of 18 karat of bad luck."
+	icon_state = "pinstripe"
+	item_state = "pinstripe"
+
+/obj/item/clothing/under/inf/gotsis_dress_1
+	name = "red gotsis dress"
+	desc = "Welcome to cabaret, lolly jolly~~"
+	icon_state = "gotsis_dress_1"
+	item_state = "gotsis_dress_1"
+
+/obj/item/clothing/under/inf/gotsis_dress_2
+	name = "orange gotsis dress"
+	desc = "Welcome to cabaret, lolly jolly~~"
+	icon_state = "gotsis_dress_2"
+	item_state = "gotsis_dress_2"
+
+/obj/item/clothing/under/inf/classic_suit
+	name = "classic suit"
+	desc = "Classic suit for really special occasions. It demands for regard, so treat it accordingly."
+	icon_state = "classic_suit"
+	item_state = "classic_suit"
+
+/obj/item/clothing/under/inf/jacket
+	name = "old style jacket"
+	desc = "You know it damn well here."
+	icon_state = "jacket"
+	item_state = "jacket"
+
+/obj/item/clothing/under/inf/blackservice
+	name = "dark service uniform"
+	desc = "A set of service clothes in military style. Largely available in many of surplus stores."
+	icon_state = "blackservice"
+	item_state = "blackservice"
+
+/obj/item/clothing/under/inf/blackserviceof
+	name = "brown service uniform"
+	desc = "A set of service clothes in military style. Largely available in many of surplus stores."
+	icon_state = "blackserviceof"
+	item_state = "blackserviceof"
+
+/obj/item/clothing/under/inf/whiteservice
+	name = "white service uniform"
+	desc = "A set of service clothes in military style. This one is purposed for special occasions."
+	icon_state = "whiteservice"
+	item_state = "whiteservice"
+
+/obj/item/clothing/under/inf/whiteservicefem
+	name = "white female service uniform"
+	desc = "A set of service clothes in military style. This one is purposed for special occasions."
+	icon_state = "whiteservicefem"
+	item_state = "whiteservicefem"
+
+/obj/item/clothing/under/inf/harper_uniform
+	name = "harper uniform"
+	desc = "A maggy tank top and denim cargo pants with some knee protection sewn onto them. Seems like a perfect outfit for some garage dweller."
+	icon_state = "harper_uniform"
+	item_state = "harper_uniform"
+
+/obj/item/clothing/under/inf/stripped_shirt
+	name = "red checkered shirt"
+	desc = "Incredibly comfy and warm flannel shirt in red checkered pattern."
+	icon_state = "stripped_shirt"
+	item_state = "stripped_shirt"
+	worn_state = "stripped_shirt"
+
+/obj/item/clothing/under/inf/lify
+	name = "lify"
+	desc = "Here's some childish style, I dunno. Like who the hell would wear tank top with buttons?."
+	icon_state = "lify"
+	item_state = "lify"
+
+/obj/item/clothing/under/inf/white_black
+	name = "white black"
+	desc = "White top, dark bottom. Too default."
+	icon_state = "white_black"
+	item_state = "white_black"
+
+/obj/item/clothing/under/inf/black_white
+	name = "black white"
+	desc = "Dark top, white bottom. That's... something."
+	icon_state = "black_white"
+	item_state = "black_white"
+
+/obj/item/clothing/under/inf/biker
+	name = "biker"
+	desc = "For when you craving for some dead meat."
+	icon_state = "biker"
+	item_state = "biker"
+
+/obj/item/clothing/under/inf/formalvest
+	name = "formal vest"
+	desc = "A standard set with a beige necktie."
+	icon_state = "formalvest"
+	item_state = "formalvest"
+
+/obj/item/clothing/under/inf/callum
+	name = "callum vest"
+	desc = "A quite sleek vest."
+	icon_state = "callum"
+	item_state = "callum"
+
+/obj/item/clothing/under/inf/denimvest
+	name = "denim vest"
+	desc = "Slightly bleached out denim vest with rebellic emblems drawn on its back."
+	icon_state = "denimvest"
+	item_state = "denimvest"
+
+/obj/item/clothing/under/inf/olympic
+	name = "olympic clothes"
+	desc = "A set of tracksuit and trackpants in gaudy coloration. Incredibly comfy for wearing and exercising, but this contrast of colors make your eyes melt."
+	icon_state = "olympic"
+	item_state = "olympic"
+
+/obj/item/clothing/under/inf/hm_suit
+	name = "charcoal vest"
+	desc = "A woven charcoal suit and an azure necktie."
+	icon_state = "hm_suit"
+	item_state = "hm_suit"
+
+/obj/item/clothing/under/inf/mafia
+	name = "mafia outfit"
+	desc = "The business of the mafia is business."
+	icon_state = "mafia_suit"
+	item_state = "mafia_suit"
+
+/obj/item/clothing/under/inf/mafia/vest
+	name = "mafia vest"
+	desc = "Extreme problems often require extreme solutions."
+	icon_state = "mafia_vest"
+	item_state = "mafia_vest"
+
+/obj/item/clothing/under/inf/mafia/white
+	name = "white mafia outfit"
+	desc = "The best defense against the treacherous is treachery."
+	icon_state = "mafia_white"
+	item_state = "mafia_white"
+
+/obj/item/clothing/under/inf/maid
+	name = "maid dress"
+	desc = "Cliche product of Japan."
+	icon_state = "meido"
+	item_state = "meido"
+	body_parts_covered = UPPER_TORSO|LOWER_TORSO
+
+/obj/item/clothing/under/inf/noble
+	name = "artsy suit"
+	desc = "A piece of exceptional work, for Avalonian artisan. Nobles from up there tend to be fond of wearing this."
+	icon_state = "noble"
+	item_state = "noble"
+
+/obj/item/clothing/under/inf/redhawaiianshirt
+	name = "red hawaiian shirt"
+	desc = "A floral shirt worn to most vacation destinations."
+	icon_state = "hawaiian_red"
+	item_state = "hawaiian_red"
+
+/obj/item/clothing/under/inf/pinkhawaiianshirt
+	name = "pink hawaiian shirt"
+	desc = "A pink floral shirt the material feels cool and comfy."
+	icon_state = "hawaiian_pink"
+	item_state = "hawaiian_pink"
+
+/obj/item/clothing/under/inf/yellowhawaiianshirt
+	name = "yellow hawaiian shirt"
+	desc = "A yellow floral shirt for a relaxing day in space."
+	icon_state = "hawaiian_orange"
+	item_state = "hawaiian_orange"
+
+/obj/item/clothing/under/inf/bluehawaiianshirt
+	name = "blue hawaiian shirt"
+	desc = "A blue floral shirt it has a oddly colored pink flower on it."
+	icon_state = "hawaiian_blue"
+	item_state = "hawaiian_blue"
+
+/obj/item/clothing/under/inf/cuban_suit
+	name = "rhumba outfit"
+	desc = "A satin shirt and high-waisted pants, worn by dancers in the Rhumba style. It smells oddly like... sulfur?"
+	icon_state = "cuban_suit"
+	item_state = "cuban_suit"
+
+/obj/item/clothing/under/inf/victdress
+	name = "black victorian dress"
+	desc = "A victorian style dress, fancy!"
+	icon_state = "victorian_dress"
+	item_state = "victorian_dress"
+	body_parts_covered = UPPER_TORSO|LOWER_TORSO
+
+/obj/item/clothing/under/inf/victdress/red
+	name = "red victorian dress"
+	desc = "A victorian style dress, fancy!"
+	icon_state = "victorian_reddress"
+	item_state = "victorian_reddress"
+	body_parts_covered = UPPER_TORSO|LOWER_TORSO
+
+/obj/item/clothing/under/inf/victsuit
+	name = "victorian suit"
+	desc = "A victorian style suit, fancy!"
+	icon_state = "victorian_black"
+	item_state = "victorian_black"
+
+/obj/item/clothing/under/inf/victsuit/redblk
+	name = "red and black victorian suit"
+	icon_state = "victorian_redblack"
+	item_state = "victorian_redblack"
+
+/obj/item/clothing/under/inf/victsuit/red
+	name = "red victorian suit"
+	icon_state = "victorian_redvest"
+	item_state = "victorian_redvest"
+
+/obj/item/clothing/under/inf/victsuit/twilight
+	name = "dark victorian suit"
+	icon_state = "victorian_twilight"
+	item_state = "victorian_twilight"
+
+/obj/item/clothing/under/inf/aristo
+	name = "aristo uniform"
+	desc = "Delicately sewn, this suit is magnificently fine and very expensive. Not for just any bourgeois."
+	icon_state = "papaleroy_aristo_suit"
+	item_state = "papaleroy_aristo_suit"
+
+/obj/item/clothing/under/inf/milsim
+	name = "milsim uniform"
+	desc = "Set of milsim navy fatigues which is very common in many of surplus stores."
+	icon_state = "papaleroy_milsim"
+	item_state = "papaleroy_milsim"
+
+/obj/item/clothing/under/inf/rubywhite
+	name = "rubywhite uniform"
+	desc = "Scarlet shirt accompained with white slacks held with suspenders."
+	icon_state = "papaleroy_rubywhite"
+	item_state = "papaleroy_rubywhite"
+	worn_state = "papaleroy_rubywhite"
+	gender_icons = 1
+	item_icons = list(slot_w_uniform_str = 'infinity/icons/mob/onmob/onmob_under.dmi')
+
+/obj/item/clothing/under/inf/faln_trousers
+	name = "faln trousers"
+	desc = "These athletic pants are truly a masterpiece as they perfectly fit for any type of figure."
+	icon_state = "papaleroy_faln_trousers"
+	item_state = "papaleroy_faln_trousers"
+
+//Ретро-униформы для сотрудников отделов
+
+/obj/item/clothing/under/inf/retro/security
+	desc = "A retro corporate security jumpsuit. Although it provides same protection as modern jumpsuits do, wearing this almost feels like being wrapped in tarp."
+	name = "retro security officer's uniform"
+	icon_state = "retro_sec"
+	item_state = "retro_sec"
+	siemens_coefficient = 0.9
+	armor = list(
+		melee = ARMOR_MELEE_SMALL
+		)
+
+/obj/item/clothing/under/inf/retro/medical
+	desc = "A biologically resistant retro medical uniform with high-vis reflective stripes."
+	name = "retro medical officer's uniform"
+	icon_state = "retro_med"
+	item_state = "retro_med"
+	permeability_coefficient = 0.50
+	armor = list(
+		bio = ARMOR_BIO_MINOR
+		)
+
+/obj/item/clothing/under/inf/retro/engineering
+	desc = "A faded grimy engineering jumpsuit and overall combo. It craves for being soiled with oil, dust, and grit this damn instant."
+	name = "retro engineering uniform"
+	icon_state = "retro_eng"
+	item_state = "retro_eng"
+	armor = list(
+		rad = ARMOR_RAD_MINOR
+		)
+
+/obj/item/clothing/under/inf/retro/science
+	desc = "A faded polo and set of brown slacks with distinctive pink stripes. What a ridiculous tie."
+	name = "retro science officer's uniform"
+	icon_state = "retro_sci"
+	item_state = "retro_sci"
+	armor = list(
+		bio = ARMOR_BIO_MINOR
+		)

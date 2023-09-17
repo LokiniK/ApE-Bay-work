@@ -1,36 +1,46 @@
 /obj/item/gun/energy/ionrifle
-	name = "ion rifle"
+	name = "Mk60 ion rifle"
 	desc = "The NT Mk60 EW Halicon is a man portable anti-armor weapon designed to disable mechanical threats, produced by NT. Not the best of its type."
-	icon = 'icons/obj/guns/ion_rifle.dmi'
+	icon = 'infinity/icons/obj/guns/ion_rifle.dmi' //inf //was: icon = 'icons/obj/guns/ion_rifle.dmi'
 	icon_state = "ionrifle"
 	item_state = "ionrifle"
 	origin_tech = list(TECH_COMBAT = 2, TECH_MAGNET = 4)
-	w_class = ITEM_SIZE_HUGE
 	force = 10
 	obj_flags =  OBJ_FLAG_CONDUCTIBLE
 	slot_flags = SLOT_BACK
-	one_hand_penalty = 4
-	charge_cost = 60
-	max_shots = 5
-	fire_delay = 60
+	charge_cost = 30
+	max_shots = 8
+	fire_delay = 30
 	projectile_type = /obj/item/projectile/ion
 	wielded_item_state = "ionrifle-wielded"
 	combustion = 0
 
+	bulk = GUN_BULK_RIFLE
+	w_class = ITEM_SIZE_HUGE
+	one_hand_penalty = 4
+	is_serial = 1
+	s_gun = "I-60"
+
+/obj/item/gun/energy/ionrifle/emp_act(severity)
+	..(max(severity, 2)) //so it doesn't EMP itself, I guess
+
 /obj/item/gun/energy/ionrifle/small
-	name = "ion pistol"
+	name = "Mk72 ion pistol"
 	desc = "The NT Mk72 EW Preston is a personal defense weapon designed to disable mechanical threats."
 	icon = 'icons/obj/guns/ion_pistol.dmi'
 	icon_state = "ionpistol"
 	item_state = "ionpistol"
 	origin_tech = list(TECH_COMBAT = 2, TECH_MAGNET = 4)
-	w_class = ITEM_SIZE_NORMAL
 	force = 5
 	slot_flags = SLOT_BELT|SLOT_HOLSTER
-	one_hand_penalty = 0
-	charge_cost = 40
-	max_shots = 3
+	charge_cost = 20
+	max_shots = 4
 	projectile_type = /obj/item/projectile/ion/small
+
+	bulk = GUN_BULK_REVOLVER
+	w_class = ITEM_SIZE_NORMAL
+	one_hand_penalty = 0
+	s_gun = "I-72"
 
 /obj/item/gun/energy/decloner
 	name = "biological demolecularisor"
@@ -42,6 +52,8 @@
 	max_shots = 10
 	projectile_type = /obj/item/projectile/energy/declone
 	combustion = 0
+
+	bulk = GUN_BULK_REVOLVER //inf
 
 /obj/item/gun/energy/floragun
 	name = "floral somatoray"
@@ -55,7 +67,7 @@
 	origin_tech = list(TECH_MATERIAL = 2, TECH_BIO = 3, TECH_POWER = 3)
 	modifystate = "floramut"
 	self_recharge = 1
-	var/singleton/plantgene/gene = null
+	var/decl/plantgene/gene = null
 	combustion = 0
 
 	firemodes = list(
@@ -63,6 +75,8 @@
 		list(mode_name="increase yield", projectile_type=/obj/item/projectile/energy/florayield, modifystate="florayield"),
 		list(mode_name="induce specific mutations", projectile_type=/obj/item/projectile/energy/floramut/gene, modifystate="floramut"),
 		)
+
+	bulk = GUN_BULK_REVOLVER
 
 /obj/item/gun/energy/floragun/resolve_attackby(atom/A)
 	if(istype(A,/obj/machinery/portable_atmospherics/hydroponics))
@@ -72,7 +86,7 @@
 /obj/item/gun/energy/floragun/afterattack(obj/target, mob/user, adjacent_flag)
 	//allow shooting into adjacent hydrotrays regardless of intent
 	if(adjacent_flag && istype(target,/obj/machinery/portable_atmospherics/hydroponics))
-		user.visible_message(SPAN_DANGER("\The [user] fires \the [src] into \the [target]!"))
+		user.visible_message("<span class='danger'>\The [user] fires \the [src] into \the [target]!</span>")
 		Fire(target,user)
 		return
 	..()
@@ -89,7 +103,7 @@
 
 	gene = SSplants.plant_gene_datums[genemask]
 
-	to_chat(usr, SPAN_INFO("You set the [src]'s targeted genetic area to [genemask]."))
+	to_chat(usr, "<span class='info'>You set the [src]'s targeted genetic area to [genemask].</span>")
 
 	return
 
@@ -131,6 +145,8 @@
 	origin_tech = list(TECH_COMBAT = 5, TECH_MAGNET = 4)
 	projectile_type = /obj/item/projectile/beam/mindflayer
 
+	bulk = GUN_BULK_RIFLE //inf
+
 /obj/item/gun/energy/toxgun
 	name = "phoron pistol"
 	desc = "A specialized firearm designed to fire lethal bolts of phoron."
@@ -142,7 +158,7 @@
 
 /obj/item/gun/energy/plasmacutter
 	name = "plasma cutter"
-	desc = "An industrial tool that expels focused plasma bursts for deconstruction and mining."
+	desc = "A mining tool capable of expelling concentrated plasma bursts. You could use it to cut limbs off of xenos! Or, you know, mine stuff."
 	charge_meter = 0
 	icon = 'icons/obj/guns/plasmacutter.dmi'
 	icon_state = "plasmacutter"
@@ -157,10 +173,6 @@
 	max_shots = 10
 	self_recharge = 1
 	var/datum/effect/effect/system/spark_spread/spark_system
-
-	// As an industrial tool the plasma cutter's safety training falls under construction.
-	gun_skill = SKILL_CONSTRUCTION
-	safety_skill = SKILL_TRAINED
 
 /obj/item/gun/energy/plasmacutter/mounted
 	name = "mounted plasma cutter"
@@ -178,21 +190,16 @@
 	QDEL_NULL(spark_system)
 	return ..()
 
-/obj/item/gun/energy/plasmacutter/proc/slice(mob/M = null)
+/obj/item/gun/energy/plasmacutter/proc/slice(var/mob/M = null)
 	if(!safety())
 		if(M)
 			M.welding_eyecheck()//Welding tool eye check
-			if(check_accidents(M, "[M] loses grip on \the [src] from its sudden recoil!",gun_skill, 60, safety_skill))
+			if(check_accidents(M, "[M] loses grip on [src] from its sudden recoil!",SKILL_CONSTRUCTION, 60, SKILL_ADEPT))
 				return 0
 		spark_system.start()
 		return 1
 	handle_click_empty(M)
 	return 0
-
-
-/obj/item/gun/energy/plasmacutter/IsHeatSource()
-	return 3800
-
 
 /obj/item/gun/energy/incendiary_laser
 	name = "dispersive blaster"
@@ -200,47 +207,8 @@
 	icon = 'icons/obj/guns/incendiary_laser.dmi'
 	icon_state = "incen"
 	item_state = "incen"
+	safety_icon = "safety"
 	origin_tech = list(TECH_COMBAT = 7, TECH_MAGNET = 4, TECH_ESOTERIC = 4)
 	matter = list(MATERIAL_ALUMINIUM = 1000, MATERIAL_PLASTIC = 500, MATERIAL_DIAMOND = 500)
 	projectile_type = /obj/item/projectile/beam/incendiary_laser
 	max_shots = 4
-
-
-/obj/item/gun/energy/laser/xenofauna
-	name = "xenofauna carbine"
-	desc = "An outdated LP76 energy carbine, repurposed for wildlife control. A safety limiter locks it to a beam capable of frying the nervous system of simple wildlife, but with barely any effect on humans."
-	icon_state = "laserwild"
-	item_state = "laserwild"
-	projectile_type = /obj/item/projectile/beam/xenofauna
-	slot_flags = null
-	wielded_item_state = "laserwild-wielded"
-	max_shots = 12
-	var/emagged = FALSE
-
-
-/obj/item/gun/energy/laser/xenofauna/emag_act(charges, mob/user)
-	if (!charges)
-		return NO_EMAG_ACT
-	if (emagged)
-		to_chat(user, SPAN_NOTICE("\The [src]'s safety limiter has already been disabled!"))
-		return NO_EMAG_ACT
-	else
-		to_chat(user, SPAN_NOTICE("\The [src]'s safety limiter sparks and dies!"))
-		projectile_type = /obj/item/projectile/beam/smalllaser
-		charge_cost = 30
-	return ..()
-
-
-/obj/item/gun/energy/laser/xenofauna/examine(mob/user, distance)
-	. = ..()
-	if (emagged && distance < 3)
-		to_chat(user, SPAN_DANGER("The safety limiter doesn't look functional."))
-
-
-/obj/item/gun/energy/laser/xenofauna/broken
-	desc = "An outdated LP76 energy carbine, repurposed for wildlife control. This one looks like junk."
-
-
-/obj/item/gun/energy/laser/xenofauna/broken/Initialize()
-	. = ..()
-	emag_act(INFINITY)

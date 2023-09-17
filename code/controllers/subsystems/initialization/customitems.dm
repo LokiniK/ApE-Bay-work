@@ -6,16 +6,13 @@ SUBSYSTEM_DEF(customitems)
 	var/list/custom_items_by_ckey = list()
 	var/list/item_states = list()
 	var/list/mob_states =  list()
+	var/list/gun_states =  list()	// INF
 
-
-/datum/controller/subsystem/customitems/UpdateStat(time)
-	return
-
-
-/datum/controller/subsystem/customitems/Initialize(start_uptime)
+/datum/controller/subsystem/customitems/Initialize()
 
 	item_states = icon_states(CUSTOM_ITEM_OBJ)
 	mob_states =  icon_states(CUSTOM_ITEM_MOB)
+	gun_states =  icon_states(CUSTOM_GUN_ICONS)	// INF
 
 	if(!fexists(CUSTOM_ITEM_CONFIG))
 		report_progress("Custom item directory [CUSTOM_ITEM_CONFIG] does not exist, no custom items will be loaded.")
@@ -47,14 +44,14 @@ SUBSYSTEM_DEF(customitems)
 					crash_with("Exception loading custom item [checkfile]: [e] on [e.file]:[e.line]")
 
 	report_progress("Loaded [item_count] custom item\s from [dir_count] director[dir_count == 1 ? "y" : "ies"].")
-
+	. = ..()
 
 // Places the item on the target mob.
-/datum/controller/subsystem/customitems/proc/place_custom_item(mob/living/carbon/human/M, datum/custom_item/citem)
+/datum/controller/subsystem/customitems/proc/place_custom_item(mob/living/carbon/human/M, var/datum/custom_item/citem)
 	. = M && citem && citem.spawn_item(get_turf(M))
 	if(. && !M.equip_to_appropriate_slot(.) && !M.equip_to_storage(.))
-		to_chat(M, SPAN_WARNING("Your custom item, \the [.], could not be placed on your character."))
-		QDEL_NULL(.)
+		to_chat(M, SPAN_WARNING("Your custom item, \the [.], could not be placed on your character. It was placed on the floor."))
+//INF		QDEL_NULL(.)
 
 //gets the relevant list for the key from the listlist if it exists, check to make sure they are meant to have it and then calls the giving function
 /datum/controller/subsystem/customitems/proc/equip_custom_items(mob/living/carbon/human/M)
@@ -67,8 +64,29 @@ SUBSYSTEM_DEF(customitems)
 			continue
 		// Check for required access.
 		var/obj/item/card/id/current_id = M.wear_id
-		if(length(citem.req_access) && (!istype(current_id) || !has_access(current_id.access, citem.req_access)))
-			continue
+//INF		if(length(citem.req_access) && (!istype(current_id) || !has_access(citem.req_access, current_id.access)))
+//[INF]
+		if(length(citem.req_access))
+			if(!current_id)
+				continue
+			if(istype(current_id, /obj/item/modular_computer))
+				var/obj/item/modular_computer/current_pda = M.wear_id
+				current_id = current_pda.card_slot.stored_card
+			if(!has_access(current_id.access, citem.req_access))
+				if(!has_access(citem.req_access, current_id.access))
+					continue
+
+		// Бумагу вперед! ~bear1ake
+		if(length(citem.assoc_paper_info) || length(citem.assoc_paper_title) || ispath(citem.assoc_paper_stamp_type) || ispath(citem.item_path, /obj/item/paper))
+			var/obj/item/paper/AP = new(text = citem.assoc_paper_info, title = citem.assoc_paper_title)
+			if(citem.assoc_paper_stamp_type)
+				AP.preStampPaper(citem.assoc_paper_stamp_type)
+			AP.loc = M
+			M.equip_to_storage(AP)
+			if(ispath(citem.item_path, /obj/item/paper))	// А вдруг бумага и есть кастомный предмет?
+				AP.inherit_custom_item_data(src)				// Применяем остальные свойства к бумаге
+				continue										// Чистый лист нам не нужен
+//[/INF]
 		// Check for required job title.
 		if(length(citem.req_titles))
 			var/check_title = M.mind.role_alt_title || M.mind.assigned_role
@@ -94,8 +112,11 @@ SUBSYSTEM_DEF(customitems)
 	var/list/req_access
 	var/list/req_titles
 	var/list/additional_data
+	var/assoc_paper_title // А вдруг кому надо приложить бумажку с предметом?
+	var/assoc_paper_info
+	var/assoc_paper_stamp_type
 
-/datum/custom_item/New(list/data)
+/datum/custom_item/New(var/list/data)
 	ckey                 = ckey(data["ckey"])
 	character_name       = lowertext(data["character_name"])
 	item_name            = data["item_name"]
@@ -106,6 +127,9 @@ SUBSYSTEM_DEF(customitems)
 	req_titles           = data["req_titles"]                      || list()
 	additional_data      = data["additional_data"]                 || list()
 	apply_to_target_type = text2path(data["apply_to_target_type"]) || data["apply_to_target_type"]
+	assoc_paper_title    = data["paper_title"]    	
+	assoc_paper_info     = data["paper_info"]    
+	assoc_paper_stamp_type = data["paper_stamp_type"]    
 
 /datum/custom_item/proc/validate()
 	if(!ispath(item_path, /obj/item))
@@ -119,14 +143,20 @@ SUBSYSTEM_DEF(customitems)
 					return SPAN_WARNING("The given item icon [state] does not exist.")
 				if(!(state in SScustomitems.mob_states))
 					return SPAN_WARNING("The given mob icon [state] does not exist.")
+// [INF]
+		else if(ispath(item_path, /obj/item/device/kit/egun) || ispath(item_path, /obj/item/device/kit/gun))
+			for(var/state in list(item_icon_state))
+				if(!(state in SScustomitems.gun_states))
+					return SPAN_WARNING("The given gun icon [state] does not exist.")
+// [/INF]
 		else
 			for(var/state in list(item_icon_state))
 				if(!(state in SScustomitems.item_states))
 					return SPAN_WARNING("The given item icon [state] does not exist.")
 
-/datum/custom_item/proc/spawn_item(newloc)
+/datum/custom_item/proc/spawn_item(var/newloc)
 	. = new item_path(newloc)
 	apply_to_item(.)
 
-/datum/custom_item/proc/apply_to_item(obj/item/item)
+/datum/custom_item/proc/apply_to_item(var/obj/item/item)
 	. = item.inherit_custom_item_data(src)

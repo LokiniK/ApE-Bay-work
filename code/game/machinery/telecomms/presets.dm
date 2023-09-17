@@ -58,10 +58,10 @@
 	freq_listening = list(AI_FREQ, SCI_FREQ, MED_FREQ, SUP_FREQ, SRV_FREQ, COMM_FREQ, ENG_FREQ, SEC_FREQ, ENT_FREQ, HAIL_FREQ)
 
 	//Common and other radio frequencies for people to freely use
-/obj/machinery/telecomms/receiver/preset_right/New()
-	for(var/i = PUBLIC_LOW_FREQ, i < PUBLIC_HIGH_FREQ, i += 2)
-		freq_listening |= i
-	..()
+	New()
+		for(var/i = PUBLIC_LOW_FREQ, i < PUBLIC_HIGH_FREQ, i += 2)
+			freq_listening |= i
+		..()
 
 /obj/machinery/telecomms/receiver/preset_cent
 	id = "CentComm Receiver"
@@ -300,3 +300,9 @@
 	network = "tcommsat"
 	produces_heat = 0
 	autolinkers = list("broadcasterCent")
+
+/obj/machinery/telecomms/relay/preset/ert
+	id = "Emergency Response Team Relay"
+	produces_heat = 0
+	autolinkers = list("cent_relay")
+

@@ -5,17 +5,16 @@
 	id = "playablecolony"
 	description = "a fully functional colony on the frontier of settled space"
 	suffixes = list("playablecolony/colony.dmm")
-	spawn_cost = 3
-	player_cost = 4
+	spawn_cost = 0.5
+	player_cost = 4 // Нынешнее значение основано на количестве игроков в авейке ~bear1ake
 	template_flags = TEMPLATE_FLAG_CLEAR_CONTENTS | TEMPLATE_FLAG_NO_RUINS | TEMPLATE_FLAG_NO_RADS
 	ruin_tags = RUIN_HUMAN|RUIN_HABITAT
 	ban_ruins = list(/datum/map_template/ruin/exoplanet/playablecolony2)
 	apc_test_exempt_areas = list(
 		/area/map_template/colony/mineralprocessing = NO_SCRUBBER|NO_VENT
 	)
-	spawn_weight = 0.2
 
-/singleton/submap_archetype/playablecolony
+/decl/submap_archetype/playablecolony
 	descriptor = "established colony"
 	crew_jobs = list(/datum/job/submap/colonist)
 
@@ -23,9 +22,13 @@
 	title = "Colonist"
 	info = "You are a Colonist, living on the rim of explored, let alone inhabited, space in a reconstructed shelter made from the very ship that took you here."
 	total_positions = 4
-	outfit_type = /singleton/hierarchy/outfit/job/colonist
+	outfit_type = /decl/hierarchy/outfit/job/colonist
+	min_skill = list(SKILL_HAULING = SKILL_BASIC,
+					SKILL_COMBAT = SKILL_BASIC,
+					SKILL_WEAPONS = SKILL_BASIC,
+					SKILL_MEDICAL = SKILL_BASIC)
 
-/singleton/hierarchy/outfit/job/colonist
+/decl/hierarchy/outfit/job/colonist
 	name = OUTFIT_JOB_NAME("Colonist")
 	id_types = null
 	pda_type = null
@@ -36,7 +39,7 @@
 
 /obj/effect/submap_landmark/joinable_submap/colony
 	name = "Established Colony"
-	archetype = /singleton/submap_archetype/playablecolony
+	archetype = /decl/submap_archetype/playablecolony
 
 // Areas //
 /area/map_template/colony

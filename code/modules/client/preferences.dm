@@ -1,14 +1,14 @@
 #define SAVE_RESET -1
 
-#define JOB_PRIORITY_HIGH   FLAG(0)
-#define JOB_PRIORITY_MEDIUM FLAG(1)
-#define JOB_PRIORITY_LOW    FLAG(2)
-#define JOB_PRIORITY_LIKELY (JOB_PRIORITY_HIGH | JOB_PRIORITY_MEDIUM)
-#define JOB_PRIORITY_PICKED (JOB_PRIORITY_HIGH | JOB_PRIORITY_MEDIUM | JOB_PRIORITY_LOW)
+#define JOB_PRIORITY_HIGH   0x1
+#define JOB_PRIORITY_MEDIUM 0x2
+#define JOB_PRIORITY_LOW    0x4
+#define JOB_PRIORITY_LIKELY 0x3
+#define JOB_PRIORITY_PICKED 0x7
 
 #define MAX_LOAD_TRIES 5
 
-/datum/preferences
+datum/preferences
 	//doohickeys for savefiles
 	var/is_guest = FALSE
 	var/default_slot = 1				//Holder so it doesn't default to slot 1, rather the last one used
@@ -23,19 +23,27 @@
 	var/last_ip
 	var/last_id
 
+	//Cooldowns for saving/loading. These are four are all separate due to loading code calling these one after another
+	var/saveprefcooldown
+	var/loadprefcooldown
+	var/savecharcooldown
+	var/loadcharcooldown
+
 	// Populated with an error message if loading fails.
 	var/load_failed = null
 
 	//game-preferences
 	var/lastchangelog = ""				//Saved changlog filesize to detect if there was a change
 
+	// Mob preview
+	var/icon/preview_icon = null
+
 	var/client/client = null
 	var/client_ckey = null
 
-	var/datum/browser/popup
-
 	var/datum/category_collection/player_setup_collection/player_setup
 	var/datum/browser/panel
+	var/character_slots_count = 0
 
 /datum/preferences/New(client/C)
 	if(istype(C))
@@ -50,7 +58,7 @@
 
 /datum/preferences/proc/setup()
 	if(!length(GLOB.skills))
-		GET_SINGLETON(/singleton/hierarchy/skill)
+		decls_repository.get_decl(/decl/hierarchy/skill)
 	player_setup = new(src)
 	gender = pick(MALE, FEMALE)
 	real_name = random_name(gender,species)
@@ -89,7 +97,7 @@
 /datum/preferences/proc/migrate_legacy_preferences()
 	// We make some assumptions here:
 	// - all relevant savefiles were version 17, which covers anything saved from 2018+
-	// - legacy saves were only made on the "torch" map
+	// - legacy saves were only made on the "torch" map ~mloc | В нашем случае не только "Факел" ~bear1ake
 	// - a maximum of 40 slots were used
 
 	var/legacy_pref_path = get_path(client.ckey, "preferences", "sav")
@@ -106,15 +114,15 @@
 	player_setup.load_preferences(savefile_reader)
 	var/orig_slot = default_slot
 
-	S.cd = "/torch"
+	S.cd = "/[GLOB.using_map.path]" // INF, было S.cd = "/torch" | Мигрировать сохранения будем с текущей карты ~bear1ake
 	for(var/slot = 1 to 40)
-		if(!S.dir.Find("character[slot]"))
+		if(!list_find(S.dir, "character[slot]"))
 			continue
-		S.cd = "/torch/character[slot]"
+		S.cd = "/[GLOB.using_map.path]/character[slot]" // INF, было S.cd = "/torch/character[slot]"
 		default_slot = slot
 		player_setup.load_character(savefile_reader)
-		save_character(override_key="character_torch_[slot]")
-		S.cd = "/torch"
+		save_character(override_key="character_[GLOB.using_map.path]_[slot]")  // INF, было save_character(override_key="character_torch_[slot]")
+		S.cd = "/[GLOB.using_map.path]"  // INF, было S.cd = "/torch"
 	S.cd = "/"
 
 	default_slot = orig_slot
@@ -133,13 +141,13 @@
 	if(is_guest)
 		dat += "Please create an account to save your preferences. If you have an account and are seeing this, please adminhelp for assistance."
 	else if(load_failed)
-		dat += "Loading your savefile failed. Please adminhelp for assistance."
+		dat += "Если вы видите этот текст, то закройте это окно и нажмите кнопку Fix characters load во вкладке ООС."
 	else
-		dat += "Slot - "
-		dat += "<a href='?src=\ref[src];load=1'>Load slot</a> - "
-		dat += "<a href='?src=\ref[src];save=1'>Save slot</a> - "
-		dat += "<a href='?src=\ref[src];resetslot=1'>Reset slot</a> - "
-		dat += "<a href='?src=\ref[src];reload=1'>Reload slot</a>"
+		dat += "Слот - "
+		dat += "<a href='?src=\ref[src];load=1'>Загрузить</a> - "
+		dat += "<a href='?src=\ref[src];save=1'>Сохранить</a> - "
+		dat += "<a href='?src=\ref[src];resetslot=1'>Сбросить </a> - "
+		dat += "<a href='?src=\ref[src];reload=1'>Перезагрузить</a>"
 
 	dat += "<br>"
 	dat += player_setup.header()
@@ -150,7 +158,7 @@
 /datum/preferences/proc/open_setup_window(mob/user)
 	if (!SScharacter_setup.initialized)
 		return
-	popup = new (user, "preferences_browser", "Character Setup", 1200, 800, src)
+	var/datum/browser/popup = new(user, "preferences_browser", "Настройка Персонажа", 1200, 800, src)
 	var/content = {"
 	<script type='text/javascript'>
 		function update_content(data){
@@ -171,10 +179,10 @@
 	if(isliving(user)) return
 
 	if(href_list["preference"] == "open_whitelist_forum")
-		if(config.forum_url)
-			send_link(user, config.forum_url)
+		if(config.forumurl)
+			send_link(user, config.forumurl)
 		else
-			to_chat(user, SPAN_DANGER("The forum URL is not set in the server configuration."))
+			to_chat(user, "<span class='danger'>The forum URL is not set in the server configuration.</span>")
 			return
 	update_setup_window(usr)
 	return 1
@@ -182,9 +190,6 @@
 /datum/preferences/Topic(href, list/href_list)
 	if(..())
 		return 1
-
-	if (href_list["close"])
-		popup = null
 
 	if(href_list["save"])
 		save_preferences()
@@ -211,8 +216,21 @@
 
 		if (href_list["details"])
 			return 1
+		open_setup_window(usr) // INF, у нас имеются некоторые проблемы с браузером. Без костыля не обойтись ~bear1ake
+	else if(href_list["changeslot_next"])
+		character_slots_count+=10
+		if(character_slots_count >= config.character_slots)
+			character_slots_count = 0
+		open_load_dialog(usr, href_list["details"])
+		return 1
+	else if(href_list["changeslot_prev"])
+		character_slots_count-=10
+		if(character_slots_count < 0)
+			character_slots_count = config.character_slots - config.character_slots % 10
+		open_load_dialog(usr, href_list["details"])
+		return 1
 	else if(href_list["resetslot"])
-		if(real_name != input("This will reset the current slot. Enter the character's full name to confirm."))
+		if(real_name != input("Это действие удалит содержимое слота - персонажа. Введите имя персонажа, чтобы подтвердить."))
 			return 0
 		load_character(SAVE_RESET)
 		sanitize_preferences()
@@ -227,25 +245,39 @@
 	player_setup.sanitize_setup()
 	character.set_species(species)
 
+	if(be_random_name)
+		var/decl/cultural_info/culture = SSculture.get_culture(cultural_info[TAG_CULTURE])
+		if(culture) real_name = culture.get_random_name(gender)
+
 	character.fully_replace_character_name(real_name)
 
 	character.gender = gender
-	character.pronouns = pronouns
 	character.age = age
 	character.b_type = b_type
 
-	character.eye_color = eye_color
+	character.r_eyes = r_eyes
+	character.g_eyes = g_eyes
+	character.b_eyes = b_eyes
 
-	character.head_hair_style = head_hair_style
-	character.head_hair_color = head_hair_color
+	character.h_style = h_style
+	character.r_hair = r_hair
+	character.g_hair = g_hair
+	character.b_hair = b_hair
 
-	character.facial_hair_style = facial_hair_style
-	character.facial_hair_color = facial_hair_color
+	character.f_style = f_style
+	character.r_facial = r_facial
+	character.g_facial = g_facial
+	character.b_facial = b_facial
 
-	character.skin_color = skin_color
+	character.r_skin = r_skin
+	character.g_skin = g_skin
+	character.b_skin = b_skin
 
-	character.skin_tone = skin_tone
-	character.base_skin = base_skin
+	character.s_tone = s_tone
+	character.s_base = s_base
+
+	character.h_style = h_style
+	character.f_style = f_style
 
 	// Replace any missing limbs.
 	for(var/name in BP_ALL_LIMBS)
@@ -358,6 +390,7 @@
 	character.sec_record = sec_record
 	character.gen_record = gen_record
 	character.exploit_record = exploit_record
+	character.ooc_notes = metadata
 
 	if(LAZYLEN(character.descriptors))
 		for(var/entry in body_descriptors)
@@ -372,16 +405,21 @@
 	dat += "<body>"
 	dat += "<tt><center>"
 
-	dat += "<b>Select a character slot to load</b><hr>"
-	for(var/i=1, i<= config.character_slots, i++)
-		var/name = (slot_names && slot_names[get_slot_key(i)]) || "Character[i]"
-		if(i==default_slot)
+	dat += "<b>Выберите слот для загрузки</b><hr>"
+	for(var/i=1, i<= 10, i++)
+		var/name = (slot_names && slot_names[get_slot_key(i + character_slots_count)]) || "Персонаж [i + character_slots_count]"
+		if((i + character_slots_count) == default_slot)
 			name = "<b>[name]</b>"
-		dat += "<a href='?src=\ref[src];changeslot=[i];[details?"details=1":""]'>[name]</a><br>"
+		if(i + character_slots_count <= config.character_slots)
+			dat += "<a href='?src=\ref[src];changeslot=[i + character_slots_count];[details?"details=1":""]'>[name]</a><br>"
+	if(config.character_slots>10)
+		dat += "<br><a href='?src=\ref[src];changeslot_prev=1'> <b>\<</b> </a>"
+		dat += " <b>[character_slots_count + 1]</b> - <b>[character_slots_count + 10]</b> "
+		dat += "<a href='?src=\ref[src];changeslot_next=1'> <b>\></b> </a><br>"
 
 	dat += "<hr>"
 	dat += "</center></tt>"
-	panel = new(user, "Character Slots", "Character Slots", 300, 390, src)
+	panel = new(user, "Слоты персонажей", "Слоты персонажей", 300, 390, src)
 	panel.set_content(jointext(dat,null))
 	panel.open()
 
@@ -422,7 +460,7 @@
 		var/name = branches[job.title]
 		if (!name)
 			continue
-		. |= GLOB.mil_branches.get_branch(name)
+		. |= mil_branches.get_branch(name)
 
 /datum/preferences/proc/selected_branches_assoc(priority = JOB_PRIORITY_PICKED)
 	. = list()
@@ -430,7 +468,7 @@
 		var/name = branches[job.title]
 		if (!name || .[name])
 			continue
-		.[name] = GLOB.mil_branches.get_branch(name)
+		.[name] = mil_branches.get_branch(name)
 
 /datum/preferences/proc/for_each_selected_job(datum/callback/callback, priority = JOB_PRIORITY_LIKELY)
 	. = list()
@@ -438,7 +476,7 @@
 		priority = selected_jobs_assoc(priority)
 	for (var/title in priority)
 		var/datum/job/job = priority[title]
-		.[title] = invoke(callback, job)
+		.[title] = callback.Invoke(job)
 
 /datum/preferences/proc/for_each_selected_job_multi(list/callbacks, priority = JOB_PRIORITY_LIKELY)
 	. = list()
@@ -453,7 +491,7 @@
 		priority = selected_branches_assoc(priority)
 	for (var/name in priority)
 		var/datum/mil_branch/branch = priority[name]
-		.[name] = invoke(callback, branch)
+		.[name] = callback.Invoke(branch)
 
 /datum/preferences/proc/for_each_selected_branch_multi(list/callbacks, priority = JOB_PRIORITY_LIKELY)
 	. = list()

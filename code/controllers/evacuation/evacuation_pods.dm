@@ -36,6 +36,10 @@
 	state = EVAC_IN_TRANSIT
 
 	if (emergency_evacuation)
+		// Open the pods (space shields)
+		for(var/obj/machinery/door/blast/regular/escape_pod/ES in world)
+			INVOKE_ASYNC(ES, /obj/machinery/door/blast/proc/force_open)
+
 		// Abondon Ship
 		for (var/datum/shuttle/autodock/ferry/escape_pod/pod in escape_pods) // Launch the pods!
 			if (!pod.arming_controller || pod.arming_controller.armed)
@@ -130,6 +134,14 @@
 /datum/evacuation_option/cancel_bluespace_jump/execute(mob/user)
 	if (evacuation_controller && evacuation_controller.cancel_evacuation())
 		log_and_message_admins("[key_name(user)] has cancelled the bluespace jump.")
+
+/obj/screen/fullscreen/bluespace_overlay
+	icon = 'icons/effects/effects.dmi'
+	icon_state = "mfoam"
+	screen_loc = "WEST,SOUTH to EAST,NORTH"
+	color = "#ff9900"
+	blend_mode = BLEND_SUBTRACT
+	layer = FULLSCREEN_LAYER
 
 #undef EVAC_OPT_ABANDON_SHIP
 #undef EVAC_OPT_BLUESPACE_JUMP

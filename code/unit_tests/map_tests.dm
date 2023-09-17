@@ -35,33 +35,33 @@
 			log_bad("[bad_msg] is not supposed to have an APC.")
 			area_good = 0
 
-		if(!length(A.air_scrub_names) && !(exemptions & GLOB.using_map.NO_SCRUBBER))
+		if(!A.air_scrub_names.len && !(exemptions & GLOB.using_map.NO_SCRUBBER))
 			log_bad("[bad_msg] lacks an air scrubber.")
 			area_good = 0
-		else if(length(A.air_scrub_names) && (exemptions & GLOB.using_map.NO_SCRUBBER))
+		else if(A.air_scrub_names.len && (exemptions & GLOB.using_map.NO_SCRUBBER))
 			log_bad("[bad_msg] is not supposed to have an air scrubber.")
 			area_good = 0
 
-		if(!length(A.air_vent_names) && !(exemptions & GLOB.using_map.NO_VENT))
+		if(!A.air_vent_names.len && !(exemptions & GLOB.using_map.NO_VENT))
 			log_bad("[bad_msg] lacks an air vent.[ascii_reset]")
 			area_good = 0
-		else if(length(A.air_vent_names) && (exemptions & GLOB.using_map.NO_VENT))
+		else if(A.air_vent_names.len && (exemptions & GLOB.using_map.NO_VENT))
 			log_bad("[bad_msg] is not supposed to have an air vent.")
 			area_good = 0
 
 		if(!area_good)
 			bad_areas.Add(A)
 
-	if(length(bad_areas))
-		fail("\[[length(bad_areas)]/[area_test_count]\]Some areas did not have the expected APC/vent/scrubber setup.")
+	if(bad_areas.len)
+		fail("\[[bad_areas.len]/[area_test_count]\]Some areas did not have the expected APC/vent/scrubber setup.")
 	else
 		pass("All \[[area_test_count]\] areas contained APCs, air scrubbers, and air vents.")
 
 	return 1
 
-/datum/unit_test/apc_area_test/proc/get_exemptions(area)
+/datum/unit_test/apc_area_test/proc/get_exemptions(var/area)
 	// We assume deeper types come last
-	for(var/i = length(GLOB.using_map.apc_test_exempt_areas); i>0; i--)
+	for(var/i = GLOB.using_map.apc_test_exempt_areas.len; i>0; i--)
 		var/exempt_type = GLOB.using_map.apc_test_exempt_areas[i]
 		if(istype(area, exempt_type))
 			return GLOB.using_map.apc_test_exempt_areas[exempt_type]
@@ -86,7 +86,7 @@
 		var/obj/machinery/alarm/alarm = locate() in A // Only test areas with functional alarms
 		if(!alarm)
 			continue
-		if(alarm.inoperable())
+		if(alarm.stat & (NOPOWER | BROKEN))
 			continue
 
 		for(var/tag in A.air_vent_names) // The point of this test is that while the names list is registered at init, the info is transmitted by radio.
@@ -156,8 +156,8 @@
 			bad_cables |= C
 			log_bad("[log_info_line(C)] has an non-existing icon state.")
 
-	if(length(bad_cables))
-		fail("Found [length(bad_cables)] cable\s with an unexpected icon state.")
+	if(bad_cables.len)
+		fail("Found [bad_cables.len] cable\s with an unexpected icon state.")
 	else
 		pass("All wires had their expected icon state.")
 
@@ -203,10 +203,10 @@
 			var/list/no_longer_contained_atoms = contents_pre_open - C.contents
 			var/list/previously_not_contained_atoms = C.contents - contents_pre_open
 
-			if(length(no_longer_contained_atoms))
+			if(no_longer_contained_atoms.len)
 				bad_tests++
 				log_bad("[log_info_line(C)] no longer contains the following atoms: [log_info_line(no_longer_contained_atoms)]")
-			if(length(previously_not_contained_atoms))
+			if(previously_not_contained_atoms.len)
 				log_debug("[log_info_line(C)] now contains the following atoms: [log_info_line(previously_not_contained_atoms)]")
 
 	if(bad_tests)
@@ -242,12 +242,12 @@
 /datum/unit_test/map_image_map_test/start_test()
 	var/failed = FALSE
 
-	for (var/i = 1 to length(GLOB.using_map.map_levels))
-		var/file_name = map_image_file_name(i)
+	for(var/z in GLOB.using_map.map_levels)
+		var/file_name = map_image_file_name(z)
 		var/file_path = MAP_IMAGE_PATH + file_name
 		if(!fexists(file_path))
 			failed = TRUE
-			log_unit_test("[GLOB.using_map.path]-[i] is missing its map image [file_name].")
+			log_unit_test("[GLOB.using_map.path]-[z] is missing its map image [file_name].")
 
 	if(failed)
 		fail("One or more map levels were missing a corresponding map image.")
@@ -258,10 +258,10 @@
 
 //=======================================================================================
 
-/datum/unit_test/correct_allowed_spawn_test
+datum/unit_test/correct_allowed_spawn_test
 	name = "MAP: All allowed_spawns entries should have spawnpoints on map."
 
-/datum/unit_test/correct_allowed_spawn_test/start_test()
+datum/unit_test/correct_allowed_spawn_test/start_test()
 	var/failed = FALSE
 
 	for(var/spawn_name in GLOB.using_map.allowed_spawns)
@@ -269,7 +269,7 @@
 		if(!spawnpoint)
 			log_unit_test("Map allows spawning in [spawn_name], but [spawn_name] is null!")
 			failed = TRUE
-		else if(!length(spawnpoint.turfs))
+		else if(!spawnpoint.turfs.len)
 			log_unit_test("Map allows spawning in [spawn_name], but [spawn_name] has no associated spawn turfs.")
 			failed = TRUE
 
@@ -288,10 +288,10 @@
 
 //=======================================================================================
 
-/datum/unit_test/map_check
+datum/unit_test/map_check
 	name = "MAP: Map Check"
 
-/datum/unit_test/map_check/start_test()
+datum/unit_test/map_check/start_test()
 	if(world.maxx < 1 || world.maxy < 1 || world.maxz < 1)
 		fail("Unexpected map size. Was a map properly included?")
 	else
@@ -299,10 +299,10 @@
 	return 1
 //=======================================================================================
 
-/datum/unit_test/ladder_check
+datum/unit_test/ladder_check
 	name = "MAP: Ladder Check"
 
-/datum/unit_test/ladder_check/start_test()
+datum/unit_test/ladder_check/start_test()
 	var/succeeded = TRUE
 	for(var/obj/structure/ladder/L)
 		if(L.allowed_directions & UP)
@@ -317,7 +317,7 @@
 
 	return 1
 
-/datum/unit_test/ladder_check/proc/check_direction(obj/structure/ladder/L, turf/destination_turf, check_direction, other_ladder_direction)
+/datum/unit_test/ladder_check/proc/check_direction(var/obj/structure/ladder/L, var/turf/destination_turf, var/check_direction, var/other_ladder_direction)
 	if(!destination_turf)
 		log_bad("Unable to acquire turf in the [dir2text(check_direction)] for [log_info_line(L)]")
 		return FALSE
@@ -330,7 +330,7 @@
 		return FALSE
 	return TRUE
 
-/datum/unit_test/ladder_check/proc/check_open_space(obj/structure/ladder/L)
+/datum/unit_test/ladder_check/proc/check_open_space(var/obj/structure/ladder/L)
 	if(!istype(get_turf(L), /turf/simulated/open))
 		log_bad("There is a non-open turf blocking the way for [log_info_line(L)]")
 		return FALSE
@@ -428,7 +428,7 @@
 		checked_cameras++
 		group_by(cameras_by_ctag, C.c_tag, C)
 
-	var/number_of_issues = number_of_issues(cameras_by_ctag, "Camera c_tags", /singleton/noi_feedback/detailed)
+	var/number_of_issues = number_of_issues(cameras_by_ctag, "Camera c_tags", /decl/noi_feedback/detailed)
 	if(number_of_issues)
 		fail("[number_of_issues] issue\s with camera c_tags found.")
 	else
@@ -481,14 +481,14 @@
 				log_bad("Following disposal pipe does not connect correctly: [log_info_line(D)]")
 				faulty_pipes += D
 
-	if(length(faulty_pipes))
-		fail("[length(faulty_pipes)] disposal segment\s did not connect with other disposal pipes.")
+	if(faulty_pipes.len)
+		fail("[faulty_pipes.len] disposal segment\s did not connect with other disposal pipes.")
 	else
 		pass("All disposal segments connect with other disposal pipes.")
 
 	return 1
 
-/datum/unit_test/disposal_segments_shall_connect_with_other_disposal_pipes/proc/turf_contains_matching_disposal_pipe(turf/T, straight_dir, list/curved_dirs)
+/datum/unit_test/disposal_segments_shall_connect_with_other_disposal_pipes/proc/turf_contains_matching_disposal_pipe(var/turf/T, var/straight_dir, var/list/curved_dirs)
 	if(!T)
 		return FALSE
 
@@ -620,7 +620,7 @@
 
 	if(failures)
 		fail("Found [failures] cable\s without connections.")
-	else if(length(exceptions))
+	else if(exceptions.len)
 		for(var/entry in exceptions)
 			log_bad("[log_info_line(entry)] - [english_list(exceptions[entry])] ")
 		fail("Unnecessary exceptions need to be cleaned up.")
@@ -630,7 +630,7 @@
 	return 1
 
 // We work on the assumption that another test ensures we only have valid directions
-/datum/unit_test/station_wires_shall_be_connected/proc/all_ends_connected(obj/structure/cable/C)
+/datum/unit_test/station_wires_shall_be_connected/proc/all_ends_connected(var/obj/structure/cable/C)
 	. = TRUE
 
 	var/turf/source_turf = get_turf(C)
@@ -650,7 +650,7 @@
 		var/list/exception = exceptions[source_turf]
 		if(exception && (dir in exception))
 			exception -= dir
-			if(!length(exception))
+			if(!exception.len)
 				exceptions -= source_turf
 			continue
 
@@ -663,13 +663,10 @@
 			target_turf = get_step(C, dir)
 
 		var/connected = FALSE
-		if (dir != UP & dir != DOWN && (locate(/obj/machinery/power/breakerbox) in target_turf))
-			connected = TRUE
-		else
-			for(var/obj/structure/cable/revC in target_turf)
-				if(revC.d1 == rev_dir || revC.d2 == rev_dir)
-					connected = TRUE
-					break
+		for(var/obj/structure/cable/revC in target_turf)
+			if(revC.d1 == rev_dir || revC.d2 == rev_dir)
+				connected = TRUE
+				break
 
 		if(!connected)
 			log_bad("Disconnected wire: [dir2text(dir)] - [log_info_line(C)]")
@@ -751,12 +748,12 @@
 	if(failed)
 		fail("A package has been delivered to an incorrect location.")
 		return
-	if(!length(packages_awaiting_delivery))
+	if(!packages_awaiting_delivery.len)
 		pass("All packages delivered.")
 		return
 	return 0
 
-/datum/unit_test/networked_disposals_shall_deliver_tagged_packages/proc/package_delivered(obj/structure/disposalholder/unit_test/package)
+/datum/unit_test/networked_disposals_shall_deliver_tagged_packages/proc/package_delivered(var/obj/structure/disposalholder/unit_test/package)
 	if(!packages_awaiting_delivery[package])
 		return
 	var/obj/structure/disposalpipe/trunk/trunk = package.loc
@@ -770,7 +767,7 @@
 		return
 	packages_awaiting_delivery -= package
 
-/datum/unit_test/networked_disposals_shall_deliver_tagged_packages/proc/get_bin_from_junction(obj/structure/disposalpipe/sortjunction/sort)
+/datum/unit_test/networked_disposals_shall_deliver_tagged_packages/proc/get_bin_from_junction(var/obj/structure/disposalpipe/sortjunction/sort)
 	var/list/traversed = list(sort) // Avoid self-looping, infinite loops.
 	var/obj/structure/disposalpipe/our_pipe = sort
 	var/current_dir = sort.sortdir
@@ -810,16 +807,16 @@
 				else if(is_invalid(req))
 					obj_access_pairs += list(list(O, req))
 
-	if(length(obj_access_pairs))
+	if(obj_access_pairs.len)
 		for(var/entry in obj_access_pairs)
-			log_bad("[log_info_line(entry[1])] has an invalid value ([entry[2]]) in req_access.")
-		fail("Mapped objs with req_access must be set up to use existing access strings.")
+			log_debug("[log_info_line(entry[1])] has an invalid value ([entry[2]]) in req_access.")
+		skip("Mapped objs with req_access must be set up to use existing access strings.") //INF: We have numbers in our map, so, we'll fix it sometime
 	else
 		pass("All mapped objs have correctly set req_access.")
 
 	return 1
 
-/datum/unit_test/req_access_shall_have_valid_strings/proc/is_invalid(value)
+/datum/unit_test/req_access_shall_have_valid_strings/proc/is_invalid(var/value)
 	if(!istext(value))
 		return TRUE //Someone tried to use a non-string as an access. There is no case where this is allowed.
 

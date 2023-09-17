@@ -9,6 +9,8 @@
 		"<b>THE SIGNAL THE SIGNAL THE SIGNAL THE SIGNAL THE</b>"
 		)
 
+	var/alarm_sound = 'sound/misc/foundation_alarm.ogg'
+
 /datum/event/minispasm/announce()
 	priority_announcement.Announce( \
 		"PRIORITY ALERT: SIGMA-[rand(50,80)] PSIONIC SIGNAL LOCAL TRAMISSION DETECTED (97% MATCH, NONVARIANT) \
@@ -16,7 +18,8 @@
 		exposure to active audio transmission equipment including radio headsets and intercoms \
 		for the duration of the signal broadcast.", \
 		"Cuchulain Sensor Array Automated Message" \
-		)
+	)
+	sound_to(world, sound(alarm_sound))
 
 /datum/event/minispasm/start()
 	var/list/victims = list()
@@ -30,7 +33,7 @@
 		var/obj/item/device/radio/source = victims[victim]
 		do_spasm(victim, source)
 
-/datum/event/minispasm/proc/do_spasm(mob/living/victim, obj/item/device/radio/source)
+/datum/event/minispasm/proc/do_spasm(var/mob/living/victim, var/obj/item/device/radio/source)
 	set waitfor = 0
 
 	if(iscarbon(victim) && !victim.isSynthetic())
@@ -38,7 +41,7 @@
 		for(var/disability in disabilities)
 			if(victim.disabilities & disability)
 				disabilities -= disability
-		if(length(disabilities))
+		if(disabilities.len)
 			victim.disabilities |= pick(disabilities)
 
 	if(victim.psi)
@@ -49,19 +52,12 @@
 	else
 		to_chat(victim, SPAN_DANGER("An indescribable, brain-tearing sound hisses from [icon2html(source, victim)] \the [source], and you collapse in a seizure!"))
 		victim.seizure()
-		var/new_latencies = rand(2,4)
-		var/list/faculties = list(PSI_COERCION, PSI_REDACTION, PSI_ENERGISTICS, PSI_PSYCHOKINESIS)
-		for(var/i = 1 to new_latencies)
-			to_chat(victim, SPAN_DANGER(FONT_LARGE(pick(psi_operancy_messages))))
-			victim.adjustBrainLoss(rand(10,20))
-			victim.set_psi_rank(pick_n_take(faculties), 1)
-			sleep(30)
-		victim.psi.update()
+		victim.adjustBrainLoss(rand(5,15))
 	sleep(45)
 	victim.psi.check_latency_trigger(100, "a psionic scream", redactive = TRUE)
 
 /datum/event/minispasm/end()
 	priority_announcement.Announce( \
 		"PRIORITY ALERT: SIGNAL BROADCAST HAS CEASED. Personnel are cleared to resume use of non-hardened radio transmission equipment. Have a nice day.", \
-		"Cuchulain Sensor Array Automated Message" \
-		)
+		"Cuchulain Sensor Array Automated Message", \
+		new_sound = 'sound/misc/foundation_restore.ogg' )

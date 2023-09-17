@@ -3,10 +3,10 @@
 /obj/effect/step_trigger
 	var/affect_ghosts = 0
 	var/stopper = 1 // stops throwers
-	invisibility = INVISIBILITY_ABSTRACT // nope cant see this shit
+	invisibility = 101 // nope cant see this shit
 	anchored = TRUE
 
-/obj/effect/step_trigger/proc/Trigger(atom/movable/A)
+/obj/effect/step_trigger/proc/Trigger(var/atom/movable/A)
 	return 0
 
 /obj/effect/step_trigger/Crossed(H as mob|obj)
@@ -31,8 +31,9 @@
 	var/facedir = 0 // if 1: atom faces the direction of movement
 	var/nostop = 0 // if 1: will only be stopped by teleporters
 	var/list/affecting = list()
+	icon = 'infinity/icons/obj/throwers.dmi'
 
-/obj/effect/step_trigger/thrower/Trigger(atom/movable/AM)
+/obj/effect/step_trigger/thrower/Trigger(var/atom/movable/AM)
 	if(!AM || !istype(AM) || !AM.simulated)
 		return
 	var/curtiles = 0
@@ -94,22 +95,22 @@
 	var/teleport_y = 0
 	var/teleport_z = 0
 
-/obj/effect/step_trigger/teleporter/Trigger(atom/movable/A)
-	if(teleport_x && teleport_y && teleport_z)
+	Trigger(var/atom/movable/A)
+		if(teleport_x && teleport_y && teleport_z)
 
-		A.x = teleport_x
-		A.y = teleport_y
-		A.z = teleport_z
+			A.x = teleport_x
+			A.y = teleport_y
+			A.z = teleport_z
 
 /* Random teleporter, teleports atoms to locations ranging from teleport_x - teleport_x_offset, etc */
 
 /obj/effect/step_trigger/teleporter/random
-	opacity = 1
+	opacity = TRUE
 	var/teleport_x_offset = 0
 	var/teleport_y_offset = 0
 	var/teleport_z_offset = 0
 
-/obj/effect/step_trigger/teleporter/random/Trigger(atom/movable/A)
+/obj/effect/step_trigger/teleporter/random/Trigger(var/atom/movable/A)
 	var/turf/T = locate(rand(teleport_x, teleport_x_offset), rand(teleport_y, teleport_y_offset), rand(teleport_z, teleport_z_offset))
 	if(T)
 		A.forceMove(T)

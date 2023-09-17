@@ -96,7 +96,7 @@
 	icon_state = "bookMedical"
 	author = "Medical Department"
 	title = "Medical Diagnostics Manual"
-	url = "Guide_to_Medicine"
+	url = "Руководство_по_медицине"
 
 /obj/item/book/manual/medical_diagnostics_manual/New()
 	..()

@@ -1,6 +1,10 @@
 /obj/effect/overmap/visitable/sector/exoplanet/desert
 	name = "desert exoplanet"
-	desc = "An arid exoplanet with sparse biological resources but rich mineral deposits underground."
+	scanner_name = "desert exoplanet"
+	scanner_desc = @{"[i]Stellar Body[/i]>: UNKNOWN
+[i]Class[/i]>: N-Class Planetoid
+[i]Habitability[/i]>: Moderate (High temperature)
+[b]Notice[/b]>: An arid exoplanet with sparse biological resources but rich mineral deposits underground"}
 	color = "#a08444"
 	planetary_area = /area/exoplanet/desert
 	rock_colors = list(COLOR_BEIGE, COLOR_PALE_YELLOW, COLOR_GRAY80, COLOR_BROWN)
@@ -11,8 +15,8 @@
 	habitability_distribution = list(HABITABILITY_IDEAL = 30, HABITABILITY_OKAY = 50, HABITABILITY_BAD = 10)
 	has_trees = FALSE
 	flora_diversity = 4
-	fauna_types = list(/mob/living/simple_animal/thinbug, /mob/living/simple_animal/tindalos, /mob/living/simple_animal/hostile/voxslug, /mob/living/simple_animal/hostile/retaliate/beast/antlion)
-	megafauna_types = list(/mob/living/simple_animal/hostile/retaliate/beast/antlion/mega)
+	fauna_types = list(/mob/living/simple_animal/thinbug, /mob/living/simple_animal/tindalos, /mob/living/simple_animal/hostile/voxslug, /mob/living/simple_animal/hostile/antlion)
+	megafauna_types = list(/mob/living/simple_animal/hostile/antlion/mega)
 
 /obj/effect/overmap/visitable/sector/exoplanet/desert/generate_map()
 	if(prob(70))
@@ -29,7 +33,7 @@
 		atmosphere.temperature = min(T20C + rand(20, 100), limit)
 		atmosphere.update_values()
 
-/obj/effect/overmap/visitable/sector/exoplanet/desert/adapt_seed(datum/seed/S)
+/obj/effect/overmap/visitable/sector/exoplanet/desert/adapt_seed(var/datum/seed/S)
 	..()
 	if(prob(90))
 		S.set_trait(TRAIT_REQUIRES_WATER,0)
@@ -50,7 +54,7 @@
 	flora_prob = 5
 	large_flora_prob = 0
 
-/datum/random_map/noise/exoplanet/desert/get_additional_spawns(value, turf/T)
+/datum/random_map/noise/exoplanet/desert/get_additional_spawns(var/value, var/turf/T)
 	..()
 	var/v = noise2value(value)
 	if(v > 6 && prob(2))
@@ -63,7 +67,7 @@
 /obj/effect/quicksand
 	name = "quicksand"
 	desc = "There is no candy at the bottom."
-	icon = 'icons/obj/structures/quicksand.dmi'
+	icon = 'icons/obj/quicksand.dmi'
 	icon_state = "intact0"
 	density = FALSE
 	anchored = TRUE
@@ -78,13 +82,11 @@
 	appearance = T.appearance
 
 /obj/effect/quicksand/user_unbuckle_mob(mob/user)
-	if (!can_unbuckle(user))
-		return
-	if (!user.stat && !user.restrained())
+	if(buckled_mob && !user.stat && !user.restrained())
 		if(busy)
 			to_chat(user, SPAN_NOTICE("\The [buckled_mob] is already getting out, be patient."))
 			return
-		var/delay = 6 SECONDS
+		var/delay = 60
 		if(user == buckled_mob)
 			delay *=2
 			user.visible_message(
@@ -99,7 +101,7 @@
 				SPAN_NOTICE("You hear water sloshing.")
 				)
 		busy = TRUE
-		if(do_after(user, delay, src, DO_PUBLIC_UNIQUE) && can_unbuckle(user))
+		if(do_after(user, delay, src))
 			busy = FALSE
 			if(user == buckled_mob)
 				if(prob(80))
@@ -118,7 +120,7 @@
 	..()
 	update_icon()
 
-/obj/effect/quicksand/buckle_mob(mob/L)
+/obj/effect/quicksand/buckle_mob(var/mob/L)
 	..()
 	update_icon()
 
@@ -140,20 +142,16 @@
 	exposed = 1
 	update_icon()
 
-
-/obj/effect/quicksand/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Any object - Expose the quicksand
-	if (!exposed && tool.force)
+/obj/effect/quicksand/attackby(obj/item/W, mob/user)
+	if(!exposed && W.force)
 		expose()
-		return TRUE
+	else
+		..()
 
-	return ..()
-
-
-/obj/effect/quicksand/Crossed(atom/movable/AM)
+/obj/effect/quicksand/Crossed(var/atom/movable/AM)
 	if(isliving(AM))
 		var/mob/living/L = AM
-		if(L.throwing || L.can_overcome_gravity() || !can_buckle(L))
+		if(L.throwing || L.can_overcome_gravity())
 			return
 		buckle_mob(L)
 		if(!exposed)

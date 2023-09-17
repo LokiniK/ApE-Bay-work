@@ -78,14 +78,17 @@ SUBSYSTEM_DEF(air)
 	var/list/active_hotspots = list()
 	var/list/active_edges = list()
 
-	var/list/deferred = list()
-	var/list/processing_edges
-	var/list/processing_fires
-	var/list/processing_hotspots
-	var/list/processing_zones
+	var/tmp/list/deferred = list()
+	var/tmp/list/processing_edges
+	var/tmp/list/processing_fires
+	var/tmp/list/processing_hotspots
+	var/tmp/list/processing_zones
 
 	var/active_zones = 0
 	var/next_id = 1
+
+	var/active_edges_firelimit = 20
+	var/times_failed_to_calc_firelevel = 0
 
 /datum/controller/subsystem/air/proc/reboot()
 	// Stop processing while we rebuild.
@@ -97,9 +100,9 @@ SUBSYSTEM_DEF(air)
 		while (state != SS_IDLE)
 			stoplag()
 
-	while (length(zones))
-		var/zone/zone = zones[length(zones)]
-		LIST_DEC(zones)
+	while (zones.len)
+		var/zone/zone = zones[zones.len]
+		zones.len--
 
 		zone.c_invalidate()
 
@@ -111,45 +114,52 @@ SUBSYSTEM_DEF(air)
 	active_edges.Cut()
 
 	// Re-run setup without air settling.
-	Initialize(Uptime(), FALSE)
+	Initialize(REALTIMEOFDAY, simulate = FALSE)
 
 	// Update next_fire so the MC doesn't try to make up for missed ticks.
 	next_fire = world.time + wait
 	can_fire = TRUE
 
+/datum/controller/subsystem/air/stat_entry()
+	var/list/out = list(
+		"TtU:[tiles_to_update.len] ",
+		"ZtU:[zones_to_update.len] ",
+		"AFZ:[active_fire_zones.len] ",
+		"AH:[active_hotspots.len] ",
+		"AE:[active_edges.len]"
+	)
+	..(out.Join())
 
-/datum/controller/subsystem/air/UpdateStat(time)
-	if (PreventUpdateStat(time))
-		return ..()
-	..({"\
-		TtU: [length(tiles_to_update)] \
-		ZtU: [length(zones_to_update)] \
-		AFZ: [length(active_fire_zones)] \
-		AH: [length(active_hotspots)] \
-		AE: [length(active_edges)]\
-	"})
+/datum/controller/subsystem/air/Initialize(timeofday, simulate = TRUE)
 
-
-/datum/controller/subsystem/air/Initialize(start_uptime, simulate = TRUE)
+	var/starttime = REALTIMEOFDAY
 	report_progress("Processing Geometry...")
+
 	var/simulated_turf_count = 0
 	for(var/turf/simulated/S)
 		simulated_turf_count++
 		S.update_air_properties()
+
 		CHECK_TICK
+
 	report_progress({"Total Simulated Turfs: [simulated_turf_count]
-Total Zones: [length(zones)]
-Total Edges: [length(edges)]
-Total Active Edges: [length(active_edges) ? SPAN_DANGER("[length(active_edges)]") : "None"]
+Total Zones: [zones.len]
+Total Edges: [edges.len]
+Total Active Edges: [active_edges.len ? "<span class='danger'>[active_edges.len]</span>" : "None"]
 Total Unsimulated Turfs: [world.maxx*world.maxy*world.maxz - simulated_turf_count]
-Geometry processing completed in [(Uptime() - start_uptime)/10] seconds!
 "})
+
+	report_progress("Geometry processing completed in [(REALTIMEOFDAY - starttime)/10] seconds!")
+
 	if (simulate)
 		report_progress("Settling air...")
-		start_uptime = Uptime()
-		fire(FALSE, TRUE)
-		report_progress("Air settling completed in [(Uptime() - start_uptime)/10] seconds!")
 
+		starttime = REALTIMEOFDAY
+		fire(FALSE, TRUE)
+
+		report_progress("Air settling completed in [(REALTIMEOFDAY - starttime)/10] seconds!")
+
+	..(timeofday)
 
 /datum/controller/subsystem/air/fire(resumed = FALSE, no_mc_tick = FALSE)
 	if (!resumed)
@@ -164,9 +174,9 @@ Geometry processing completed in [(Uptime() - start_uptime)/10] seconds!
 	var/list/curr_hotspot = processing_hotspots
 	var/list/curr_zones = zones_to_update
 
-	while (length(curr_tiles))
-		var/turf/T = curr_tiles[length(curr_tiles)]
-		LIST_DEC(curr_tiles)
+	while (curr_tiles.len)
+		var/turf/T = curr_tiles[curr_tiles.len]
+		curr_tiles.len--
 
 		if (!T)
 			if (no_mc_tick)
@@ -191,7 +201,7 @@ Geometry processing completed in [(Uptime() - start_uptime)/10] seconds!
 		T.post_update_air_properties()
 		T.needs_air_update = 0
 		#ifdef ZASDBG
-		T.overlays -= mark
+		T.cut_overlay(mark, TRUE)
 		updated++
 		#endif
 
@@ -200,15 +210,15 @@ Geometry processing completed in [(Uptime() - start_uptime)/10] seconds!
 		else if (MC_TICK_CHECK)
 			return
 
-	while (length(curr_defer))
-		var/turf/T = curr_defer[length(curr_defer)]
-		LIST_DEC(curr_defer)
+	while (curr_defer.len)
+		var/turf/T = curr_defer[curr_defer.len]
+		curr_defer.len--
 
 		T.update_air_properties()
 		T.post_update_air_properties()
 		T.needs_air_update = 0
 		#ifdef ZASDBG
-		T.overlays -= mark
+		T.cut_overlay(mark, TRUE)
 		updated++
 		#endif
 
@@ -217,9 +227,9 @@ Geometry processing completed in [(Uptime() - start_uptime)/10] seconds!
 		else if (MC_TICK_CHECK)
 			return
 
-	while (length(curr_edges))
-		var/connection_edge/edge = curr_edges[length(curr_edges)]
-		LIST_DEC(curr_edges)
+	while (curr_edges.len)
+		var/connection_edge/edge = curr_edges[curr_edges.len]
+		curr_edges.len--
 
 		if (!edge)
 			if (no_mc_tick)
@@ -235,9 +245,25 @@ Geometry processing completed in [(Uptime() - start_uptime)/10] seconds!
 		else if (MC_TICK_CHECK)
 			return
 
-	while (length(curr_fire))
-		var/zone/Z = curr_fire[length(curr_fire)]
-		LIST_DEC(curr_fire)
+	var/halt_firelevel_calculations = 0
+	if(tick_usage * world.tick_lag > Master.current_ticklimit || length(processing_edges) > active_edges_firelimit)
+		halt_firelevel_calculations = 1
+		times_failed_to_calc_firelevel++
+		if(times_failed_to_calc_firelevel > 60)
+			active_edges_firelimit += 5
+			times_failed_to_calc_firelevel = 0
+	else
+		times_failed_to_calc_firelevel = 0
+
+	while (curr_fire.len)
+		var/zone/Z = curr_fire[curr_fire.len]
+		curr_fire.len--
+
+		if(halt_firelevel_calculations)
+			if(length(Z.fire_tiles) && !Z.firelevel)
+				Z.firelevel = vsc.fire_firelevel_multiplier
+		else
+			Z.calculate_fire_level()
 
 		Z.process_fire()
 
@@ -246,9 +272,9 @@ Geometry processing completed in [(Uptime() - start_uptime)/10] seconds!
 		else if (MC_TICK_CHECK)
 			return
 
-	while (length(curr_hotspot))
-		var/obj/hotspot/F = curr_hotspot[length(curr_hotspot)]
-		LIST_DEC(curr_hotspot)
+	while (curr_hotspot.len)
+		var/obj/fire/F = curr_hotspot[curr_hotspot.len]
+		curr_hotspot.len--
 
 		F.Process()
 
@@ -257,9 +283,9 @@ Geometry processing completed in [(Uptime() - start_uptime)/10] seconds!
 		else if (MC_TICK_CHECK)
 			return
 
-	while (length(curr_zones))
-		var/zone/Z = curr_zones[length(curr_zones)]
-		LIST_DEC(curr_zones)
+	while (curr_zones.len)
+		var/zone/Z = curr_zones[curr_zones.len]
+		curr_zones.len--
 
 		Z.tick()
 		Z.needs_update = FALSE
@@ -300,7 +326,7 @@ Geometry processing completed in [(Uptime() - start_uptime)/10] seconds!
 	ASSERT(!B.invalid)
 	ASSERT(A != B)
 	#endif
-	if(length(A.contents) < length(B.contents))
+	if(A.contents.len < B.contents.len)
 		A.c_merge(B)
 		mark_zone_update(B)
 	else
@@ -324,7 +350,7 @@ Geometry processing completed in [(Uptime() - start_uptime)/10] seconds!
 	var/space = !istype(B)
 
 	if(!space)
-		if(min(length(A.zone.contents), length(B.zone.contents)) < ZONE_MIN_SIZE || (direct && (equivalent_pressure(A.zone,B.zone) || times_fired == 0)))
+		if(min(A.zone.contents.len, B.zone.contents.len) < ZONE_MIN_SIZE || (direct && (equivalent_pressure(A.zone,B.zone) || times_fired == 0)))
 			merge(A.zone,B.zone)
 			return
 
@@ -357,7 +383,7 @@ Geometry processing completed in [(Uptime() - start_uptime)/10] seconds!
 		return
 	tiles_to_update += T
 	#ifdef ZASDBG
-	T.overlays += mark
+	T.add_overlay(mark, TRUE)
 	#endif
 	T.needs_air_update = 1
 

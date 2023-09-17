@@ -1,14 +1,16 @@
-/mob/Destroy()
+/mob/Destroy()//This makes sure that mobs with clients/keys are not just deleted from the game.
 	STOP_PROCESSING_MOB(src)
-	GLOB.dead_mobs -= src
-	GLOB.alive_mobs -= src
+	GLOB.dead_mob_list_ -= src
+	GLOB.living_mob_list_ -= src
 	GLOB.player_list -= src
 	unset_machine()
-	QDEL_NULL(ability_master)
 	QDEL_NULL(hud_used)
+	if(istype(ability_master))
+		QDEL_NULL(ability_master)
 	if(istype(skillset))
 		QDEL_NULL(skillset)
-	remove_grabs_and_pulls()
+	for(var/obj/item/grab/G in grabbed_by)
+		qdel(G)
 	clear_fullscreen()
 	if(client)
 		remove_screen_obj_references()
@@ -20,7 +22,8 @@
 	if(mind && mind.current == src)
 		spellremove(src)
 	ghostize()
-	return ..()
+	..()
+	return QDEL_HINT_HARDDEL
 
 /mob/proc/remove_screen_obj_references()
 	hands = null
@@ -50,9 +53,8 @@
 	if(!move_intent)
 		move_intent = move_intents[1]
 	if(ispath(move_intent))
-		move_intent = GET_SINGLETON(move_intent)
-	if (!isliving(src))
-		status_flags |= NOTARGET
+		move_intent = decls_repository.get_decl(move_intent)
+	set_focus(src)
 	START_PROCESSING_MOB(src)
 
 /mob/proc/show_message(msg, type, alt, alt_type)//Message, type of message (1 or 2), alternative message, alt message type (1 or 2)
@@ -92,14 +94,14 @@
 
 	for(var/o in objs)
 		var/obj/O = o
-		if (length(exclude_objs) && (O in exclude_objs))
+		if (exclude_objs?.len && (O in exclude_objs))
 			exclude_objs -= O
 			continue
 		O.show_message(message, VISIBLE_MESSAGE, blind_message, AUDIBLE_MESSAGE)
 
 	for(var/m in mobs)
 		var/mob/M = m
-		if (length(exclude_mobs) && (M in exclude_mobs))
+		if (exclude_mobs?.len && (M in exclude_mobs))
 			exclude_mobs -= M
 			continue
 
@@ -113,12 +115,6 @@
 		if(self_message && M == src)
 			M.show_message(self_message, VISIBLE_MESSAGE, blind_message, AUDIBLE_MESSAGE)
 			continue
-
-		if(!(M.knows_target(src)) && !isghost(M))
-			for(var/datum/pronouns/entry as anything in GLOB.pronouns.instances)
-				mob_message = replacetext(mob_message, " [initial(entry.his)] ", " their ")
-				mob_message = replacetext(mob_message, " [initial(entry.him)] ", " them ")
-				mob_message = replacetext(mob_message, " [initial(entry.self)] ", " themselves ")
 
 		if((!M.is_blind() && M.see_invisible >= src.invisibility) || narrate)
 			M.show_message(mob_message, VISIBLE_MESSAGE, blind_message, AUDIBLE_MESSAGE)
@@ -145,7 +141,7 @@
 
 	for(var/m in mobs)
 		var/mob/M = m
-		if (length(exclude_mobs) && (M in exclude_mobs))
+		if (exclude_mobs?.len && (M in exclude_mobs))
 			exclude_mobs -= M
 			continue
 		var/mob_message = message
@@ -154,12 +150,6 @@
 			if(ghost_skip_message(M))
 				continue
 			mob_message = add_ghost_track(mob_message, M)
-
-		if(!(M.knows_target(src)) && !(isghost(M)))
-			for(var/datum/pronouns/entry as anything in GLOB.pronouns.instances)
-				mob_message = replacetext(mob_message, " [initial(entry.his)] ", " their ")
-				mob_message = replacetext(mob_message, " [initial(entry.him)] ", " them ")
-				mob_message = replacetext(mob_message, " [initial(entry.self)] ", " themselves ")
 
 		if(self_message && M == src)
 			M.show_message(self_message, AUDIBLE_MESSAGE, deaf_message, VISIBLE_MESSAGE)
@@ -170,12 +160,12 @@
 
 	for(var/o in objs)
 		var/obj/O = o
-		if (length(exclude_objs) && (O in exclude_objs))
+		if (exclude_objs?.len && (O in exclude_objs))
 			exclude_objs -= O
 			continue
 		O.show_message(message, AUDIBLE_MESSAGE, deaf_message, VISIBLE_MESSAGE)
 
-/mob/proc/add_ghost_track(message, mob/observer/ghost/M)
+/mob/proc/add_ghost_track(var/message, var/mob/observer/ghost/M)
 	ASSERT(istype(M))
 
 	var/remote = ""
@@ -187,26 +177,25 @@
 	message = track + remote + " " + message
 	return message
 
-/mob/proc/ghost_skip_message(mob/observer/ghost/M)
+/mob/proc/ghost_skip_message(var/mob/observer/ghost/M)
 	ASSERT(istype(M))
 	if(M.get_preference_value(/datum/client_preference/ghost_sight) == GLOB.PREF_ALL_EMOTES && !(src in view(M)))
 		if(!client)
 			return TRUE
 	return FALSE
 
-/**
- * Returns an amount of power drawn from the atom or `-1` if it's not viable.
- *
- * **Parameters**:
- * - `drain_check` Boolean - If set, does not actually drain power, only returns an amount.
- * - `surge` Boolean - If set, this will damage the recipient and not return any power.
- * - `amount` - The amount of power to attempt to drain.
- *
- * Returns integer.
- */
-/atom/proc/drain_power(drain_check,surge, amount = 0)
+// Returns an amount of power drawn from the object (-1 if it's not viable).
+// If drain_check is set it will not actually drain power, just return a value.
+// If surge is set, it will destroy/damage the recipient and not return any power.
+// Not sure where to define this, so it can sit here for the rest of time.
+/atom/proc/drain_power(var/drain_check,var/surge, var/amount = 0)
 	return -1
 
+/mob/proc/findname(msg)
+	for(var/mob/M in SSmobs.mob_list)
+		if (M.real_name == msg)
+			return M
+	return 0
 
 /mob/proc/movement_delay()
 	. = 0
@@ -227,7 +216,8 @@
 	if(pulling)
 		if(istype(pulling, /obj))
 			var/obj/O = pulling
-			. += clamp(O.w_class, 0, ITEM_SIZE_GARGANTUAN) / 5
+			. += O.get_additional_speed_decrease()
+
 		else if(istype(pulling, /mob))
 			var/mob/M = pulling
 			. += max(0, M.mob_size) / MOB_MEDIUM
@@ -239,11 +229,11 @@
 /mob/proc/size_strength_mod()
 	return log(2, mob_size / MOB_MEDIUM)
 
-
 /mob/proc/Life()
-	if(ability_master)
-		ability_master.update_spells(0)
-
+	set waitfor = FALSE
+//	if(organStructure)
+//		organStructure.ProcessOrgans()
+	return
 
 #define UNBUCKLED 0
 #define PARTIALLY_BUCKLED 1
@@ -267,11 +257,11 @@
 /mob/proc/cannot_stand()
 	return incapacitated(INCAPACITATION_KNOCKDOWN)
 
-/mob/proc/incapacitated(incapacitation_flags = INCAPACITATION_DEFAULT)
+/mob/proc/incapacitated(var/incapacitation_flags = INCAPACITATION_DEFAULT)
 	if ((incapacitation_flags & INCAPACITATION_STUNNED) && stunned)
 		return 1
 
-	if ((incapacitation_flags & INCAPACITATION_FORCELYING) && (weakened || resting || length(pinned)))
+	if ((incapacitation_flags & INCAPACITATION_FORCELYING) && (weakened || resting || pinned.len))
 		return 1
 
 	if ((incapacitation_flags & INCAPACITATION_KNOCKOUT) && (stat || paralysis || sleeping || (status_flags & FAKEDEATH)))
@@ -323,12 +313,38 @@
 /mob/proc/show_inv(mob/user as mob)
 	return
 
-
-/mob/verb/ExaminateVerb(atom/A as mob|obj|turf in view())
+//mob verbs are faster than object verbs. See http://www.byond.com/forum/?post=1326139&page=2#comment8198716 for why this isn't atom/verb/examine()
+/mob/verb/examinate(atom/A as mob|obj|turf in view())
 	set name = "Examine"
 	set category = "IC"
 
-	examinate(usr, A)
+	if((is_blind(src) || usr && usr.stat) && !isobserver(src))
+		to_chat(src, "<span class='notice'>Something is there but you can't see it.</span>")
+		return 1
+
+	face_atom(A)
+
+	if(!isghost(src))
+		if(A.loc != src || A == l_hand || A == r_hand)
+			for(var/mob/M in viewers(4, src))
+				if(M == src)
+					continue
+				if(M.client && M.client.get_preference_value(/datum/client_preference/examine_messages) == GLOB.PREF_SHOW)
+					if(M.is_blind() || is_invisible_to(M))
+						continue
+					to_chat(M, "<span class='subtle'><b>\The [src]</b> looks at \the [A].</span>")
+
+	var/distance = INFINITY
+	if(isghost(src) || stat == DEAD)
+		distance = 0
+	else
+		var/turf/source_turf = get_turf(src)
+		var/turf/target_turf = get_turf(A)
+		if(source_turf && source_turf.z == target_turf?.z)
+			distance = get_dist(source_turf, target_turf)
+
+	if(!A.examine(src, distance))
+		crash_with("Improper /examine() override: [log_info_line(A)]")
 
 /mob/verb/pointed(atom/A as mob|obj|turf in view())
 	set name = "Point To"
@@ -339,28 +355,32 @@
 	if(istype(A, /obj/effect/decal/point))
 		return 0
 
-	var/turf/tile = get_turf(A)
+	var/tile = get_turf(A)
 	if (!tile)
 		return 0
 
-	var/turf/mob_tile = get_turf(src)
-	var/obj/P = new /obj/effect/decal/point(mob_tile)
+	var/obj/P = new /obj/effect/decal/point(tile)
 	P.set_invisibility(invisibility)
-	animate(P, pixel_x = (tile.x - mob_tile.x) * world.icon_size + A.pixel_x, pixel_y = (tile.y - mob_tile.y) * world.icon_size + A.pixel_y, time = 3, easing = EASE_OUT)
+	P.pixel_x = A.pixel_x
+	P.pixel_y = A.pixel_y
+	QDEL_IN(P, 2 SECONDS)
+
 	face_atom(A)
 	return 1
 
 //Gets the mob grab conga line.
 /mob/proc/ret_grab(list/L)
-	if (!IsHolding(/obj/item/grab))
+	if (!istype(l_hand, /obj/item/grab) && !istype(r_hand, /obj/item/grab))
 		return L
 	if (!L)
 		L = list(src)
-	for (var/obj/item/grab/grab as anything in GetAllHeld(/obj/item/grab))
-		if (!(grab.affecting in L))
-			L += grab.affecting
-			if (grab.affecting)
-				grab.affecting.ret_grab(L)
+	for(var/A in list(l_hand,r_hand))
+		if (istype(A, /obj/item/grab))
+			var/obj/item/grab/G = A
+			if (!(G.affecting in L))
+				L += G.affecting
+				if (G.affecting)
+					G.affecting.ret_grab(L)
 	return L
 
 /mob/verb/mode()
@@ -383,7 +403,7 @@
 		else
 			attack_empty_hand(BP_R_HAND)
 
-/mob/proc/update_flavor_text(key)
+/mob/proc/update_flavor_text(var/key)
 	var/msg = sanitize(input(usr,"Set the flavor text in your 'examine' verb. Can also be used for OOC notes about your character.","Flavor Text",html_decode(flavor_text)) as message|null, extra = 0)
 	if(!CanInteract(usr, GLOB.self_state))
 		return
@@ -393,18 +413,18 @@
 /mob/proc/warn_flavor_changed()
 	if(flavor_text && flavor_text != "") // don't spam people that don't use it!
 		to_chat(src, "<h2 class='alert'>OOC Warning:</h2>")
-		to_chat(src, SPAN_CLASS("alert", "Your flavor text is likely out of date! <a href='byond://?src=\ref[src];flavor_change=1'>Change</a>"))
+		to_chat(src, "<span class='alert'>Your flavor text is likely out of date! <a href='byond://?src=\ref[src];flavor_change=1'>Change</a></span>")
 
 /mob/proc/print_flavor_text()
 	if (flavor_text && flavor_text != "")
 		var/msg = replacetext(flavor_text, "\n", " ")
 		if(length(msg) <= 40)
-			return SPAN_NOTICE("[msg]")
+			return "<span class='notice'>[msg]</span>"
 		else
-			return SPAN_NOTICE("[copytext_preserve_html(msg, 1, 37)]... <a href='byond://?src=\ref[src];flavor_more=1'>More...</a>")
+			return "<span class='notice'>[copytext_preserve_html(msg, 1, 37)]... <a href='byond://?src=\ref[src];flavor_more=1'>More...</a></span>"
 
 /client/verb/changes()
-	set name = "Changelog"
+	set name = "Baystation12 Changelog"
 	set category = "OOC"
 	getFiles(
 		'html/88x31.png',
@@ -428,8 +448,8 @@
 		'html/changelog.html'
 		)
 	show_browser(src, 'html/changelog.html', "window=changes;size=675x650")
-	if (GLOB.changelog_hash && prefs.lastchangelog != GLOB.changelog_hash)
-		prefs.lastchangelog = GLOB.changelog_hash
+	if (SSmisc.changelog_hash && prefs.lastchangelog != SSmisc.changelog_hash)
+		prefs.lastchangelog = SSmisc.changelog_hash
 		SScharacter_setup.queue_preferences_save(prefs)
 		winset(src, "rpane.changelog", "background-color=none;font-style=;")
 
@@ -439,6 +459,12 @@
 	unset_machine()
 	reset_view(null)
 
+/*
+/mob/verb/tail_layer()
+	set name = "Tail"
+	set category = "IC"
+	switch_tail_layer(src)
+*/
 /mob/DefaultTopicState()
 	return GLOB.view_state
 
@@ -448,7 +474,7 @@
 		if(href_list["mach_close"])
 			var/t1 = text("window=[href_list["mach_close"]]")
 			unset_machine()
-			show_browser(src, null, t1)
+			close_browser(src, t1)
 			return TOPIC_HANDLED
 		if(href_list["flavor_change"])
 			update_flavor_text(href_list["flavor_change"])
@@ -457,7 +483,7 @@
 // If usr != src, or if usr == src but the Topic call was not resolved, this is called next.
 /mob/OnTopic(mob/user, href_list, datum/topic_state/state)
 	if(href_list["flavor_more"])
-		var/text = "<HTML><HEAD><TITLE>[name]</TITLE></HEAD><BODY><TT>[replacetext(flavor_text, "\n", "<BR>")]</TT></BODY></HTML>"
+		var/text = "<HTML><meta charset=\"UTF-8\"><HEAD><TITLE>[name]</TITLE></HEAD><BODY><TT>[replacetext(flavor_text, "\n", "<BR>")]</TT></BODY></HTML>"
 		show_browser(user, text, "window=[name];size=500x200")
 		onclose(user, "[name]")
 		return TOPIC_HANDLED
@@ -475,13 +501,7 @@
 	return 0
 
 /mob/living/carbon/human/pull_damage()
-	if(!lying)
-		return 0
-	for (var/obj/item/organ/external/e in organs)
-		var/incision_state = e.how_open()
-		if(incision_state == SURGERY_RETRACTED || incision_state == SURGERY_ENCASED)
-			return 1
-	if(getBruteLoss() + getFireLoss() < 100)
+	if(!lying || getBruteLoss() + getFireLoss() < 100)
 		return 0
 	for(var/thing in organs)
 		var/obj/item/organ/external/e = thing
@@ -518,38 +538,28 @@
 		if(pullin)
 			pullin.icon_state = "pull0"
 
-/mob/proc/start_pulling(atom/movable/AM)
+/mob/proc/start_pulling(var/atom/movable/AM)
 
 	if ( !AM || !usr || src==AM || !isturf(src.loc) )	//if there's no person pulling OR the person is pulling themself OR the object being pulled is inside something: abort!
 		return
 
 	if (AM.anchored)
-		to_chat(src, SPAN_WARNING("It won't budge!"))
+		to_chat(src, "<span class='warning'>It won't budge!</span>")
 		return
 
 	var/mob/M = AM
 	if(ismob(AM))
 
-		var/obj/item/grab/G = locate() in M
-		if(istype(G))
-			if(G.current_grab.shield_assailant) // Check that the pull target isn't holding someone hostage to prevent just yanking them away from their victim.
-				visible_message(SPAN_WARNING("\The [G.assailant] uses \the [G.affecting] to block \the [src] from getting a firm grip!"), SPAN_WARNING("Your grip is blocked by \the [G.assailant] using \the [G.affecting] as a shield!"))
-				return
-			if(prob(25))
-				visible_message(SPAN_WARNING("\The [src] fails to pull \the [G.assailant] away from \the [G.affecting]!"), SPAN_WARNING("You fail to pull \the [G.assailant] away from \the [G.affecting]!"))
-				return
-			G.current_grab.let_go(G) // Makes sure dragging the assailant away from their victim makes them release the grab instead of holding it at long range forever.
-
 		if(!can_pull_mobs || !can_pull_size)
-			to_chat(src, SPAN_WARNING("It won't budge!"))
+			to_chat(src, "<span class='warning'>It won't budge!</span>")
 			return
 
 		if((mob_size < M.mob_size) && (can_pull_mobs != MOB_PULL_LARGER))
-			to_chat(src, SPAN_WARNING("It won't budge!"))
+			to_chat(src, "<span class='warning'>It won't budge!</span>")
 			return
 
 		if((mob_size == M.mob_size) && (can_pull_mobs == MOB_PULL_SMALLER))
-			to_chat(src, SPAN_WARNING("It won't budge!"))
+			to_chat(src, "<span class='warning'>It won't budge!</span>")
 			return
 
 		// If your size is larger than theirs and you have some
@@ -564,7 +574,7 @@
 	else if(isobj(AM))
 		var/obj/I = AM
 		if(!can_pull_size || can_pull_size < I.w_class)
-			to_chat(src, SPAN_WARNING("It won't budge!"))
+			to_chat(src, "<span class='warning'>It won't budge!</span>")
 			return
 
 	if(pulling)
@@ -608,12 +618,16 @@
 		playsound(src.loc, 'sound/weapons/thudswoosh.ogg', 15) //Quieter than hugging/grabbing but we still want some audio feedback
 
 		if(H.pull_damage())
-			to_chat(src, SPAN_DANGER("Pulling \the [H] in their current condition would probably be a bad idea."))
+			to_chat(src, "<span class='danger'>Pulling \the [H] in their current condition would probably be a bad idea.</span>")
 
 		var/obj/item/clothing/C = H.get_covering_equipped_item_by_zone(BP_CHEST)
 		if(istype(C))
 			C.leave_evidence(src)
 
+	//Attempted fix for people flying away through space when cuffed and dragged.
+	if(ismob(AM))
+		var/mob/pulled = AM
+		pulled.inertia_dir = 0
 
 /mob/proc/can_use_hands()
 	return
@@ -632,16 +646,8 @@
 /mob/proc/is_ready()
 	return client && !!mind
 
-
-/mob/choose_from_pronouns()
-	if (!pronouns)
-		return ..()
-
-	var/datum/pronouns/P = GLOB.pronouns.by_key[pronouns]
-	if(P.types)
-		P = GLOB.pronouns.by_key[pick(P.types)]
-	return P
-
+/mob/proc/get_gender()
+	return gender
 
 /mob/proc/see(message)
 	if(!is_active())
@@ -655,40 +661,51 @@
 
 /mob/Stat()
 	..()
-	. = (is_client_active(5 MINUTES))
-	if (!.)
+	. = (is_client_active(10 MINUTES))
+	if(!.)
 		return
 
 	if(statpanel("Status"))
 		if(GAME_STATE >= RUNLEVEL_LOBBY)
+			stat("Local Time", stationtime2text())
+			stat("Local Date", stationdate2text())
 			stat("Round Duration", roundduration2text())
+//[INF]
+			if(game_id)
+				stat("Round ID:", game_id)
+			var/server_status_info
+			if(SSticker.update_server)
+				server_status_info = "Server Update"
+			else if(SSticker.scheduled_map_change)
+				server_status_info = "Map Change"
+			if(server_status_info)
+				stat("Round End type:", server_status_info)
+//[/INF]
+			stat("Server Time", time2text(world.realtime, "YYYY-MM-DD hh:mm"))
 		if(client.holder || isghost(client.mob))
 			stat("Location:", "([x], [y], [z]) [loc]")
 
 	if(client.holder)
 		if(statpanel("MC"))
-			stat("CPU:","[world.cpu]")
-			stat("Instances:","[length(world.contents)]")
+			stat("CPU:", "[Master.format_color_cpu()]")
+			stat("Map CPU:", "[Master.format_color_cpu_map()]")
+			stat("Instances:","[world.contents.len]")
+			stat("World Time:", "[world.time]")
 			stat(null)
-			var/time = Uptime()
 			if(Master)
-				Master.UpdateStat(time)
+				Master.stat_entry()
 			else
 				stat("Master Controller:", "ERROR")
 			if(Failsafe)
-				Failsafe.UpdateStat(time)
+				Failsafe.stat_entry()
 			else if (Master.initializing)
 				stat("Failsafe Controller:", "Waiting for MC")
 			else
 				stat("Failsafe Controller:", "ERROR")
 			if(Master)
 				stat(null)
-				config.UpdateStat()
-				GLOB.UpdateStat()
-				GLOB.debug_real_globals.UpdateStat()
-				stat(null)
-				for (var/datum/controller/subsystem/subsystem as anything in Master.subsystems)
-					subsystem.UpdateStat(time)
+				for(var/datum/controller/subsystem/SS in Master.subsystems)
+					SS.stat_entry()
 
 	if(listed_turf && client)
 		if(!TurfAdjacent(listed_turf))
@@ -721,10 +738,10 @@
 	else if(buckled)
 		anchored = TRUE
 		if(istype(buckled))
-			if (isnull(buckled.buckle_stance))
+			if(buckled.buckle_lying == -1)
 				lying = incapacitated(INCAPACITATION_KNOCKDOWN)
 			else
-				lying = buckled.buckle_stance
+				lying = buckled.buckle_lying
 			if(buckled.buckle_movable)
 				anchored = FALSE
 	else
@@ -732,8 +749,8 @@
 
 	if(lying)
 		set_density(0)
-		for (var/obj/item/item as anything in GetAllHeld())
-			unEquip(item)
+		if(l_hand) unEquip(l_hand)
+		if(r_hand) unEquip(r_hand)
 	else
 		set_density(initial(density))
 	reset_layer()
@@ -758,7 +775,7 @@
 	else
 		reset_plane_and_layer()
 
-/mob/proc/facedir(ndir)
+/mob/proc/facedir(var/ndir)
 	if(!canface() || moving || (buckled && !buckled.buckle_movable))
 		return 0
 	set_dir(ndir)
@@ -862,7 +879,7 @@
 /mob/proc/get_species()
 	return ""
 
-/mob/proc/get_visible_implants(class = 0)
+/mob/proc/get_visible_implants(var/class = 0)
 	var/list/visible_implants = list()
 	for(var/obj/item/O in embedded)
 		if(O.w_class > class)
@@ -870,15 +887,15 @@
 	return visible_implants
 
 /mob/proc/embedded_needs_process()
-	return (length(embedded) > 0)
+	return (embedded.len > 0)
 
-/mob/proc/remove_implant(obj/item/implant, surgical_removal = FALSE)
+/mob/proc/remove_implant(var/obj/item/implant, var/surgical_removal = FALSE)
 	if(!LAZYLEN(get_visible_implants(0))) //Yanking out last object - removing verb.
 		verbs -= /mob/proc/yank_out_object
 	for(var/obj/item/O in pinned)
 		if(O == implant)
 			pinned -= O
-		if(!length(pinned))
+		if(!pinned.len)
 			anchored = FALSE
 	implant.dropInto(loc)
 	implant.add_blood(src)
@@ -886,24 +903,15 @@
 	if(istype(implant,/obj/item/implant))
 		var/obj/item/implant/imp = implant
 		imp.removed()
-	if (istype(implant, /obj/item/holder/voxslug))
-		var/obj/item/holder/voxslug/holder = implant
-		var/mob/living/simple_animal/hostile/voxslug/V = holder.contents[1]
-
-		V.visible_message(SPAN_WARNING("\The [src] is momentarily stunned as it is ripped from its victim!"))
-		if (V.ai_holder)
-			var/datum/ai_holder/AI = V.ai_holder
-			AI.set_busy_delay(8 SECONDS)
-
 	. = TRUE
 
-/mob/living/silicon/robot/remove_implant(obj/item/implant, surgical_removal = FALSE)
+/mob/living/silicon/robot/remove_implant(var/obj/item/implant, var/surgical_removal = FALSE)
 	embedded -= implant
 	adjustBruteLoss(5)
 	adjustFireLoss(10)
 	. = ..()
 
-/mob/living/carbon/human/remove_implant(obj/item/implant, surgical_removal = FALSE, obj/item/organ/external/affected)
+/mob/living/carbon/human/remove_implant(var/obj/item/implant, var/surgical_removal = FALSE, var/obj/item/organ/external/affected)
 	if(!affected) //Grab the organ holding the implant.
 		for(var/obj/item/organ/external/organ in organs)
 			for(var/obj/item/O in organ.implants)
@@ -916,7 +924,7 @@
 			LAZYREMOVE(wound.embedded_objects, implant)
 		if(!surgical_removal)
 			shock_stage+=20
-			affected.take_external_damage((implant.w_class * 3), 0, DAMAGE_FLAG_EDGE, "Embedded object extraction")
+			affected.take_external_damage((implant.w_class * 3), 0, DAM_EDGE, "Embedded object extraction")
 			if(!BP_IS_ROBOTIC(affected) && prob(implant.w_class * 5) && affected.sever_artery()) //I'M SO ANEMIC I COULD JUST -DIE-.
 				custom_pain("Something tears wetly in your [affected.name] as [implant] is pulled free!", 50, affecting = affected)
 	. = ..()
@@ -948,7 +956,7 @@
 		self = 1 // Removing object from yourself.
 
 	valid_objects = get_visible_implants(0)
-	if(!length(valid_objects))
+	if(!valid_objects.len)
 		if(self)
 			to_chat(src, "You have nothing stuck in your body that is large enough to remove.")
 		else
@@ -956,21 +964,21 @@
 		return
 	var/obj/item/selection = input("What do you want to yank out?", "Embedded objects") in valid_objects
 	if(self)
-		to_chat(src, SPAN_WARNING("You attempt to get a good grip on [selection] in your body."))
+		to_chat(src, "<span class='warning'>You attempt to get a good grip on [selection] in your body.</span>")
 	else
-		to_chat(U, SPAN_WARNING("You attempt to get a good grip on [selection] in [S]'s body."))
-	if(!do_after(U, 3 SECONDS, S, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS, INCAPACITATION_DEFAULT & ~INCAPACITATION_FORCELYING)) //let people pinned to stuff yank it out, otherwise they're stuck... forever!!!
+		to_chat(U, "<span class='warning'>You attempt to get a good grip on [selection] in [S]'s body.</span>")
+	if(!do_after(U, 3 SECONDS, S, incapacitation_flags = INCAPACITATION_DEFAULT & ~INCAPACITATION_FORCELYING)) //let people pinned to stuff yank it out, otherwise they're stuck... forever!!!
 		return
 	if(!selection || !S || !U)
 		return
 
 	if(self)
-		visible_message(SPAN_WARNING("<b>[src] rips [selection] out of their body.</b>"),SPAN_WARNING("<b>You rip [selection] out of your body.</b>"))
+		visible_message("<span class='warning'><b>[src] rips [selection] out of their body.</b></span>","<span class='warning'><b>You rip [selection] out of your body.</b></span>")
 	else
-		visible_message(SPAN_WARNING("<b>[usr] rips [selection] out of [src]'s body.</b>"),SPAN_WARNING("<b>[usr] rips [selection] out of your body.</b>"))
+		visible_message("<span class='warning'><b>[usr] rips [selection] out of [src]'s body.</b></span>","<span class='warning'><b>[usr] rips [selection] out of your body.</b></span>")
 	remove_implant(selection)
 	selection.forceMove(get_turf(src))
-	if (U.HasFreeHand())
+	if(!(U.l_hand && U.r_hand))
 		U.put_in_hands(selection)
 	if(ishuman(U))
 		var/mob/living/carbon/human/human_user = U
@@ -986,12 +994,14 @@
 /mob/on_update_icon()
 	return update_icons()
 
-/mob/verb/face_direction()
+/mob/proc/switch_tail_layer()
+	set category = "Abilities"
+	set name = "Toggle tail layer"
+	set desc = "tail will be over or under backpack"
+	tail_layer = !tail_layer
+	to_chat(src, "<span class='notice'>Your tail will be [tail_layer == TRUE ? "over" : "under"] backpacks.</span>")
 
-	set name = "Face Direction"
-	set category = "IC"
-	set src = usr
-
+/mob/proc/face_direction()
 	set_face_dir()
 
 	if(!facing_dir)
@@ -999,7 +1009,7 @@
 	else
 		to_chat(usr, "You are now facing [dir2text(facing_dir)].")
 
-/mob/proc/set_face_dir(newdir)
+/mob/proc/set_face_dir(var/newdir)
 	if(!isnull(facing_dir) && newdir == facing_dir)
 		facing_dir = null
 	else if(newdir)
@@ -1026,7 +1036,7 @@
 	else
 		return ..()
 
-/mob/proc/set_stat(new_stat)
+/mob/proc/set_stat(var/new_stat)
 	. = stat != new_stat
 	stat = new_stat
 
@@ -1086,7 +1096,7 @@
 			to_chat(usr, "The game is not currently looking for antags.")
 	else
 		to_chat(usr, "You must be observing or in the lobby to join the antag pool.")
-/mob/proc/is_invisible_to(mob/viewer)
+/mob/proc/is_invisible_to(var/mob/viewer)
 	return (!alpha || !mouse_opacity || viewer.see_invisible < invisibility)
 
 /client/proc/check_has_body_select()
@@ -1148,16 +1158,16 @@
 /mob/proc/get_sex()
 	return gender
 
-/mob/is_fluid_pushable(amt)
+/mob/is_fluid_pushable(var/amt)
 	if(..() && !buckled && (lying || !Check_Shoegrip()) && (amt >= mob_size * (lying ? 5 : 10)))
 		if(!lying)
 			Weaken(1)
 			if(lying && prob(10))
-				to_chat(src, SPAN_DANGER("You are pushed down by the flood!"))
+				to_chat(src, "<span class='danger'>You are pushed down by the flood!</span>")
 		return TRUE
 	return FALSE
 
-/mob/proc/get_footstep(footstep_type)
+/mob/proc/get_footstep(var/footstep_type)
 	return
 
 /mob/proc/handle_embedded_and_stomach_objects()
@@ -1167,52 +1177,3 @@
 	if(ear_deaf)
 		return 0
 	return 1
-
-/mob/proc/check_emissive_equipment()
-	var/old_zflags = z_flags
-	z_flags &= ~ZMM_MANGLE_PLANES
-	for(var/atom/movable/AM in get_equipped_items(TRUE))
-		if(AM.z_flags & ZMM_MANGLE_PLANES)
-			z_flags |= ZMM_MANGLE_PLANES
-			break
-	if(old_zflags != z_flags)
-		UPDATE_OO_IF_PRESENT
-
-/mob/verb/introduce()
-	set category = "IC"
-	set name = "Introduce Self"
-	set desc = "Introduce yourself to someone else."
-
-	var/mob/S = src
-	var/mob/U = usr
-	if(U == S)
-		to_chat(U, SPAN_WARNING("You can't introduce yourself to yourself!"))
-		return
-	if(get_dist(U, S) > 3)
-		to_chat(U, SPAN_WARNING("You're too far away to properly introduce yourself!"))
-		return
-	if((S.stat != CONSCIOUS) || !(S.mind))
-		to_chat(U, SPAN_WARNING("You can't introduce yourself while they're in this state!"))
-		return
-	if((S in U.mind.known_mobs) || (U in S.mind.known_mobs))
-		to_chat(U, SPAN_WARNING("You already know [S.name]!"))
-		return
-
-	var/datum/pronouns/P = choose_from_pronouns(U)
-
-	to_chat(U, SPAN_WARNING("You introduce yourself to [S.name]!"))
-	to_chat(S, SPAN_WARNING("[U.name] introduces [P.self]!"))
-	U.mind.add_known_mob(S)
-	S.mind.add_known_mob(U)
-
-/mob/proc/knows_target(mob/M)
-	if(mind)
-		if((M in mind.known_mobs) || (M.faction == faction) || (M.last_faction == faction) || (M.faction == last_faction) || isghost(src))
-			return TRUE
-		else
-			return FALSE
-	else
-		return FALSE
-
-/mob/get_mass()
-	return mob_size

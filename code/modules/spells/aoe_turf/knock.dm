@@ -20,8 +20,14 @@
 			spawn(1)
 				if(istype(door,/obj/machinery/door/airlock))
 					var/obj/machinery/door/airlock/AL = door //casting is important
-					AL.locked = FALSE
+					AL.locked = 0
 				door.open()
+		for(var/obj/structure/closet/closet in T.contents)
+			spawn(1)
+				if(istype(closet,/obj/structure/closet/secure_closet))
+					var/obj/structure/closet/secure_closet/AK = closet //casting is important
+					AK.locked = 0
+				closet.update_icon()
 	return
 
 

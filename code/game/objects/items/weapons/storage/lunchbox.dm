@@ -1,7 +1,6 @@
 /obj/item/storage/lunchbox
-	max_storage_space = ITEM_SIZE_SMALL * 4
+	max_storage_space = 8 //slightly smaller than a toolbox
 	name = "rainbow lunchbox"
-	icon = 'icons/obj/lunchboxes.dmi'
 	icon_state = "lunchbox_rainbow"
 	item_state = "toolbox_pink"
 	desc = "A little lunchbox. This one is the colors of the rainbow!"
@@ -9,7 +8,6 @@
 	max_w_class = ITEM_SIZE_SMALL
 	var/filled = FALSE
 	attack_verb = list("lunched")
-	allow_slow_dump = TRUE
 
 /obj/item/storage/lunchbox/New()
 	..()
@@ -109,7 +107,6 @@
 
 /obj/item/storage/lunchbox/picnic
 	name = "picnic basket"
-	icon = 'icons/obj/picnic_basket.dmi'
 	icon_state = "picnic_basket"
 	item_state = "picnic_basket"
 	desc = "A small, old-fashioned picnic basket. Great for lunches in the garden."

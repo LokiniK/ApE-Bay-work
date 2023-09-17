@@ -11,10 +11,7 @@
 				continue
 
 			var/turf/T = pick_n_take(spots)
-			if (severity > EVENT_LEVEL_MUNDANE && prob(10))
-				new/mob/living/simple_animal/hostile/rogue_drone/big(T)
-			else
-				new/mob/living/simple_animal/hostile/rogue_drone(T)
+			new/mob/living/simple_animal/hostile/rogue_drone(T)
 
 /datum/event/rogue_maint_drones/announce()
 	var/stealth_chance = 70 - 20*severity
@@ -23,12 +20,12 @@
 	var/naming
 	switch(severity)
 		if(EVENT_LEVEL_MUNDANE)
-			naming = "malfunction"
+			naming = "Один сбойный дрон обнаружен"
 		if(EVENT_LEVEL_MODERATE)
-			naming = "uprising"
+			naming = "Четверо сбойных дронов обнаружено"
 		if(EVENT_LEVEL_MAJOR)
-			naming = "revolution"
-	command_announcement.Announce("A maintenance drone [naming] has been detected. Caution is advised when entering maintenance tunnels.", "Drone Behaviour Control", zlevels = affecting_z)
+			naming = "Шесть и более сбойных дронов обнаружено"
+	command_announcement.Announce("[naming] в технических помещениях судна. Требуется устранение дронов силами Службы Безопасности.", "Станция Контроля Дронов", zlevels = affecting_z)
 
 /datum/event/rogue_maint_drones/proc/get_infestation_turfs()
 	var/area/location = pick_area(list(/proc/is_not_space_area, /proc/is_station_area, /proc/is_maint_area))
@@ -38,7 +35,7 @@
 		return
 
 	var/list/dron_turfs = get_area_turfs(location, list(/proc/not_turf_contains_dense_objects, /proc/IsTurfAtmosSafe))
-	if(!length(dron_turfs))
+	if(!dron_turfs.len)
 		log_debug("Drone infestation failed to find viable turfs in \the [location].")
 		kill(TRUE)
 		return

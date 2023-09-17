@@ -41,10 +41,13 @@
 		)
 	allowed = list(/obj/item/device/flashlight,/obj/item/tank,/obj/item/device/suit_cooling_unit,/obj/item/storage/toolbox,/obj/item/storage/briefcase/inflatable,/obj/item/device/t_scanner,/obj/item/rcd,/obj/item/rpd)
 
+/obj/item/clothing/suit/space/void/engineering/New()
+	..()
+	slowdown_per_slot[slot_wear_suit] = 1
+
 /obj/item/clothing/suit/space/void/engineering/prepared
 	helmet = /obj/item/clothing/head/helmet/space/void/engineering
 	boots = /obj/item/clothing/shoes/magboots
-	item_flags = ITEM_FLAG_THICKMATERIAL | ITEM_FLAG_INVALID_FOR_CHAMELEON
 
 //Mining
 /obj/item/clothing/head/helmet/space/void/mining
@@ -88,7 +91,7 @@
 
 /obj/item/clothing/suit/space/void/mining/prepared
 	helmet = /obj/item/clothing/head/helmet/space/void/mining
-	item_flags = ITEM_FLAG_THICKMATERIAL | ITEM_FLAG_INVALID_FOR_CHAMELEON
+	boots = /obj/item/clothing/shoes/magboots
 
 //Medical
 /obj/item/clothing/head/helmet/space/void/medical
@@ -128,7 +131,6 @@
 /obj/item/clothing/suit/space/void/medical/prepared
 	helmet = /obj/item/clothing/head/helmet/space/void/medical
 	boots = /obj/item/clothing/shoes/magboots
-	item_flags = ITEM_FLAG_THICKMATERIAL | ITEM_FLAG_INVALID_FOR_CHAMELEON
 
 //Security
 /obj/item/clothing/head/helmet/space/void/security
@@ -173,7 +175,6 @@
 /obj/item/clothing/suit/space/void/security/prepared
 	helmet = /obj/item/clothing/head/helmet/space/void/security
 	boots = /obj/item/clothing/shoes/magboots
-	item_flags = ITEM_FLAG_THICKMATERIAL | ITEM_FLAG_INVALID_FOR_CHAMELEON
 
 //Atmospherics
 /obj/item/clothing/head/helmet/space/void/atmos
@@ -220,7 +221,6 @@
 /obj/item/clothing/suit/space/void/atmos/prepared
 	helmet = /obj/item/clothing/head/helmet/space/void/atmos
 	boots = /obj/item/clothing/shoes/magboots
-	item_flags = ITEM_FLAG_THICKMATERIAL | ITEM_FLAG_INVALID_FOR_CHAMELEON
 
 //Surplus Voidsuits
 
@@ -228,6 +228,15 @@
 /obj/item/clothing/head/helmet/space/void/engineering/alt
 	name = "reinforced engineering voidsuit helmet"
 	desc = "A heavy, radiation-shielded voidsuit helmet with a surprisingly comfortable interior."
+//[INF]
+	sprite_sheets = list(
+		SPECIES_TAJARA = 'icons/mob/species/tajaran/helmet.dmi',
+		SPECIES_EROSAN = 'infinity/icons/mob/species/erosan/helmet.dmi',
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_head_resomi.dmi',
+		SPECIES_UNATHI = 'infinity/icons/mob/species/unathi/onmob_head_unathi.dmi',
+		SPECIES_SKRELL = 'icons/mob/species/skrell/onmob_head_skrell.dmi',
+		)
+//[/INF]
 	icon_state = "rig0-engineeringalt"
 	item_state = "engalt_helm"
 	armor = list(
@@ -243,6 +252,15 @@
 /obj/item/clothing/suit/space/void/engineering/alt
 	name = "reinforced engineering voidsuit"
 	desc = "A bulky industrial voidsuit. It's a few generations old, but a reliable design and radiation shielding make up for the lack of climate control."
+//[INF]
+	sprite_sheets = list(
+		SPECIES_TAJARA = 'icons/mob/species/tajaran/suit.dmi',
+		SPECIES_EROSAN = 'infinity/icons/mob/species/erosan/suit.dmi',
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_suit_resomi.dmi',
+		SPECIES_UNATHI = 'infinity/icons/mob/species/unathi/onmob_suit_unathi.dmi',
+		SPECIES_SKRELL = 'icons/mob/species/skrell/onmob_suit_skrell.dmi',
+		)
+//[/INF]
 	icon_state = "rig-engineeringalt"
 	armor = list(
 		melee = ARMOR_MELEE_RESISTANT,
@@ -253,14 +271,13 @@
 		rad = ARMOR_RAD_SHIELDED
 		)
 
-/obj/item/clothing/suit/space/void/engineering/alt/Initialize()
-	. = ..()
-	slowdown_per_slot[slot_wear_suit] = 1.25
+/obj/item/clothing/suit/space/void/engineering/alt/New()
+	..()
+	slowdown_per_slot[slot_wear_suit] = 2
 
 /obj/item/clothing/suit/space/void/engineering/alt/prepared
 	helmet = /obj/item/clothing/head/helmet/space/void/engineering/alt
 	boots = /obj/item/clothing/shoes/magboots
-	item_flags = ITEM_FLAG_THICKMATERIAL | ITEM_FLAG_INVALID_FOR_CHAMELEON
 
 //Mining
 /obj/item/clothing/head/helmet/space/void/mining/alt
@@ -276,7 +293,7 @@
 
 /obj/item/clothing/suit/space/void/mining/alt/prepared
 	helmet = /obj/item/clothing/head/helmet/space/void/mining/alt
-	item_flags = ITEM_FLAG_THICKMATERIAL | ITEM_FLAG_INVALID_FOR_CHAMELEON
+	boots = /obj/item/clothing/shoes/magboots
 
 //Medical
 /obj/item/clothing/head/helmet/space/void/medical/alt
@@ -306,37 +323,54 @@
 		rad = ARMOR_RAD_RESISTANT
 		)
 
-/obj/item/clothing/suit/space/void/medical/alt/Initialize()
-	. = ..()
-	slowdown_per_slot[slot_wear_suit] = 0.5
+/obj/item/clothing/suit/space/void/medical/alt/New()
+	..()
+	slowdown_per_slot[slot_wear_suit] = 0
 
 /obj/item/clothing/suit/space/void/medical/alt/prepared
 	helmet = /obj/item/clothing/head/helmet/space/void/medical/alt
 	boots = /obj/item/clothing/shoes/magboots
-	item_flags = ITEM_FLAG_THICKMATERIAL | ITEM_FLAG_INVALID_FOR_CHAMELEON
 
 //Security
 /obj/item/clothing/head/helmet/space/void/security/alt
-	name = "riot security voidsuit helmet"
+//INF	name = "riot security voidsuit helmet"
 	desc = "A somewhat tacky voidsuit helmet, a fact mitigated by heavy armor plating."
+//[INF]
+	sprite_sheets = list(
+		SPECIES_TAJARA = 'icons/mob/species/tajaran/helmet.dmi',
+		SPECIES_EROSAN = 'infinity/icons/mob/species/erosan/helmet.dmi',
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_head_resomi.dmi',
+		SPECIES_UNATHI = 'infinity/icons/mob/species/unathi/onmob_head_unathi.dmi',
+		SPECIES_SKRELL = 'icons/mob/species/skrell/onmob_head_skrell.dmi',
+		)
+//[/INF]
 	icon_state = "rig0-secalt"
 	item_state = "secalt_helm"
 	light_overlay = "helmet_light_alt"
 	armor = list(
-		melee = ARMOR_MELEE_VERY_HIGH,
-		bullet = ARMOR_BALLISTIC_SMALL,
+		melee = ARMOR_MELEE_RESISTANT,
+		bullet = ARMOR_BALLISTIC_PISTOL, //INF WAS ARMOR_BALLISTIC_SMALL
 		laser = ARMOR_LASER_SMALL,
 		bomb = ARMOR_BOMB_PADDED,
 		bio = ARMOR_BIO_SHIELDED,
 		rad = ARMOR_RAD_MINOR)
 
 /obj/item/clothing/suit/space/void/security/alt
-	name = "riot security voidsuit"
+//INF	name = "riot security voidsuit"
 	icon_state = "rig-secalt"
 	desc = "A heavily armored voidsuit, designed to intimidate people who find black intimidating. Surprisingly slimming."
+//[INF]
+	sprite_sheets = list(
+		SPECIES_TAJARA = 'icons/mob/species/tajaran/suit.dmi',
+		SPECIES_EROSAN = 'infinity/icons/mob/species/erosan/suit.dmi',
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_suit_resomi.dmi',
+		SPECIES_UNATHI = 'infinity/icons/mob/species/unathi/onmob_suit_unathi.dmi',
+		SPECIES_SKRELL = 'icons/mob/species/skrell/onmob_suit_skrell.dmi',
+		)
+//[/INF]
 	armor = list(
-		melee = ARMOR_MELEE_VERY_HIGH,
-		bullet = ARMOR_BALLISTIC_SMALL,
+		melee = ARMOR_MELEE_RESISTANT,
+		bullet = ARMOR_BALLISTIC_PISTOL, //INF WAS ARMOR_BALLISTIC_SMALL
 		laser = ARMOR_LASER_SMALL,
 		bomb = ARMOR_BOMB_PADDED,
 		bio = ARMOR_BIO_SHIELDED,
@@ -346,12 +380,20 @@
 /obj/item/clothing/suit/space/void/security/alt/prepared
 	helmet = /obj/item/clothing/head/helmet/space/void/security/alt
 	boots = /obj/item/clothing/shoes/magboots
-	item_flags = ITEM_FLAG_THICKMATERIAL | ITEM_FLAG_INVALID_FOR_CHAMELEON
 
 //Atmospherics
 /obj/item/clothing/head/helmet/space/void/atmos/alt
 	name = "heavy duty atmospherics voidsuit helmet"
 	desc = "A voidsuit helmet plated with an expensive heat and radiation resistant ceramic."
+//[INF]
+	sprite_sheets = list(
+		SPECIES_TAJARA = 'icons/mob/species/tajaran/helmet.dmi',
+		SPECIES_EROSAN = 'infinity/icons/mob/species/erosan/helmet.dmi',
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_head_resomi.dmi',
+		SPECIES_UNATHI = 'infinity/icons/mob/species/unathi/onmob_head_unathi.dmi',
+		SPECIES_SKRELL = 'icons/mob/species/skrell/onmob_head_skrell.dmi',
+		)
+//[/INF]
 	icon_state = "rig0-atmosalt"
 	item_state = "atmosalt_helm"
 	light_overlay = "hardhat_light"
@@ -359,12 +401,20 @@
 /obj/item/clothing/suit/space/void/atmos/alt
 	name = "heavy duty atmos voidsuit"
 	desc = "An expensive voidsuit, rated to withstand extreme heat and even minor radiation without exceeding room temperature within."
+	//[INF]
+	sprite_sheets = list(
+		SPECIES_TAJARA = 'icons/mob/species/tajaran/suit.dmi',
+		SPECIES_EROSAN = 'infinity/icons/mob/species/erosan/suit.dmi',
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_suit_resomi.dmi',
+		SPECIES_UNATHI = 'infinity/icons/mob/species/unathi/onmob_suit_unathi.dmi',
+		SPECIES_SKRELL = 'icons/mob/species/skrell/onmob_suit_skrell.dmi',
+		)
+//[/INF]
 	icon_state = "rig-atmosalt"
 
 /obj/item/clothing/suit/space/void/atmos/alt/prepared
 	helmet = /obj/item/clothing/head/helmet/space/void/atmos/alt
 	boots = /obj/item/clothing/shoes/magboots
-	item_flags = ITEM_FLAG_THICKMATERIAL | ITEM_FLAG_INVALID_FOR_CHAMELEON
 
 //Misc
 /obj/item/clothing/head/helmet/space/void/engineering/salvage
@@ -426,14 +476,27 @@
 /obj/item/clothing/suit/space/void/engineering/salvage/prepared
 	helmet = /obj/item/clothing/head/helmet/space/void/engineering/salvage
 	boots = /obj/item/clothing/shoes/magboots
-	item_flags = ITEM_FLAG_THICKMATERIAL | ITEM_FLAG_INVALID_FOR_CHAMELEON
 
 //Pilot
 /obj/item/clothing/head/helmet/space/void/pilot
-	desc = "An atmos resistant helmet for space and planet exploration."
+	desc = "A pilot atmos resistant helmet for space and planet exploration."
 	name = "pilot voidsuit helmet"
-	icon_state = "rig0_pilot"
+	icon = 'infinity/icons/obj/clothing/obj_head.dmi'
+	item_icons = list(slot_head_str = 'infinity/icons/mob/onmob/onmob_head.dmi')
+	icon_state = "pilot_helm"
 	item_state = "pilot_helm"
+	sprite_sheets = list(
+		SPECIES_UNATHI = 'infinity/icons/mob/species/unathi/onmob_head_unathi.dmi',//INF
+		SPECIES_SKRELL = 'infinity/icons/mob/species/skrell/onmob_head_skrell.dmi',//INF
+		SPECIES_TAJARA = 'infinity/icons/mob/species/tajaran/onmob_head_tajaran.dmi',//INF
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_head_resomi.dmi'//INF
+		)
+	sprite_sheets_obj = list(
+		SPECIES_UNATHI = 'infinity/icons/obj/clothing/species/unathi/obj_head_unathi.dmi',//INF
+		SPECIES_SKRELL = 'infinity/icons/obj/clothing/species/skrell/obj_head_skrell.dmi',//INF
+		SPECIES_TAJARA = 'infinity/icons/obj/clothing/species/tajaran/obj_head_tajaran.dmi',//INF
+		SPECIES_RESOMI = 'infinity/icons/obj/clothing/species/resomi/obj_head_resomi.dmi'//INF
+		)
 	armor = list(
 		melee = ARMOR_MELEE_KNIVES,
 		bullet = ARMOR_BALLISTIC_MINOR,
@@ -442,11 +505,27 @@
 		rad = ARMOR_RAD_SMALL
 		)
 	light_overlay = "helmet_light_dual"
+	tint = TINT_NONE //inf
 
 /obj/item/clothing/suit/space/void/pilot
-	desc = "An atmos resistant voidsuit for space and planet exploration."
-	icon_state = "rig-pilot"
+	desc = "A pilot atmos resistant voidsuit for space and planet exploration."
+	icon_state = "void_pilot"
+	item_state = "void_pilot"
 	name = "pilot voidsuit"
+	icon = 'infinity/icons/obj/clothing/obj_suit.dmi'
+	item_icons = list(slot_wear_suit_str = 'infinity/icons/mob/onmob/onmob_suit.dmi')
+	sprite_sheets = list(
+		SPECIES_UNATHI = 'infinity/icons/mob/species/unathi/onmob_suit_unathi.dmi',//INF
+		SPECIES_SKRELL = 'infinity/icons/mob/species/skrell/onmob_suit_skrell.dmi',//INF
+		SPECIES_TAJARA = 'infinity/icons/mob/species/tajaran/onmob_suit_tajaran.dmi',//INF
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_suit_resomi.dmi'//INF
+		)
+	sprite_sheets_obj = list(
+		SPECIES_UNATHI = 'infinity/icons/obj/clothing/species/unathi/obj_suit_unathi.dmi',//INF
+		SPECIES_SKRELL = 'infinity/icons/obj/clothing/species/skrell/obj_suit_skrell.dmi',//INF
+		SPECIES_TAJARA = 'infinity/icons/obj/clothing/species/tajaran/obj_suit_tajaran.dmi',//INF
+		SPECIES_RESOMI = 'infinity/icons/obj/clothing/species/resomi/obj_suit_resomi.dmi'//INF
+		)
 	armor = list(
 		melee = ARMOR_MELEE_KNIVES,
 		bullet = ARMOR_BALLISTIC_MINOR,
@@ -455,21 +534,17 @@
 		rad = ARMOR_RAD_SMALL
 		)
 	allowed = list(/obj/item/device/flashlight,/obj/item/tank,/obj/item/device/suit_cooling_unit,/obj/item/storage/toolbox,/obj/item/storage/briefcase/inflatable,/obj/item/device/t_scanner,/obj/item/rcd,/obj/item/rpd)
+	tint = 1 //INF, WAS NOTHING (0)
 
 /obj/item/clothing/suit/space/void/pilot/prepared
 	helmet = /obj/item/clothing/head/helmet/space/void/pilot
 	boots = /obj/item/clothing/shoes/magboots
-	item_flags = ITEM_FLAG_THICKMATERIAL | ITEM_FLAG_INVALID_FOR_CHAMELEON
 
-/obj/item/clothing/suit/space/void/pilot/Initialize()
-	. = ..()
-	slowdown_per_slot[slot_wear_suit] = 0.75
-
-//Retro
-/obj/item/clothing/suit/space/void/retro
-	name = "retro voidsuit"
-	desc = "A voidsuit designed to replicate older designs with newer technology."
-	icon_state = "rig-retro"
+//Ceti
+/obj/item/clothing/suit/space/void/ceti
+	name = "CTI Voidsuit"
+	desc = "A xenoarcheology voidsuit designed for CTI researchers, by CTI researchers. Tools not included."
+	icon_state = "rig-ceti"
 	armor = list(
 		melee = ARMOR_MELEE_RESISTANT,
 		energy = ARMOR_ENERGY_RESISTANT,
@@ -477,13 +552,13 @@
 		bio = ARMOR_BIO_SHIELDED,
 		rad = ARMOR_RAD_SHIELDED
 	)
-	allowed = list(/obj/item/gun,/obj/item/device/flashlight,/obj/item/tank,/obj/item/device/suit_cooling_unit)
+	allowed = list(/obj/item/device/flashlight,/obj/item/tank,/obj/item/device/suit_cooling_unit,/obj/item/stack/flag,/obj/item/storage/excavation,/obj/item/pickaxe,/obj/item/device/scanner/health,/obj/item/device/measuring_tape,/obj/item/device/ano_scanner,/obj/item/device/depth_scanner,/obj/item/device/core_sampler,/obj/item/device/gps,/obj/item/pinpointer/radio,/obj/item/device/radio/beacon,/obj/item/pickaxe/xeno,/obj/item/storage/bag/fossils)
 
-/obj/item/clothing/head/helmet/space/void/retro
-	name = "retro voidsuit helmet"
-	desc = "A voidsuit helmet designed to replicate older designs with newer technology."
-	icon_state = "rig0-retro"
-	item_state = "helm-retro"
+/obj/item/clothing/head/helmet/space/void/ceti
+	name = "CTI voidsuit helmet"
+	desc = "A specially made voidsuit helmet designed for use by CTI affiliated researchers."
+	icon_state = "rig0-ceti"
+	item_state = "helm-ceti"
 	armor = list(
 		melee = ARMOR_MELEE_RESISTANT,
 		energy = ARMOR_ENERGY_RESISTANT,
@@ -491,9 +566,8 @@
 		bio = ARMOR_BIO_SHIELDED,
 		rad = ARMOR_RAD_SHIELDED
 	)
-	light_overlay = "helmet_light_alt"
+	light_overlay = "helmet_light"
 
-/obj/item/clothing/suit/space/void/retro/prepared
-	helmet = /obj/item/clothing/head/helmet/space/void/retro
+/obj/item/clothing/suit/space/void/ceti/prepared
+	helmet = /obj/item/clothing/head/helmet/space/void/ceti
 	boots = /obj/item/clothing/shoes/magboots
-	item_flags = ITEM_FLAG_THICKMATERIAL | ITEM_FLAG_INVALID_FOR_CHAMELEON

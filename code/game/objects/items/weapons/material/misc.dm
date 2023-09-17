@@ -11,8 +11,6 @@
 	thrown_force_multiplier = 1.8
 	attack_verb = list("jabbed","stabbed","ripped")
 	does_spin = FALSE
-	w_class = 5
-	throw_speed = 6
 	var/spent
 	worth_multiplier = 15
 
@@ -28,12 +26,12 @@
 		return
 	audible_message(SPAN_WARNING("\The [src] emits a long, harsh tone!"))
 	playsound(loc, 'sound/weapons/bombwhine.ogg', 100, 0, -3)
-	addtimer(new Callback(src, .proc/harpoon_detonate), 4 SECONDS) //for suspense
+	addtimer(CALLBACK(src, .proc/harpoon_detonate), 4 SECONDS) //for suspense
 
 /obj/item/material/harpoon/bomb/proc/harpoon_detonate()
 	audible_message(SPAN_DANGER("\The [src] detonates!")) //an actual sound will be handled by explosion()
 	var/turf/T = get_turf(src)
-	explosion(T, 2, EX_ACT_LIGHT, 1, UP|DOWN, 1)
+	explosion(T, 0, 0, 2, 0, 1, UP|DOWN, 1)
 	fragmentate(T, 4, 2)
 	handle_afterbomb()
 
@@ -77,6 +75,7 @@
 	default_material = MATERIAL_TITANIUM
 	base_parry_chance = 50
 	attack_cooldown_modifier = 1
+	hitsound = 'sound/weapons/bladeslice.ogg' //inf
 	max_force = 20
 	force_multiplier = 0.2
 

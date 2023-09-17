@@ -1,6 +1,6 @@
 /obj/item/gun/projectile/revolver
 	name = "revolver"
-	desc = "The al-Maliki & Mosley Magnum Double Action is a choice revolver for when you absolutely, positively need to put a hole in the other guy. You feelin' lucky punk?"
+	desc = "The al-Maliki & Mosley Magnum Double Action is a choice revolver for when you absolutely, positively need to put a hole in the other guy."
 	icon = 'icons/obj/guns/revolvers.dmi'
 	icon_state = "revolver"
 	item_state = "revolver"
@@ -13,16 +13,18 @@
 	var/chamber_offset = 0 //how many empty chambers in the cylinder until you hit a round
 	mag_insert_sound = 'sound/weapons/guns/interaction/rev_magin.ogg'
 	mag_remove_sound = 'sound/weapons/guns/interaction/rev_magout.ogg'
-	accuracy = 2
+
+	accuracy = -1 //inf, was 2
 	accuracy_power = 8
+	bulk = GUN_BULK_SMG
 	one_hand_penalty = 2
-	bulk = 3
+
+	is_serial = 1
+	s_gun = "M&M-DA"
 
 /obj/item/gun/projectile/revolver/AltClick()
 	if(CanPhysicallyInteract(usr))
 		spin_cylinder()
-		return TRUE
-	return ..()
 
 /obj/item/gun/projectile/revolver/verb/spin_cylinder()
 	set name = "Spin cylinder"
@@ -30,12 +32,12 @@
 	set category = "Object"
 
 	chamber_offset = 0
-	visible_message(SPAN_WARNING("\The [usr] spins the cylinder of \the [src]!"), \
-	SPAN_NOTICE("You hear something metallic spin and click."))
+	visible_message("<span class='warning'>\The [usr] spins the cylinder of \the [src]!</span>", \
+	"<span class='notice'>You hear something metallic spin and click.</span>")
 	playsound(src.loc, 'sound/weapons/revolver_spin.ogg', 100, 1)
 	loaded = shuffle(loaded)
-	if(rand(1,max_shells) > length(loaded))
-		chamber_offset = rand(0,max_shells - length(loaded))
+	if(rand(1,max_shells) > loaded.len)
+		chamber_offset = rand(0,max_shells - loaded.len)
 
 /obj/item/gun/projectile/revolver/consume_next_projectile()
 	if(chamber_offset)
@@ -43,7 +45,7 @@
 		return
 	return ..()
 
-/obj/item/gun/projectile/revolver/load_ammo(obj/item/A, mob/user)
+/obj/item/gun/projectile/revolver/load_ammo(var/obj/item/A, mob/user)
 	chamber_offset = 0
 	return ..()
 
@@ -54,22 +56,30 @@
 	caliber = CALIBER_PISTOL
 	ammo_type = /obj/item/ammo_casing/pistol
 	desc = "The Lumoco Arms' Solid is a rugged revolver for people who don't keep their guns well-maintained."
-	accuracy = 1
-	bulk = 0
 	fire_delay = 9
+
+	accuracy = 1
+	bulk = GUN_BULK_REVOLVER //inf
+
+	is_serial = 1
+	s_gun = "LA-S"
 
 /obj/item/gun/projectile/revolver/holdout
 	name = "holdout revolver"
 	desc = "The al-Maliki & Mosley Partner is a concealed-carry revolver made for people who do not trust automatic pistols any more than the people they're dealing with."
 	icon_state = "holdout"
-	item_state = "pistol"
+	item_state = "pen"
 	caliber = CALIBER_PISTOL_SMALL
 	ammo_type = /obj/item/ammo_casing/pistol/small
-	w_class = ITEM_SIZE_SMALL
-	accuracy = 1
-	one_hand_penalty = 0
-	bulk = 0
 	fire_delay = 7
+
+	accuracy = 1
+	bulk = GUN_BULK_PISTOL
+	w_class = ITEM_SIZE_SMALL
+	one_hand_penalty = 0
+
+	is_serial = 1
+	s_gun = "AM-P"
 
 /obj/item/gun/projectile/revolver/capgun
 	name = "cap gun"
@@ -78,40 +88,17 @@
 	caliber = CALIBER_CAPS
 	origin_tech = list(TECH_COMBAT = 1, TECH_MATERIAL = 1)
 	ammo_type = /obj/item/ammo_casing/cap
-	var/snipped = FALSE
 
+	bulk = 0
 
-/obj/item/gun/projectile/revolver/capgun/on_update_icon()
-	if (snipped)
-		icon_state = "revolver"
-	else
-		icon_state = "revolver-toy"
-	..()
+	is_serial = 1
+	s_gun = "FUN"
 
-
-/obj/item/gun/projectile/revolver/capgun/proc/set_snipped(new_snipped = TRUE)
-	snipped = new_snipped
-	if (new_snipped)
-		SetName("revolver")
-		desc += " Someone snipped off the barrel's toy mark. How dastardly, this could get someone shot."
-	else
-		SetName(initial(name))
-		desc = initial(desc)
-	update_icon()
-
-
-/obj/item/gun/projectile/revolver/capgun/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Wirecutters - Remove toy marking
-	if (isWirecutter(tool))
-		if (snipped)
-			USE_FEEDBACK_FAILURE("\The [src] has already had it's barrel snipped.")
-			return TRUE
-		user.visible_message(
-			SPAN_NOTICE("\The [user] snips \a [src]'s toy markings with \a [tool]."),
-			SPAN_NOTICE("You snip \the [src]'s toy markings with \the [tool]."),
-			range = 3
-		)
-		set_snipped()
-		return TRUE
-
-	return ..()
+/obj/item/gun/projectile/revolver/capgun/attackby(obj/item/wirecutters/W, mob/user)
+	if(!istype(W) || icon_state == "revolver")
+		return ..()
+	to_chat(user, "<span class='notice'>You snip off the toy markings off the [src].</span>")
+	name = "revolver"
+	icon_state = "revolver"
+	desc += " Someone snipped off the barrel's toy mark. How dastardly."
+	return 1

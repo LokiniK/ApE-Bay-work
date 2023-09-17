@@ -4,17 +4,13 @@ SUBSYSTEM_DEF(mobs)
 	flags = SS_NO_INIT | SS_KEEP_TIMING
 	runlevels = RUNLEVEL_GAME | RUNLEVEL_POSTGAME
 	wait = 2 SECONDS
-	var/static/list/mob/mob_list = list()
-	var/static/list/mob/queue = list()
+	var/static/tmp/list/mob_list = list()
+	var/static/tmp/list/queue = list()
+	var/static/tmp/run_empty_levels
 
 
-/datum/controller/subsystem/mobs/UpdateStat(time)
-	if (PreventUpdateStat(time))
-		return ..()
-	..({"\
-		Mobs: [length(mob_list)] \
-		Run Empty Levels: [config.run_empty_levels ? "Y" : "N"]\
-	"})
+/datum/controller/subsystem/mobs/stat_entry(msg)
+	..("[msg] | Active Mobs: [mob_list.len] | Run Empty Levels: [run_empty_levels ? "Y" : "N"]")
 
 
 /datum/controller/subsystem/mobs/Recover()
@@ -24,20 +20,19 @@ SUBSYSTEM_DEF(mobs)
 /datum/controller/subsystem/mobs/fire(resume, no_mc_tick)
 	if (!resume)
 		queue = mob_list.Copy()
-	var/cut_until = 1
-	for (var/mob/mob as anything in queue)
-		++cut_until
+	var/mob/mob
+	for (var/i = queue.len to 1 step -1)
+		mob = queue[i]
 		if (QDELETED(mob))
 			continue
-		if (!config.run_empty_levels && !SSpresence.population(get_z(mob)))
+		if (!run_empty_levels && !SSpresence.population(mob.z))
 			continue
 		mob.Life()
 		if (no_mc_tick)
 			CHECK_TICK
 		else if (MC_TICK_CHECK)
-			queue.Cut(1, cut_until)
+			queue.Cut(i)
 			return
-	queue.Cut()
 
 
 #define START_PROCESSING_MOB(MOB) \
@@ -56,7 +51,6 @@ else {\
 if(MOB.is_processing == SSmobs) {\
 	MOB.is_processing = null;\
 	SSmobs.mob_list -= MOB;\
-	SSmobs.queue -= MOB;\
 }\
 else if (MOB.is_processing) {\
 	crash_with("Failed to stop processing mob. Being processed by [MOB.is_processing] instead.")\

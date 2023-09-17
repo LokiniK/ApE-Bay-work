@@ -1,13 +1,12 @@
 
 //Hijacking this file for BS12 playernotes functions. ~ Chinsky.
 
-/proc/notes_add(key, note, mob/user)
+/proc/notes_add(var/key, var/note, var/mob/user)
 	if (!key || !note)
 		return
 
 	//Loading list of notes for this key
-	var/target = ckey(key)
-	var/savefile/info = new("data/player_saves/[copytext_char(target, 1, 2)]/[target]/info.sav")
+	var/savefile/info = new("data/player_saves/[copytext(key, 1, 2)]/[key]/info.sav")
 	var/list/infos
 	from_save(info, infos)
 	if(!infos) infos = list()
@@ -28,7 +27,6 @@
 	var/day_loc = findtext(full_date, time2text(world.timeofday, "DD"))
 
 	var/datum/player_info/P = new
-	P.game_id = game_id
 	if (ismob(user))
 		P.author = user.key
 		P.rank = user.client.holder.rank
@@ -44,8 +42,8 @@
 	infos += P
 	to_save(info, infos)
 
-	message_staff(SPAN_NOTICE("[P.author] has edited [target]'s notes."))
-	log_admin("[P.author] has edited [target]'s notes.")
+	message_staff("<span class='notice'>[P.author] has edited [key]'s notes.</span>")
+	log_admin("[P.author] has edited [key]'s notes.")
 
 	del(info) // savefile, so NOT qdel
 
@@ -54,37 +52,35 @@
 	var/list/note_keys
 	from_save(note_list, note_keys)
 	if(!note_keys) note_keys = list()
-	if(!note_keys.Find(target)) note_keys += target
+	if(!list_find(note_keys, key)) note_keys += key
 	to_save(note_list, note_keys)
 	del(note_list) // savefile, so NOT qdel
 
 
-/proc/notes_del(key, index)
-	var/target = ckey(key)
-	var/savefile/info = new("data/player_saves/[copytext_char(target, 1, 2)]/[target]/info.sav")
+/proc/notes_del(var/key, var/index)
+	var/savefile/info = new("data/player_saves/[copytext(key, 1, 2)]/[key]/info.sav")
 	var/list/infos
 	from_save(info, infos)
-	if(!infos || length(infos) < index) return
+	if(!infos || infos.len < index) return
 
 	var/datum/player_info/item = infos[index]
 	infos.Remove(item)
 	to_save(info, infos)
 
-	message_staff(SPAN_NOTICE("[key_name_admin(usr)] deleted one of [target]'s notes."))
-	log_admin("[key_name(usr)] deleted one of [target]'s notes.")
+	message_staff("<span class='notice'>[key_name_admin(usr)] deleted one of [key]'s notes.</span>")
+	log_admin("[key_name(usr)] deleted one of [key]'s notes.")
 
 	del(info) // savefile, so NOT qdel
 
-/proc/show_player_info_irc(key as text)
+/proc/show_player_info_irc(var/key as text)
 	var/dat = "          Info on [key]\n"
-	var/target = ckey(key)
-	var/savefile/info = new("data/player_saves/[copytext_char(target, 1, 2)]/[target]/info.sav")
+	var/savefile/info = new("data/player_saves/[copytext(key, 1, 2)]/[key]/info.sav")
 	var/list/infos
 	from_save(info, infos)
 	if(!infos)
 		dat = "No information found on the given key."
 	else
 		for(var/datum/player_info/I in infos)
-			dat += "[I.content]\nby [I.author] ([I.rank]) on [I.timestamp] ([I.game_id])\n\n"
+			dat += "[I.content]\nby [I.author] ([I.rank]) on [I.timestamp]\n\n"
 
-	return list2params(list("notes" = dat))
+	return list2params(list(dat))

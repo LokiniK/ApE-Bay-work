@@ -1,8 +1,8 @@
-/singleton/webhook/custom_event
+/decl/webhook/custom_event
 	id = WEBHOOK_CUSTOM_EVENT
 
 // Data expects a "text" field containing the new custom event text.
-/singleton/webhook/custom_event/get_message(list/data)
+/decl/webhook/custom_event/get_message(var/list/data)
 	. = ..()
 	.["embeds"] = list(list(
 		"title" = "An event is beginning.",

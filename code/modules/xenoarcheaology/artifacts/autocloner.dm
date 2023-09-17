@@ -1,7 +1,7 @@
 /obj/machinery/auto_cloner
 	name = "mysterious pod"
 	desc = "It's full of a viscous liquid, but appears dark and silent."
-	icon = 'icons/obj/machines/medical/cryogenics.dmi'
+	icon = 'icons/obj/cryogenics.dmi'
 	icon_state = "cellold0"
 	var/spawn_type
 	var/time_spent_spawning = 0
@@ -26,15 +26,15 @@
 		/mob/living/simple_animal/hostile/creature)
 	else
 		spawn_type = pick(\
-		/mob/living/simple_animal/passive/cat,
-		/mob/living/simple_animal/passive/corgi,
-		/mob/living/simple_animal/passive/corgi/puppy,
-		/mob/living/simple_animal/passive/chicken,
-		/mob/living/simple_animal/passive/cow,
+		/mob/living/simple_animal/friendly/cat,
+		/mob/living/simple_animal/friendly/corgi,
+		/mob/living/simple_animal/friendly/corgi/puppy,
+		/mob/living/simple_animal/friendly/chicken,
+		/mob/living/simple_animal/friendly/cow,
 		/mob/living/simple_animal/hostile/retaliate/parrot,
 		/mob/living/simple_animal/slime,
-		/mob/living/simple_animal/passive/crab,
-		/mob/living/simple_animal/passive/mouse,
+		/mob/living/simple_animal/crab,
+		/mob/living/simple_animal/friendly/mouse,
 		/mob/living/simple_animal/hostile/retaliate/goat,
 		/mob/living/simple_animal/hostile/retaliate/goose)
 
@@ -44,17 +44,17 @@
 		if(!previous_power_state)
 			previous_power_state = 1
 			icon_state = "cellold1"
-			src.visible_message(SPAN_NOTICE("[icon2html(src, viewers(get_turf(src)))] [src] suddenly comes to life!"))
+			src.visible_message("<span class='notice'>[icon2html(src, viewers(get_turf(src)))] [src] suddenly comes to life!</span>")
 
 		//slowly grow a mob
 		if(prob(5))
-			src.visible_message(SPAN_NOTICE("[icon2html(src, viewers(get_turf(src)))] [src] [pick("gloops","glugs","whirrs","whooshes","hisses","purrs","hums","gushes")]."))
+			src.visible_message("<span class='notice'>[icon2html(src, viewers(get_turf(src)))] [src] [pick("gloops","glugs","whirrs","whooshes","hisses","purrs","hums","gushes")].</span>")
 
 		//if we've finished growing...
 		if(time_spent_spawning >= time_per_spawn)
 			time_spent_spawning = 0
 			update_use_power(POWER_USE_IDLE)
-			src.visible_message(SPAN_NOTICE("[icon2html(src, viewers(get_turf(src)))] [src] pings!"))
+			src.visible_message("<span class='notice'>[icon2html(src, viewers(get_turf(src)))] [src] pings!</span>")
 			icon_state = "cellold1"
 			desc = "It's full of a bubbling viscous liquid, and is lit by a mysterious glow."
 			if(spawn_type)
@@ -75,7 +75,7 @@
 		if(previous_power_state)
 			previous_power_state = 0
 			icon_state = "cellold0"
-			src.visible_message(SPAN_NOTICE("[icon2html(src, viewers(get_turf(src)))] [src] suddenly shuts down."))
+			src.visible_message("<span class='notice'>[icon2html(src, viewers(get_turf(src)))] [src] suddenly shuts down.</span>")
 
 		//cloned mob slowly breaks down
 		time_spent_spawning = max(time_spent_spawning + last_process - world.time, 0)

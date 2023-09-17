@@ -22,7 +22,7 @@
 /turf/simulated/floor/tiled/steel_ridged,
 /area/template_noop)
 "af" = (
-/obj/machinery/anomaly_container,
+/obj/structure/anomaly_container,
 /obj/effect/landmark/clear,
 /turf/template_noop,
 /area/template_noop)
@@ -196,8 +196,15 @@
 /obj/effect/decal/cleanable/mucus,
 /turf/simulated/floor/tiled/white,
 /area/template_noop)
+"aO" = (
+/obj/machinery/door/airlock/vault{
+	name = "Door";
+	welded = null
+	},
+/turf/simulated/floor/tiled/steel_ridged,
+/area/template_noop)
 "aP" = (
-/obj/machinery/door/airlock/external,
+/obj/machinery/door/airlock/external/bolted,
 /turf/simulated/floor/tiled/steel_ridged,
 /area/template_noop)
 "aQ" = (
@@ -379,7 +386,7 @@ aa
 ab
 ah
 aF
-aT
+aO
 aN
 aA
 ab

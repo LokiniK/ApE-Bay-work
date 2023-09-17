@@ -5,7 +5,7 @@
 // So this cannot be abused for other uses, we make it two-handed and inable to have its storage looked into.
 /obj/item/storage/laundry_basket
 	name = "laundry basket"
-	icon = 'icons/obj/janitor_tools.dmi'
+	icon = 'icons/obj/janitor.dmi'
 	icon_state = "laundry-empty"
 	item_state = "laundry"
 	desc = "The peak of thousands of years of laundry evolution."
@@ -28,17 +28,17 @@
 		if (user.hand)
 			temp = H.get_organ(BP_L_HAND)
 		if(!temp)
-			to_chat(user, SPAN_WARNING("You need two hands to pick this up!"))
+			to_chat(user, "<span class='warning'>You need two hands to pick this up!</span>")
 			return
 
 	if(user.get_inactive_hand())
-		to_chat(user, SPAN_WARNING("You need your other hand to be empty"))
+		to_chat(user, "<span class='warning'>You need your other hand to be empty</span>")
 		return
 	return ..()
 
 /obj/item/storage/laundry_basket/attack_self(mob/user as mob)
 	var/turf/T = get_turf(user)
-	to_chat(user, SPAN_NOTICE("You dump the [src]'s contents onto \the [T]."))
+	to_chat(user, "<span class='notice'>You dump the [src]'s contents onto \the [T].</span>")
 	return ..()
 
 /obj/item/storage/laundry_basket/pickup(mob/user)
@@ -51,7 +51,7 @@
 	return
 
 /obj/item/storage/laundry_basket/on_update_icon()
-	if(length(contents))
+	if(contents.len)
 		icon_state = "laundry-full"
 	else
 		icon_state = "laundry-empty"
@@ -85,3 +85,4 @@
 	..()
 	user.drop_from_inventory(linked)
 	return
+

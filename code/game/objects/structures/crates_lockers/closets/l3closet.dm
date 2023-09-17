@@ -1,27 +1,27 @@
 /obj/structure/closet/l3closet
 	name = "level-3 biohazard suit closet"
 	desc = "It's a storage unit for level-3 biohazard gear."
-	closet_appearance = /singleton/closet_appearance/bio
+	icon_state = "bio"
 
 /obj/structure/closet/l3closet/general/WillContain()
 	return list(
 		/obj/item/clothing/suit/bio_suit/general,
 		/obj/item/clothing/head/bio_hood/general,
 		/obj/item/clothing/mask/gas/half,
-		/obj/item/tank/oxygen_emergency_extended,
+		/obj/item/tank/emergency/oxygen/engi,
 	)
 
 /obj/structure/closet/l3closet/general/multi/WillContain()
 	return MERGE_ASSOCS_WITH_NUM_VALUES(..(), list(
-		/obj/item/clothing/head/bio_hood/general = 5,
-		/obj/item/clothing/mask/gas/half = 5,
-		/obj/item/clothing/suit/bio_suit/general = 5,
-		/obj/item/tank/oxygen_emergency_extended = 5
+		/obj/item/clothing/head/bio_hood/general = 3, //inf was 5,
+		/obj/item/clothing/mask/gas/half = 3, //inf was 5,
+		/obj/item/clothing/suit/bio_suit/general = 3, //inf was 5,
+		/obj/item/tank/emergency/oxygen/engi = 3, //inf was 5,
 	))
 
 
 /obj/structure/closet/l3closet/virology
-	closet_appearance = /singleton/closet_appearance/bio/virology
+	icon_state = "bio_viro"
 
 /obj/structure/closet/l3closet/virology/WillContain()
 	return list(
@@ -32,29 +32,29 @@
 	)
 
 /obj/structure/closet/l3closet/security
-	closet_appearance = /singleton/closet_appearance/bio/security
+	icon_state = "bio_sec"
 
 /obj/structure/closet/l3closet/security/WillContain()
 	return list(
 		/obj/item/clothing/suit/bio_suit/security,
 		/obj/item/clothing/head/bio_hood/security,
 		/obj/item/clothing/mask/gas/half,
-		/obj/item/tank/oxygen_emergency_extended
+		/obj/item/tank/emergency/oxygen/engi
 	)
 
 /obj/structure/closet/l3closet/janitor
-	closet_appearance = /singleton/closet_appearance/bio/janitor
+	icon_state = "bio_jan"
 
 /obj/structure/closet/l3closet/janitor/WillContain()
 	return list(
 		/obj/item/clothing/suit/bio_suit/janitor,
 		/obj/item/clothing/head/bio_hood/janitor,
 		/obj/item/clothing/mask/gas/half,
-		/obj/item/tank/oxygen_emergency_extended
+		/obj/item/tank/emergency/oxygen/engi
 	)
 
 /obj/structure/closet/l3closet/scientist
-	closet_appearance = /singleton/closet_appearance/bio/science
+	icon_state = "bio_scientist"
 
 
 /obj/structure/closet/l3closet/scientist/WillContain()
@@ -62,7 +62,7 @@
 		/obj/item/clothing/suit/bio_suit/scientist,
 		/obj/item/clothing/head/bio_hood/scientist,
 		/obj/item/clothing/mask/gas,
-		/obj/item/tank/oxygen_emergency_double,
+		/obj/item/tank/emergency/oxygen/double,
 	)
 
 /obj/structure/closet/l3closet/scientist/multi/WillContain()
@@ -70,11 +70,11 @@
 		/obj/item/clothing/head/bio_hood/scientist = 5,
 		/obj/item/clothing/suit/bio_suit/scientist = 5,
 		/obj/item/clothing/mask/gas = 5,
-		/obj/item/tank/oxygen_emergency_double = 5,
+		/obj/item/tank/emergency/oxygen/double = 5,
 	))
 
 /obj/structure/closet/l3closet/command
-	closet_appearance = /singleton/closet_appearance/bio/command
+	icon_state = "bio_sec"
 
 
 /obj/structure/closet/l3closet/command/WillContain()
@@ -82,5 +82,5 @@
 		/obj/item/clothing/suit/bio_suit/cmo,
 		/obj/item/clothing/head/bio_hood/cmo,
 		/obj/item/clothing/mask/gas/half,
-		/obj/item/tank/oxygen_emergency_extended
+		/obj/item/tank/emergency/oxygen/engi
 	)

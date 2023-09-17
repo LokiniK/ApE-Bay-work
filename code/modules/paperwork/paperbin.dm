@@ -14,7 +14,7 @@
 
 
 /obj/item/paper_bin/MouseDrop(mob/user as mob)
-	if((user == usr && (!( usr.restrained() ) && (!( usr.stat ) && (usr.contents.Find(src) || in_range(src, usr))))))
+	if((user == usr && (!( usr.restrained() ) && (!( usr.stat ) && (list_find(usr.contents, src) || in_range(src, usr))))))
 		if(!istype(usr, /mob/living/carbon/slime) && !istype(usr, /mob/living/simple_animal))
 			if( !usr.get_active_hand() )		//if active hand is empty
 				var/mob/living/carbon/human/H = user
@@ -23,25 +23,28 @@
 				if (H.hand)
 					temp = H.organs_by_name[BP_L_HAND]
 				if(temp && !temp.is_usable())
-					to_chat(user, SPAN_NOTICE("You try to move your [temp.name], but cannot!"))
+					to_chat(user, "<span class='notice'>You try to move your [temp.name], but cannot!</span>")
 					return
 
-				to_chat(user, SPAN_NOTICE("You pick up the [src]."))
+				to_chat(user, "<span class='notice'>You pick up the [src].</span>")
 				user.put_in_hands(src)
 
 	return
 
 /obj/item/paper_bin/attack_hand(mob/user as mob)
+	if(!istype(loc, /turf) && user.a_intent != I_GRAB)
+		..()
+		return
 	if(ishuman(user))
 		var/mob/living/carbon/human/H = user
 		var/obj/item/organ/external/temp = H.organs_by_name[BP_R_HAND]
 		if (H.hand)
 			temp = H.organs_by_name[BP_L_HAND]
 		if(temp && !temp.is_usable())
-			to_chat(user, SPAN_NOTICE("You try to move your [temp.name], but cannot!"))
+			to_chat(user, "<span class='notice'>You try to move your [temp.name], but cannot!</span>")
 			return
 	var/response = ""
-	if(!length(papers) > 0)
+	if(!papers.len > 0)
 		response = alert(user, "Do you take regular paper, or Carbon copy paper?", "Paper type request", "Regular", "Carbon-Copy", "Cancel")
 		if (response != "Regular" && response != "Carbon-Copy")
 			add_fingerprint(user)
@@ -52,8 +55,8 @@
 			update_icon()
 
 		var/obj/item/paper/P
-		if(length(papers) > 0)	//If there's any custom paper on the stack, use that instead of creating a new paper.
-			P = papers[length(papers)]
+		if(papers.len > 0)	//If there's any custom paper on the stack, use that instead of creating a new paper.
+			P = papers[papers.len]
 			papers.Remove(P)
 		else
 			if(response == "Regular")
@@ -61,9 +64,9 @@
 			else if (response == "Carbon-Copy")
 				P = new /obj/item/paper/carbon
 		user.put_in_hands(P)
-		to_chat(user, SPAN_NOTICE("You take [P] out of the [src]."))
+		to_chat(user, "<span class='notice'>You take [P] out of the [src].</span>")
 	else
-		to_chat(user, SPAN_NOTICE("[src] is empty!"))
+		to_chat(user, "<span class='notice'>[src] is empty!</span>")
 
 	add_fingerprint(user)
 	return
@@ -73,12 +76,12 @@
 	if(istype(i, /obj/item/paper))
 		if(!user.unEquip(i, src))
 			return
-		to_chat(user, SPAN_NOTICE("You put [i] in [src]."))
+		to_chat(user, "<span class='notice'>You put [i] in [src].</span>")
 		papers.Add(i)
 		update_icon()
 		amount++
 	else if(istype(i, /obj/item/paper_bundle))
-		to_chat(user, SPAN_NOTICE("You loosen \the [i] and add its papers into \the [src]."))
+		to_chat(user, "<span class='notice'>You loosen \the [i] and add its papers into \the [src].</span>")
 		var/was_there_a_photo = 0
 		for(var/obj/item/bundleitem in i) //loop through items in bundle
 			if(istype(bundleitem, /obj/item/paper)) //if item is paper, add into the bin
@@ -91,16 +94,16 @@
 				bundleitem.reset_plane_and_layer()
 		qdel(i)
 		if(was_there_a_photo)
-			to_chat(user, SPAN_NOTICE("The photo cannot go into \the [src]."))
+			to_chat(user, "<span class='notice'>The photo cannot go into \the [src].</span>")
 
 
 /obj/item/paper_bin/examine(mob/user, distance)
 	. = ..()
 	if(distance <= 1)
 		if(amount)
-			to_chat(user, SPAN_NOTICE("There " + (amount > 1 ? "are [amount] papers" : "is one paper") + " in the bin."))
+			to_chat(user, "<span class='notice'>There " + (amount > 1 ? "are [amount] papers" : "is one paper") + " in the bin.</span>")
 		else
-			to_chat(user, SPAN_NOTICE("There are no papers in the bin."))
+			to_chat(user, "<span class='notice'>There are no papers in the bin.</span>")
 
 
 /obj/item/paper_bin/on_update_icon()

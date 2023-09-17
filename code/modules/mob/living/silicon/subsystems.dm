@@ -7,15 +7,13 @@
 		/datum/nano_module/crew_manifest
 	)
 
-
-/mob/living/silicon/ai/Initialize(mapload)
+/mob/living/silicon/ai/New()
 	silicon_subsystems.Cut()
 	for(var/subtype in subtypesof(/datum/nano_module))
 		var/datum/nano_module/NM = subtype
 		if(initial(NM.available_to_ai))
 			silicon_subsystems += NM
-	. = ..()
-
+	..()
 
 /mob/living/silicon/robot/syndicate
 	silicon_subsystems = list(
@@ -33,7 +31,12 @@
 	for(var/subsystem_type in silicon_subsystems)
 		init_subsystem(subsystem_type)
 
-/mob/living/silicon/proc/init_subsystem(subsystem_type)
+	if(/datum/nano_module/alarm_monitor/all in silicon_subsystems)
+		for(var/datum/alarm_handler/AH as anything in SSalarm.handlers)
+			AH.register_alarm(src, /mob/living/silicon/proc/receive_alarm)
+			queued_alarms[AH] = list()	// Makes sure alarms remain listed in consistent order
+
+/mob/living/silicon/proc/init_subsystem(var/subsystem_type)
 	var/existing_entry = silicon_subsystems[subsystem_type]
 	if(existing_entry && !ispath(existing_entry))
 		return FALSE
@@ -44,7 +47,7 @@
 	silicon_subsystems_by_name[SSS.name] = SSS
 	return TRUE
 
-/mob/living/silicon/proc/remove_subsystem(subsystem_type)
+/mob/living/silicon/proc/remove_subsystem(var/subsystem_type)
 	var/stat_silicon_subsystem/SSS = silicon_subsystems[subsystem_type]
 	if(!istype(SSS))
 		return FALSE
@@ -54,15 +57,15 @@
 	qdel(SSS)
 	return TRUE
 
-/mob/living/silicon/proc/open_subsystem(subsystem_type, mob/given = src)
+/mob/living/silicon/proc/open_subsystem(var/subsystem_type, var/mob/given = src)
 	var/stat_silicon_subsystem/SSS = silicon_subsystems[subsystem_type]
 	if(!istype(SSS))
 		return FALSE
 	SSS.Click(given)
 	return TRUE
 
-/mob/living/silicon/verb/activate_subsystem(datum/silicon_subsystem_name in silicon_subsystems_by_name)
-	set name = "Subsystems"
+/mob/living/silicon/verb/activate_subsystem(var/datum/silicon_subsystem_name in silicon_subsystems_by_name)
+	set name = "MAIN: Subsystems"
 	set desc = "Activates the given subsystem"
 	set category = "Silicon Commands"
 
@@ -74,7 +77,7 @@
 	. = ..()
 	if(!.)
 		return
-	if(!length(silicon_subsystems))
+	if(!silicon_subsystems.len)
 		return
 	if(!statpanel("Subsystems"))
 		return
@@ -96,7 +99,7 @@
 	var/ui_state
 	var/datum/nano_module/subsystem
 
-/stat_silicon_subsystem/New(mob/living/silicon/loc, subsystem_type, ui_state)
+/stat_silicon_subsystem/New(var/mob/living/silicon/loc, var/subsystem_type, var/ui_state)
 	if(!istype(loc))
 		CRASH("Unexpected location. Expected /mob/living/silicon, was [loc.type].")
 	src.ui_state = ui_state
@@ -109,7 +112,7 @@
 	subsystem = null
 	. = ..()
 
-/stat_silicon_subsystem/Click(mob/given = usr)
+/stat_silicon_subsystem/Click(var/mob/given = usr)
 	if (istype(given))
 		subsystem.ui_interact(given, state = ui_state)
 	else

@@ -56,7 +56,7 @@
 		targets = target_filter_distance(targets)
 	else
 		targets = target_filter_closest(targets)
-	if (!length(targets)) // We found nothing.
+	if (!targets.len) // We found nothing.
 		return
 
 	var/chosen_target
@@ -141,7 +141,7 @@
 
 	if (istype(the_target, /obj/machinery/porta_turret))
 		var/obj/machinery/porta_turret/P = the_target
-		if (MACHINE_IS_BROKEN(P))
+		if (P.stat & BROKEN)
 			return FALSE // Already dead.
 		if (!(P.assess_living(holder)))
 			return FALSE // Don't shoot allied turrets.

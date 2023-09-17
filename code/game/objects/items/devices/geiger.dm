@@ -7,7 +7,6 @@
 /obj/item/device/geiger
 	name = "geiger counter"
 	desc = "A handheld device used for detecting and measuring radiation in an area."
-	icon = 'icons/obj/tools/geiger_counter.dmi'
 	icon_state = "geiger_off"
 	item_state = "multitool"
 	w_class = ITEM_SIZE_SMALL
@@ -22,7 +21,7 @@
 	. = ..()
 	sound_id = "[type]_[sequential_id(type)]"
 
-/obj/item/device/geiger/proc/update_sound(playing)
+/obj/item/device/geiger/proc/update_sound(var/playing)
 	if(playing && !sound_token)
 		sound_token = GLOB.sound_player.PlayLoopingSound(src, sound_id, "sound/items/geiger.ogg", volume = geiger_volume, range = 4, falloff = 3, prefer_mute = TRUE)
 	else if(!playing && sound_token)
@@ -43,18 +42,18 @@
 	. = ..()
 	var/msg = "[scanning ? "ambient" : "stored"] Radiation level: [radiation_count ? radiation_count : "0"] IU/s."
 	if(radiation_count > RAD_LEVEL_LOW)
-		to_chat(user, SPAN_WARNING("[msg]"))
+		to_chat(user, "<span class='warning'>[msg]</span>")
 	else
-		to_chat(user, SPAN_NOTICE("[msg]"))
+		to_chat(user, "<span class='notice'>[msg]</span>")
 
-/obj/item/device/geiger/attack_self(mob/user)
+/obj/item/device/geiger/attack_self(var/mob/user)
 	scanning = !scanning
 	if(scanning)
 		START_PROCESSING(SSobj, src)
 	else
 		STOP_PROCESSING(SSobj, src)
 	update_icon()
-	to_chat(user, SPAN_NOTICE("[icon2html(src, user)] You switch [scanning ? "on" : "off"] [src]."))
+	to_chat(user, "<span class='notice'>[icon2html(src, user)] You switch [scanning ? "on" : "off"] [src].</span>")
 
 /obj/item/device/geiger/on_update_icon()
 	if(!scanning)
@@ -86,3 +85,5 @@
 			icon_state = "geiger_on_5"
 			geiger_volume = 60
 			sound_token.SetVolume(geiger_volume)
+
+

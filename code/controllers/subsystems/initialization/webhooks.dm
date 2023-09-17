@@ -2,16 +2,11 @@ SUBSYSTEM_DEF(webhooks)
 	name = "Webhooks"
 	init_order = SS_INIT_EARLY
 	flags = SS_NO_FIRE
-	var/list/webhook_singletons = list()
+	var/list/webhook_decls = list()
 
-
-/datum/controller/subsystem/webhooks/UpdateStat(time)
-	return
-
-
-/datum/controller/subsystem/webhooks/Initialize(start_uptime)
+/datum/controller/subsystem/webhooks/Initialize()
 	load_webhooks()
-
+	. = ..()
 
 /datum/controller/subsystem/webhooks/proc/load_webhooks()
 
@@ -20,13 +15,13 @@ SUBSYSTEM_DEF(webhooks)
 		return
 
 	var/list/all_webhooks_by_id = list()
-	var/list/all_webhooks = GET_SINGLETON_SUBTYPE_MAP(/singleton/webhook)
+	var/list/all_webhooks = decls_repository.get_decls_of_subtype(/decl/webhook)
 	for(var/wid in all_webhooks)
-		var/singleton/webhook/webhook = all_webhooks[wid]
+		var/decl/webhook/webhook = all_webhooks[wid]
 		if(webhook.id)
 			all_webhooks_by_id[webhook.id] = webhook
 
-	webhook_singletons.Cut()
+	webhook_decls.Cut()
 	var/webhook_config = file2text("config/webhooks.json") || "{}"
 	if(webhook_config)
 		for(var/webhook_data in json_decode(webhook_config))
@@ -35,17 +30,17 @@ SUBSYSTEM_DEF(webhooks)
 			var/wmention = webhook_data["mentions"]
 			to_world_log("Setting up webhook [wid].")
 			if(wid && wurl && all_webhooks_by_id[wid])
-				var/singleton/webhook/webhook = all_webhooks_by_id[wid]
+				var/decl/webhook/webhook = all_webhooks_by_id[wid]
 				webhook.urls = islist(wurl) ? wurl : list(wurl)
 				if(wmention)
 					webhook.mentions = jointext(wmention, ", ")
-				webhook_singletons[wid] = webhook
+				webhook_decls[wid] = webhook
 				to_world_log("Webhook [wid] ready.")
 			else
 				to_world_log("Failed to set up webhook [wid].")
 
-/datum/controller/subsystem/webhooks/proc/send(wid, wdata)
-	var/singleton/webhook/webhook = webhook_singletons[wid]
+/datum/controller/subsystem/webhooks/proc/send(var/wid, var/wdata)
+	var/decl/webhook/webhook = webhook_decls[wid]
 	if(webhook)
 		if(webhook.send(wdata))
 			to_world_log("Sent webhook [webhook.id].")
@@ -76,13 +71,13 @@ SUBSYSTEM_DEF(webhooks)
 	if(!holder)
 		return
 
-	if(!length(SSwebhooks.webhook_singletons))
+	if(!length(SSwebhooks.webhook_decls))
 		to_chat(usr, "Webhook list is empty; either webhooks are disabled, webhooks aren't configured, or the subsystem hasn't initialized.")
 		return
 
-	var/choice = input(usr, "Select a webhook to ping.", "Ping Webhook") as null|anything in SSwebhooks.webhook_singletons
-	if(choice && SSwebhooks.webhook_singletons[choice])
-		var/singleton/webhook/webhook = SSwebhooks.webhook_singletons[choice]
+	var/choice = input(usr, "Select a webhook to ping.", "Ping Webhook") as null|anything in SSwebhooks.webhook_decls
+	if(choice && SSwebhooks.webhook_decls[choice])
+		var/decl/webhook/webhook = SSwebhooks.webhook_decls[choice]
 		log_and_message_admins("has pinged webhook [choice].", usr)
 		to_world_log("[usr.key] has pinged webhook [choice].")
 		webhook.send()

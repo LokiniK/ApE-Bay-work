@@ -6,83 +6,93 @@
 	icon = 'icons/obj/closets/bodybag.dmi'
 	icon_state = "bodybag_folded"
 	w_class = ITEM_SIZE_SMALL
-/obj/item/bodybag/attack_self(mob/user)
-	var/obj/structure/closet/body_bag/R = new /obj/structure/closet/body_bag(user.loc)
-	R.add_fingerprint(user)
-	qdel(src)
+	attack_self(mob/user)
+		var/obj/structure/closet/body_bag/R = new /obj/structure/closet/body_bag(user.loc)
+		R.add_fingerprint(user)
+		qdel(src)
 
+	ex_act(severity)
+		switch(severity)
+			if(1)
+				for(var/atom/movable/A in src)//pulls everything out of the locker and hits it with an explosion
+					A.forceMove(src.loc)
+					A.ex_act(severity + 1)
+				qdel(src)
+			if(2)
+				if(prob(90))
+					for (var/atom/movable/A in src)
+						A.forceMove(src.loc)
+						A.ex_act(severity + 1)
+					qdel(src)
+			if(3)
+				if(prob(70))
+					for(var/atom/movable/A in src)
+						A.forceMove(src.loc)
+					qdel(src)
 
 /obj/item/storage/box/bodybags
 	name = "body bags"
 	desc = "This box contains body bags."
 	icon_state = "bodybags"
-	startswith = list(/obj/item/bodybag = 7)
+	New()
+		..()
+		new /obj/item/bodybag(src)
+		new /obj/item/bodybag(src)
+		new /obj/item/bodybag(src)
+		new /obj/item/bodybag(src)
+		new /obj/item/bodybag(src)
+		new /obj/item/bodybag(src)
+		new /obj/item/bodybag(src)
 
 
 /obj/structure/closet/body_bag
 	name = "body bag"
 	desc = "A plastic bag designed for the storage and transportation of cadavers."
 	icon = 'icons/obj/closets/bodybag.dmi'
-	icon_state = "closed"
-	closet_appearance = null
+	icon_state = "bodybag"
 	open_sound = 'sound/items/zip.ogg'
 	close_sound = 'sound/items/zip.ogg'
 	var/item_path = /obj/item/bodybag
 	density = FALSE
 	storage_capacity = (MOB_MEDIUM * 2) - 1
 	var/contains_body = 0
-	/// String. The body bag's label, if set.
-	var/label = null
+	var/has_label = FALSE
 
+/obj/structure/closet/body_bag/attackby(var/obj/item/W, mob/user as mob)
+	if (istype(W, /obj/item/pen))
+		var/t = input(user, "What would you like the label to be?", text("[]", src.name), null)  as text
+		if (user.get_active_hand() != W)
+			return
+		if (!in_range(src, user) && src.loc != user)
+			return
+		t = sanitizeSafe(t, MAX_NAME_LEN)
+		if (t)
+			src.SetName("body bag - ")
+			src.name += t
+			has_label = TRUE
+		else
+			src.SetName("body bag")
 
-/obj/structure/closet/body_bag/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Pen - Set label
-	if (istype(tool, /obj/item/pen))
-		var/input = input(user, "What would you like the label to be?", name, label) as text|null
-		input = sanitizeSafe(input, MAX_NAME_LEN)
-		if (!input || input == label || !user.use_sanity_check(src, tool))
-			return TRUE
-		set_label(input)
-		user.visible_message(
-			SPAN_NOTICE("\The [user] labels \the [src] with \a [tool]."),
-			SPAN_NOTICE("You set \the [src]'s label with \the [tool] to: [SPAN_INFO("'[label]'")]")
-		)
-		return TRUE
+		return
+	else if(isWirecutter(W))
+		src.SetName("body bag")
+		has_label = FALSE
+		to_chat(user, "You cut the tag off \the [src].")
+		src.update_icon()
+		return
 
-	// Wirecutters - Remove label
-	if (isWirecutter(tool))
-		if (!label)
-			USE_FEEDBACK_FAILURE("\The [src] has no label to remove.")
-			return TRUE
-		set_label(null)
-		user.visible_message(
-			SPAN_NOTICE("\The [user] removes \the [src]'s label with \a [tool]."),
-			SPAN_NOTICE("You remove \the [src]'s label with \the [tool].")
-		)
-		return TRUE
+/obj/structure/closet/body_bag/update_icon()
+	icon_state = "[initial(icon_state)][opened ? "_open" : "[contains_body ? "_occupied" : ""]"]"
+	//src.overlays.Cut()
 
-	return ..()
-
-
-/obj/structure/closet/body_bag/proc/set_label(new_label)
-	label = new_label
-	name = initial(name)
-	if (label)
-		name += " - [label]"
-	update_icon()
-
-
-/obj/structure/closet/body_bag/on_update_icon()
-	if(opened)
-		icon_state = "open"
-	else
-		icon_state = "closed"
-
-	src.overlays.Cut()
-	if(label)
+	if(has_label)
 		src.overlays += image(src.icon, "bodybag_label")
 
-/obj/structure/closet/body_bag/store_mobs(stored_units)
+/obj/structure/closet/body_bag/animate_door()
+
+	flick("[initial(icon_state)]_anim_[opened ? "open" : "close"]", src)
+
+/obj/structure/closet/body_bag/store_mobs(var/stored_units)
 	contains_body = ..()
 	return contains_body
 
@@ -92,7 +102,7 @@
 		return 1
 	return 0
 
-/obj/structure/closet/body_bag/proc/fold(user)
+/obj/structure/closet/body_bag/proc/fold(var/user)
 	if(!(ishuman(user) || isrobot(user)))
 		to_chat(user, SPAN_NOTICE("You lack the dexterity to close \the [name]."))
 		return FALSE
@@ -101,7 +111,7 @@
 		to_chat(user, SPAN_NOTICE("You must close \the [name] before it can be folded."))
 		return FALSE
 
-	if(length(contents))
+	if(contents.len)
 		to_chat(user, SPAN_NOTICE("You can't fold \the [name] while it has something inside it."))
 		return FALSE
 
@@ -111,7 +121,7 @@
 
 /obj/structure/closet/body_bag/MouseDrop(over_object, src_location, over_location)
 	..()
-	if((over_object == usr && (in_range(src, usr) || usr.contents.Find(src))))
+	if((over_object == usr && (in_range(src, usr) || list_find(usr.contents, src))))
 		fold(usr)
 
 /obj/item/robot_rack/body_bag

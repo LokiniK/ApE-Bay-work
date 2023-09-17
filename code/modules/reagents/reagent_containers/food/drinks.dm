@@ -4,7 +4,7 @@
 /obj/item/reagent_containers/food/drinks
 	name = "drink"
 	desc = "Yummy!"
-	icon = 'icons/obj/food/drinks.dmi'
+	icon = 'icons/obj/drinks.dmi'
 	icon_state = null
 	atom_flags = ATOM_FLAG_OPEN_CONTAINER
 	amount_per_transfer_from_this = 5
@@ -25,9 +25,15 @@
 		open(user)
 
 /obj/item/reagent_containers/food/drinks/proc/open(mob/user)
-	playsound(loc,'sound/effects/canopen.ogg', rand(10,50), 1)
-	to_chat(user, SPAN_NOTICE("You open \the [src] with an audible pop!"))
+//	playsound(loc,'sound/effects/canopen.ogg', rand(10,50), 1) inf-dev: see below
+	to_chat(user, "<span class='notice'>You open \the [src] with an audible pop!</span>")
 	atom_flags |= ATOM_FLAG_OPEN_CONTAINER
+
+	// INF@CODE - START
+	verbs += /obj/item/reagent_containers/food/drinks/proc/gulp_whole
+	if(open_sound)
+		playsound(src, open_sound, rand(10, 50), 1)
+	// INF@CODE - END
 
 /obj/item/reagent_containers/food/drinks/attack(mob/M as mob, mob/user as mob, def_zone)
 	if(force && !(item_flags & ITEM_FLAG_NO_BLUDGEON) && user.a_intent == I_HURT)
@@ -42,36 +48,44 @@
 	if(!proximity) return
 
 	if(standard_dispenser_refill(user, target))
-		return
+		return 1
 	if(standard_pour_into(user, target))
 		return
-	return ..()
+	if(user.a_intent == I_HURT)
+		if(reagents && reagents.total_volume)
+			to_chat(user, "<span class='notice'>You splash the contents of \the [src] onto [target].</span>") //They are on harm intent, aka wanting to spill it.
+			playsound(src,'infinity/sound/effects/Splash_Small_01_mono.ogg',50,1)
+			reagents.splash(target, reagents.total_volume)
+			return
+	..()
 
-/obj/item/reagent_containers/food/drinks/standard_feed_mob(mob/user, mob/target)
+/obj/item/reagent_containers/food/drinks/standard_feed_mob(var/mob/user, var/mob/target)
 	if(!is_open_container())
-		to_chat(user, SPAN_NOTICE("You need to open \the [src]!"))
+		to_chat(user, "<span class='notice'>You need to open \the [src]!</span>")
+		return 1
+	if(user.a_intent == I_HURT)
 		return 1
 	return ..()
 
-/obj/item/reagent_containers/food/drinks/standard_dispenser_refill(mob/user, obj/structure/reagent_dispensers/target)
+/obj/item/reagent_containers/food/drinks/standard_dispenser_refill(var/mob/user, var/obj/structure/reagent_dispensers/target)
 	if(!is_open_container())
-		to_chat(user, SPAN_NOTICE("You need to open \the [src]!"))
+		to_chat(user, "<span class='notice'>You need to open \the [src]!</span>")
 		return 1
 	return ..()
 
-/obj/item/reagent_containers/food/drinks/standard_pour_into(mob/user, atom/target)
+/obj/item/reagent_containers/food/drinks/standard_pour_into(var/mob/user, var/atom/target)
 	if(!is_open_container())
-		to_chat(user, SPAN_NOTICE("You need to open \the [src]!"))
+		to_chat(user, "<span class='notice'>You need to open \the [src]!</span>")
 		return 1
 	return ..()
 
-/obj/item/reagent_containers/food/drinks/self_feed_message(mob/user)
-	to_chat(user, SPAN_NOTICE("You swallow a gulp from \the [src]."))
+/obj/item/reagent_containers/food/drinks/self_feed_message(var/mob/user)
+	to_chat(user, "<span class='notice'>You swallow a gulp from \the [src].</span>")
 	if(user.has_personal_goal(/datum/goal/achievement/specific_object/drink))
 		for(var/datum/reagent/R in reagents.reagent_list)
 			user.update_personal_goal(/datum/goal/achievement/specific_object/drink, R.type)
 
-/obj/item/reagent_containers/food/drinks/feed_sound(mob/user)
+/obj/item/reagent_containers/food/drinks/feed_sound(var/mob/user)
 	playsound(user.loc, 'sound/items/drink.ogg', rand(10, 50), 1)
 
 /obj/item/reagent_containers/food/drinks/examine(mob/user, distance)
@@ -79,15 +93,15 @@
 	if(distance > 1)
 		return
 	if(!reagents || reagents.total_volume == 0)
-		to_chat(user, SPAN_NOTICE("\The [src] is empty!"))
+		to_chat(user, "<span class='notice'>\The [src] is empty!</span>")
 	else if (reagents.total_volume <= volume * 0.25)
-		to_chat(user, SPAN_NOTICE("\The [src] is almost empty!"))
+		to_chat(user, "<span class='notice'>\The [src] is almost empty!</span>")
 	else if (reagents.total_volume <= volume * 0.66)
-		to_chat(user, SPAN_NOTICE("\The [src] is half full!"))
+		to_chat(user, "<span class='notice'>\The [src] is half full!</span>")
 	else if (reagents.total_volume <= volume * 0.90)
-		to_chat(user, SPAN_NOTICE("\The [src] is almost full!"))
+		to_chat(user, "<span class='notice'>\The [src] is almost full!</span>")
 	else
-		to_chat(user, SPAN_NOTICE("\The [src] is full!"))
+		to_chat(user, "<span class='notice'>\The [src] is full!</span>")
 
 /obj/item/reagent_containers/food/drinks/proc/get_filling_state()
 	var/percent = round((reagents.total_volume / volume) * 100)
@@ -97,7 +111,7 @@
 
 /obj/item/reagent_containers/food/drinks/on_update_icon()
 	overlays.Cut()
-	if(length(reagents.reagent_list) > 0)
+	if(reagents.reagent_list.len > 0)
 		if(base_name)
 			var/datum/reagent/R = reagents.get_master_reagent()
 			SetName("[base_name] of [R.glass_name ? R.glass_name : "something"]")
@@ -109,7 +123,6 @@
 	else
 		SetName(initial(name))
 		desc = initial(desc)
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Drinks. END
@@ -144,21 +157,6 @@
 /obj/item/reagent_containers/food/drinks/milk/Initialize()
 	. = ..()
 	reagents.add_reagent(/datum/reagent/drink/milk, 50)
-
-
-/obj/item/reagent_containers/food/drinks/bottle/thoom
-	name = "th'oom juice carton"
-	desc = "It's th'oom juice. Strangely sweet and savory!"
-	icon_state = "thoom"
-	item_state = "carton"
-	center_of_mass = "x=16;y=8"
-	can_shatter = FALSE
-
-
-/obj/item/reagent_containers/food/drinks/bottle/thoom/Initialize()
-	. = ..()
-	reagents.add_reagent(/datum/reagent/drink/thoom, 50)
-
 
 /obj/item/reagent_containers/food/drinks/soymilk
 	name = "soymilk carton"
@@ -323,7 +321,7 @@
 	icon_state = "coffee"
 	item_state = "coffee"
 	center_of_mass = "x=16;y=14"
-	//filling_states = "100"
+	filling_states = "100"
 	base_name = "cup"
 	base_icon = "cup"
 
@@ -357,7 +355,7 @@
 	icon_state = "coffee"
 	item_state = "coffee"
 	center_of_mass = "x=16;y=14"
-	//filling_states = "100"
+	filling_states = "100"
 	base_name = "cup"
 	base_icon = "cup"
 

@@ -34,13 +34,13 @@
 		return EyeMove(direct)
 	return 0
 
-/mob/observer/eye/facedir(ndir)
+/mob/observer/eye/facedir(var/ndir)
 	if(!canface())
 		return 0
 	set_dir(ndir)
 	return 1
 
-/mob/observer/eye/ExaminateVerb()
+/mob/observer/eye/examinate()
 	set popup_menu = 0
 	set src = usr.contents
 	return 0
@@ -53,7 +53,7 @@
 /mob/observer/eye/examine(mob/user)
 	return TRUE
 
-/mob/observer/eye/proc/possess(mob/user)
+/mob/observer/eye/proc/possess(var/mob/user)
 	if(owner && owner != user)
 		return
 	if(owner && owner.eyeobj != src)
@@ -64,9 +64,10 @@
 	if(owner.client)
 		owner.client.eye = src
 	setLoc(owner)
-	visualnet.update_eye_chunks(src, TRUE)
+	if(visualnet) //INF
+		visualnet.update_eye_chunks(src, TRUE)
 
-/mob/observer/eye/proc/release(mob/user)
+/mob/observer/eye/proc/release(var/mob/user)
 	if(owner != user || !user)
 		return
 	if(owner.eyeobj != src)
@@ -78,7 +79,7 @@
 
 // Use this when setting the eye's location.
 // It will also stream the chunk that the new loc is in.
-/mob/observer/eye/proc/setLoc(T)
+/mob/observer/eye/proc/setLoc(var/T)
 	if(!owner)
 		return FALSE
 
@@ -93,7 +94,8 @@
 	if(owner_follows_eye)
 		owner.forceMove(loc)
 
-	visualnet.update_eye_chunks(src)
+	if(visualnet) //INF
+		visualnet.update_eye_chunks(src)
 	return TRUE
 
 /mob/observer/eye/proc/getLoc()

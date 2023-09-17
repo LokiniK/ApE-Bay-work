@@ -5,7 +5,7 @@ MRE Stuff
 /obj/item/storage/mre
 	name = "MRE, Menu 1"
 	desc = "A vacuum-sealed bag containing a day's worth of nutrients for an adult in strenuous situations. There is no visible expiration date on the package."
-	icon = 'icons/obj/food/food.dmi'
+	icon = 'icons/obj/food.dmi'
 	icon_state = "mre"
 	storage_slots = 7
 	max_w_class = ITEM_SIZE_SMALL
@@ -41,7 +41,7 @@ MRE Stuff
 
 /obj/item/storage/mre/open(mob/user)
 	if(!opened)
-		to_chat(usr, SPAN_NOTICE("You tear open the bag, breaking the vacuum seal."))
+		to_chat(usr, "<span class='notice'>You tear open the bag, breaking the vacuum seal.</span>")
 	. = ..()
 
 /obj/item/storage/mre/menu2
@@ -183,7 +183,7 @@ MRE Stuff
 /obj/item/storage/mrebag
 	name = "main course"
 	desc = "A vacuum-sealed bag containing the MRE's main course. Self-heats when opened."
-	icon = 'icons/obj/food/food.dmi'
+	icon = 'icons/obj/food.dmi'
 	icon_state = "pouch_medium"
 	storage_slots = 1
 	w_class = ITEM_SIZE_SMALL
@@ -205,7 +205,7 @@ MRE Stuff
 
 /obj/item/storage/mrebag/open(mob/user)
 	if(!opened)
-		to_chat(usr, SPAN_NOTICE("The pouch heats up as you break the vaccum seal."))
+		to_chat(usr, "<span class='notice'>The pouch heats up as you break the vaccum seal.</span>")
 	. = ..()
 
 /obj/item/storage/mrebag/menu2
@@ -215,7 +215,7 @@ MRE Stuff
 	startswith = list(/obj/item/reagent_containers/food/snacks/slice/vegetablepizza/filled)
 
 /obj/item/storage/mrebag/menu4
-	startswith = list(/obj/item/reagent_containers/food/snacks/plainburger)
+	startswith = list(/obj/item/reagent_containers/food/snacks/hamburger)
 
 /obj/item/storage/mrebag/menu5
 	startswith = list(/obj/item/reagent_containers/food/snacks/taco)

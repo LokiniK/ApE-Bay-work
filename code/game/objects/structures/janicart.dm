@@ -1,7 +1,7 @@
 /obj/structure/janitorialcart
 	name = "janitorial cart"
 	desc = "The ultimate in janitorial carts! Has space for water, mops, signs, trash bags, and more!"
-	icon = 'icons/obj/carts.dmi'
+	icon = 'icons/obj/janitor.dmi'
 	icon_state = "cart"
 	anchored = FALSE
 	density = TRUE
@@ -15,8 +15,7 @@
 	var/signs = 0	//maximum capacity hardcoded below
 
 
-/obj/structure/janitorialcart/Initialize()
-	. = ..()
+/obj/structure/janitorialcart/New()
 	create_reagents(180)
 
 
@@ -26,125 +25,73 @@
 		to_chat(user, "[src] [icon2html(src, viewers(get_turf(src)))] contains [reagents.total_volume] unit\s of liquid!")
 
 
-/obj/structure/janitorialcart/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Caution Sign - Attach
-	if (istype(tool, /obj/item/caution))
-		if (signs >= 4)
-			USE_FEEDBACK_FAILURE("\The [src] can't hold any more signs.")
-			return TRUE
-		if (!user.unEquip(tool, src))
-			FEEDBACK_UNEQUIP_FAILURE(tool, src)
-			return TRUE
-		signs++
+/obj/structure/janitorialcart/attackby(obj/item/I, mob/user)
+	if(istype(I, /obj/item/storage/bag/trash) && !mybag)
+		if(!user.unEquip(I, src))
+			return
+		mybag = I
 		update_icon()
 		updateUsrDialog()
-		user.visible_message(
-			SPAN_NOTICE("\The [user] puts \a [tool] on \the [src]."),
-			SPAN_NOTICE("You put \the [tool] on \the [src].")
-		)
-		return TRUE
+		to_chat(user, "<span class='notice'>You put [I] into [src].</span>")
 
-	// Light Replacer - Attach
-	if (istype(tool, /obj/item/device/lightreplacer))
-		if (myreplacer)
-			USE_FEEDBACK_FAILURE("\The [src] already has \a [myreplacer] attached.")
-			return TRUE
-		if (!user.unEquip(tool, src))
-			FEEDBACK_UNEQUIP_FAILURE(tool, src)
-			return TRUE
-		myreplacer = tool
-		update_icon()
-		updateUsrDialog()
-		user.visible_message(
-			SPAN_NOTICE("\The [user] puts \a [tool] on \the [src]."),
-			SPAN_NOTICE("You put \the [tool] on \the [src].")
-		)
-		return TRUE
-
-	// Mop - Wet or store
-	if (istype(tool, /obj/item/mop))
-		var/input = input(user, "What would you like to do with \the [tool]?", "[src] - [tool]") as null|anything in list("Wet", "Store")
-		if (!input || !user.use_sanity_check(src, tool))
-			return TRUE
-		switch (input)
-			// Wet
-			if ("Wet")
-				if (reagents.total_volume < 1)
-					USE_FEEDBACK_FAILURE("\The [src] is out of water.")
-					return TRUE
-				reagents.trans_to_obj(tool, tool.reagents.maximum_volume)
-				playsound(src, 'sound/effects/slosh.ogg', 50, TRUE)
-				user.visible_message(
-					SPAN_NOTICE("\The [user] wets \a [tool] in \the [src]."),
-					SPAN_NOTICE("You wets \the [tool] in \the [src].")
-				)
-				return TRUE
-			// Store
-			if ("Store")
-				if (mymop)
-					USE_FEEDBACK_FAILURE("\The [src] already has \a [mymop] attached.")
-					return TRUE
-				if (!user.unEquip(tool, src))
-					FEEDBACK_UNEQUIP_FAILURE(user, tool)
-					return TRUE
-				mymop = tool
-				update_icon()
-				updateUsrDialog()
-				user.visible_message(
-					SPAN_NOTICE("\The [user] adds \a [tool] to \the [src]."),
-					SPAN_NOTICE("You add \the [tool] to \the [src].")
-				)
-				return TRUE
+	else if(istype(I, /obj/item/mop))
+		if(I.reagents.total_volume < I.reagents.maximum_volume)	//if it's not completely soaked we assume they want to wet it, otherwise store it
+			if(reagents.total_volume < 1)
+				to_chat(user, "<span class='warning'>[src] is out of water!</span>")
 			else
-				return TRUE
+				reagents.trans_to_obj(I, I.reagents.maximum_volume)
+				to_chat(user, "<span class='notice'>You wet [I] in [src].</span>")
+				playsound(loc, 'sound/effects/slosh.ogg', 25, 1)
+				return
+		if(!mymop)
+			if (istype(user, /mob/living/silicon/robot))
+				return 0
+			if(!user.unEquip(I, src))
+				return
+			mymop = I
+			update_icon()
+			updateUsrDialog()
+			to_chat(user, "<span class='notice'>You put [I] into [src].</span>")
 
-	// Spray Bottle - Attach
-	if (istype(tool, /obj/item/reagent_containers/spray))
-		if (myspray)
-			USE_FEEDBACK_FAILURE("\The [src] already has \a [myspray] attached.")
-			return TRUE
-		if (!user.unEquip(tool, src))
-			FEEDBACK_UNEQUIP_FAILURE(user, tool)
-			return TRUE
-		myspray = tool
+	else if(istype(I, /obj/item/reagent_containers/spray) && !myspray)
+		if(!user.unEquip(I, src))
+			return
+		myspray = I
 		update_icon()
 		updateUsrDialog()
-		user.visible_message(
-			SPAN_NOTICE("\The [user] puts \a [tool] on \the [src]."),
-			SPAN_NOTICE("You put \the [tool] on \the [src].")
-		)
-		return TRUE
+		to_chat(user, "<span class='notice'>You put [I] into [src].</span>")
 
-	// Trash Bag - Attach
-	if (istype(tool, /obj/item/storage/bag/trash))
-		if (mybag)
-			USE_FEEDBACK_FAILURE("\The [src] already has \a [mybag] attached.")
-			return TRUE
-		if (!user.unEquip(tool, src))
-			FEEDBACK_UNEQUIP_FAILURE(tool, src)
-			return TRUE
-		mybag = tool
+	else if(istype(I, /obj/item/device/lightreplacer) && !myreplacer)
+		if(!user.unEquip(I, src))
+			return
+		myreplacer = I
 		update_icon()
 		updateUsrDialog()
-		user.visible_message(
-			SPAN_NOTICE("\The [user] puts \a [tool] on \the [src]."),
-			SPAN_NOTICE("You put \the [tool] on \the [src].")
-		)
-		return TRUE
+		to_chat(user, "<span class='notice'>You put [I] into [src].</span>")
 
-	// Everything else - Passthrough to mybag
-	// Skip reagent containers as those fill the mop bucket
-	if (mybag && !(istype(tool, /obj/item/reagent_containers/glass)))
-		return tool.resolve_attackby(mybag, user, click_params)
+	else if(istype(I, /obj/item/caution))
+		if(signs < 4)
+			if(!user.unEquip(I, src))
+				return
+			signs++
+			update_icon()
+			updateUsrDialog()
+			to_chat(user, "<span class='notice'>You put [I] into [src].</span>")
+		else
+			to_chat(user, "<span class='notice'>[src] can't hold any more signs.</span>")
 
-	return ..()
+	else if(istype(I, /obj/item/reagent_containers/glass))
+		return // So we do not put them in the trash bag as we mean to fill the mop bucket
+
+	else if(mybag)
+		mybag.attackby(I, user)
 
 
 /obj/structure/janitorialcart/attack_hand(mob/user)
 	ui_interact(user)
 	return
 
-/obj/structure/janitorialcart/ui_interact(mob/user, ui_key = "main", datum/nanoui/ui = null, force_open = 1)
+/obj/structure/janitorialcart/ui_interact(var/mob/user, var/ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1)
 	var/data[0]
 	data["name"] = capitalize(name)
 	data["bag"] = mybag ? capitalize(mybag.name) : null
@@ -171,29 +118,29 @@
 			if("garbage")
 				if(mybag)
 					user.put_in_hands(mybag)
-					to_chat(user, SPAN_NOTICE("You take [mybag] from [src]."))
+					to_chat(user, "<span class='notice'>You take [mybag] from [src].</span>")
 					mybag = null
 			if("mop")
 				if(mymop)
 					user.put_in_hands(mymop)
-					to_chat(user, SPAN_NOTICE("You take [mymop] from [src]."))
+					to_chat(user, "<span class='notice'>You take [mymop] from [src].</span>")
 					mymop = null
 			if("spray")
 				if(myspray)
 					user.put_in_hands(myspray)
-					to_chat(user, SPAN_NOTICE("You take [myspray] from [src]."))
+					to_chat(user, "<span class='notice'>You take [myspray] from [src].</span>")
 					myspray = null
 			if("replacer")
 				if(myreplacer)
 					user.put_in_hands(myreplacer)
-					to_chat(user, SPAN_NOTICE("You take [myreplacer] from [src]."))
+					to_chat(user, "<span class='notice'>You take [myreplacer] from [src].</span>")
 					myreplacer = null
 			if("sign")
 				if(signs)
 					var/obj/item/caution/Sign = locate() in src
 					if(Sign)
 						user.put_in_hands(Sign)
-						to_chat(user, SPAN_NOTICE("You take \a [Sign] from [src]."))
+						to_chat(user, "<span class='notice'>You take \a [Sign] from [src].</span>")
 						signs--
 					else
 						warning("[src] signs ([signs]) didn't match contents")
@@ -217,7 +164,7 @@
 		overlays += "cart_sign[signs]"
 
 
-//old style cart
+//old style retardo-cart
 /obj/structure/bed/chair/janicart
 	name = "janicart"
 	icon = 'icons/obj/vehicles.dmi'
@@ -230,7 +177,6 @@
 	var/obj/item/storage/bag/trash/mybag	= null
 	var/callme = "pimpin' ride"	//how do people refer to it?
 	buckle_movable = FALSE
-	bed_flags = BED_FLAG_CANNOT_BE_DISMANTLED | BED_FLAG_CANNOT_BE_ELECTRIFIED | BED_FLAG_CANNOT_BE_PADDED
 
 
 /obj/structure/bed/chair/janicart/Initialize()
@@ -247,41 +193,21 @@
 		to_chat(user, "\A [mybag] is hanging on the [callme].")
 
 
-/obj/structure/bed/chair/janicart/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Key - Show message
-	if (istype(tool, /obj/item/key))
-		USE_FEEDBACK_FAILURE("Hold \the [tool] in your hands while you drive \the [callme].")
-		return TRUE
-
-	// Mop - Wet mop
-	if (istype(tool, /obj/item/mop))
-		if (!reagents.total_volume)
-			USE_FEEDBACK_FAILURE("\The [callme]'s bucket is out of water.")
-			return TRUE
-		reagents.trans_to_obj(tool, 2)
-		playsound(loc, 'sound/effects/slosh.ogg', 50, TRUE)
-		user.visible_message(
-			SPAN_NOTICE("\The [user] wets \a [tool] in \the [callme]."),
-			SPAN_NOTICE("You wet \the [tool] in \the [callme].")
-		)
-		return TRUE
-
-	// Trash Bag - Hook bag to cart
-	if (istype(tool, /obj/item/storage/bag/trash))
-		if (!user.unEquip(tool, src))
-			FEEDBACK_UNEQUIP_FAILURE(user, tool)
-			return TRUE
-		if (mybag)
-			USE_FEEDBACK_FAILURE("\The [callme] already has \a [mybag] attached.")
-			return TRUE
-		mybag = TRUE
-		user.visible_message(
-			SPAN_NOTICE("\The [user] hooks \a [tool] onto \the [callme]."),
-			SPAN_NOTICE("You hook \the [tool] onto \the [callme].")
-		)
-		return TRUE
-
-	return ..()
+/obj/structure/bed/chair/janicart/attackby(obj/item/I, mob/user)
+	if(istype(I, /obj/item/mop))
+		if(reagents.total_volume > 1)
+			reagents.trans_to_obj(I, 2)
+			to_chat(user, "<span class='notice'>You wet [I] in the [callme].</span>")
+			playsound(loc, 'sound/effects/slosh.ogg', 25, 1)
+		else
+			to_chat(user, "<span class='notice'>This [callme] is out of water!</span>")
+	else if(istype(I, /obj/item/key))
+		to_chat(user, "Hold [I] in one of your hands while you drive this [callme].")
+	else if(istype(I, /obj/item/storage/bag/trash))
+		if(!user.unEquip(I, src))
+			return
+		to_chat(user, "<span class='notice'>You hook the trashbag onto the [callme].</span>")
+		mybag = I
 
 
 /obj/structure/bed/chair/janicart/attack_hand(mob/user)
@@ -295,11 +221,11 @@
 /obj/structure/bed/chair/janicart/relaymove(mob/user, direction)
 	if(user.stat || user.stunned || user.weakened || user.paralysis)
 		unbuckle_mob()
-	if (user.IsHolding(/obj/item/key))
+	if(istype(user.l_hand, /obj/item/key) || istype(user.r_hand, /obj/item/key))
 		step(src, direction)
 		update_mob()
 	else
-		to_chat(user, SPAN_NOTICE("You'll need the keys in one of your hands to drive this [callme]."))
+		to_chat(user, "<span class='notice'>You'll need the keys in one of your hands to drive this [callme].</span>")
 
 
 /obj/structure/bed/chair/janicart/Move()
@@ -349,11 +275,11 @@
 				buckled_mob.pixel_y = 7
 
 
-/obj/structure/bed/chair/janicart/bullet_act(obj/item/projectile/Proj)
+/obj/structure/bed/chair/janicart/bullet_act(var/obj/item/projectile/Proj)
 	if(buckled_mob)
 		if(prob(85))
 			return buckled_mob.bullet_act(Proj)
-	visible_message(SPAN_WARNING("[Proj] ricochets off the [callme]!"))
+	visible_message("<span class='warning'>[Proj] ricochets off the [callme]!</span>")
 
 
 /obj/item/key

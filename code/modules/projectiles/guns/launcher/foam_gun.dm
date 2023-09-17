@@ -19,44 +19,32 @@
 	var/max_darts = 1
 	var/list/darts = new/list()
 
-
-/obj/item/gun/launcher/foam/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Foam Dart - Load ammo
-	if (istype(tool, /obj/item/foam_dart))
-		if (length(darts) >= max_darts)
-			USE_FEEDBACK_FAILURE("\The [src] is full.")
-			return TRUE
-		if (!user.unEquip(tool, src))
-			FEEDBACK_UNEQUIP_FAILURE(user, tool)
-			return TRUE
-		darts += tool
-		user.visible_message(
-			SPAN_NOTICE("\The [user] loads \the [src] with \a [tool]."),
-			SPAN_NOTICE("You load \the [src] with \the [tool].")
-		)
-		if (max_darts > 1)
-			to_chat(user, SPAN_INFO("\The [src] now has [length(darts)]/[max_darts] darts loaded."))
-		return TRUE
-
-	return ..()
-
+/obj/item/gun/launcher/foam/attackby(obj/item/I, mob/user)
+	if(istype(I, /obj/item/foam_dart))
+		if(darts.len < max_darts)
+			if(!user.unEquip(I, src))
+				return
+			darts += I
+			to_chat(user, SPAN_NOTICE("You slot \the [I] into \the [src]."))
+		else
+			to_chat(user, SPAN_WARNING("\The [src] can hold no more darts."))
 
 /obj/item/gun/launcher/foam/consume_next_projectile()
-	if(length(darts))
+	if(darts.len)
 		var/obj/item/I = darts[1]
 		darts -= I
 		return I
 	return null
 
 /obj/item/gun/launcher/foam/CtrlAltClick(mob/user)
-	if(length(darts) && src.loc == user)
+	if(darts.len && src.loc == user)
 		to_chat(user, "You empty \the [src].")
 		for(var/obj/item/foam_dart/D in darts)
 			darts -= D
 			D.dropInto(user.loc)
 			D.mix_up()
-		return TRUE
-	return FALSE
+		return 1
+	return 0
 
 /obj/item/gun/launcher/foam/burst
 	name = "foam machine pistol"
@@ -102,7 +90,7 @@
 /obj/item/foam_dart/Initialize()
 	mix_up()
 	. = ..()
-
+	
 /obj/item/foam_dart/proc/mix_up()
 	pixel_x = rand(-randpixel, randpixel)
 	pixel_y = rand(-randpixel, randpixel)

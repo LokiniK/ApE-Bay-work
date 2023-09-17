@@ -6,17 +6,15 @@
 	icon_living = "carrier"
 	icon_dead = "carrier_dead"
 
-	maxHealth = 60
-	health = 60
+	maxHealth = 100
+	health = 100
 
 	natural_weapon = /obj/item/natural_weapon/bite/spider/carrier
 
 	poison_per_bite = 3
 	poison_type = /datum/reagent/chloralhydrate
 
-	movement_cooldown = 8
-
-	mob_size = MOB_LARGE
+	movement_cooldown = 5
 
 	var/spiderling_count = 0
 	var/spiderling_type = /obj/effect/spider/spiderling
@@ -26,13 +24,13 @@
 	var/swarmling_prob = 10
 
 /mob/living/simple_animal/hostile/giant_spider/carrier/Initialize()
-	spiderling_count = rand(4, 8)
-	SetTransform(scale = 1.2)
+	spiderling_count = rand(5, 10)
+	scale(1.2)
 	return ..()
 
 /mob/living/simple_animal/hostile/giant_spider/carrier/death()
 	visible_message(SPAN_WARNING("\The [src]'s abdomen splits as it rolls over, spiderlings crawling from the wound."))
-	addtimer(new Callback(src, .proc/spawn_swarmlings), 1 SECOND)
+	addtimer(CALLBACK(src, .proc/spawn_swarmlings), 1 SECOND)
 	return ..()
 
 /mob/living/simple_animal/hostile/giant_spider/carrier/proc/spawn_swarmlings()
@@ -48,7 +46,7 @@
 			swarmling.health = swarm_health
 			swarmling.natural_weapon = /obj/item/natural_weapon/bite/spider/swarmling
 			swarmling.faction = swarmling_faction
-			swarmling.SetTransform(scale = 0.75)
+			swarmling.scale(0.75)
 			new_spiders += swarmling
 		else
 			new spiderling_type(loc)

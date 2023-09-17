@@ -9,8 +9,8 @@
 
 /obj/structure/monolith
 	name = "monolith"
-	desc = "An obviously artifical structure of unknown origin. The symbols '𒁀𒀝 𒋢𒌦 𒉡 𒋺𒂊' are engraved on the base." //for the sake of the reader, "BAKU SUUN NU TAKE"
-	icon = 'icons/obj/structures/monolith.dmi'
+	desc = "An obviously artifical structure of unknown origin. The symbols '<font face='Shage'>DWNbTX</font>' are engraved on the base."
+	icon = 'icons/obj/monolith.dmi'
 	icon_state = "jaggy1"
 	layer = ABOVE_HUMAN_LAYER
 	density = TRUE
@@ -33,7 +33,7 @@
 	overlays.Cut()
 	if(active)
 		var/image/I = image(icon,"[icon_state]decor")
-		I.appearance_flags = DEFAULT_APPEARANCE_FLAGS | RESET_COLOR
+		I.appearance_flags = RESET_COLOR
 		I.color = get_random_colour(0, 150, 255)
 		I.layer = ABOVE_LIGHTING_LAYER
 		I.plane = EFFECTS_ABOVE_LIGHTING_PLANE
@@ -56,17 +56,17 @@
 				active = 1
 				update_icon()
 				if(prob(70))
-					to_chat(H, SPAN_NOTICE("As you touch \the [src], you suddenly get a vivid image - [E.get_engravings()]"))
+					to_chat(H, "<span class='notice'>As you touch \the [src], you suddenly get a vivid image - [E.get_engravings()]</span>")
 				else
-					to_chat(H, SPAN_WARNING("An overwhelming stream of information invades your mind!"))
+					to_chat(H, "<span class='warning'>An overwhelming stream of information invades your mind!</span>")
 					var/vision = ""
 					for(var/i = 1 to 10)
 						vision += pick(E.actors) + " " + pick("killing","dying","gored","expiring","exploding","mauled","burning","flayed","in agony") + ". "
-					to_chat(H, SPAN_DANGER(FONT_NORMAL(uppertext(vision))))
+					to_chat(H, "<span class='danger'><font size=2>[uppertext(vision)]</font></span>")
 					H.Paralyse(2)
 					H.hallucination(20, 100)
 				return
-	to_chat(user, SPAN_NOTICE("\The [src] is still."))
+	to_chat(user, "<span class='notice'>\The [src] is still.</span>")
 	return ..()
 
 /turf/simulated/floor/fixed/alium/ruin

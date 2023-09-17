@@ -18,29 +18,29 @@
 			)
 	arrival_message = "A blood-curdling howl echoes through the air as the planet starts to shake violently. Something has woken up..."
 	arrival_sound   = 'sound/ambience/meat_monster_arrival.ogg'
-	limit = 30
+	limit = 55
 	spawn_near_chance = 30
 
 /datum/mob_list/major/spiders
 	mobs = list(
 				list(/mob/living/simple_animal/hostile/giant_spider/lurker, 40),
 				list(/mob/living/simple_animal/hostile/giant_spider/tunneler, 45),
-				list(/mob/living/simple_animal/hostile/giant_spider/pepper, 30),
-				list(/mob/living/simple_animal/hostile/giant_spider/webslinger, 30),
-				list(/mob/living/simple_animal/hostile/giant_spider/electric, 35),
-				list(/mob/living/simple_animal/hostile/giant_spider/thermic, 25),
-				list(/mob/living/simple_animal/hostile/giant_spider/frost, 25),
+				list(/mob/living/simple_animal/hostile/giant_spider/pepper, 25),
+				list(/mob/living/simple_animal/hostile/giant_spider/webslinger, 20),
+				list(/mob/living/simple_animal/hostile/giant_spider/electric, 20),
+				list(/mob/living/simple_animal/hostile/giant_spider/thermic, 15),
+				list(/mob/living/simple_animal/hostile/giant_spider/frost, 15),
 				list(/mob/living/simple_animal/hostile/giant_spider/carrier, 20),
-				list(/mob/living/simple_animal/hostile/giant_spider/phorogenic, 10),
+				list(/mob/living/simple_animal/hostile/giant_spider/phorogenic, 5),
 				list(/mob/living/simple_animal/hostile/giant_spider/guard, 85),
-				list(/mob/living/simple_animal/hostile/giant_spider/hunter, 65),
+				list(/mob/living/simple_animal/hostile/giant_spider/hunter, 75),
 				list(/mob/living/simple_animal/hostile/giant_spider/nurse, 60),
 				list(/mob/living/simple_animal/hostile/giant_spider/spitter, 55),
-				list(/mob/living/simple_animal/hostile/giant_spider, 65)
+				list(/mob/living/simple_animal/hostile/giant_spider, 90)
 			)
 	arrival_message = "The ground beneath you shakes and rumbles, and is accompanied by an approaching skittering sound..."
 	arrival_sound   = 'sound/effects/wind/wind_3_1.ogg'
-	limit = 15
+	limit = 25
 	length = 45
 	spawn_near_chance = 10
 
@@ -50,12 +50,10 @@
 				list(/mob/living/simple_animal/hostile/hivebot/range, 45),
 				list(/mob/living/simple_animal/hostile/hivebot/strong, 25),
 				list(/mob/living/simple_animal/hostile/hivebot/mega, 2),
-				list(/obj/random/single/hivebot/ranged, 40),
-				list(/obj/random/single/hivebot/tank, 25)
 			)
 	arrival_message = "The ground beneath you rumbles as you hear the sounds of machinery from all around you..."
 	arrival_sound   = 'sound/effects/wind/wind_3_1.ogg'
-	limit = 25
+	limit = 45
 	length = 50
 	spawn_near_chance = 10
 
@@ -69,19 +67,17 @@
 			)
 	arrival_message = "You feel uneasy as you hear something skittering about..."
 	arrival_sound = 'sound/effects/wind/wind_3_1.ogg'
-	limit = 8
+	limit = 15
 	length = 40
 	spawn_near_chance = 5
 
 /datum/mob_list/moderate/machines
 	mobs = list(
 				list(/mob/living/simple_animal/hostile/hivebot, 95),
-				list(/mob/living/simple_animal/hostile/hivebot/range, 15),
-				list(/obj/random/single/hivebot/ranged, 5),
-				list(/obj/random/single/hivebot/tank, 15)
+				list(/mob/living/simple_animal/hostile/hivebot/range, 15)
 			)
 	arrival_message = "You hear the distant sound of creaking metal joints, what is that?"
 	arrival_sound = 'sound/effects/wind/wind_3_1.ogg'
-	limit = 10
+	limit = 25
 	length = 50
 	spawn_near_chance = 15

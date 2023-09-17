@@ -10,7 +10,7 @@
 /datum/category_group/underwear
 	var/sort_order		// Lower sort order is applied as icons first
 
-/datum/category_group/underwear/dd_SortValue()
+datum/category_group/underwear/dd_SortValue()
 	return sort_order
 
 /datum/category_group/underwear/top
@@ -57,17 +57,20 @@
 		return "~"+name
 	return name
 
-/datum/category_item/underwear/proc/is_default(gender)
+/datum/category_item/underwear/proc/is_default(var/gender)
 	return is_default
 
-/datum/category_item/underwear/proc/create_underwear(mob/user, list/metadata)
+/datum/category_item/underwear/proc/create_underwear(var/mob/user, var/list/metadata)
 	if(!underwear_type)
 		return
 
 	var/obj/item/underwear/UW = new underwear_type()
 	UW.SetName(underwear_name)
 	UW.gender = underwear_gender
-	UW.icon = icon
+	if(user.is_species(SPECIES_UNATHI) || user.is_species(SPECIES_YEOSA))
+		UW.icon = 'icons/mob/underwear_unath.dmi'
+	else
+		UW.icon = icon
 	UW.icon_state = icon_state
 
 	for(var/datum/gear_tweak/gt in tweaks)

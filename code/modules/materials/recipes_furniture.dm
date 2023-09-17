@@ -17,92 +17,55 @@
 
 /datum/stack_recipe/furniture/chair/padded
 	req_amount = 2
-
-#define PADDED_CHAIR(color) /datum/stack_recipe/furniture/chair/padded/##color{\
-	result_type = /obj/structure/bed/chair/padded/##color;\
-	modifiers = list("padded", #color)\
-	}
-PADDED_CHAIR(beige)
-PADDED_CHAIR(black)
-PADDED_CHAIR(brown)
-PADDED_CHAIR(lime)
-PADDED_CHAIR(teal)
-PADDED_CHAIR(red)
-PADDED_CHAIR(purple)
-PADDED_CHAIR(green)
-PADDED_CHAIR(yellow)
-#undef PADDED_CHAIR
+	result_type = /obj/structure/bed/chair/padded/hard
 
 /datum/stack_recipe/furniture/chair/office
 	title = "office chair"
+	result_type = /obj/structure/bed/chair/office/hard
 	req_amount = 5
 
-/datum/stack_recipe/furniture/chair/office/display_name()
-	return modifiers ? jointext(modifiers + title, " ") : title // Bypass material
-
-/datum/stack_recipe/furniture/chair/office/light
-	result_type = /obj/structure/bed/chair/office/light
-	modifiers = list("light")
-
-/datum/stack_recipe/furniture/chair/office/dark
-	result_type = /obj/structure/bed/chair/office/dark
-	modifiers = list("dark")
-
 /datum/stack_recipe/furniture/chair/office/comfy
+	result_type = /obj/structure/bed/chair/office/comfy/hard
 	req_amount = 7
-
-#define COMFY_OFFICE_CHAIR(color) /datum/stack_recipe/furniture/chair/office/comfy/##color{\
-	result_type = /obj/structure/bed/chair/office/comfy/##color;\
-	modifiers = list(#color, "comfy")\
-	}
-COMFY_OFFICE_CHAIR(beige)
-COMFY_OFFICE_CHAIR(black)
-COMFY_OFFICE_CHAIR(brown)
-COMFY_OFFICE_CHAIR(lime)
-COMFY_OFFICE_CHAIR(teal)
-COMFY_OFFICE_CHAIR(red)
-COMFY_OFFICE_CHAIR(purple)
-COMFY_OFFICE_CHAIR(green)
-COMFY_OFFICE_CHAIR(yellow)
-#undef COMFY_OFFICE_CHAIR
 
 /datum/stack_recipe/furniture/chair/comfy
 	title = "comfy chair"
+	result_type = /obj/structure/bed/chair/office/comfy/hard
 	req_amount = 3
 
-#define COMFY_CHAIR(color) /datum/stack_recipe/furniture/chair/comfy/##color{\
-	result_type = /obj/structure/bed/chair/comfy/##color;\
-	modifiers = list(#color)\
-	}
-COMFY_CHAIR(beige)
-COMFY_CHAIR(black)
-COMFY_CHAIR(brown)
-COMFY_CHAIR(lime)
-COMFY_CHAIR(teal)
-COMFY_CHAIR(red)
-COMFY_CHAIR(purple)
-COMFY_CHAIR(green)
-COMFY_CHAIR(yellow)
-#undef COMFY_CHAIR
+/datum/stack_recipe/furniture/chair/rounded
+	title = "rounded chair"
+	result_type = /obj/structure/bed/chair/rounded/hard
+	req_amount = 3
 
 /datum/stack_recipe/furniture/chair/arm
 	title = "armchair"
+	result_type = /obj/structure/bed/chair/armchair/hard
 	req_amount = 4
 
-#define ARMCHAIR(color) /datum/stack_recipe/furniture/chair/arm/##color{\
-	result_type = /obj/structure/bed/chair/armchair/##color;\
-	modifiers = list(#color)\
-	}
-ARMCHAIR(beige)
-ARMCHAIR(black)
-ARMCHAIR(brown)
-ARMCHAIR(lime)
-ARMCHAIR(teal)
-ARMCHAIR(red)
-ARMCHAIR(purple)
-ARMCHAIR(green)
-ARMCHAIR(yellow)
-#undef ARMCHAIR
+/datum/stack_recipe/furniture/sofa
+	title = "sofa"
+	result_type = /obj/structure/bed/sofa
+	time = 10
+	var/list/modifiers
+
+/datum/stack_recipe/furniture/sofa/display_name()
+	return modifiers ? jointext(modifiers + ..(), " ") : ..()
+
+/datum/stack_recipe/furniture/sofa/m
+	title = "middle sofa"
+	result_type = /obj/structure/bed/sofa/m/hard
+	req_amount = 3
+
+/datum/stack_recipe/furniture/sofa/l
+	title = "left sofa"
+	result_type = /obj/structure/bed/sofa/l/hard
+	req_amount = 3
+
+/datum/stack_recipe/furniture/sofa/r
+	title = "right sofa"
+	result_type = /obj/structure/bed/sofa/r/hard
+	req_amount = 3
 
 /datum/stack_recipe/furniture/chair/wood
 	req_amount = 3
@@ -157,7 +120,6 @@ ARMCHAIR(yellow)
 /datum/stack_recipe/furniture/rack
 	title = "rack"
 	result_type = /obj/structure/table/rack
-	send_material_data = FALSE
 
 /datum/stack_recipe/furniture/closet
 	title = "closet"
@@ -235,9 +197,16 @@ ARMCHAIR(yellow)
 	title = "emergency shutter"
 	result_type = /obj/structure/firedoor_assembly
 
+/datum/stack_recipe/furniture/door_assembly/firedoor/border_only
+	title = "unidirectional emergency shutter"
+	result_type = /obj/structure/firedoor_assembly/border_only
+	req_amount = 2
+
 /datum/stack_recipe/furniture/door_assembly/multi_tile
 	title = "multi-tile airlock assembly"
 	result_type = /obj/structure/door_assembly/multi_tile
+	req_amount = 8
+	time = 10 SECONDS
 
 /datum/stack_recipe/furniture/crate
 	title = "crate"
@@ -254,16 +223,15 @@ ARMCHAIR(yellow)
 	req_amount = 30
 	time = 50
 
-/datum/stack_recipe/furniture/coffin
-	title = "coffin"
-	result_type = /obj/structure/closet/coffin
-	req_amount = 5
-	time = 15
-
 /datum/stack_recipe/furniture/coffin/wooden
 	title = "coffin"
-	result_type = /obj/structure/closet/coffin/wooden
+	result_type = /obj/structure/closet/crate/coffin
 	req_amount = 5
+
+/datum/stack_recipe/furniture/wooden_altar
+	title = "wooden altar"
+	result_type = /obj/structure/table/rack/wooden
+	req_amount = 3
 	time = 15
 
 /datum/stack_recipe/furniture/bookcase
@@ -271,12 +239,6 @@ ARMCHAIR(yellow)
 	result_type = /obj/structure/bookcase
 	req_amount = 5
 	time = 15
-
-/datum/stack_recipe/furniture/truss
-	title = "truss"
-	result_type = /obj/structure/kitchenspike/improvised
-	req_amount = 10
-	time = 20
 
 /datum/stack_recipe/furniture/planting_bed
 	title = "planting bed"
@@ -297,7 +259,7 @@ ARMCHAIR(yellow)
 	if(.)
 		for(var/obj/structure/window/check_window in user.loc)
 			if(check_window.is_fulltile())
-				to_chat(user, SPAN_WARNING("There is already a full-tile window here!"))
+				to_chat(user, "<span class='warning'>There is already a full-tile window here!</span>")
 				return FALSE
 
 /datum/stack_recipe/furniture/fullwindow/spawn_result(mob/user, location, amount)
@@ -315,7 +277,7 @@ ARMCHAIR(yellow)
 	if(.)
 		for(var/obj/structure/window/check_window in user.loc)
 			if(check_window.dir == user.dir)
-				to_chat(user, SPAN_WARNING("There is already a window facing that direction here!"))
+				to_chat(user, "<span class='warning'>There is already a window facing that direction here!</span>")
 				return FALSE
 
 /datum/stack_recipe/furniture/borderwindow/spawn_result(mob/user, location, amount)
@@ -332,7 +294,7 @@ ARMCHAIR(yellow)
 	. = ..()
 	if(.)
 		if(locate(/obj/machinery/door/window) in user.loc)
-			to_chat(user, SPAN_WARNING("There is already a windoor here!"))
+			to_chat(user, "<span class='warning'>There is already a windoor here!</span>")
 			return FALSE
 
 /datum/stack_recipe/furniture/windoor/spawn_result(mob/user, location, amount)

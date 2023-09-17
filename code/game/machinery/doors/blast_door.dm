@@ -22,8 +22,8 @@
 	var/icon_state_open_broken = null
 	var/icon_state_closed_broken = null
 
-	var/open_sound = 'sound/machines/blastdoor_open.ogg'
-	var/close_sound = 'sound/machines/blastdoor_close.ogg'
+	var/open_sound = 'infinity/sound/SS2/effects/machines/blast_open_close.ogg'//inf //was: 'sound/machines/blastdoor_open.ogg'
+	var/close_sound = 'infinity/sound/SS2/effects/machines/blast_open_close.ogg'//inf //was: 'sound/machines/blastdoor_close.ogg'
 
 	closed_layer = ABOVE_WINDOW_LAYER
 	dir = 1
@@ -32,7 +32,7 @@
 
 	//Most blast doors are infrequently toggled and sometimes used with regular doors anyways,
 	//turning this off prevents awkward zone geometry in places like medbay lobby, for example.
-	block_air_zones = FALSE
+	block_air_zones = 0
 
 	var/begins_closed = TRUE
 	var/material/implicit_material
@@ -45,11 +45,11 @@
 	)
 	// To be fleshed out and moved to parent door, but staying minimal for now.
 	public_methods = list(
-		/singleton/public_access/public_method/open_door,
-		/singleton/public_access/public_method/close_door_delayed,
-		/singleton/public_access/public_method/toggle_door
+		/decl/public_access/public_method/open_door,
+		/decl/public_access/public_method/close_door_delayed,
+		/decl/public_access/public_method/toggle_door
 	)
-	stock_part_presets = list(/singleton/stock_part_preset/radio/receiver/blast_door = 1)
+	stock_part_presets = list(/decl/stock_part_preset/radio/receiver/blast_door = 1)
 
 /obj/machinery/door/blast/Initialize()
 	. = ..()
@@ -64,7 +64,7 @@
 
 /obj/machinery/door/blast/examine(mob/user)
 	. = ..()
-	if(MACHINE_IS_BROKEN(src))
+	if((stat & BROKEN))
 		to_chat(user, "It's broken.")
 
 // Proc: Bumped()
@@ -81,12 +81,12 @@
 // Description: Updates icon of this object. Uses icon state variables.
 /obj/machinery/door/blast/on_update_icon()
 	if(density)
-		if(MACHINE_IS_BROKEN(src))
+		if(stat & BROKEN)
 			icon_state = icon_state_closed_broken
 		else
 			icon_state = icon_state_closed
 	else
-		if(MACHINE_IS_BROKEN(src))
+		if(stat & BROKEN)
 			icon_state = icon_state_open_broken
 		else
 			icon_state = icon_state_open
@@ -97,8 +97,8 @@
 // Parameters: None
 // Description: Opens the door. No checks are done inside this proc.
 /obj/machinery/door/blast/proc/force_open()
-	operating = DOOR_OPERATING_YES
-	playsound(src.loc, open_sound, 100, 1)
+	operating = 1
+	playsound(src.loc, open_sound, 100, need_change_sound_freq) //inf //was: playsound(src.loc, open_sound, 100, 1)
 	flick(icon_state_opening, src)
 	set_density(0)
 	update_nearby_tiles()
@@ -106,22 +106,24 @@
 	set_opacity(0)
 	sleep(15)
 	layer = open_layer
-	operating = DOOR_OPERATING_NO
+	operating = 0
 
 // Proc: force_close()
 // Parameters: None
 // Description: Closes the door. No checks are done inside this proc.
 /obj/machinery/door/blast/proc/force_close()
-	operating = DOOR_OPERATING_YES
-	playsound(src.loc, close_sound, 100, 1)
+	operating = 1
+	playsound(src.loc, close_sound, 100, need_change_sound_freq) //inf //was: playsound(src.loc, close_sound, 100, 1)
+
 	layer = closed_layer
 	flick(icon_state_closing, src)
+	crush() //inf
 	set_density(1)
 	update_nearby_tiles()
 	update_icon()
 	set_opacity(1)
 	sleep(15)
-	operating = DOOR_OPERATING_NO
+	operating = 0
 
 // Proc: force_toggle()
 // Parameters: None
@@ -135,9 +137,6 @@
 /obj/machinery/door/blast/get_material()
 	return implicit_material
 
-/obj/machinery/door/blast/get_material_melting_point()
-	return 10000 // Blast doors are implicitly heavily fire resistant and are used for containing high-temperature areas like burn chambers.
-
 // Proc: attackby()
 // Parameters: 2 (C - Item this object was clicked with, user - Mob which clicked this object)
 // Description: If we are clicked with crowbar or wielded fire axe, try to manually open the door.
@@ -145,45 +144,40 @@
 /obj/machinery/door/blast/attackby(obj/item/C as obj, mob/user as mob)
 	add_fingerprint(user, 0, C)
 	if(isCrowbar(C) || (istype(C, /obj/item/material/twohanded/fireaxe) && C:wielded == 1))
-		if(((!is_powered()) || MACHINE_IS_BROKEN(src)) && !( operating ))
-			to_chat(user, SPAN_NOTICE("You begin prying at \the [src]..."))
-			if(do_after(user, (C.toolspeed * 2) SECONDS, src, DO_REPAIR_CONSTRUCT))
+		if(((stat & NOPOWER) || (stat & BROKEN)) && !( operating ))
+			to_chat(user, "<span class='notice'>You begin prying at \the [src]...</span>")
+			if(do_after(user, 2 SECONDS, src))
 				force_toggle()
 		else
-			to_chat(user, SPAN_NOTICE("[src]'s motors resist your effort."))
+			to_chat(user, "<span class='notice'>[src]'s motors resist your effort.</span>")
 		return
 	if(istype(C, /obj/item/stack/material) && C.get_material_name() == MATERIAL_PLASTEEL)
-		var/amt = ceil(get_damage_value() / 150)
+		var/amt = Ceiling((maxhealth - health)/150)
 		if(!amt)
-			to_chat(user, SPAN_NOTICE("\The [src] is already fully functional."))
+			to_chat(user, "<span class='notice'>\The [src] is already fully functional.</span>")
 			return
 		var/obj/item/stack/P = C
 		if(!P.can_use(amt))
-			to_chat(user, SPAN_WARNING("You don't have enough sheets to repair this! You need at least [amt] sheets."))
+			to_chat(user, "<span class='warning'>You don't have enough sheets to repair this! You need at least [amt] sheets.</span>")
 			return
-		to_chat(user, SPAN_NOTICE("You begin repairing \the [src]..."))
-		if(do_after(user, 5 SECONDS, src, DO_REPAIR_CONSTRUCT))
+		to_chat(user, "<span class='notice'>You begin repairing \the [src]...</span>")
+		if(do_after(user, 5 SECONDS, src))
 			if(P.use(amt))
-				to_chat(user, SPAN_NOTICE("You have repaired \the [src]."))
-				revive_health()
+				to_chat(user, "<span class='notice'>You have repaired \the [src].</span>")
+				repair()
 			else
-				to_chat(user, SPAN_WARNING("You don't have enough sheets to repair this! You need at least [amt] sheets."))
+				to_chat(user, "<span class='warning'>You don't have enough sheets to repair this! You need at least [amt] sheets.</span>")
 		else
-			to_chat(user, SPAN_WARNING("You must remain still while working on \the [src]."))
-		return
+			to_chat(user, "<span class='warning'>You must remain still while working on \the [src].</span>")
+	check_force(C, user)
 
-	return ..()
-
-
-/obj/machinery/door/blast/allowed(mob/M)
-	return FALSE // Blast doors can only be opened remotely, or with a crowbar when broken/unpowered.
 
 
 // Proc: open()
 // Parameters: None
 // Description: Opens the door. Does necessary checks. Automatically closes if autoclose is true
 /obj/machinery/door/blast/open()
-	if (operating || (MACHINE_IS_BROKEN(src) || !is_powered()))
+	if (operating || (stat & BROKEN || stat & NOPOWER))
 		return
 	force_open()
 	if(autoclose)
@@ -195,20 +189,28 @@
 // Parameters: None
 // Description: Closes the door. Does necessary checks.
 /obj/machinery/door/blast/close()
-	if (operating || (MACHINE_IS_BROKEN(src) || !is_powered()))
+	if (operating || (stat & BROKEN || stat & NOPOWER))
 		return
 	force_close()
 
 /obj/machinery/door/blast/toggle()
-	if (operating || (MACHINE_IS_BROKEN(src) || !is_powered()))
+	if (operating || (stat & BROKEN || stat & NOPOWER))
 		return
 	force_toggle()
+
+// Proc: repair()
+// Parameters: None
+// Description: Fully repairs the blast door.
+/obj/machinery/door/blast/proc/repair()
+	health = maxhealth
+	set_broken(FALSE)
+	queue_icon_update()
 
 /obj/machinery/door/blast/CanPass(atom/movable/mover, turf/target, height=0, air_group=0)
 	if(air_group) return 1
 	return ..()
 
-/obj/machinery/door/blast/do_simple_ranged_interaction(mob/user)
+/obj/machinery/door/blast/do_simple_ranged_interaction(var/mob/user)
 	return TRUE
 
 // Used with mass drivers to time the close.
@@ -217,37 +219,52 @@
 	sleep(5 SECONDS)
 	close()
 
-/singleton/public_access/public_method/close_door_delayed
+/decl/public_access/public_method/close_door_delayed
 	name = "delayed close door"
 	desc = "Closes the door if possible, after a short delay."
 	call_proc = /obj/machinery/door/blast/proc/delayed_close
 
-/singleton/stock_part_preset/radio/receiver/blast_door
+/decl/stock_part_preset/radio/receiver/blast_door
 	frequency = BLAST_DOORS_FREQ
 	receive_and_call = list(
-		"open_door" = /singleton/public_access/public_method/open_door,
-		"close_door_delayed" = /singleton/public_access/public_method/close_door_delayed,
-		"toggle_door" = /singleton/public_access/public_method/toggle_door
+		"open_door" = /decl/public_access/public_method/open_door,
+		"close_door_delayed" = /decl/public_access/public_method/close_door_delayed,
+		"toggle_door" = /decl/public_access/public_method/toggle_door
 	)
 
 /obj/machinery/button/blast_door
-	icon = 'icons/obj/structures/buttons.dmi'
+	icon = 'icons/obj/buttons.dmi'
 	name = "remote blast door-control"
 	desc = "It controls blast doors, remotely."
-	icon_state = "blastctrl"
-	stock_part_presets = list(/singleton/stock_part_preset/radio/basic_transmitter/blast_door_button = 1)
+	icon_state = "blastctrl0"
+	stock_part_presets = list(/decl/stock_part_preset/radio/basic_transmitter/blast_door_button = 1)
 
-/singleton/stock_part_preset/radio/basic_transmitter/blast_door_button
+/decl/stock_part_preset/radio/basic_transmitter/blast_door_button
 	transmit_on_change = list(
-		"toggle_door" = /singleton/public_access/public_variable/button_active,
+		"toggle_door" = /decl/public_access/public_variable/button_active,
 	)
 	frequency = BLAST_DOORS_FREQ
 
 /obj/machinery/button/blast_door/on_update_icon()
-	if(operating)
-		icon_state = "blastctrl1"
+	if(!overlay)
+		overlay = image(icon, "blastctrl0-overlay")
+		overlay.plane = EFFECTS_ABOVE_LIGHTING_PLANE
+		overlay.layer = ABOVE_LIGHTING_LAYER
+
+	overlays.Cut()
+	if(stat & (NOPOWER|BROKEN))
+		icon_state = "blastctrl-p"
+		overlay.icon_state = "blastctrl-p-overlay"
+		overlays += overlay
+		set_light(0.3, 0.1, 1, 2,"#C50022")
 	else
-		icon_state = "blastctrl"
+		icon_state = "blastctrl[operating]"
+		overlay.icon_state = "blastctrl[operating]-overlay"
+		overlays += overlay
+		switch(operating)
+			if(0) set_light(0.3, 0.1, 1, 2, "#F2FF00")
+			if(1) set_light(0.3, 0.1, 1, 2, "#a1FF00")
+			else set_light(0.3, 0.1, 1, 2,"#f86060")
 
 // SUBTYPE: Regular
 // Your classical blast door, found almost everywhere.
@@ -262,12 +279,13 @@
 	icon_state_open_broken = "blast_open_broken"
 	icon_state_closed_broken = "blast_closed_broken"
 
-	health_min_damage = 30
-	health_max = 1000
-	block_air_zones = TRUE
+	min_force = 30
+	maxhealth = 1000
+	block_air_zones = 1
+	need_change_sound_freq = 0 //inf
 
 /obj/machinery/door/blast/regular/escape_pod
-	name = "escape pod release door"
+	name = "Escape Pod release Door"
 
 /obj/machinery/door/blast/regular/escape_pod/Process()
 	if(evacuation_controller.emergency_evacuation && evacuation_controller.state >= EVAC_LAUNCHING && src.icon_state == icon_state_closed)
@@ -276,6 +294,7 @@
 
 /obj/machinery/door/blast/regular/open
 	begins_closed = FALSE
+	icon_state = "pdoor0" //INF
 
 // SUBTYPE: Shutters
 // Nicer looking, and also weaker, shutters. Found in kitchen and similar areas.
@@ -294,10 +313,96 @@
 
 	open_sound = 'sound/machines/shutters_open.ogg'
 	close_sound = 'sound/machines/shutters_close.ogg'
-	health_min_damage = 15
-	health_max = 500
+	min_force = 15
+	maxhealth = 500
 	explosion_resistance = 10
 	pry_mod = 0.55
 
 /obj/machinery/door/blast/shutters/open
+	icon_state = "shutter0"
 	begins_closed = FALSE
+
+/obj/machinery/door/blast/shutters/attack_generic(var/mob/user, var/damage)
+	if(stat & BROKEN)
+		qdel(src)
+	..()
+
+// SUBTYPE: Multi-tile
+// Pod doors ported from Paradise
+
+ // Whoever wrote the old code for multi-tile spesspod doors needs to burn in hell. - Unknown
+ // Wise words. - Bxil
+/obj/machinery/door/blast/multi_tile
+	name = "large blast door"
+
+/obj/machinery/door/blast/multi_tile/Initialize(mapload)
+	. = ..()
+	apply_opacity_to_my_turfs(opacity)
+
+/obj/machinery/door/blast/multi_tile/set_opacity()
+	. = ..()
+	apply_opacity_to_my_turfs(opacity)
+
+//Multi-tile poddoors don't turn invisible automatically, so we change the opacity of the turfs below instead one by one.
+/obj/machinery/door/blast/multi_tile/proc/apply_opacity_to_my_turfs(new_opacity)
+	for(var/turf/T in locs)
+		T.set_opacity(new_opacity)
+	update_nearby_tiles()
+
+/obj/machinery/door/blast/multi_tile
+	icon_state_open = "open"
+	icon_state_opening = "opening"
+	icon_state_closed = "closed"
+	icon_state_closing = "closing"
+	icon_state = "closed"
+
+/obj/machinery/door/blast/multi_tile/four_tile_ver
+	icon = 'icons/obj/doors/multi-tile/1x4blast_vert.dmi'
+	bound_height = 128
+	width = 4
+	dir = NORTH
+
+/obj/machinery/door/blast/multi_tile/three_tile_ver
+	icon = 'icons/obj/doors/multi-tile/1x3blast_vert.dmi'
+	bound_height = 96
+	width = 3
+	dir = NORTH
+
+/obj/machinery/door/blast/multi_tile/two_tile_ver
+	icon = 'icons/obj/doors/multi-tile/1x2blast_vert.dmi'
+	bound_height = 64
+	width = 2
+	dir = NORTH
+
+/obj/machinery/door/blast/multi_tile/four_tile_hor
+	icon = 'icons/obj/doors/multi-tile/1x4blast_hor.dmi'
+	bound_width = 128
+	width = 4
+	dir = EAST
+
+/obj/machinery/door/blast/multi_tile/three_tile_hor
+	icon = 'icons/obj/doors/multi-tile/1x3blast_hor.dmi'
+	bound_width = 96
+	width = 3
+	dir = EAST
+
+/obj/machinery/door/blast/multi_tile/two_tile_hor
+	icon = 'icons/obj/doors/multi-tile/1x2blast_hor.dmi'
+	bound_width = 64
+	width = 2
+	dir = EAST
+
+
+/obj/machinery/door/blast/multi_tile/four_tile_ver_sec
+	icon = 'icons/obj/doors/multi-tile/1x4blast_vert_sec.dmi'
+	bound_height = 128
+	width = 4
+	dir = NORTH
+	autoclose = TRUE
+
+/obj/machinery/door/blast/multi_tile/four_tile_hor_sec
+	icon = 'icons/obj/doors/multi-tile/1x4blast_hor_sec.dmi'
+	bound_width = 128
+	width = 4
+	dir = EAST
+	autoclose = TRUE

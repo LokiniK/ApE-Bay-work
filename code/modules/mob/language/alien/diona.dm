@@ -1,9 +1,9 @@
 /datum/language/diona
 	name = LANGUAGE_ROOTLOCAL
 	desc = "A complex language known instinctively by Dionaea, 'spoken' by emitting modulated radio waves. This version uses high frequency waves for quick communication at short ranges."
-	speech_verb = "creaks and rustles"
-	ask_verb = "creaks"
-	exclaim_verb = "rustles"
+	speech_verb = "шуршит"
+	ask_verb = "скрипит"
+	exclaim_verb = "шелестит"
 	colour = "soghun"
 	key = "q"
 	flags = RESTRICTED

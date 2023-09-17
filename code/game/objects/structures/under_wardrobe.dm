@@ -3,55 +3,48 @@
 /obj/structure/undies_wardrobe
 	name = "underwear wardrobe"
 	desc = "Holds item of clothing you shouldn't be showing off in the hallways."
-	icon = 'icons/obj/structures/undies_wardrobe.dmi'
+	icon = 'icons/obj/undies_wardrobe.dmi'
 	icon_state = "closed"
 	density = TRUE
-	anchored = TRUE
-	obj_flags = OBJ_FLAG_ANCHORABLE
 	var/static/list/amount_of_underwear_by_id_card
 
+/obj/structure/undies_wardrobe/attackby(var/obj/item/underwear/underwear, var/mob/user)
+	if(istype(underwear))
+		if(!user.unEquip(underwear))
+			return
+		qdel(underwear)
+		user.visible_message("<span class='notice'>\The [user] inserts \their [underwear.name] into \the [src].</span>", "<span class='notice'>You insert your [underwear.name] into \the [src].</span>")
 
-/obj/structure/undies_wardrobe/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Underwear - Return to wardrobe
-	if (istype(tool, /obj/item/underwear))
-		if (!user.unEquip(tool, src))
-			FEEDBACK_UNEQUIP_FAILURE(user, tool)
-			return TRUE
-		user.visible_message(
-			SPAN_NOTICE("\The [user] inserts \a [tool] into \the [src]."),
-			SPAN_NOTICE("You insert \the [tool] into \the [src].")
-		)
-		qdel(tool)
-		var/obj/item/card/id/id = user.GetIdCard()
+		var/id = user.GetIdCard()
 		var/message
-		if (id)
+		if(id)
 			message = "ID card detected. Your underwear quota for this shift has been increased, if applicable."
 		else
 			message = "No ID card detected. Thank you for your contribution."
+
 		audible_message(message, WARDROBE_BLIND_MESSAGE(user))
 
 		var/number_of_underwear = LAZYACCESS(amount_of_underwear_by_id_card, id) - 1
-		if (number_of_underwear)
+		if(number_of_underwear)
 			LAZYSET(amount_of_underwear_by_id_card, id, number_of_underwear)
 			GLOB.destroyed_event.register(id, src, /obj/structure/undies_wardrobe/proc/remove_id_card)
 		else
 			remove_id_card(id)
-		return TRUE
 
-	return ..()
+	else
+		..()
 
-
-/obj/structure/undies_wardrobe/proc/remove_id_card(id_card)
+/obj/structure/undies_wardrobe/proc/remove_id_card(var/id_card)
 	LAZYREMOVE(amount_of_underwear_by_id_card, id_card)
 	GLOB.destroyed_event.unregister(id_card, src, /obj/structure/undies_wardrobe/proc/remove_id_card)
 
-/obj/structure/undies_wardrobe/attack_hand(mob/user)
+/obj/structure/undies_wardrobe/attack_hand(var/mob/user)
 	if(!human_who_can_use_underwear(user))
-		to_chat(user, SPAN_WARNING("Sadly there's nothing in here for you to wear."))
+		to_chat(user, "<span class='warning'>Sadly there's nothing in here for you to wear.</span>")
 		return
 	interact(user)
 
-/obj/structure/undies_wardrobe/interact(mob/living/carbon/human/H)
+/obj/structure/undies_wardrobe/interact(var/mob/living/carbon/human/H)
 	var/id = H.GetIdCard()
 
 	var/dat = list()
@@ -63,12 +56,12 @@
 	dat = jointext(dat,null)
 	show_browser(H, dat, "window=wardrobe;size=400x250")
 
-/obj/structure/undies_wardrobe/proc/human_who_can_use_underwear(mob/living/carbon/human/H)
-	if(!istype(H) || !H.species || !(H.species.appearance_flags & SPECIES_APPEARANCE_HAS_UNDERWEAR))
+/obj/structure/undies_wardrobe/proc/human_who_can_use_underwear(var/mob/living/carbon/human/H)
+	if(!istype(H) || !H.species || !(H.species.appearance_flags & HAS_UNDERWEAR))
 		return FALSE
 	return TRUE
 
-/obj/structure/undies_wardrobe/CanUseTopic(user)
+/obj/structure/undies_wardrobe/CanUseTopic(var/user)
 	if(!human_who_can_use_underwear(user))
 		return STATUS_CLOSE
 
@@ -118,11 +111,17 @@
 	if(.)
 		interact(H)
 
-/obj/structure/undies_wardrobe/proc/exlude_none(list/L)
+/obj/structure/undies_wardrobe/proc/exlude_none(var/list/L)
 	. = L.Copy()
 	for(var/e in .)
 		var/datum/category_item/underwear/UWI = e
 		if(!UWI.underwear_type)
 			. -= UWI
+
+/obj/structure/undies_wardrobe/dresser
+	name = "dresser"
+	desc = "Holds item of clothing you shouldn't be showing off in the hallways."
+	icon = 'infinity/icons/obj/objects.dmi'
+	icon_state = "metal_dresser"
 
 #undef WARDROBE_BLIND_MESSAGE

@@ -14,7 +14,7 @@
 /obj/item/card
 	name = "card"
 	desc = "Does card things."
-	icon = 'icons/obj/tools/card.dmi'
+	icon = 'icons/obj/card.dmi'
 	w_class = ITEM_SIZE_TINY
 	slot_flags = SLOT_EARS
 
@@ -32,7 +32,7 @@
 	else
 		to_chat(user, "It has a blank space for a signature.")
 
-/obj/item/card/union/attackby(obj/item/thing, mob/user)
+/obj/item/card/union/attackby(var/obj/item/thing, var/mob/user)
 	if(istype(thing, /obj/item/pen))
 		if(signed_by)
 			to_chat(user, SPAN_WARNING("\The [src] has already been signed."))
@@ -43,56 +43,6 @@
 				user.visible_message(SPAN_NOTICE("\The [user] signs \the [src] with a flourish."))
 		return
 	..()
-
-/obj/item/card/operant_card
-	name = "operant registration card"
-	icon_state = "warrantcard_civ"
-	desc = "A registration card in a faux-leather case. It marks the named individual as a registered, law-abiding psionic."
-	w_class = ITEM_SIZE_SMALL
-	attack_verb = list("whipped")
-	hitsound = 'sound/weapons/towelwhip.ogg'
-	var/info
-	var/potential
-	var/use_rating
-
-
-/obj/item/card/operant_card/proc/set_info(mob/living/carbon/human/human)
-	if(!istype(human))
-		return
-	switch(human.psi?.rating)
-		if(0)
-			use_rating = "[human.psi.rating]-Lambda"
-		if(1)
-			use_rating = "[human.psi.rating]-Epsilon"
-		if(2)
-			use_rating = "[human.psi.rating]-Gamma"
-		if(3)
-			use_rating = "[human.psi.rating]-Delta"
-		if(4)
-			use_rating = "[human.psi.rating]-Beta"
-		if(5)
-			use_rating = "[human.psi.rating]-Alpha"
-		if (6 to INFINITY)
-			use_rating = "[human.psi.rating]-Omega"
-		else
-			use_rating = "Non-Psionic"
-
-	potential = "This individual has an overall psi rating of [use_rating]."
-	info = {"\
-		Name: [human.real_name]\n\
-		Species: [human.get_species()]\n\
-		Fingerprint: [human.dna?.uni_identity ? md5(human.dna.uni_identity) : "N/A"]\n\
-		Assessed Potential: [potential]\
-	"}
-
-
-/obj/item/card/operant_card/attack_self(mob/living/user)
-	user.visible_message(
-		SPAN_ITALIC("\The [user] examines \a [src]."),
-		SPAN_ITALIC("You examine \the [src]."),
-		3
-	)
-	to_chat(user, info || SPAN_WARNING("\The [src] is completely blank!"))
 
 /obj/item/card/data
 	name = "data card"
@@ -110,7 +60,7 @@
 
 /obj/item/card/data/on_update_icon()
 	overlays.Cut()
-	var/image/detail_overlay = image('icons/obj/tools/card.dmi', src,"[icon_state]-color")
+	var/image/detail_overlay = image('icons/obj/card.dmi', src,"[icon_state]-color")
 	detail_overlay.color = detail_color
 	overlays += detail_overlay
 
@@ -142,7 +92,7 @@
 
 /obj/item/card/emag_broken/examine(mob/user, distance)
 	. = ..()
-	if(distance <= 0 && (user.skill_check(SKILL_DEVICES, SKILL_TRAINED) || player_is_antag(user.mind)))
+	if(distance <= 0 && (user.skill_check(SKILL_DEVICES, SKILL_ADEPT) || player_is_antag(user.mind)))
 		to_chat(user, SPAN_WARNING("You can tell the components are completely fried; whatever use it may have had before is gone."))
 
 /obj/item/card/emag_broken/get_antag_info()
@@ -157,7 +107,17 @@
 	origin_tech = list(TECH_MAGNET = 2, TECH_ESOTERIC = 2)
 	var/uses = 10
 
-var/global/const/NO_EMAG_ACT = -50
+	var/static/list/card_choices = list(
+							/obj/item/card/emag,
+							/obj/item/card/union,
+							/obj/item/card/data,
+							/obj/item/card/data/full_color,
+							/obj/item/card/data/disk,
+							/obj/item/card/id,
+						) //Should be enough of a selection for most purposes
+	var/list/emag_sounds = list('infinity/sound/SS2/effects/emag_act.wav') //inf
+
+var/const/NO_EMAG_ACT = -50
 
 /obj/item/card/emag/resolve_attackby(atom/A, mob/user)
 	var/used_uses = A.emag_act(uses, user, src)
@@ -168,9 +128,10 @@ var/global/const/NO_EMAG_ACT = -50
 	A.add_fingerprint(user)
 	if(used_uses)
 		log_and_message_admins("emagged \an [A].")
+		playsound(get_turf(A), pick(emag_sounds), 40, extrarange = -3) //inf
 
 	if(uses<1)
-		user.visible_message(SPAN_WARNING("\The [src] fizzles and sparks - it seems it's been used once too often, and is now spent."))
+		user.visible_message("<span class='warning'>\The [src] fizzles and sparks - it seems it's been used once too often, and is now spent.</span>")
 		var/obj/item/card/emag_broken/junk = new(user.loc)
 		junk.add_fingerprint(user)
 		qdel(src)
@@ -191,7 +152,12 @@ var/global/const/NO_EMAG_ACT = -50
 	icon_state = "base"
 	item_state = "card-id"
 	slot_flags = SLOT_ID
-
+	//[inf]
+	sprite_sheets = list(
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_id_resomi.dmi',
+		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/id.dmi'
+		)
+	//[/inf]
 	var/list/access = list()
 	var/registered_name = "Unknown" // The name registered_name on the card
 	var/associated_account_number = 0
@@ -244,14 +210,14 @@ var/global/const/NO_EMAG_ACT = -50
 	for(var/detail in extra_details)
 		overlays += overlay_image(icon, detail, flags=RESET_COLOR)
 
-/obj/item/card/id/CanUseTopic(user)
+/obj/item/card/id/CanUseTopic(var/user)
 	if(user in view(get_turf(src)))
 		return STATUS_INTERACTIVE
 
-/obj/item/card/id/OnTopic(mob/user, list/href_list)
+/obj/item/card/id/OnTopic(var/mob/user, var/list/href_list)
 	if(href_list["look_at_id"])
 		if(istype(user))
-			examinate(user, src)
+			user.examinate(src)
 			return TOPIC_HANDLED
 
 /obj/item/card/id/examine(mob/user, distance)
@@ -282,29 +248,31 @@ var/global/const/NO_EMAG_ACT = -50
 	if(assignment)
 		. += ", [assignment]"
 
-/obj/item/card/id/proc/set_id_photo(mob/M)
+/obj/item/card/id/proc/set_id_photo(var/mob/M)
+	set waitfor = FALSE //inf, nude card photo fix
+	sleep(20) //inf, nude card photo fix
 	front = getFlatIcon(M, SOUTH, always_use_defdir = 1)
 	side = getFlatIcon(M, WEST, always_use_defdir = 1)
 
-/mob/proc/set_id_info(obj/item/card/id/id_card)
+/mob/proc/set_id_info(var/obj/item/card/id/id_card)
 	id_card.age = 0
 
 	id_card.formal_name_prefix = initial(id_card.formal_name_prefix)
 	id_card.formal_name_suffix = initial(id_card.formal_name_suffix)
 	if(client && client.prefs)
 		for(var/culturetag in client.prefs.cultural_info)
-			var/singleton/cultural_info/culture = SSculture.get_culture(client.prefs.cultural_info[culturetag])
+			var/decl/cultural_info/culture = SSculture.get_culture(client.prefs.cultural_info[culturetag])
 			if(culture)
 				id_card.formal_name_prefix = "[culture.get_formal_name_prefix()][id_card.formal_name_prefix]"
 				id_card.formal_name_suffix = "[id_card.formal_name_suffix][culture.get_formal_name_suffix()]"
 
 	id_card.registered_name = real_name
 
-	var/pronouns = "Unset"
-	var/datum/pronouns/P = choose_from_pronouns()
-	if(P)
-		pronouns = P.formal_term
-	id_card.sex = pronouns
+	var/gender_term = "Unset"
+	var/datum/gender/G = gender_datums[get_sex()]
+	if(G)
+		gender_term = gender2text(G.formal_term)
+	id_card.sex = gender2text(gender_term)
 	id_card.set_id_photo(src)
 
 	if(dna)
@@ -312,23 +280,18 @@ var/global/const/NO_EMAG_ACT = -50
 		id_card.dna_hash		= dna.unique_enzymes
 		id_card.fingerprint_hash= md5(dna.uni_identity)
 
-/mob/living/carbon/human/set_id_info(obj/item/card/id/id_card)
+/mob/living/carbon/human/set_id_info(var/obj/item/card/id/id_card)
 	..()
 	id_card.age = age
 	if(GLOB.using_map.flags & MAP_HAS_BRANCH)
 		id_card.military_branch = char_branch
 	if(GLOB.using_map.flags & MAP_HAS_RANK)
 		id_card.military_rank = char_rank
-		if (char_rank)
-			var/singleton/rank_category/category = char_rank.rank_category()
-			if(category)
-				for(var/add_access in category.add_accesses)
-					id_card.access.Add(add_access)
 
 /obj/item/card/id/proc/dat()
 	var/list/dat = list("<table><tr><td>")
 	dat += text("Name: []</A><BR>", "[formal_name_prefix][registered_name][formal_name_suffix]")
-	dat += text("Pronouns: []</A><BR>\n", sex)
+	dat += text("Sex: []</A><BR>\n", sex)
 	dat += text("Age: []</A><BR>\n", age)
 
 	if(GLOB.using_map.flags & MAP_HAS_BRANCH)
@@ -369,11 +332,11 @@ var/global/const/NO_EMAG_ACT = -50
 	to_chat(usr, "The fingerprint hash on the card is [fingerprint_hash].")
 	return
 
-/singleton/vv_set_handler/id_card_military_branch
+/decl/vv_set_handler/id_card_military_branch
 	handled_type = /obj/item/card/id
 	handled_vars = list("military_branch")
 
-/singleton/vv_set_handler/id_card_military_branch/handle_set_var(obj/item/card/id/id, variable, var_value, client)
+/decl/vv_set_handler/id_card_military_branch/handle_set_var(var/obj/item/card/id/id, variable, var_value, client)
 	if(!var_value)
 		id.military_branch = null
 		id.military_rank = null
@@ -386,7 +349,7 @@ var/global/const/NO_EMAG_ACT = -50
 		return
 
 	if(ispath(var_value, /datum/mil_branch) || istext(var_value))
-		var/datum/mil_branch/new_branch = GLOB.mil_branches.get_branch(var_value)
+		var/datum/mil_branch/new_branch = mil_branches.get_branch(var_value)
 		if(new_branch)
 			if(new_branch != id.military_branch)
 				id.military_branch = new_branch
@@ -395,11 +358,11 @@ var/global/const/NO_EMAG_ACT = -50
 
 	to_chat(client, SPAN_WARNING("Input, must be an existing branch - [var_value] is invalid"))
 
-/singleton/vv_set_handler/id_card_military_rank
+/decl/vv_set_handler/id_card_military_rank
 	handled_type = /obj/item/card/id
 	handled_vars = list("military_rank")
 
-/singleton/vv_set_handler/id_card_military_rank/handle_set_var(obj/item/card/id/id, variable, var_value, client)
+/decl/vv_set_handler/id_card_military_rank/handle_set_var(var/obj/item/card/id/id, variable, var_value, client)
 	if(!var_value)
 		id.military_rank = null
 		return
@@ -417,7 +380,7 @@ var/global/const/NO_EMAG_ACT = -50
 		var_value = rank.name
 
 	if(istext(var_value))
-		var/new_rank = GLOB.mil_branches.get_rank(id.military_branch.name, var_value)
+		var/new_rank = mil_branches.get_rank(id.military_branch.name, var_value)
 		if(new_rank)
 			id.military_rank = new_rank
 			return
@@ -478,11 +441,13 @@ var/global/const/NO_EMAG_ACT = -50
 	detail_color = COLOR_COMMAND_BLUE
 	extra_details = list("goldstripe")
 
-/obj/item/card/id/centcom/New()
-	access = get_all_centcom_access()
+/obj/item/card/id/centcom/NtPass
+
+/obj/item/card/id/centcom/NtPass/New()
+	access = get_all_centcom_access() | access_iaa
 	..()
 
-/obj/item/card/id/centcom/station/New()
+/obj/item/card/id/centcom/NtPass/station/New()
 	..()
 	access |= get_all_station_access()
 
@@ -491,9 +456,18 @@ var/global/const/NO_EMAG_ACT = -50
 	assignment = "Emergency Response Team"
 
 /obj/item/card/id/centcom/ERT/New()
+	access = get_all_station_access() | access_cent_general | access_iaa
 	..()
-	access |= get_all_station_access()
 
+/obj/item/card/id/centcom/ERT/commando/New()
+	..()
+	access |= get_all_centcom_access()
+/*inf dev stuff	access |= list(
+		access_security, access_medical, access_engine, access_network, access_maint_tunnels,
+		access_emergency_storage, access_bridge, access_janitor, access_kitchen,
+		access_cargo, access_mailsorting, access_RC_announce, access_keycard_auth,
+		access_external_airlocks, access_eva, access_cent_creed
+		)*/
 /obj/item/card/id/foundation_civilian
 	name = "operant registration card"
 	desc = "A registration card in a faux-leather case. It marks the named individual as a registered, law-abiding psionic."
@@ -517,7 +491,7 @@ var/global/const/NO_EMAG_ACT = -50
 		else
 			to_chat(user, SPAN_NOTICE("This is the real deal, stamped by [GLOB.using_map.boss_name]. It gives the holder the full authority to pursue their goals. You believe it implicitly."))
 
-/obj/item/card/id/foundation/attack_self(mob/living/user)
+/obj/item/card/id/foundation/attack_self(var/mob/living/user)
 	. = ..()
 	if(istype(user))
 		for(var/mob/M in viewers(world.view, get_turf(user))-user)
@@ -641,6 +615,9 @@ var/global/const/NO_EMAG_ACT = -50
 	desc = "A card issued to civilian staff."
 	job_access_type = DEFAULT_JOB_TYPE
 	detail_color = COLOR_CIVIE_GREEN
+
+/obj/item/card/id/civilian/bartender
+	job_access_type = /datum/job/bartender
 
 /obj/item/card/id/civilian/chef
 	job_access_type = /datum/job/chef

@@ -8,9 +8,9 @@
 //			/old_name: name before the change
 //			/new_name: name after the change
 
-GLOBAL_DATUM_INIT(name_set_event, /singleton/observ/name_set, new)
+GLOBAL_DATUM_INIT(name_set_event, /decl/observ/name_set, new)
 
-/singleton/observ/name_set
+/decl/observ/name_set
 	name = "Name Set"
 	expected_type = /atom
 
@@ -18,15 +18,7 @@ GLOBAL_DATUM_INIT(name_set_event, /singleton/observ/name_set, new)
 * Name Set Handling *
 *********************/
 
-/**
- * Sets the atom's name to the provided value, allowing for any additional processing required that `name = new_value` alone cannot perform. It is preferred to use this over modifying the `name` var directly.
- *
- * This proc will also raise `name_set_event`.
- *
- * **Parameters**:
- * - `new_name` (string) - The new name to set.
- */
-/atom/proc/SetName(new_name)
+/atom/proc/SetName(var/new_name)
 	var/old_name = name
 	if(old_name != new_name)
 		name = new_name

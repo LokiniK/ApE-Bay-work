@@ -15,14 +15,14 @@
 
 /datum/genetics/side_effect/proc/trigger_side_effect(mob/living/carbon/human/H)
 	if(ishuman(H))
-		addtimer(new Callback(src, .proc/do_side_effect, H), 0)
+		addtimer(CALLBACK(src, .proc/do_side_effect, H), 0)
 
 /datum/genetics/side_effect/proc/do_side_effect(mob/living/carbon/human/H)
 	var/tp = pick(typesof(/datum/genetics/side_effect) - /datum/genetics/side_effect)
 	var/datum/genetics/side_effect/S = new tp
 
 	S.start(H)
-	addtimer(new Callback(H, /mob/proc/Weaken, rand(0, S.duration / 50)), 20)
+	addtimer(CALLBACK(H, /mob/proc/Weaken, rand(0, S.duration / 50)), 20)
 	sleep(S.duration)
 	H.SetWeakened(0)
 	S.finish(H)
@@ -67,9 +67,10 @@
 	effect = "Subject becomes confused."
 	duration = 30 SECONDS
 
-/datum/genetics/side_effect/confuse/start(mob/living/carbon/human/H)
-	H.visible_message("<B>\The [H]</B> drools.")
+	start(mob/living/carbon/human/H)
+		H.visible_message("<B>\The [H]</B> drools.")
 
-/datum/genetics/side_effect/confuse/finish(mob/living/carbon/human/H)
-	if(!H.reagents.has_reagent(/datum/reagent/dylovene))
-		H.confused += 100
+	finish(mob/living/carbon/human/H)
+		if(!H.reagents.has_reagent(/datum/reagent/dylovene))
+			H.confused += 100
+

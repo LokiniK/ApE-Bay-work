@@ -1,6 +1,6 @@
 /obj/item/implanter
 	name = "implanter"
-	icon = 'icons/obj/tools/implanter.dmi'
+	icon = 'icons/obj/items.dmi'
 	icon_state = "implanter0"
 	item_state = "syringe_0"
 	throw_speed = 1
@@ -14,6 +14,11 @@
 		imp = new imp(src)
 	..()
 	update_icon()
+
+/obj/item/implanter/Destroy()
+	QDEL_NULL(imp)
+	. = ..()
+
 
 /obj/item/implanter/on_update_icon()
 	if (imp)
@@ -36,7 +41,7 @@
 
 /obj/item/implanter/attackby(obj/item/I, mob/user)
 	if(!imp && istype(I, /obj/item/implant) && user.unEquip(I,src))
-		to_chat(usr, SPAN_NOTICE("You slide \the [I] into \the [src]."))
+		to_chat(usr, "<span class='notice'>You slide \the [I] into \the [src].</span>")
 		imp = I
 		update_icon()
 	else
@@ -46,7 +51,7 @@
 	if (!istype(M, /mob/living/carbon))
 		return
 	if (user && src.imp)
-		M.visible_message(SPAN_WARNING("[user] is attemping to implant [M]."))
+		M.visible_message("<span class='warning'>[user] is attemping to implant [M].</span>")
 
 		user.setClickCooldown(DEFAULT_QUICK_COOLDOWN)
 		user.do_attack_animation(M)
@@ -55,8 +60,8 @@
 		if(src.imp.can_implant(M, user, target_zone))
 			var/imp_name = imp.name
 
-			if(do_after(user, 5 SECONDS, M, DO_EQUIP) && src.imp?.implant_in_mob(M, target_zone))
-				M.visible_message(SPAN_WARNING("[M] has been implanted by [user]."))
+			if(do_after(user, 50, M) && src.imp?.implant_in_mob(M, target_zone))
+				M.visible_message("<span class='warning'>[M] has been implanted by [user].</span>")
 				admin_attack_log(user, M, "Implanted using \the [src] ([imp_name])", "Implanted with \the [src] ([imp_name])", "used an implanter, \the [src] ([imp_name]), on")
 
 				src.imp = null

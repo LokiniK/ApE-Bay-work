@@ -26,7 +26,7 @@
 		return FALSE
 	else
 		clear_antag_roles(H.mind, 1)
-		to_chat(H, SPAN_NOTICE("You feel a surge of loyalty towards [GLOB.using_map.company_name]."))
+		to_chat(H, "<span class='notice'>You feel a surge of loyalty towards [GLOB.using_map.company_name].</span>")
 	return TRUE
 
 /obj/item/implanter/loyalty

@@ -9,39 +9,55 @@
 	var/sound_in = 'sound/effects/holster/holsterin.ogg'
 	var/sound_out = 'sound/effects/holster/holsterout.ogg'
 
-
 /obj/item/clothing/accessory/storage/holster/Initialize()
 	. = ..()
+	INIT_SKIP_QDELETED
 	container.virtual = TRUE
 	set_extension(src, /datum/extension/holster, container, sound_in, sound_out, can_holster)
 
-
 /obj/item/clothing/accessory/storage/holster/attackby(obj/item/W as obj, mob/user as mob)
 	var/datum/extension/holster/H = get_extension(src, /datum/extension/holster)
-	if (H.holster(W, user))
-		return
+	if(H.holster(W, user))
+		return TRUE
 	else
 		. = ..(W, user)
 
-
 /obj/item/clothing/accessory/storage/holster/attack_hand(mob/user as mob)
 	var/datum/extension/holster/H = get_extension(src, /datum/extension/holster)
-	if (H.unholster(user))
-		return
+	if(H.unholster(user))
+		return TRUE
 	. = ..(user)
-
 
 /obj/item/clothing/accessory/storage/holster/examine(mob/user)
 	. = ..(user)
 	var/datum/extension/holster/H = get_extension(src, /datum/extension/holster)
 	H.examine_holster(user)
 
+/obj/item/clothing/accessory/storage/holster/on_attached(obj/item/clothing/under/S, mob/user as mob)
+	..()
+	has_suit.verbs += /atom/proc/holster_verb
+
+/obj/item/clothing/accessory/storage/holster/on_removed(mob/user as mob)
+	if(has_suit)
+		var/remove_verb = TRUE
+		if(has_extension(has_suit, /datum/extension/holster))
+			remove_verb = FALSE
+
+		for(var/obj/accessory in has_suit.accessories)
+			if(accessory == src)
+				continue
+			if(has_extension(accessory, /datum/extension/holster))
+				remove_verb = FALSE
+
+		if(remove_verb)
+			has_suit.verbs -= /atom/proc/holster_verb
+	..()
+
 /obj/item/clothing/accessory/storage/holster/armpit
 	name = "armpit holster"
 	desc = "A worn-out handgun holster. Perfect for concealed carry."
 	icon_state = "holster"
 	body_location = UPPER_TORSO
-
 
 /obj/item/clothing/accessory/storage/holster/waist
 	name = "waist holster"
@@ -50,13 +66,36 @@
 	overlay_state = "holster_low"
 	body_location = UPPER_TORSO
 
-
 /obj/item/clothing/accessory/storage/holster/hip
 	name = "hip holster"
 	desc = "A handgun holster slung low on the hip, draw pardner!"
 	icon_state = "holster_hip"
 	body_location = LOWER_TORSO
 
+/obj/item/clothing/accessory/storage/holster/katana
+	name = "katana holster"
+	desc = "Katana sheath made of magnolia wood and varnishes to protect against moisture."
+	icon_state = "holster_katana"
+	overlay_state = "katana"
+	can_holster = list(/obj/item/material/sword/katana)
+	sound_in = 'sound/effects/holster/sheathin.ogg'
+	sound_out = 'sound/effects/holster/sheathout.ogg'
+	body_location = LOWER_TORSO
+
+/obj/item/clothing/accessory/storage/holster/katana/attackby(obj/item/W, mob/user)
+	. = ..()
+	if(.)
+		icon_state = initial(icon_state) + "_occupied"
+
+/obj/item/clothing/accessory/storage/holster/katana/attack_hand(mob/user)
+	. = ..()
+	if(.)
+		icon_state = initial(icon_state)
+
+/obj/item/clothing/accessory/storage/holster/katana/attack_self(mob/user)
+	. = ..()
+	if(.)
+		icon_state = initial(icon_state)
 
 /obj/item/clothing/accessory/storage/holster/thigh
 	name = "thigh holster"
@@ -66,16 +105,14 @@
 	sound_out = 'sound/effects/holster/tactiholsterout.ogg'
 	body_location = LEGS
 
-
 /obj/item/clothing/accessory/storage/holster/machete
 	name = "machete sheath"
 	desc = "A handsome synthetic leather sheath with matching belt."
 	icon_state = "holster_machete"
-	can_holster = list(/obj/item/material/hatchet/machete)
+	can_holster = list(/obj/item/material/hatchet/machete, /obj/item/chainsword)
 	sound_in = 'sound/effects/holster/sheathin.ogg'
 	sound_out = 'sound/effects/holster/sheathout.ogg'
 	body_location = LEGS
-
 
 /obj/item/clothing/accessory/storage/holster/knife
 	name = "leather knife sheath"
@@ -85,7 +122,6 @@
 	sound_in = 'sound/effects/holster/sheathin.ogg'
 	sound_out = 'sound/effects/holster/sheathout.ogg'
 	body_location = LEGS
-
 
 /obj/item/clothing/accessory/storage/holster/knife/polymer
 	name = "polymer knife sheath"

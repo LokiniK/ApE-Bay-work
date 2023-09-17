@@ -13,17 +13,16 @@
 	icon = 'icons/obj/weapons/melee_physical.dmi'
 	icon_state = "baton"
 	item_state = "classic_baton"
-	base_parry_chance = 30
 	slot_flags = SLOT_BELT
 	force = 10
 
 /obj/item/melee/classic_baton/attack(mob/M as mob, mob/living/user as mob)
 	if ((MUTATION_CLUMSY in user.mutations) && prob(50))
-		to_chat(user, SPAN_WARNING("You club yourself over the head."))
+		to_chat(user, "<span class='warning'>You club yourself over the head.</span>")
 		user.Weaken(3 * force)
 		if(ishuman(user))
 			var/mob/living/carbon/human/H = user
-			H.apply_damage(2*force, DAMAGE_BRUTE, BP_HEAD)
+			H.apply_damage(2*force, BRUTE, BP_HEAD)
 		else
 			user.take_organ_damage(2*force, 0)
 		return
@@ -32,11 +31,10 @@
 //Telescopic baton
 /obj/item/melee/telebaton
 	name = "telescopic baton"
-	desc = "A compact yet balanced personal defense weapon. Can be concealed when collapsed."
+	desc = "A compact yet rebalanced personal defense weapon. Can be concealed when folded."
 	icon = 'icons/obj/weapons/melee_physical.dmi'
 	icon_state = "telebaton_0"
 	item_state = "telebaton_0"
-	base_parry_chance = 30
 	slot_flags = SLOT_BELT
 	w_class = ITEM_SIZE_SMALL
 	force = 3
@@ -46,21 +44,21 @@
 /obj/item/melee/telebaton/attack_self(mob/user as mob)
 	on = !on
 	if(on)
-		user.visible_message(SPAN_WARNING("With a flick of their wrist, [user] extends their telescopic baton."),\
-		SPAN_WARNING("You extend the baton."),\
+		user.visible_message("<span class='warning'>With a flick of their wrist, [user] extends their telescopic baton.</span>",\
+		"<span class='warning'>You extend the baton.</span>",\
 		"You hear an ominous click.")
 		w_class = ITEM_SIZE_NORMAL
 		force = 15//quite robust
-		attack_verb = list("cracked", "struck", "snapped", "thrashed", "whapped")
+		attack_verb = list("smacked", "struck", "slapped")
 	else
-		user.visible_message(SPAN_NOTICE("\The [user] collapses their telescopic baton."),\
-		SPAN_NOTICE("You collapse the baton."),\
+		user.visible_message("<span class='notice'>\The [user] collapses their telescopic baton.</span>",\
+		"<span class='notice'>You collapse the baton.</span>",\
 		"You hear a click.")
 		w_class = ITEM_SIZE_SMALL
 		force = 3//not so robust now
 		attack_verb = list("hit", "punched")
 
-	playsound(src.loc, 'sound/weapons/empty.ogg', 50, 1)
+	playsound(src.loc, 'infinity/sound/weapons/batonextend.ogg', 50, 1)
 	add_fingerprint(user)
 	update_icon()
 	update_held_icon()
@@ -80,11 +78,11 @@
 /obj/item/melee/telebaton/attack(mob/target as mob, mob/living/user as mob)
 	if(on)
 		if ((MUTATION_CLUMSY in user.mutations) && prob(50))
-			to_chat(user, SPAN_WARNING("You club yourself over the head."))
+			to_chat(user, "<span class='warning'>You club yourself over the head.</span>")
 			user.Weaken(3 * force)
 			if(ishuman(user))
 				var/mob/living/carbon/human/H = user
-				H.apply_damage(2*force, DAMAGE_BRUTE, BP_HEAD)
+				H.apply_damage(2*force, BRUTE, BP_HEAD)
 			else
 				user.take_organ_damage(2*force, 0)
 			return

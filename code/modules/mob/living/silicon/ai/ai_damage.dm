@@ -12,25 +12,25 @@
 /mob/living/silicon/ai/getOxyLoss()
 	return oxyloss
 
-/mob/living/silicon/ai/adjustFireLoss(amount)
+/mob/living/silicon/ai/adjustFireLoss(var/amount)
 	if(status_flags & GODMODE) return
 	fireloss = max(0, fireloss + min(amount, health))
 
-/mob/living/silicon/ai/adjustBruteLoss(amount)
+/mob/living/silicon/ai/adjustBruteLoss(var/amount)
 	if(status_flags & GODMODE) return
 	bruteloss = max(0, bruteloss + min(amount, health))
 
-/mob/living/silicon/ai/adjustOxyLoss(amount)
+/mob/living/silicon/ai/adjustOxyLoss(var/amount)
 	if(status_flags & GODMODE) return
 	oxyloss = max(0, oxyloss + min(amount, maxHealth - oxyloss))
 
-/mob/living/silicon/ai/setFireLoss(amount)
+/mob/living/silicon/ai/setFireLoss(var/amount)
 	if(status_flags & GODMODE)
 		fireloss = 0
 		return
 	fireloss = max(0, amount)
 
-/mob/living/silicon/ai/setOxyLoss(amount)
+/mob/living/silicon/ai/setOxyLoss(var/amount)
 	if(status_flags & GODMODE)
 		oxyloss = 0
 		return

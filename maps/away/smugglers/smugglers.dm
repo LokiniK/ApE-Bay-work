@@ -3,9 +3,10 @@
 
 /obj/effect/overmap/visitable/sector/smugglers
 	name = "asteroid station"
+	scanner_name = "asteroid station"
 	desc = "A small station built into an asteroid. No radio traffic detected."
 	icon_state = "object"
-
+	known = 0
 
 	initial_generic_waypoints = list(
 		"nav_smugglers",
@@ -95,7 +96,7 @@
 /obj/random/ammo_magazine_smug
 	name = "Random Ammo Magazine"
 	desc = "This is smuggler's random ammo magazine."
-	icon = 'icons/obj/weapons/ammo.dmi'
+	icon = 'icons/obj/ammo.dmi'
 	icon_state = "magnum"
 
 /obj/random/ammo_magazine_smug/spawn_choices()
@@ -103,12 +104,12 @@
 		/obj/item/ammo_magazine/pistol,
 		/obj/item/ammo_magazine/speedloader,
 		/obj/item/ammo_magazine/rifle,
-		/obj/item/ammo_magazine/mil_rifle/heavy)
+		/obj/item/ammo_magazine/mil_rifle)
 
 /obj/structure/closet/crate/plastic_smug_ammo
 	name = "dirty plastic crate"
 	desc = "Dirty and scrtached plastic crate."
-	closet_appearance = /singleton/closet_appearance/crate/plastic
+	closet_appearance = /decl/closet_appearance/crate/plastic
 
 /obj/structure/closet/crate/plastic_smug_ammo/WillContain()
 	return list(
@@ -121,7 +122,7 @@
 /obj/structure/closet/crate/plastic_smug_weapons
 	name = "dirty plastic crate"
 	desc = "Dirty and scrtached plastic crate."
-	closet_appearance = /singleton/closet_appearance/crate/plastic
+	closet_appearance = /decl/closet_appearance/crate/plastic
 
 /obj/structure/closet/crate/plastic_smug_weapons/WillContain()
 	return list(

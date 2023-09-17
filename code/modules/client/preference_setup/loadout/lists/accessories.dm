@@ -1,13 +1,12 @@
+
 /datum/gear/accessory
 	sort_category = "Accessories"
 	category = /datum/gear/accessory
 	slot = slot_tie
 
-
 /datum/gear/accessory/tie
 	display_name = "tie selection"
 	path = /obj/item/clothing/accessory
-
 
 /datum/gear/accessory/tie/New()
 	..()
@@ -23,12 +22,10 @@
 	ties["brown tie"] = /obj/item/clothing/accessory/brown
 	gear_tweaks += new/datum/gear_tweak/path(ties)
 
-
 /datum/gear/accessory/tie_color
 	display_name = "colored tie"
 	path = /obj/item/clothing/accessory
 	flags = GEAR_HAS_COLOR_SELECTION
-
 
 /datum/gear/accessory/tie_color/New()
 	..()
@@ -37,124 +34,96 @@
 	ties["striped tie"] = /obj/item/clothing/accessory/long
 	gear_tweaks += new/datum/gear_tweak/path(ties)
 
-
 /datum/gear/accessory/locket
 	display_name = "locket"
 	path = /obj/item/clothing/accessory/locket
-
 
 /datum/gear/accessory/necklace
 	display_name = "necklace, colour select"
 	path = /obj/item/clothing/accessory/necklace
 	flags = GEAR_HAS_COLOR_SELECTION
 
-
 /datum/gear/accessory/bowtie
 	display_name = "bowtie, horrible"
 	path = /obj/item/clothing/accessory/bowtie/ugly
-
 
 /datum/gear/accessory/bowtie/color
 	display_name = "bowtie, colour select"
 	path = /obj/item/clothing/accessory/bowtie/color
 	flags = GEAR_HAS_COLOR_SELECTION
 
-
 /datum/gear/accessory/ntaward
-	display_name = "corporate award selection"
-	description = "A medal or ribbon awarded to corporate personnel for significant accomplishments."
+	display_name = "NT award selection" //inf, was: display_name = "NanoTrasen award selection"
+	description = "A medal or ribbon awarded to NanoTrasen personnel for significant accomplishments."
 	path = /obj/item/clothing/accessory/medal
 	cost = 8
-	flags = GEAR_HAS_NO_CUSTOMIZATION
-
 
 /datum/gear/accessory/ntaward/New()
 	..()
 	var/ntawards = list()
-	ntawards["sciences medal"] = /obj/item/clothing/accessory/medal/bronze/nanotrasen
-	ntawards["distinguished service"] = /obj/item/clothing/accessory/medal/silver/nanotrasen
-	ntawards["command medal"] = /obj/item/clothing/accessory/medal/gold/nanotrasen
+	ntawards["generic medal"] = /obj/item/clothing/accessory/medal/iron/nanotrasen
+	ntawards["nanotrasen service"] = /obj/item/clothing/accessory/medal/silver/nanotrasen
 	gear_tweaks += new/datum/gear_tweak/path(ntawards)
 
+/datum/gear/accessory/ntaward_sci
+	display_name = "NT science award" //inf, was: display_name = "NanoTrasen science award"
+	path = /obj/item/clothing/accessory/medal/bronze/nanotrasen
+	cost = 8
 
+//have to break up armbands to restrict access
 /datum/gear/accessory/armband_security
 	display_name = "security armband"
 	path = /obj/item/clothing/accessory/armband
-	flags = GEAR_HAS_NO_CUSTOMIZATION
-
 
 /datum/gear/accessory/armband_cargo
 	display_name = "cargo armband"
 	path = /obj/item/clothing/accessory/armband/cargo
-	flags = GEAR_HAS_NO_CUSTOMIZATION
-
 
 /datum/gear/accessory/armband_medical
 	display_name = "medical armband"
 	path = /obj/item/clothing/accessory/armband/med
-	flags = GEAR_HAS_NO_CUSTOMIZATION
-
 
 /datum/gear/accessory/armband_emt
 	display_name = "EMT armband"
 	path = /obj/item/clothing/accessory/armband/medgreen
-	allowed_roles = list(
-		/datum/job/doctor
-	)
-	flags = GEAR_HAS_NO_CUSTOMIZATION
-
+	allowed_roles = list(/datum/job/doctor)
 
 /datum/gear/accessory/armband_engineering
 	display_name = "engineering armband"
 	path = /obj/item/clothing/accessory/armband/engine
-	flags = GEAR_HAS_NO_CUSTOMIZATION
-
 
 /datum/gear/accessory/armband_hydro
 	display_name = "hydroponics armband"
 	path = /obj/item/clothing/accessory/armband/hydro
-	allowed_roles = list(
-		/datum/job/rd,
-		/datum/job/scientist,
-		/datum/job/assistant
-	)
-	flags = GEAR_HAS_NO_CUSTOMIZATION
-
+	allowed_roles = list(/datum/job/rd, /datum/job/scientist, /datum/job/assistant)
 
 /datum/gear/accessory/armband_nt
-	display_name = "corporate armband"
+	display_name = "NanoTrasen armband"
 	path = /obj/item/clothing/accessory/armband/whitered
 
-
-/datum/gear/accessory/ftu_pin
+/datum/gear/accessory/ftupin
 	display_name = "Free Trade Union pin"
-	path = /obj/item/clothing/accessory/ftu_pin
-	flags = GEAR_HAS_NO_CUSTOMIZATION
+	path = /obj/item/clothing/accessory/ftupin
 
-
-/datum/gear/accessory/chaplain
+/datum/gear/accessory/chaplaininsignia
 	display_name = "chaplain insignia"
-	path = /obj/item/clothing/accessory/chaplain
-	allowed_roles = list(
-		/datum/job/chaplain
-	)
-	flags = GEAR_HAS_NO_CUSTOMIZATION
+	path = /obj/item/clothing/accessory/chaplaininsignia
+	cost = 1
+	allowed_roles = list(/datum/job/chaplain)
 
-
-/datum/gear/accessory/chaplain/New()
+/datum/gear/accessory/chaplaininsignia/New()
 	..()
-	var/options = list()
-	options["Christianity"] = /obj/item/clothing/accessory/chaplain/christianity
-	options["Judaism"] = /obj/item/clothing/accessory/chaplain/judaism
-	options["Islam"] = /obj/item/clothing/accessory/chaplain/islam
-	options["Buddhism"] = /obj/item/clothing/accessory/chaplain/buddhism
-	options["Hinduism"] = /obj/item/clothing/accessory/chaplain/hinduism
-	options["Sikhism"] = /obj/item/clothing/accessory/chaplain/sikhism
-	options["Baha'i Faith"] = /obj/item/clothing/accessory/chaplain/bahaifaith
-	options["Jainism"] = /obj/item/clothing/accessory/chaplain/jainism
-	options["Taoism"] = /obj/item/clothing/accessory/chaplain/taoism
-	gear_tweaks += new/datum/gear_tweak/path (options)
-
+	var/insignia = list()
+	insignia["chaplain insignia (christianity)"] = /obj/item/clothing/accessory/chaplaininsignia
+	insignia["chaplain insignia (judaism)"] = /obj/item/clothing/accessory/chaplaininsignia/judaism
+	insignia["chaplain insignia (islam)"] = /obj/item/clothing/accessory/chaplaininsignia/islam
+	insignia["chaplain insignia (buddhism)"] = /obj/item/clothing/accessory/chaplaininsignia/buddhism
+	insignia["chaplain insignia (hinduism)"] = /obj/item/clothing/accessory/chaplaininsignia/hinduism
+	insignia["chaplain insignia (sikhism)"] = /obj/item/clothing/accessory/chaplaininsignia/sikhism
+	insignia["chaplain insignia (baha'i faith)"] = /obj/item/clothing/accessory/chaplaininsignia/bahaifaith
+	insignia["chaplain insignia (jainism)"] = /obj/item/clothing/accessory/chaplaininsignia/jainism
+	insignia["chaplain insignia (taoism)"] = /obj/item/clothing/accessory/chaplaininsignia/taoism
+	gear_tweaks += new/datum/gear_tweak/path(insignia)
 
 /datum/gear/accessory/bracelet
 	display_name = "bracelet, color select"
@@ -162,16 +131,36 @@
 	cost = 1
 	flags = GEAR_HAS_COLOR_SELECTION
 
-
 /datum/gear/accessory/wristwatch
 	display_name = "wrist watch selection"
-	path = /obj/item/clothing/accessory/wristwatch
+	path = /obj/item/clothing/accessory/wristwatches
 	cost = 1
 	flags = GEAR_HAS_TYPE_SELECTION
 
+/datum/gear/accessory/pronouns
+	display_name = "pronoun badge selection"
+	path = /obj/item/clothing/accessory/pronouns
+	flags = GEAR_HAS_TYPE_SELECTION
+
+/datum/gear/accessory/pridepins
+	display_name = "pride pin selection"
+	path = /obj/item/clothing/accessory/pridepins
+	flags = GEAR_HAS_TYPE_SELECTION
 
 /datum/gear/accessory/neckerchief
 	display_name = "neckerchief, colour select"
 	description = "A piece of cloth tied around the neck. A favorite of Sailors and Partisans everywhere."
 	path = /obj/item/clothing/accessory/neckerchief
 	flags = GEAR_HAS_COLOR_SELECTION
+/datum/gear/accessory/corpbadge
+	display_name = "investigator holobadge (IAA)"
+	path = /obj/item/clothing/accessory/badge/holo/investigator
+	allowed_roles = list(/datum/job/iaa)
+
+/datum/gear/accessory/pressbadge
+	display_name = "corporate press pass"
+	path = /obj/item/clothing/accessory/badge/press
+
+/datum/gear/accessory/pressbadge1
+	display_name = "freelance press pass"
+	path = /obj/item/clothing/accessory/badge/press/independent

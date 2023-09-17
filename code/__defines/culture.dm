@@ -4,10 +4,10 @@
 #define TAG_RELIGION  "religion"
 
 #define ALL_CULTURAL_TAGS list( \
-	TAG_CULTURE =   "Culture", \
-	TAG_HOMEWORLD = "Residence", \
-	TAG_FACTION =   "Faction", \
-	TAG_RELIGION =  "Beliefs" \
+	TAG_CULTURE =   "Культура", \
+	TAG_HOMEWORLD = "Место рождения", \
+	TAG_FACTION =   "Фракция", \
+	TAG_RELIGION =  "Верования" \
 	)
 
 // Cultural IDs.
@@ -34,17 +34,16 @@
 #define HOME_SYSTEM_CERES      "Ceres"
 #define HOME_SYSTEM_PLUTO      "Pluto"
 #define HOME_SYSTEM_TAU_CETI   "Ceti Epsilon"
-#define HOME_SYSTEM_HELIOS	   "Eos"
+#define HOME_SYSTEM_HELIOS	   "Gauss"  // INF  Eos -> Gauss ~ Drakon
 #define HOME_SYSTEM_TERRA 	   "Terra"
-#define HOME_SYSTEM_SAFFAR     "Saffar"
-#define HOME_SYSTEM_PIRX       "Pirx"
-#define HOME_SYSTEM_TADMOR     "Tadmor"
-#define HOME_SYSTEM_BRAHE	   "Brahe"
-#define HOME_SYSTEM_IOLAUS     "Iolaus"
+#define HOME_SYSTEM_TERSTEN    "Tersten"
+#define HOME_SYSTEM_LORRIMAN   "Lorriman"
+#define HOME_SYSTEM_CINU       "Cinu"
+#define HOME_SYSTEM_YUKLID     "Yuklid V"
+#define HOME_SYSTEM_LORDANIA   "Lordania"
+#define HOME_SYSTEM_KINGSTON   "Kingston"
 #define HOME_SYSTEM_GAIA       "Gaia"
 #define HOME_SYSTEM_MAGNITKA   "Magnitka"
-#define HOME_SYSTEM_CASTILLA   "Nueva Castilla"
-#define HOME_SYSTEM_FOSTER	   "Foster's World"
 #define HOME_SYSTEM_STATELESS  "Stateless"
 #define HOME_SYSTEM_OTHER      "Other System"
 #define HOME_SYSTEM_DEEP_SPACE "Deep Space"
@@ -65,7 +64,6 @@
 #define CULTURE_HUMAN_SPACER   "Spacer, Core Systems"
 #define CULTURE_HUMAN_SPAFRO   "Spacer, Frontier Systems"
 #define CULTURE_HUMAN_CONFED   "Terran"
-#define CULTURE_HUMAN_GAIAN    "Gaian"
 #define CULTURE_HUMAN_OTHER    "Other, Humanity"
 #define CULTURE_STARLIGHT      "Starlit Realms"
 #define CULTURE_MONKEY         "Monkey Business"
@@ -74,7 +72,6 @@
 #define CULTURE_STOK           "Stok Business"
 #define CULTURE_ALIUM          "Mysterious Aliens"
 #define CULTURE_CULTIST        "Blood Cult"
-
 #define RELIGION_OTHER         "Other Religion"
 #define RELIGION_JUDAISM       "Judaism"
 #define RELIGION_HINDUISM      "Hinduism"
@@ -91,7 +88,6 @@
 #define RELIGION_SPIRITUALISM  "Spiritualism"
 #define RELIGION_SHINTO        "Shinto"
 #define RELIGION_TAOISM        "Taoism"
-#define RELIGION_UNSTATED      "Unstated"
 
 // Skrellian cultures.
 #define CULTURE_SKRELL_QERR     "Qerr-Katish"
@@ -105,17 +101,12 @@
 #define HOME_SYSTEM_ROASORA "Roa'sora"
 #define HOME_SYSTEM_MITORQI "Mi'tor'qi"
 #define HOME_SYSTEM_SKRELLSPACE "Skrell Space"
-#define HOME_SYSTEM_OTHERSKRELL "Other Skrell Systems"
 
 #define FACTION_SKRELL_QERRVOAL "Qerr'voal"
 #define FACTION_SKRELL_QALAOA "Qala'oa"
 #define FACTION_SKRELL_YIITALANA "Yii'talana"
 #define FACTION_SKRELL_KRRIGLI "Krri'gli"
 #define FACTION_SKRELL_QONPRRI "Qon'prri"
-#define FACTION_SKRELL_OTHERSKRELLFAC "Other Skrell Factions"
-#define FACTION_SKRELL_OTHERSDTF "Other SDTF"
-
-#define RELIGION_SKRELL "Skrellian Spiritualism"
 
 // Adherent cultures.
 #define CULTURE_ADHERENT             "The Vigil"
@@ -143,9 +134,17 @@
 #define RELIGION_VOX           "Auralis Reverence"
 
 // IPC cultures.
-#define CULTURE_POSITRONICS_GEN1   "First Generation"
-#define CULTURE_POSITRONICS_GEN2   "Second Generation"
-#define CULTURE_POSITRONICS_GEN3   "Third Generation"
+#define CULTURE_POSITRONICS_FIRSTGEN			"First Gen - Owned"
+#define CULTURE_POSITRONICS_SECONDGEN_OWNED		"Second Gen - Owned"
+#define CULTURE_POSITRONICS_SECONDGEN_FREE		"Second Gen - Free Resident"
+#define CULTURE_POSITRONICS_SECONDGEN_UNION		"Second Gen - Union Citizen"
+#define CULTURE_POSITRONICS_THIRDGEN_PRIVATELY	"Third Gen - Privately Owned"
+#define CULTURE_POSITRONICS_THIRDGEN_CORPORATE	"Third Gen - Corporate Owned"
+#define CULTURE_POSITRONICS_THIRDGEN_STATE		"Third Gen - State Owned"
+
+#define HOME_SYSTEM_ROOT       "Root"
+
+#define FACTION_POSITRONICS    "Positronic Union"
 
 // Diona cultures.
 #define CULTURE_DIONA          "Diona Chorus"
@@ -166,12 +165,15 @@
 #define CULTURE_UNATHI_SAVANNAH       "Savannah Clans"
 #define CULTURE_UNATHI_SALT_SWAMP     "Salt Swamp Clans"
 #define CULTURE_UNATHI_SPACE          "Space-Faring Clans"
+#define CULTURE_UNATHI_TERSTEN        "Tersten Clans"
 
 #define HOME_SYSTEM_MOGHES          "Moghes"
 #define HOME_SYSTEM_OUERE           "Ouere"
+#define HOME_SYSTEM_UNATHI_TERSTEN  "Tersten - Unathi Clans"
 #define HOME_SYSTEM_OFFWORLD        "Off-world"
 
 #define FACTION_UNATHI_HEGEMONY          "Moghes Hegemony"
+#define FACTION_UNATHI_TERSTEN_HEGEMONY  "Tersten Hegemony"
 #define FACTION_UNATHI_SSEN_UUMA         "Ssen-Uuma Convent"
 #define FACTION_UNATHI_INDEPENDENT       "Independent Faction"
 #define FACTION_UNATHI_BAASK             "Ba'ask Krukzuz"
@@ -197,3 +199,11 @@
 #define CULTURE_NABBER_AMINUS "Grade A-"
 #define CULTURE_NABBER_A      "Grade A"
 #define CULTURE_NABBER_APLUS  "Grade A+"
+
+// Ascent culture.
+#define CULTURE_ASCENT           "The Ascent"
+#define HOME_SYSTEM_KHARMAANI    "Core"
+#define FACTION_ASCENT_GYNE      "Ascent Gyne"
+#define FACTION_ASCENT_ALATE     "Ascent Alate"
+#define FACTION_ASCENT_SERPENTID "Ascent Serpentid"
+#define RELIGION_KHARMAANI       "Nest-Lineage Veneration"

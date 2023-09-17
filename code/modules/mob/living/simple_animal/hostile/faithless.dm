@@ -31,18 +31,18 @@
 	name = "shadow tendril"
 	attack_verb = list("gripped")
 	hitsound = 'sound/hallucinations/growl1.ogg'
-	damtype = DAMAGE_BURN
+	damtype = BURN
 	force = 15
 
-/mob/living/simple_animal/hostile/faithless/Process_Spacemove()
+/mob/living/simple_animal/hostile/faithless/Allow_Spacemove(var/check_drift = 0)
 	return 1
 
-/mob/living/simple_animal/hostile/faithless/apply_melee_effects(atom/A)
+/mob/living/simple_animal/hostile/faithless/apply_melee_effects(var/atom/A)
 	if(isliving(A))
 		var/mob/living/L = A
 		if(prob(12))
 			L.Weaken(3)
-			L.visible_message(SPAN_DANGER("\the [src] knocks down \the [L]!"))
+			L.visible_message("<span class='danger'>\the [src] knocks down \the [L]!</span>")
 
 // Strong Variant
 /mob/living/simple_animal/hostile/faithless/strong

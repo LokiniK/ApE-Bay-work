@@ -27,8 +27,6 @@
 		bomb = ARMOR_BOMB_SHIELDED
 	)
 	special_attack_cooldown = 80 SECONDS
-	special_attack_min_range = 0
-	special_attack_max_range = 5
 
 	var/empowered_attack = FALSE
 	var/gas_spent = FALSE
@@ -39,12 +37,20 @@
 /mob/living/simple_animal/hostile/drake/lava_act(datum/gas_mixture/air, temperature, pressure)
 	return
 
-/mob/living/simple_animal/hostile/drake/do_special_attack(atom/A)
+/mob/living/simple_animal/hostile/drake/can_special_attack()
+	. = ..()
+	if(!.)
+		return FALSE
+	if(!target_mob)
+		return FALSE
+
+/mob/living/simple_animal/hostile/drake/do_special_attack()
 	. = ..()
 	if(empowered_attack)
 		depower()
 		return
-	empower()
+	if(can_special_attack())
+		empower()
 
 /mob/living/simple_animal/hostile/drake/get_natural_weapon()
 	if(empowered_attack)
@@ -76,14 +82,3 @@
 /datum/say_list/drake
 	emote_hear = list("clicks")
 	emote_see = list("flaps its wings idly")
-
-
-/mob/living/simple_animal/hostile/drake/bluespace
-	name = "bluespace dragon"
-	desc = "A large, reptilian interloper from another dimension."
-	icon = 'icons/mob/simple_animal/bluespace_dragon.dmi'
-	icon_state = "bluespace_dragon"
-	icon_living = "bluespace_dragon"
-	icon_dead = "bluespace_dragon_dead"
-	faction = "bluespace"
-	bleed_colour = "#71faff"

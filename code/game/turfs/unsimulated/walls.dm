@@ -2,7 +2,7 @@
 	name = "wall"
 	icon = 'icons/turf/walls.dmi'
 	icon_state = "riveted"
-	opacity = 1
+	opacity = TRUE
 	density = TRUE
 
 /turf/unsimulated/wall/fakeglass

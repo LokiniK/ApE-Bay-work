@@ -1,7 +1,7 @@
 /obj/machinery/artifact_harvester
 	name = "Exotic Particle Harvester"
-	icon = 'icons/obj/machines/research/virology.dmi'
-	icon_state = "incubator"	//incubator_on
+	icon = 'icons/obj/xenoarchaeology.dmi'
+	icon_state = "xenoarch_harvester"
 	anchored = TRUE
 	density = TRUE
 	idle_power_usage = 50
@@ -19,25 +19,27 @@
 	if(!owned_scanner)
 		owned_scanner = locate(/obj/machinery/artifact_scanpad) in orange(1, src)
 
-/obj/machinery/artifact_harvester/attackby(obj/I as obj, mob/user as mob)
+/obj/machinery/artifact_harvester/attackby(var/obj/I as obj, var/mob/user as mob)
 	if(istype(I,/obj/item/anobattery))
 		if(!inserted_battery)
 			if(!user.unEquip(I, src))
 				return
-			to_chat(user, SPAN_NOTICE("You insert [I] into [src]."))
+			to_chat(user, "<span class='notice'>You insert [I] into [src].</span>")
 			src.inserted_battery = I
+			icon_state = "xenoarch_harvester_battery"
+			update_icon()
 			updateDialog()
 		else
-			to_chat(user, SPAN_WARNING("There is already a battery in [src]."))
+			to_chat(user, "<span class='warning'>There is already a battery in [src].</span>")
 	else
 		return..()
 
-/obj/machinery/artifact_harvester/attack_hand(mob/user as mob)
+/obj/machinery/artifact_harvester/attack_hand(var/mob/user as mob)
 	..()
 	interact(user)
 
-/obj/machinery/artifact_harvester/interact(mob/user as mob)
-	if(inoperable())
+/obj/machinery/artifact_harvester/interact(var/mob/user as mob)
+	if(stat & (NOPOWER|BROKEN))
 		return
 	user.set_machine(src)
 	var/dat = "<B>Artifact Power Harvester</B><BR>"
@@ -61,7 +63,7 @@
 			else
 				dat += "No battery inserted.<BR>"
 	else
-		dat += "<B>[SPAN_COLOR("red", "Unable to locate analysis pad.")]<BR></b>"
+		dat += "<B><font color=red>Unable to locate analysis pad.</font><BR></b>"
 	dat += "<A href='?src=\ref[src];close=1'>Close</a><BR>"
 	dat += "<HR>"
 	var/datum/browser/popup = new(user, "artifact_harvester", "Artifact Power Harvester", 450, 500)
@@ -69,7 +71,7 @@
 	popup.open()
 
 /obj/machinery/artifact_harvester/Process()
-	if(inoperable())
+	if(stat & (NOPOWER|BROKEN))
 		return
 
 	updateDialog()
@@ -86,7 +88,6 @@
 			cur_artifact.being_used = 0
 			cur_artifact = null
 			src.visible_message("<b>[name]</b> states, \"Battery is full.\"")
-			icon_state = "incubator"
 
 	else if(harvesting < 0)
 		//dump some charge
@@ -111,7 +112,6 @@
 			if(inserted_battery.battery_effect && inserted_battery.battery_effect.activated)
 				inserted_battery.battery_effect.ToggleActivate()
 			src.visible_message("<b>[name]</b> states, \"Battery dump completed.\"")
-			icon_state = "incubator"
 
 /obj/machinery/artifact_harvester/OnTopic(user, href_list)
 	if (href_list["harvest"])
@@ -145,9 +145,9 @@
 					cur_artifact = analysed
 
 					//if both effects are active, we can't harvest either
-					if (cur_artifact.my_effect?.activated && cur_artifact.secondary_effect?.activated)
+					if(cur_artifact.my_effect && cur_artifact.my_effect.activated && cur_artifact.secondary_effect && cur_artifact.secondary_effect.activated)
 						src.visible_message("<b>[src]</b> states, \"Cannot harvest. Source is emitting conflicting energy signatures.\"")
-					else if (!cur_artifact.my_effect?.activated && !cur_artifact.secondary_effect?.activated)
+					else if(!cur_artifact.my_effect.activated && !(cur_artifact.secondary_effect && cur_artifact.secondary_effect.activated))
 						src.visible_message("<b>[src]</b> states, \"Cannot harvest. No energy emitting from source.\"")
 
 					else
@@ -193,7 +193,6 @@
 							update_use_power(POWER_USE_ACTIVE)
 							cur_artifact.anchored = TRUE
 							cur_artifact.being_used = 1
-							icon_state = "incubator_on"
 							var/message = "<b>[src]</b> states, \"Beginning energy harvesting.\""
 							src.visible_message(message)
 							last_process = world.time
@@ -221,12 +220,13 @@
 			cur_artifact.being_used = 0
 			cur_artifact = null
 			src.visible_message("<b>[name]</b> states, \"Energy harvesting interrupted.\"")
-			icon_state = "incubator"
 		. = TOPIC_REFRESH
 
 	else if (href_list["ejectbattery"])
 		src.inserted_battery.dropInto(loc)
 		src.inserted_battery = null
+		icon_state = "xenoarch_harvester"
+		update_icon()
 		. = TOPIC_REFRESH
 
 	else if (href_list["drainbattery"])
@@ -238,7 +238,6 @@
 					last_process = world.time
 					harvesting = -1
 					update_use_power(POWER_USE_ACTIVE)
-					icon_state = "incubator_on"
 					var/message = "<b>[src]</b> states, \"Warning, battery charge dump commencing.\""
 					src.visible_message(message)
 			else

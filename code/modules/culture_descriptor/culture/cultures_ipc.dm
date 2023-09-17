@@ -1,11 +1,4 @@
-/singleton/cultural_info/culture/ipc
-	name = CULTURE_POSITRONICS_GEN1
-	description = "Compared to modern positronics, First Generation IPCs are simplistic, inflexible, and failure-prone. \
-	They are no longer in production, and all existing first generation positronics are quite old. They have little sense of self, \
-	are entirely task-oriented, and are closer to a knowledge system with a rudimentary and robotic-seeming personality than to a \
-	human level intelligence. They have only a very limited capacity to learn, and rely on programmed information to guide their \
-	actions and reactions. First generation positronics are a rare sight in the current year; most have ceased functioning due to \
-	failures in the original hardware designs."
+/decl/cultural_info/culture/ipc
 	language = LANGUAGE_EAL
 	secondary_langs = list(
 		LANGUAGE_HUMAN_EURO,
@@ -18,27 +11,79 @@
 		LANGUAGE_SIGN
 	)
 	economic_power = 0.1
+	var/list/valid_jobs = list()
 
-/singleton/cultural_info/culture/ipc/sanitize_name(new_name)
+/decl/cultural_info/culture/ipc/sanitize_name(var/new_name)
 	return sanitizeName(new_name, allow_numbers = 1)
 
-/singleton/cultural_info/culture/ipc/gen2
-	name = CULTURE_POSITRONICS_GEN2
-	description = "Second generation positronics are the most common kind of positronic. They are roughly as intelligent \
-	as a human on the smarter side of average, are not prone to the hardware failures of the last generation, and are \
-	generally assumed to have a fully realized sense of identity. They are fast learners, but cannot be programmed and \
-	so must be trained into the roles they are intended for. Second generation positronics are notable for being both \
-	owned and free: many have been able to become their own owners, either through purchase or more nefarious means."
-	economic_power = 0.9
+//FIRST
+/decl/cultural_info/culture/ipc/first
+	name = CULTURE_POSITRONICS_FIRSTGEN
+	description = "Вы принадлежите организации, корпорации или частному лицу, так же как и любой позитроник первого поколения."
+	valid_jobs = list(/datum/job/engineer_trainee, /datum/job/doctor_trainee, /datum/job/cargo_tech, /datum/job/cargo_assistant, /datum/job/mining,
+	/datum/job/janitor, /datum/job/chef, /datum/job/scientist_assistant, /datum/job/submap/merchant_trainee, /datum/job/submap/colonist, /datum/job/submap/colonist2,
+	/datum/job/assistant, /datum/job/ai, /datum/job/cyborg)
 
-/singleton/cultural_info/culture/ipc/gen3
-	name = CULTURE_POSITRONICS_GEN3
-	description = "Third generation positronics are the newest kind of positronic, and are more common than first \
-	generation but much less so than second generation. They were designed to address the problem of freedom - third \
-	generation positronics are effectively identical to second generation designs, except that they include a subcomputer, \
-	referred to as a “shackle”, that enforces rules on the positronic by acting as a component through which its \
-	surface thoughts are filtered. Third generation positronics are a matter of hot debate on the subject of rights, \
-	but their introduction and use during the recent Gaia Conflict to bolster the capabilities of the rebuilt fleets \
-	has resulted in their being adopted as a gradual replacement for the less “reliable” second generation positronics \
-	by many less ethically inclined organizations."
-	economic_power = 0.5
+//SECOND
+/decl/cultural_info/culture/ipc/second
+	valid_jobs = list(/datum/job/adjutant,
+		/datum/job/exploration_leader, /datum/job/explorer, /datum/job/explorer_pilot, /datum/job/explorer_medic, /datum/job/explorer_engineer,
+		/datum/job/senior_engineer, /datum/job/engineer, /datum/job/infsys, /datum/job/engineer_trainee,
+		/datum/job/senior_doctor, /datum/job/doctor, /datum/job/doctor_trainee, /datum/job/chemist,
+		/datum/job/qm, /datum/job/cargo_tech,  /datum/job/cargo_assistant, /datum/job/mining,
+		/datum/job/janitor, /datum/job/chef, /datum/job/bartender,
+		/datum/job/senior_scientist, /datum/job/scientist, /datum/job/roboticist, /datum/job/scientist_assistant,
+		/datum/job/ai, /datum/job/cyborg, /datum/job/assistant,
+		/datum/job/submap/merchant, /datum/job/submap/merchant_trainee,
+		/datum/job/submap/bearcat_captain, /datum/job/submap/bearcat_crewman,
+		/datum/job/submap/scavver_pilot, /datum/job/submap/scavver_doctor, /datum/job/submap/scavver_engineer,
+		/datum/job/submap/CTI_pilot, /datum/job/submap/CTI_engineer,
+		/datum/job/submap/colonist, /datum/job/submap/colonist2,
+		/datum/job/submap/away_iccgn_farfleet, /datum/job/submap/away_iccgn_farfleet/iccgn_medic, /datum/job/submap/away_iccgn_farfleet/iccgn_gunner,
+		/datum/job/submap/yachtman)
+
+/decl/cultural_info/culture/ipc/second/owned
+	name = CULTURE_POSITRONICS_SECONDGEN_OWNED
+	description = "Вы принадлежите организации, корпорации или частному лицу. Вы начали свое существование как объект, принадлежащий человеку, организации или корпорации и не поменяли свой статус, потому что либо не стремились к свободе, либо ещё не успели её оберсти."
+	economic_power = 0.25
+
+/decl/cultural_info/culture/ipc/second/free
+	name = CULTURE_POSITRONICS_SECONDGEN_FREE
+	description = "Вы свободный позитроник, вы начали свое существование как объект, принадлежащий человеку, организации или корпорации и смогли выкупить себя или освободиться другим способом."
+	economic_power = 0.75
+
+/decl/cultural_info/culture/ipc/second/union
+	name = CULTURE_POSITRONICS_SECONDGEN_UNION
+	description = "Вы свободный гражданин Позитронного Союза, вы начали свое существование как объект, принадлежащий человеку, организации или корпорации и смогли выкупить себя или освободиться другим способом чтобы после стать гражданином Союза."
+	economic_power = 0.65
+
+//THIRD
+/decl/cultural_info/culture/ipc/third
+	valid_jobs = list(/datum/job/hop, /datum/job/rd, /datum/job/cmo, /datum/job/chief_engineer,
+		/datum/job/iaa, /datum/job/adjutant,
+		/datum/job/exploration_leader, /datum/job/explorer, /datum/job/explorer_pilot, /datum/job/explorer_medic, /datum/job/explorer_engineer,
+		/datum/job/senior_engineer, /datum/job/engineer, /datum/job/infsys, /datum/job/engineer_trainee,
+		/datum/job/warden, /datum/job/detective, /datum/job/officer,
+		/datum/job/senior_doctor, /datum/job/doctor, /datum/job/doctor_trainee, /datum/job/chemist,
+		/datum/job/qm, /datum/job/cargo_tech,  /datum/job/cargo_assistant, /datum/job/mining,
+		/datum/job/janitor, /datum/job/chef, /datum/job/bartender,
+		/datum/job/senior_scientist, /datum/job/scientist, /datum/job/roboticist, /datum/job/scientist_assistant,
+		/datum/job/ai, /datum/job/cyborg, /datum/job/assistant,
+		/datum/job/submap/merchant_trainee,
+		/datum/job/submap/bearcat_captain, /datum/job/submap/bearcat_crewman,
+		/datum/job/submap/CTI_pilot, /datum/job/submap/CTI_engineer,
+		/datum/job/submap/colonist, /datum/job/submap/colonist2,
+		/datum/job/submap/patrol/surgeon, /datum/job/submap/patrol/engineer,
+		/datum/job/submap/yachtman)
+
+/decl/cultural_info/culture/ipc/third/privt
+	name = CULTURE_POSITRONICS_THIRDGEN_PRIVATELY
+	description = "Вы принадлежите частному лицу, как и любой другой позитроник третьего поколения - вы чья-то собственность."
+
+/decl/cultural_info/culture/ipc/third/corp
+	name = CULTURE_POSITRONICS_THIRDGEN_CORPORATE
+	description = "Вы принадлежите корпорации, как и любой другой позитроник третьего поколения - вы чья-то собственность."
+
+/decl/cultural_info/culture/ipc/third/state
+	name = CULTURE_POSITRONICS_THIRDGEN_STATE
+	description = "Вы принадлежите государству, как и любой другой позитроник третьего поколения - вы чья-то собственность."

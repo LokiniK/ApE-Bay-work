@@ -1,9 +1,9 @@
 /obj/machinery/r_n_d/server
-	name = "\improper R&D server"
-	icon = 'icons/obj/machines/research/server.dmi'
+	name = "R&D Server"
+	icon = 'icons/obj/machines/research_infinity.dmi'
 	icon_state = "server"
 	base_type = /obj/machinery/r_n_d/server
-	construct_state = /singleton/machine_construction/default/panel_closed
+	construct_state = /decl/machine_construction/default/panel_closed
 	machine_name = "\improper R&D server"
 	machine_desc = "A powerful piece of hardware used as the hub of a research matrix, containing every byte of data gleaned from an experiment."
 	var/datum/research/files
@@ -29,12 +29,12 @@
 	if(!files)
 		files = new /datum/research(src)
 	var/list/temp_list
-	if(!length(id_with_upload))
+	if(!id_with_upload.len)
 		temp_list = list()
 		temp_list = splittext(id_with_upload_string, ";")
 		for(var/N in temp_list)
 			id_with_upload += text2num(N)
-	if(!length(id_with_download))
+	if(!id_with_download.len)
 		temp_list = list()
 		temp_list = splittext(id_with_download_string, ";")
 		for(var/N in temp_list)
@@ -47,7 +47,7 @@
 		if(0 to T0C)
 			health = min(100, health + 1)
 		if(T0C to (T20C + 20))
-			health = clamp(health, 0, 100)
+			health = between(0, health, 100)
 		if((T20C + 20) to (T0C + 70))
 			health = max(0, health - 1)
 	if(health <= 0)
@@ -69,7 +69,7 @@
 	if(!use_power)
 		return
 
-	if(operable()) //Blatently stolen from telecoms
+	if(!(stat & (NOPOWER|BROKEN))) //Blatently stolen from telecoms
 		var/turf/simulated/L = loc
 		if(istype(L))
 			var/datum/gas_mixture/env = L.return_air()
@@ -86,7 +86,7 @@
 			env.merge(removed)
 
 /obj/machinery/r_n_d/server/centcom
-	name = "central R&D database"
+	name = "Central R&D Database"
 	server_id = -1
 
 /obj/machinery/r_n_d/server/centcom/proc/update_connections()
@@ -115,7 +115,7 @@
 	return PROCESS_KILL //don't need process()
 
 /obj/machinery/computer/rdservercontrol
-	name = "\improper R&D server controller"
+	name = "R&D Server Controller"
 	icon_keyboard = "rd_key"
 	icon_screen = "rdcomp"
 	light_color = "#a97faa"
@@ -129,7 +129,7 @@
 
 /obj/machinery/computer/rdservercontrol/CanUseTopic(user)
 	if(!allowed(user) && !emagged)
-		to_chat(user, SPAN_WARNING("You do not have the required access level"))
+		to_chat(user, "<span class='warning'>You do not have the required access level</span>")
 		return STATUS_CLOSE
 	return ..()
 
@@ -261,23 +261,23 @@
 	onclose(user, "server_control")
 	return
 
-/obj/machinery/computer/rdservercontrol/emag_act(remaining_charges, mob/user)
+/obj/machinery/computer/rdservercontrol/emag_act(var/remaining_charges, var/mob/user)
 	if(!emagged)
 		playsound(src.loc, 'sound/effects/sparks4.ogg', 75, 1)
 		emagged = TRUE
 		req_access.Cut()
-		to_chat(user, SPAN_NOTICE("You disable the security protocols."))
+		to_chat(user, "<span class='notice'>You you disable the security protocols.</span>")
 		src.updateUsrDialog()
 		return 1
 
 /obj/machinery/r_n_d/server/robotics
-	name = "robotics R&D server"
-	id_with_upload_string = "1;2;3"
-	id_with_download_string = "1;2;3"
+	name = "Robotics R&D Server"
+	id_with_upload_string = "1;2"
+	id_with_download_string = "1;2"
 	server_id = 2
 
 /obj/machinery/r_n_d/server/core
-	name = "core R&D server"
+	name = "Core R&D Server"
 	id_with_upload_string = "1;3"
 	id_with_download_string = "1;3"
 	server_id = 1

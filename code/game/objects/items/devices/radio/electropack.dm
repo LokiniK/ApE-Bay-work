@@ -14,48 +14,36 @@
 
 /obj/item/device/radio/electropack/attack_hand(mob/user as mob)
 	if(src == user.back)
-		to_chat(user, SPAN_NOTICE("You need help taking this off!"))
+		to_chat(user, "<span class='notice'>You need help taking this off!</span>")
 		return
 	..()
 
+/obj/item/device/radio/electropack/attackby(obj/item/W as obj, mob/user as mob)
+	..()
+	if(istype(W, /obj/item/clothing/head/helmet))
+		if(!b_stat)
+			to_chat(user, "<span class='notice'>[src] is not ready to be attached!</span>")
+			return
+		if(!user.unEquip(W) || !user.unEquip(src))
+			return
+		var/obj/item/assembly/shock_kit/A = new /obj/item/assembly/shock_kit( user )
+		A.icon = 'icons/obj/assemblies.dmi'
 
-/obj/item/device/radio/electropack/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Helmet - Attach helmet
-	if (istype(tool, /obj/item/clothing/head/helmet))
-		if (!b_stat)
-			USE_FEEDBACK_FAILURE("\The [src] is not ready to be attached.")
-			return TRUE
-		if (!user.unEquip(tool))
-			FEEDBACK_UNEQUIP_FAILURE(user, tool)
-			return TRUE
-		if (!user.unEquip(src))
-			FEEDBACK_UNEQUIP_FAILURE(user, src)
-			return TRUE
-		var/obj/item/assembly/shock_kit/shock_kit = new(user)
-		user.put_in_hands(shock_kit)
-		tool.forceMove(shock_kit)
-		tool.master = shock_kit
-		tool.transfer_fingerprints_to(shock_kit)
-		shock_kit.part1 = tool
-		forceMove(shock_kit)
-		master = shock_kit
-		shock_kit.part2 = src
-		transfer_fingerprints_to(shock_kit)
-		shock_kit.add_fingerprint(user)
-		user.visible_message(
-			SPAN_NOTICE("\The [user] attaches \a [src] to \a [tool] to create \a [shock_kit]."),
-			SPAN_NOTICE("You attach \the [src] to \the [tool] to create \the [shock_kit].")
-		)
-		return TRUE
+		W.forceMove(A)
+		W.master = A
+		A.part1 = W
 
-	return ..()
+		forceMove(A)
+		master = A
+		A.part2 = src
 
+		user.put_in_hands(A)
 
 /obj/item/device/radio/electropack/Topic(href, href_list)
 	//..()
 	if(usr.stat || usr.restrained())
 		return
-	if(((istype(usr, /mob/living/carbon/human) && (usr.IsAdvancedToolUser() && usr.contents.Find(src))) || (usr.contents.Find(master) || (in_range(src, usr) && istype(loc, /turf)))))
+	if(((istype(usr, /mob/living/carbon/human) && (usr.IsAdvancedToolUser() && list_find(usr.contents, src))) || (list_find(usr.contents, master) || (in_range(src, usr) && istype(loc, /turf)))))
 		usr.set_machine(src)
 		if(href_list["freq"])
 			var/new_frequency = sanitize_frequency(frequency + text2num(href_list["freq"]))
@@ -103,14 +91,13 @@
 				sleep(50)
 				if(M)
 					M.moved_recently = 0
-		to_chat(M, SPAN_DANGER("You feel a sharp shock!"))
+		to_chat(M, "<span class='danger'>You feel a sharp shock!</span>")
 		var/datum/effect/effect/system/spark_spread/s = new /datum/effect/effect/system/spark_spread
 		s.set_up(3, 1, M)
 		s.start()
 
 		M.Weaken(10)
-
-	if(master && listening)
+	if(master && !(wires.IsIndexCut(WIRE_SIGNAL)))
 		master.receive_signal()
 	return
 

@@ -14,7 +14,6 @@
 	skin_material = null
 
 	genders =                 list(PLURAL)
-	pronouns = 				  list(PRONOUNS_THEY_THEM)
 	cyborg_noun =             null
 
 	icon_template =           'icons/mob/human_races/species/adherent/template.dmi'
@@ -49,11 +48,16 @@
 	species_flags = SPECIES_FLAG_NO_SCAN | SPECIES_FLAG_NO_PAIN | SPECIES_FLAG_NO_POISON | SPECIES_FLAG_NO_MINOR_CUT
 	spawn_flags =   SPECIES_CAN_JOIN | SPECIES_IS_WHITELISTED | SPECIES_NO_FBP_CONSTRUCTION | SPECIES_NO_FBP_CHARGEN
 
-	appearance_flags = SPECIES_APPEARANCE_HAS_EYE_COLOR | SPECIES_APPEARANCE_HAS_BASE_SKIN_COLOURS
+	appearance_flags = HAS_EYE_COLOR | HAS_BASE_SKIN_COLOURS
 	blood_color = "#2de00d"
 	flesh_color = "#90edeb"
 	slowdown = -1
 	hud_type = /datum/hud_data/adherent
+
+	descriptors = list(
+		/datum/mob_descriptor/height = 1.6,
+		/datum/mob_descriptor/build = 0.4
+		)
 
 	available_cultural_info = list(
 		TAG_CULTURE = list(
@@ -109,6 +113,10 @@
 		"Jet"         = "_black"
 	)
 
+	inherent_verbs = list(
+		/mob/living/carbon/human/proc/toggle_emergency_discharge
+	)
+
 /datum/species/adherent/New()
 	equip_adjust = list(
 		"[slot_l_hand_str]" = list("[NORTH]" = list("x" = 0, "y" = 14), "[EAST]" = list("x" = 0, "y" = 14), "[SOUTH]" = list("x" = 0, "y" = 14), "[WEST]" = list("x" = 0,  "y" = 14)),
@@ -121,7 +129,7 @@
 	)
 	..()
 
-/datum/species/adherent/can_overcome_gravity(mob/living/carbon/human/H)
+/datum/species/adherent/can_overcome_gravity(var/mob/living/carbon/human/H)
 	. = FALSE
 	if(H && H.stat == CONSCIOUS)
 		for(var/obj/item/organ/internal/powered/float/float in H.internal_organs)
@@ -129,16 +137,16 @@
 				. = TRUE
 				break
 
-/datum/species/adherent/can_fall(mob/living/carbon/human/H)
+/datum/species/adherent/can_fall(var/mob/living/carbon/human/H)
 	. = !can_overcome_gravity(H)
 
-/datum/species/adherent/can_float(mob/living/carbon/human/H)
+/datum/species/adherent/can_float(var/mob/living/carbon/human/H)
 	return FALSE
 
-/datum/species/adherent/get_slowdown(mob/living/carbon/human/H)
+/datum/species/adherent/get_slowdown(var/mob/living/carbon/human/H)
 	return slowdown
 
-/datum/species/adherent/handle_fall_special(mob/living/carbon/human/H, turf/landing)
+/datum/species/adherent/handle_fall_special(var/mob/living/carbon/human/H, var/turf/landing)
 	var/float_is_usable = FALSE
 	if(H && H.stat == CONSCIOUS)
 		for(var/obj/item/organ/internal/powered/float/float in H.internal_organs)
@@ -163,7 +171,7 @@
 		if(2000 to 8000) . =  4
 		else             . =  8
 
-/datum/species/adherent/get_additional_examine_text(mob/living/carbon/human/H)
+/datum/species/adherent/get_additional_examine_text(var/mob/living/carbon/human/H)
 	if(can_overcome_gravity(H)) return "\nThey are floating on a cloud of shimmering distortion."
 
 /datum/hud_data/adherent
@@ -176,5 +184,5 @@
 		"belt" =  list("loc" = ui_belt,      "name" = "Belt",     "slot" = slot_belt,    "state" = "belt")
 	)
 
-/datum/species/adherent/post_organ_rejuvenate(obj/item/organ/org, mob/living/carbon/human/H)
+/datum/species/adherent/post_organ_rejuvenate(var/obj/item/organ/org, var/mob/living/carbon/human/H)
 	org.status |= (ORGAN_BRITTLE|ORGAN_CRYSTAL|ORGAN_ROBOTIC)

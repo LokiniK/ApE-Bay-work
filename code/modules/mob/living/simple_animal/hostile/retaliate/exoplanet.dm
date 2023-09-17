@@ -13,7 +13,7 @@
 		ai_holder.hostile = FALSE
 	else
 		for(var/mob/living/simple_animal/S in range(src,1))
-			if(S.stat == DEAD && S != src)
+			if(S.stat == DEAD)
 				visible_message("[src] consumes \the body of [S]!")
 				var/turf/T = get_turf(S)
 				var/obj/item/remains/xeno/X = new(T)
@@ -36,17 +36,15 @@
 		return
 	if(!CanInteract(usr, GLOB.conscious_state))
 		return
-	if (isghost(usr))
-		return
 
 	for(var/obj/effect/overmap/visitable/sector/exoplanet/E)
 		if(src in E.animals)
 			newname = sanitizeName(newname, allow_numbers = TRUE, force_first_letter_uppercase = FALSE)
 			if(newname && CanInteract(usr, GLOB.conscious_state))
 				if(E.rename_species(type, newname))
-					to_chat(usr,SPAN_NOTICE("This species will be known from now on as '[newname]'."))
+					to_chat(usr,"<span class='notice'>This species will be known from now on as '[newname]'.</span>")
 				else
-					to_chat(usr,SPAN_WARNING("This species has already been named!"))
+					to_chat(usr,"<span class='warning'>This species has already been named!</span>")
 			return
 
 /mob/living/simple_animal/hostile/retaliate/beast/samak
@@ -166,10 +164,8 @@
 		melee = ARMOR_MELEE_RESISTANT
 		)
 
-	ai_holder = /datum/ai_holder/simple_animal/retaliate/royalcrab
+	ai_holder = /datum/ai_holder/simple_animal/royalcrab
 	say_list = /datum/say_list/royalcrab
-	meat_type = /obj/item/reagent_containers/food/snacks/shellfish/crab
-	meat_amount = 3
 
 /mob/living/simple_animal/hostile/retaliate/beast/charbaby
 	name = "charbaby"
@@ -206,13 +202,13 @@
 			L.IgniteMob()
 /obj/item/natural_weapon/charbaby
 	name = "scalding hide"
-	damtype = DAMAGE_BURN
+	damtype = BURN
 	force = 5
 	attack_verb = list("singed")
 
 /mob/living/simple_animal/hostile/retaliate/beast/charbaby/attack_hand(mob/living/carbon/human/H)
 	. = ..()
-	reflect_unarmed_damage(H, DAMAGE_BURN, "amorphous mass")
+	reflect_unarmed_damage(H, BURN, "amorphous mass")
 
 /mob/living/simple_animal/hostile/retaliate/beast/shantak/lava
 	desc = "A vaguely canine looking beast. It looks as though its fur is made of stone wool."
@@ -246,7 +242,7 @@
 /datum/ai_holder/simple_animal/passive/thinbug
 	speak_chance = 1
 
-/datum/ai_holder/simple_animal/retaliate/royalcrab
+/datum/ai_holder/simple_animal/royalcrab
 	speak_chance = 1
 
 /* Say Lists */

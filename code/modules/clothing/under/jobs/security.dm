@@ -36,6 +36,31 @@
 		)
 	siemens_coefficient = 0.9
 
+/obj/item/clothing/under/security/officer
+    name = "large security uniform"
+    desc = "An aftermarket modification of a regular desert jumpsuit, favored by unathi mercenaries. This one provides a bit more physical protection as if unathi ever needed that. It's too big to fit anyone, but unathi."
+    item_icons = list(slot_w_uniform_str = 'icons/mob/species/unathi/generated/onmob_under_unathi.dmi')
+    species_restricted  = list(SPECIES_UNATHI)
+    icon_state = "unsecuniform"
+    item_state = "unsecuniform"
+    worn_state = "unsecuniform"
+    rolled_sleeves = 0  //0 = unrolled, 1 = rolled, -1 = cannot be toggled
+
+
+/obj/item/clothing/under/security/desert
+    name = "desert jumpsuit"
+    desc = "A bulky and light jumpsuit designed for use in the desert. Unathi use it to withstand scorhing heat rays when \"Burning Mother\" at it's zenith, something that their scales cannot handle. It's too big to fit anyone, but unathi."
+    //icon = 'infinity/icons/mob/species/unathi/onmob_under_unathi.dmi'
+    species_restricted  = list(SPECIES_UNATHI)
+    item_icons = list(slot_w_uniform_str = 'icons/mob/species/unathi/generated/onmob_under_unathi.dmi')
+    //sprite_sheets = list(
+    //        SPECIES_UNATHI = 'icons/mob/species/unathi/generated/onmob_under_unathi.dmi'
+    //)
+    icon_state = "desertuniform"
+    item_state = "desertuniform"
+    worn_state = "desertuniform"
+    rolled_sleeves = 0  //0 = unrolled, 1 = rolled, -1 = cannot be toggled
+
 /obj/item/clothing/under/rank/dispatch
 	name = "dispatcher's uniform"
 	desc = "A dress shirt and khakis with a security patch sewn on."
@@ -91,14 +116,14 @@
 		melee = ARMOR_MELEE_SMALL
 		)
 	siemens_coefficient = 0.9
-	accessories = list(/obj/item/clothing/accessory/blue_clip)
+	starting_accessories = list(/obj/item/clothing/accessory/blue_clip)
 
 /obj/item/clothing/under/det/grey
 	icon_state = "detective2"
 	worn_state = "detective2"
 	gender_icons = 1
 	desc = "A serious-looking tan dress shirt paired with freshly-pressed black slacks."
-	accessories = list(/obj/item/clothing/accessory/red_long)
+	starting_accessories = list(/obj/item/clothing/accessory/red_long)
 
 /obj/item/clothing/under/det/black
 	icon_state = "detective3"
@@ -106,7 +131,7 @@
 	item_state = "sl_suit"
 	gender_icons = 1
 	desc = "An immaculate white dress shirt, paired with a pair of dark grey dress pants, a red tie, and a charcoal vest."
-	accessories = list(/obj/item/clothing/accessory/red_long, /obj/item/clothing/accessory/toggleable/suit_vest)
+	starting_accessories = list(/obj/item/clothing/accessory/red_long, /obj/item/clothing/accessory/toggleable/vest)
 
 /obj/item/clothing/head/det
 	name = "fedora"
@@ -126,7 +151,7 @@
 
 /obj/item/clothing/head/det/attack_self(mob/user)
 	flags_inv ^= BLOCKHEADHAIR
-	to_chat(user, SPAN_NOTICE("[src] will now [flags_inv & BLOCKHEADHAIR ? "hide" : "show"] hair."))
+	to_chat(user, "<span class='notice'>[src] will now [flags_inv & BLOCKHEADHAIR ? "hide" : "show"] hair.</span>")
 	..()
 
 /obj/item/clothing/head/det/grey
@@ -153,14 +178,14 @@
 	worn_state = "hos_corporate"
 
 /obj/item/clothing/head/HoS
-	name = "head of security's hat"
+	name = "Head of Security Hat"
 	desc = "The hat of the Head of Security. For showing the officers who's in charge."
 	icon_state = "hoscap"
 	body_parts_covered = 0
 	siemens_coefficient = 0.8
 
 /obj/item/clothing/head/HoS/dermal
-	name = "dermal armour patch"
+	name = "Dermal Armour Patch"
 	desc = "You're not quite sure how you manage to take it on and off, but it implants nicely in your head."
 	icon_state = "dermal"
 	armor = list(
@@ -170,11 +195,15 @@
 		energy = ARMOR_ENERGY_SMALL,
 		bomb = ARMOR_BOMB_PADDED
 		)
+	item_flags = ITEM_FLAG_THICKMATERIAL //INF
+	body_parts_covered = HEAD //INF
 	siemens_coefficient = 0.6
 
 /obj/item/clothing/suit/armor/hos
 	name = "armored coat"
 	desc = "A greatcoat enhanced with a special alloy for some protection and style."
+	icon = 'infinity/icons/obj/clothing/obj_suit.dmi' //INF
+	item_icons = list(slot_wear_suit_str = 'infinity/icons/mob/onmob/onmob_suit.dmi') //INF
 	icon_state = "hos"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|ARMS|LEGS
 	armor = list(
@@ -184,8 +213,9 @@
 		energy = ARMOR_ENERGY_MINOR,
 		bomb = ARMOR_BOMB_PADDED
 		)
-	flags_inv = HIDEJUMPSUIT
+//INF	flags_inv = HIDEJUMPSUIT
 	siemens_coefficient = 0.6
+	valid_accessory_slots = list(ACCESSORY_SLOT_ARMBAND, ACCESSORY_SLOT_OVER, ACCESSORY_SLOT_INSIGNIA) //INF
 
 //Jensen cosplay gear
 /obj/item/clothing/under/rank/head_of_security/jensen

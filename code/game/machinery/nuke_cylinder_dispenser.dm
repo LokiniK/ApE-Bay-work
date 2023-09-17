@@ -10,6 +10,7 @@
 	var/locked = TRUE
 	var/open = FALSE
 	var/list/cylinders = list() //Should only hold 6
+	var/nuke_emagged = FALSE
 
 /obj/machinery/nuke_cylinder_dispenser/Initialize()
 	. = ..()
@@ -18,11 +19,23 @@
 	update_icon()
 
 /obj/machinery/nuke_cylinder_dispenser/emag_act(remaining_charges, mob/user, emag_source)
-	to_chat(user, SPAN_NOTICE("The card fails to do anything. It seems this device has an advanced encryption system."))
-	return NO_EMAG_ACT
+	if(is_powered() && !nuke_emagged)
+		open = TRUE
+		locked = TRUE
+		nuke_emagged = TRUE
+		user.visible_message("[user] unlocks \the [src].", "You emagged \the [src].")
+		visible_message("<span class = 'warning'>\The [src.name] breaks!</span>")
+		to_chat(user, SPAN_NOTICE("Security protocol disabled.The encryption system was hacked."))
+		var/datum/effect/effect/system/spark_spread/s = new /datum/effect/effect/system/spark_spread
+		s.set_up(5, 1, src)
+		s.start()
+		desc += " It appears to be broken."
+		update_icon()
+		add_fingerprint(user)
+		return TRUE
 
 /obj/machinery/nuke_cylinder_dispenser/physical_attack_hand(mob/user)
-	if(is_powered() && locked && check_access(user))
+	if(is_powered() && locked && check_access(user) && !nuke_emagged)
 		locked = FALSE
 		user.visible_message("[user] unlocks \the [src].", "You unlock \the [src].")
 		update_icon()
@@ -45,7 +58,7 @@
 		return
 	if(open && istype(O, /obj/item/nuclear_cylinder) && (length(cylinders) < 6))
 		user.visible_message("[user] begins inserting \the [O] into storage.", "You begin inserting \the [O] into storage.")
-		if(do_after(user, 8 SECONDS, src, DO_PUBLIC_UNIQUE) && open && (length(cylinders) < 6) && user.unEquip(O, src))
+		if(do_after(user, 80, src) && open && (length(cylinders) < 6) && user.unEquip(O, src))
 			user.visible_message("[user] places \the [O] into storage.", "You place \the [O] into storage.")
 			cylinders.Add(O)
 			update_icon()
@@ -56,7 +69,7 @@
 		return
 	if(over == usr && open && length(cylinders))
 		usr.visible_message("[usr] begins to extract \the [cylinders[1]].", "You begin to extract \the [cylinders[1]].")
-		if(do_after(usr, 7 SECONDS, src, DO_PUBLIC_UNIQUE) && open && length(cylinders))
+		if(do_after(usr, 70, src) && open && length(cylinders))
 			usr.visible_message("[usr] picks up \the [cylinders[1]].", "You pick up \the [cylinders[1]].")
 			usr.put_in_hands(cylinders[length(cylinders)])
 			cylinders.Cut(length(cylinders))

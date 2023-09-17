@@ -1,16 +1,14 @@
 // This system is used to grab a ghost from observers with the required preferences
 // and lack of bans set. See posibrain.dm for an example of how they are called/used.
 
-var/global/list/ghost_traps
+var/list/ghost_traps
 
-/proc/get_ghost_trap(trap_key)
-	RETURN_TYPE(/datum/ghosttrap)
+/proc/get_ghost_trap(var/trap_key)
 	if(!ghost_traps)
 		populate_ghost_traps()
 	return ghost_traps[trap_key]
 
 /proc/get_ghost_traps()
-	RETURN_TYPE(/list)
 	if(!ghost_traps)
 		populate_ghost_traps()
 	return ghost_traps
@@ -25,9 +23,11 @@ var/global/list/ghost_traps
 	var/object = "default ghost trap"
 	var/minutes_since_death = 0     // If non-zero the ghost must have been dead for this many minutes to be allowed to spawn
 	var/list/ban_checks = list()
+	var/pref_check = ""
 	var/ghost_trap_message = "They are no longer a ghost."
 	var/ghost_trap_role = "default ghost trap"
 	var/can_set_own_name = TRUE
+	var/list_as_special_role = FALSE	// If true, this entry will be listed as a special role in the character setup
 
 	var/list/request_timeouts
 	var/datum/species/species_whitelist // If defined, this is the species whitelist required to join
@@ -37,18 +37,8 @@ var/global/list/ghost_traps
 	..()
 
 // Check for bans, proper atom types, etc.
-/datum/ghosttrap/proc/assess_candidate(mob/observer/ghost/candidate, mob/target, feedback = TRUE)
+/datum/ghosttrap/proc/assess_candidate(var/mob/observer/ghost/candidate, var/mob/target, var/feedback = TRUE)
 	if(!candidate.MayRespawn(feedback, minutes_since_death))
-		return FALSE
-
-	if(request_timeouts[target] && world.time > request_timeouts[target])
-		if (feedback)
-			to_chat(candidate, "This occupation request is no longer valid.")
-		return FALSE
-
-	if(target.key)
-		if (feedback)
-			to_chat(candidate, "The target is already occupied.")
 		return FALSE
 
 	if(islist(ban_checks))
@@ -74,7 +64,7 @@ var/global/list/ghost_traps
 		. = FALSE
 
 // Print a message to all ghosts with the right prefs/lack of bans.
-/datum/ghosttrap/proc/request_player(mob/target, request_string, request_timeout)
+/datum/ghosttrap/proc/request_player(var/mob/target, var/request_string, var/request_timeout)
 	if(request_timeout)
 		request_timeouts[target] = world.time + request_timeout
 		GLOB.destroyed_event.register(target, src, /datum/ghosttrap/proc/unregister_target)
@@ -82,22 +72,21 @@ var/global/list/ghost_traps
 		unregister_target(target)
 
 	for(var/mob/observer/ghost/O in GLOB.player_list)
-		if (O.client.get_preference_value(/datum/client_preference/notify_ghost_trap) == GLOB.PREF_NO)
-			return
 		if(!assess_candidate(O, target, FALSE))
+			return
+		if(pref_check && !O.client.wishes_to_be_role(pref_check))
 			continue
 		if(O.client)
-			to_chat(O, SPAN_BOLD(FONT_LARGE("[request_string] <a href='?src=\ref[src];candidate=\ref[O];target=\ref[target]'>(Occupy)</a> ([ghost_follow_link(target, O)])")))
-			sound_to(O, 'sound/effects/ding2.ogg')
+			to_chat(O, "[request_string] <a href='?src=\ref[src];candidate=\ref[O];target=\ref[target]'>(Occupy)</a> ([ghost_follow_link(target, O)])")
 
-/datum/ghosttrap/proc/unregister_target(target)
+/datum/ghosttrap/proc/unregister_target(var/target)
 	request_timeouts -= target
 	GLOB.destroyed_event.unregister(target, src, /datum/ghosttrap/proc/unregister_target)
 
 // Handles a response to request_player().
 /datum/ghosttrap/Topic(href, href_list)
 	if(..())
-		return TRUE
+		return 1
 	if(href_list["candidate"] && href_list["target"])
 		var/mob/observer/ghost/candidate = locate(href_list["candidate"]) // BYOND magic.
 		var/mob/target = locate(href_list["target"])                     // So much BYOND magic.
@@ -105,18 +94,20 @@ var/global/list/ghost_traps
 			return
 		if(candidate != usr)
 			return
-		if(!assess_candidate(candidate, target))
+		if(request_timeouts[target] && world.time > request_timeouts[target])
+			to_chat(candidate, "This occupation request is no longer valid.")
 			return
-		// Modal yes/no alert to guard misclicks
-		if(alert("Would you like to occupy \a [object]?", "Occupy", "Yes", "No") != "Yes")
+		if(target.key)
+			to_chat(candidate, "The target is already occupied.")
 			return
-		transfer_personality(candidate,target)
-		return TRUE
+		if(assess_candidate(candidate, target))
+			transfer_personality(candidate,target)
+		return 1
 
 // Shunts the ckey/mind into the target mob.
-/datum/ghosttrap/proc/transfer_personality(mob/candidate, mob/target)
+/datum/ghosttrap/proc/transfer_personality(var/mob/candidate, var/mob/target)
 	if(!assess_candidate(candidate, target))
-		return FALSE
+		return 0
 	target.ckey = candidate.ckey
 	if(target.mind)
 		target.mind.reset()
@@ -124,13 +115,13 @@ var/global/list/ghost_traps
 	announce_ghost_joinleave(candidate, 0, "[ghost_trap_message]")
 	welcome_candidate(target)
 	set_new_name(target)
-	return TRUE
+	return 1
 
-/datum/ghosttrap/proc/welcome_candidate(mob/target)
+/datum/ghosttrap/proc/welcome_candidate(var/mob/target)
 	return
 
 // Allows people to set their own name.
-/datum/ghosttrap/proc/set_new_name(mob/target)
+/datum/ghosttrap/proc/set_new_name(var/mob/target)
 	if (can_set_own_name)
 		var/newname = sanitizeSafe(input(target, "Enter a name, or leave blank for the default name.", "Name change", target.real_name) as text, MAX_NAME_LEN)
 		if (newname)
@@ -145,8 +136,10 @@ var/global/list/ghost_traps
 /datum/ghosttrap/positronic
 	object = "positronic brain"
 	ban_checks = list("AI","Robot")
+	pref_check = BE_SYNTH
 	ghost_trap_message = "They are occupying a positronic brain now."
 	ghost_trap_role = "Positronic Brain"
+	list_as_special_role = TRUE
 
 /datum/ghosttrap/positronic/welcome_candidate(mob/target)
 	to_chat(target, SPAN_BOLD("You are a positronic brain, activated on [station_name()]."))
@@ -158,7 +151,7 @@ var/global/list/ghost_traps
 		return
 	P.visible_message(SPAN_ITALIC("The [P] chimes quietly."), range = 3)
 	deltimer(P.searching)
-	P.searching = null
+	P.searching = TIMER_ID_NULL
 	P.update_icon()
 
 /datum/ghosttrap/positronic/set_new_name(mob/target)
@@ -174,12 +167,14 @@ var/global/list/ghost_traps
 /datum/ghosttrap/plant
 	object = "living plant"
 	ban_checks = list("Dionaea")
+	pref_check = BE_PLANT
 	ghost_trap_message = "They are occupying a living plant now."
 	ghost_trap_role = "Plant"
+	list_as_special_role = TRUE
 	species_whitelist = /datum/species/diona
 
-/datum/ghosttrap/plant/welcome_candidate(mob/target)
-	to_chat(target, SPAN_CLASS("alium", "<B>You awaken slowly, stirring into sluggish motion as the air caresses you.</B>"))
+/datum/ghosttrap/plant/welcome_candidate(var/mob/target)
+	to_chat(target, "<span class='alium'><B>You awaken slowly, stirring into sluggish motion as the air caresses you.</B></span>")
 	// This is a hack, replace with some kind of species blurb proc.
 	if(istype(target,/mob/living/carbon/alien/diona))
 		to_chat(target, "<B>You are \a [target], one of a race of drifting interstellar plantlike creatures that sometimes share their seeds with human traders.</B>")
@@ -190,12 +185,14 @@ var/global/list/ghost_traps
 /datum/ghosttrap/borer
 	object = "cortical borer"
 	ban_checks = list(MODE_BORER)
+	pref_check = MODE_BORER
 	ghost_trap_message = "They are occupying a borer now."
 	ghost_trap_role = "Cortical Borer"
 	can_set_own_name = FALSE
+	list_as_special_role = FALSE
 
-/datum/ghosttrap/borer/welcome_candidate(mob/target)
-	to_chat(target, "[SPAN_NOTICE("You are a cortical borer!")] You are a brain slug that worms its way \
+/datum/ghosttrap/borer/welcome_candidate(var/mob/target)
+	to_chat(target, "<span class='notice'>You are a cortical borer!</span> You are a brain slug that worms its way \
 	into the head of its victim. Use stealth, persuasion and your powers of mind control to keep you, \
 	your host and your eventual spawn safe and warm.")
 	to_chat(target, "You can speak to your victim with <b>say</b>, to other borers with <b>say [target.get_language_prefix()]x</b>, and use your Abilities tab to access powers.")
@@ -204,22 +201,24 @@ var/global/list/ghost_traps
 *********************/
 /datum/ghosttrap/drone
 	object = "maintenance drone"
+	pref_check = BE_PAI
 	ghost_trap_message = "They are occupying a maintenance drone now."
 	ghost_trap_role = "Maintenance Drone"
 	can_set_own_name = FALSE
+	list_as_special_role = FALSE
 
 /datum/ghosttrap/drone/New()
 	minutes_since_death = DRONE_SPAWN_DELAY
 	..()
 
-/datum/ghosttrap/drone/assess_candidate(mob/observer/ghost/candidate, mob/target)
+datum/ghosttrap/drone/assess_candidate(var/mob/observer/ghost/candidate, var/mob/target)
 	. = ..()
 	if(. && !target.can_be_possessed_by(candidate))
-		return FALSE
+		return 0
 
-/datum/ghosttrap/drone/transfer_personality(mob/candidate, mob/living/silicon/robot/drone/drone)
+datum/ghosttrap/drone/transfer_personality(var/mob/candidate, var/mob/living/silicon/robot/drone/drone)
 	if(!assess_candidate(candidate))
-		return FALSE
+		return 0
 	drone.transfer_personality(candidate.client)
 
 /**************
@@ -227,48 +226,52 @@ var/global/list/ghost_traps
 **************/
 /datum/ghosttrap/pai
 	object = "pAI"
+	pref_check = BE_PAI
 	ghost_trap_message = "They are occupying a pAI now."
 	ghost_trap_role = "pAI"
+	list_as_special_role = TRUE
 
-/datum/ghosttrap/pai/assess_candidate(mob/observer/ghost/candidate, mob/target)
-	return FALSE
+datum/ghosttrap/pai/assess_candidate(var/mob/observer/ghost/candidate, var/mob/target)
+	return 0
 
-/datum/ghosttrap/pai/transfer_personality(mob/candidate, mob/living/silicon/robot/drone/drone)
-	return FALSE
+datum/ghosttrap/pai/transfer_personality(var/mob/candidate, var/mob/living/silicon/robot/drone/drone)
+	return 0
 
 /******************
 * Wizard Familiar *
 ******************/
 /datum/ghosttrap/familiar
 	object = "wizard familiar"
+	pref_check = MODE_WIZARD
 	ghost_trap_message = "They are occupying a familiar now."
 	ghost_trap_role = "Wizard Familiar"
 	ban_checks = list(MODE_WIZARD)
+	list_as_special_role = TRUE
 
-/datum/ghosttrap/familiar/welcome_candidate(mob/target)
-	return FALSE
+/datum/ghosttrap/familiar/welcome_candidate(var/mob/target)
+	return 0
 
 /datum/ghosttrap/cult
 	object = "cultist"
 	ban_checks = list("cultist")
+	pref_check = MODE_CULTIST
 	can_set_own_name = FALSE
 	ghost_trap_message = "They are occupying a cultist's body now."
 	ghost_trap_role = "Cultist"
+	list_as_special_role = TRUE
 
-/datum/ghosttrap/cult/welcome_candidate(mob/target)
+/datum/ghosttrap/cult/welcome_candidate(var/mob/target)
 	var/obj/item/device/soulstone/S = target.loc
 	if(istype(S))
-		switch (S.owner_flag)
-			if (SOULSTONE_OWNER_CULT)
-				GLOB.cult.add_antagonist(target.mind)
-				to_chat(target, "<b>Remember, you serve the one who summoned you first, and the cult second.</b>")
-			if (SOULSTONE_OWNER_WIZARD)
-				to_chat(target, "<b>Remember, you only serve the wizard who summoned you.</b>")
-			else
-				to_chat(target, "<b>This soultone has been purified. You do not belong to the cult.</b>")
-				to_chat(target, "<b>Remember, you only serve the one who summoned you.</b>")
+		if(S.is_evil)
+			GLOB.cult.add_antagonist(target.mind)
+			to_chat(target, "<b>Remember, you serve the one who summoned you first, and the cult second.</b>")
+		else
+			to_chat(target, "<b>This soultone has been purified. You do not belong to the cult.</b>")
+			to_chat(target, "<b>Remember, you only serve the one who summoned you.</b>")
 
 /datum/ghosttrap/cult/shade
 	object = "soul stone"
 	ghost_trap_message = "They are occupying a soul stone now."
 	ghost_trap_role = "Shade"
+	list_as_special_role = TRUE

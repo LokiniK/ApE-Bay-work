@@ -2,7 +2,7 @@
 /obj/effect/spresent
 	name = "strange present"
 	desc = "It's a ... present?"
-	icon = 'icons/obj/gifts.dmi'
+	icon = 'icons/obj/items.dmi'
 	icon_state = "strangepresent"
 	density = TRUE
 	anchored = FALSE
@@ -25,7 +25,7 @@
 	. = ..()
 	return INITIALIZE_HINT_LATELOAD
 
-/obj/effect/paint/LateInitialize(mapload)
+/obj/effect/paint/LateInitialize()
 	var/turf/simulated/wall/W = get_turf(src)
 	if(istype(W))
 		W.paint_color = color
@@ -51,16 +51,19 @@
 /obj/effect/paint/black
 	color = COLOR_DARK_GRAY
 
+/obj/effect/paint/dark_gunmetal
+	color = COLOR_DARK_GUNMETAL
+
 /obj/effect/paint/green
 	color = COLOR_GREEN_GRAY
 
 /obj/effect/paint/blue
 	color = COLOR_NAVY_BLUE
 
-/obj/effect/paint/ocean
+obj/effect/paint/ocean
 	color =	COLOR_OCEAN
 
-/obj/effect/paint/palegreengray
+obj/effect/paint/palegreengray
 	color =	COLOR_PALE_GREEN_GRAY
 
 /obj/effect/paint/brown
@@ -78,7 +81,7 @@
 	. = ..()
 	return INITIALIZE_HINT_LATELOAD
 
-/obj/effect/paint_stripe/LateInitialize(mapload)
+/obj/effect/paint_stripe/LateInitialize()
 	var/turf/simulated/wall/W = get_turf(src)
 	if(istype(W))
 		W.stripe_color = color
@@ -131,19 +134,3 @@
 		var/datum/gas_mixture/G = P.air_temporary
 		G.adjust_gas(GAS_OXYGEN,((pressure*P.volume)/(R_IDEAL_GAS_EQUATION*temperature)))
 	return INITIALIZE_HINT_QDEL
-
-/obj/effect/heat
-	icon = 'icons/effects/fire.dmi'
-	icon_state = "3"
-	render_target = HEAT_EFFECT_TARGET
-	mouse_opacity = MOUSE_OPACITY_UNCLICKABLE
-
-/// Example of a warp filter
-/obj/effect/effect/warp
-	plane = WARP_EFFECT_PLANE
-	appearance_flags = PIXEL_SCALE
-	icon = 'icons/effects/352x352.dmi'
-	icon_state = "singularity_s11"
-	pixel_x = -176
-	pixel_y = -176
-	z_flags = ZMM_IGNORE

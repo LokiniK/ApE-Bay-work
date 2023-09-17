@@ -1,7 +1,7 @@
 /obj/item/extinguisher
 	name = "fire extinguisher"
 	desc = "A traditional red fire extinguisher."
-	icon = 'icons/obj/tools/fire_extinguishers.dmi'
+	icon = 'icons/obj/items.dmi'
 	icon_state = "fire_extinguisher0"
 	item_state = "fire_extinguisher"
 	hitsound = 'sound/weapons/smash.ogg'
@@ -11,7 +11,6 @@
 	throw_speed = 2
 	throw_range = 10
 	force = 10.0
-	base_parry_chance = 15
 	matter = list(MATERIAL_STEEL = 90)
 	attack_verb = list("slammed", "whacked", "bashed", "thunked", "battered", "bludgeoned", "thrashed")
 
@@ -62,7 +61,7 @@
 	to_chat(user, "The safety is [safety ? "on" : "off"].")
 	return
 
-/obj/item/extinguisher/attack(mob/living/M, mob/user)
+/obj/item/extinguisher/attack(var/mob/living/M, var/mob/user)
 	if(user.a_intent == I_HELP)
 		if(src.safety || (world.time < src.last_use + 20)) // We still catch help intent to not randomly attack people
 			return
@@ -79,7 +78,7 @@
 		return 1 // No afterattack
 	return ..()
 
-/obj/item/extinguisher/proc/propel_object(obj/O, mob/user, movementdirection)
+/obj/item/extinguisher/proc/propel_object(var/obj/O, mob/user, movementdirection)
 	if(O.anchored) return
 
 	var/obj/structure/bed/chair/C
@@ -97,13 +96,13 @@
 		O.Move(get_step(user,movementdirection), movementdirection)
 		sleep(3)
 
-/obj/item/extinguisher/resolve_attackby(atom/target, mob/user, flag)
+/obj/item/extinguisher/resolve_attackby(var/atom/target, var/mob/user, var/flag)
 	if (istype(target, /obj/structure/hygiene/sink) && reagents.get_free_space() > 0) // fill first, wash if full
 		return FALSE
 	return ..()
 
 
-/obj/item/extinguisher/afterattack(atom/target, mob/user, flag)
+/obj/item/extinguisher/afterattack(var/atom/target, var/mob/user, var/flag)
 	var/issink = istype(target, /obj/structure/hygiene/sink)
 
 	if (flag && (issink || istype(target, /obj/structure/reagent_dispensers)))
@@ -140,21 +139,21 @@
 
 		playsound(src.loc, 'sound/effects/extinguish.ogg', 75, 1, -3)
 
-		var/direction = get_dir(target, src)
+		var/direction = get_dir(src,target)
 
 		if(user.buckled && isobj(user.buckled))
-			addtimer(new Callback(src, .proc/propel_object, user.buckled, user, direction), 0)
+			addtimer(CALLBACK(src, .proc/propel_object, user.buckled, user, turn(direction,180)), 0)
 
-		addtimer(new Callback(src, .proc/do_spray, target), 0)
+		addtimer(CALLBACK(src, .proc/do_spray, target), 0)
 
-		if(!user.check_space_footing())
-			step(user, direction)
-
+		if((istype(usr.loc, /turf/space)) || (usr.lastarea.has_gravity == 0))
+			user.inertia_dir = get_dir(target, user)
+			step(user, user.inertia_dir)
 	else
 		return ..()
 	return
 
-/obj/item/extinguisher/proc/do_spray(atom/Target)
+/obj/item/extinguisher/proc/do_spray(var/atom/Target)
 	var/turf/T = get_turf(Target)
 	var/per_particle = min(spray_amount, reagents.total_volume)/spray_particles
 	for(var/a = 1 to spray_particles)

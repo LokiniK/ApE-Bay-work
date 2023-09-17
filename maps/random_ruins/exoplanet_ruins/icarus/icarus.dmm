@@ -75,7 +75,7 @@
 /area/map_template/icarus/sec)
 "aT" = (
 /obj/structure/grille,
-/turf/simulated/floor/reinforced,
+/turf/simulated/floor/reinforced/airless,
 /area/map_template/icarus/driver/east)
 "aV" = (
 /obj/machinery/door/airlock/sol{
@@ -102,7 +102,8 @@
 	dir = 6
 	},
 /obj/effect/floor_decal/corner/blue{
-	dir = 8
+	dir = 8;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/tiled/dark,
 /area/map_template/icarus/bridge)
@@ -122,7 +123,7 @@
 	icon_state = "pdoor0";
 	opacity = 0
 	},
-/turf/simulated/floor/reinforced,
+/turf/simulated/floor/reinforced/airless,
 /area/map_template/icarus/driver/east)
 "bK" = (
 /obj/random/junk,
@@ -141,7 +142,8 @@
 /area/map_template/icarus/bridge)
 "cd" = (
 /obj/effect/floor_decal/spline/fancy/wood{
-	dir = 1
+	dir = 1;
+	icon_state = "spline_fancy"
 	},
 /obj/item/ore/slag,
 /turf/simulated/floor/carpet/blue,
@@ -158,7 +160,7 @@
 /area/map_template/icarus/sci)
 "cF" = (
 /obj/effect/landmark/clear,
-/obj/machinery/stasis_cage,
+/obj/structure/stasis_cage,
 /turf/template_noop,
 /area/template_noop)
 "cS" = (
@@ -172,7 +174,7 @@
 /area/map_template/icarus/driver/east)
 "cZ" = (
 /obj/effect/decal/cleanable/dirt,
-/turf/simulated/floor/reinforced,
+/turf/simulated/floor/reinforced/airless,
 /area/map_template/icarus/driver/west)
 "dn" = (
 /obj/random/trash,
@@ -229,7 +231,8 @@
 "fq" = (
 /obj/item/stack/material/rods,
 /obj/effect/floor_decal/corner/research{
-	dir = 5
+	dir = 5;
+	icon_state = "corner_white"
 	},
 /obj/structure/filingcabinet/chestdrawer,
 /turf/simulated/floor/tiled/white,
@@ -250,7 +253,8 @@
 /area/map_template/icarus/sec)
 "fz" = (
 /obj/effect/floor_decal/corner/research{
-	dir = 5
+	dir = 5;
+	icon_state = "corner_white"
 	},
 /obj/effect/decal/cleanable/dirt,
 /obj/machinery/light_construct,
@@ -263,7 +267,8 @@
 /area/map_template/icarus/bridge)
 "fJ" = (
 /obj/effect/floor_decal/corner/research{
-	dir = 5
+	dir = 5;
+	icon_state = "corner_white"
 	},
 /obj/effect/decal/cleanable/dirt,
 /obj/structure/bookcase/manuals/research_and_development,
@@ -320,7 +325,7 @@
 /turf/simulated/floor/tiled/dark,
 /area/map_template/icarus/bridge)
 "hc" = (
-/obj/machinery/anomaly_container,
+/obj/structure/anomaly_container,
 /turf/simulated/floor/tiled/white,
 /area/map_template/icarus/sci)
 "hf" = (
@@ -449,7 +454,7 @@
 /turf/simulated/floor/tiled/dark,
 /area/map_template/icarus/bridge)
 "lv" = (
-/turf/simulated/floor/reinforced,
+/turf/simulated/floor/reinforced/airless,
 /area/map_template/icarus/driver/west)
 "lA" = (
 /obj/machinery/door/airlock/sol{
@@ -515,7 +520,8 @@
 /area/map_template/icarus/sec)
 "oJ" = (
 /obj/effect/floor_decal/corner/yellow/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/light_construct,
 /turf/simulated/floor/tiled,
@@ -563,7 +569,8 @@
 /area/map_template/icarus/armory)
 "pL" = (
 /obj/effect/floor_decal/spline/fancy/wood{
-	dir = 1
+	dir = 1;
+	icon_state = "spline_fancy"
 	},
 /obj/effect/decal/cleanable/dirt,
 /turf/simulated/floor/carpet/blue,
@@ -672,7 +679,7 @@
 "sM" = (
 /obj/structure/table/glass,
 /obj/effect/decal/cleanable/dirt,
-/obj/item/gun/projectile/pistol/m22f/icarus,
+/obj/item/gun/projectile/pistol/military/icarus,
 /turf/simulated/floor/tiled/dark,
 /area/map_template/icarus/bridge)
 "sO" = (
@@ -687,7 +694,8 @@
 /area/map_template/icarus/eng)
 "sS" = (
 /obj/effect/floor_decal/corner/blue{
-	dir = 10
+	dir = 10;
+	icon_state = "corner_white"
 	},
 /obj/effect/decal/cleanable/dirt,
 /obj/machinery/light_construct,
@@ -768,7 +776,8 @@
 	dir = 8
 	},
 /obj/effect/floor_decal/corner/blue{
-	dir = 10
+	dir = 10;
+	icon_state = "corner_white"
 	},
 /obj/effect/decal/cleanable/dirt,
 /turf/simulated/floor/tiled/dark,
@@ -783,7 +792,7 @@
 	opacity = 0
 	},
 /obj/structure/ship_munition/ap_slug,
-/turf/simulated/floor/reinforced,
+/turf/simulated/floor/reinforced/airless,
 /area/map_template/icarus/driver/west)
 "wr" = (
 /obj/machinery/computer/modular/preset,
@@ -791,7 +800,8 @@
 /area/map_template/icarus/sci)
 "wT" = (
 /obj/effect/floor_decal/corner/yellow/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/item/frame/apc,
 /turf/simulated/floor/tiled,
@@ -839,7 +849,8 @@
 "yi" = (
 /obj/structure/table/standard,
 /obj/effect/floor_decal/corner/blue{
-	dir = 10
+	dir = 10;
+	icon_state = "corner_white"
 	},
 /obj/effect/decal/cleanable/dirt,
 /obj/item/folder/blue,
@@ -882,7 +893,8 @@
 /area/map_template/icarus/eng)
 "zX" = (
 /obj/structure/bed/chair/comfy/blue{
-	dir = 1
+	dir = 1;
+	icon_state = "comfychair_preview"
 	},
 /obj/item/remains/human,
 /obj/machinery/light_construct,
@@ -904,14 +916,17 @@
 	dir = 8
 	},
 /obj/structure/bed/chair/comfy/captain{
-	dir = 1
+	color = "#666666";
+	dir = 1;
+	icon_state = "capchair_preview"
 	},
 /obj/item/remains/human,
 /turf/simulated/floor/tiled/dark,
 /area/map_template/icarus/bridge)
 "AG" = (
 /obj/effect/floor_decal/corner/yellow/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/structure/table/steel_reinforced,
 /obj/item/folder/yellow,
@@ -950,7 +965,7 @@
 	opacity = 0
 	},
 /obj/effect/decal/cleanable/dirt,
-/turf/simulated/floor/reinforced,
+/turf/simulated/floor/reinforced/airless,
 /area/map_template/icarus/driver/west)
 "Ck" = (
 /obj/structure/girder,
@@ -989,7 +1004,8 @@
 /area/map_template/icarus/eng)
 "DB" = (
 /obj/structure/bed/chair/comfy/blue{
-	dir = 1
+	dir = 1;
+	icon_state = "comfychair_preview"
 	},
 /obj/item/remains/human,
 /obj/effect/decal/cleanable/dirt,
@@ -1019,7 +1035,7 @@
 /area/map_template/icarus/eng)
 "Ew" = (
 /obj/structure/grille,
-/turf/simulated/floor/reinforced,
+/turf/simulated/floor/reinforced/airless,
 /area/map_template/icarus/driver/west)
 "EB" = (
 /obj/random/obstruction,
@@ -1058,7 +1074,7 @@
 /area/map_template/icarus/bridge)
 "FK" = (
 /obj/effect/floor_decal/industrial/outline/grey,
-/obj/structure/closet/firecloset,
+/obj/structure/closet/walllocker/firecloset,
 /turf/simulated/floor/tiled/dark/monotile,
 /area/map_template/icarus/bridge)
 "Gl" = (
@@ -1151,7 +1167,7 @@
 /area/map_template/icarus/sec)
 "Jk" = (
 /obj/effect/decal/cleanable/dirt,
-/turf/simulated/floor/reinforced,
+/turf/simulated/floor/reinforced/airless,
 /area/map_template/icarus/driver/east)
 "JO" = (
 /obj/effect/decal/cleanable/dirt,
@@ -1196,7 +1212,8 @@
 /area/map_template/icarus/driver/west)
 "Mf" = (
 /obj/effect/floor_decal/corner/research{
-	dir = 5
+	dir = 5;
+	icon_state = "corner_white"
 	},
 /obj/machinery/papershredder,
 /turf/simulated/floor/tiled/white,
@@ -1237,7 +1254,8 @@
 /area/map_template/icarus/sci)
 "No" = (
 /obj/effect/floor_decal/corner/blue{
-	dir = 10
+	dir = 10;
+	icon_state = "corner_white"
 	},
 /obj/item/frame/apc,
 /turf/simulated/floor/tiled/dark,
@@ -1274,7 +1292,8 @@
 /area/map_template/icarus/driver/east)
 "NU" = (
 /obj/effect/floor_decal/corner/yellow/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/computer/modular/preset/engineering{
 	dir = 4;
@@ -1325,7 +1344,7 @@
 /turf/simulated/wall/r_wall/prepainted,
 /area/map_template/icarus/eng)
 "QL" = (
-/turf/simulated/floor/reinforced,
+/turf/simulated/floor/reinforced/airless,
 /area/map_template/icarus/driver/east)
 "Rm" = (
 /obj/effect/decal/cleanable/dirt,
@@ -1496,7 +1515,9 @@
 /area/map_template/icarus/driver/east)
 "Zh" = (
 /obj/structure/bed/chair/comfy/captain{
-	dir = 8
+	color = "#666666";
+	dir = 8;
+	icon_state = "capchair_preview"
 	},
 /turf/simulated/floor/wood/walnut,
 /area/map_template/icarus/bridge)
@@ -1512,7 +1533,8 @@
 /area/map_template/icarus/bridge)
 "ZQ" = (
 /obj/effect/floor_decal/spline/fancy/wood{
-	dir = 1
+	dir = 1;
+	icon_state = "spline_fancy"
 	},
 /obj/item/frame/air_alarm,
 /obj/effect/decal/cleanable/dirt,

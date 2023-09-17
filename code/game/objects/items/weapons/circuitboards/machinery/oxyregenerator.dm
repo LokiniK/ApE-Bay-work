@@ -1,5 +1,5 @@
 /obj/item/stock_parts/circuitboard/oxyregenerator
-	name = "circuit board (oxygen regenerator)"
+	name = T_BOARD("oxygen regenerator")
 	build_path = /obj/machinery/atmospherics/binary/oxyregenerator
 	board_type = "machine"
 	origin_tech = list(TECH_MAGNET = 2, TECH_ENGINEERING = 2)

@@ -17,7 +17,7 @@
 	//  the specific order matters to get a usable icon_state, it is
 	//  copied here so that, in the unlikely case that alldirs is changed,
 	//  this continues to work.
-	var/static/list/tube_dir_list = list(NORTH, SOUTH, EAST, WEST, NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST)
+	var/global/list/tube_dir_list = list(NORTH, SOUTH, EAST, WEST, NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST)
 
 
 // A place where tube pods stop, and people can get in or out.
@@ -56,16 +56,16 @@
 
 
 // When destroyed by explosions, properly handle contents.
-/obj/structure/transit_tube_pod/ex_act(severity)
+obj/structure/ex_act(severity)
 	switch(severity)
-		if(EX_ACT_DEVASTATING)
+		if(1.0)
 			for(var/atom/movable/AM in contents)
 				AM.dropInto(loc)
 				AM.ex_act(severity++)
 
 			qdel(src)
 			return
-		if(EX_ACT_HEAVY)
+		if(2.0)
 			if(prob(50))
 				for(var/atom/movable/AM in contents)
 					AM.dropInto(loc)
@@ -73,7 +73,7 @@
 
 				qdel(src)
 				return
-		if(EX_ACT_LIGHT)
+		if(3.0)
 			return
 
 
@@ -101,11 +101,11 @@
 /obj/structure/transit_tube/Bumped(mob/AM as mob|obj)
 	var/obj/structure/transit_tube/T = locate() in AM.loc
 	if(T)
-		to_chat(AM, SPAN_WARNING("The tube's support pylons block your way."))
+		to_chat(AM, "<span class='warning'>The tube's support pylons block your way.</span>")
 		return ..()
 	else
 		AM.dropInto(loc)
-		to_chat(AM, SPAN_INFO("You slip under the tube."))
+		to_chat(AM, "<span class='info'>You slip under the tube.</span>")
 
 /obj/structure/transit_tube/station/New(loc)
 	..(loc)
@@ -113,8 +113,8 @@
 /obj/structure/transit_tube/station/Bumped(mob/AM as mob|obj)
 	if(!pod_moving && icon_state == "open" && istype(AM, /mob))
 		for(var/obj/structure/transit_tube_pod/pod in loc)
-			if(length(pod.contents))
-				to_chat(AM, SPAN_NOTICE("The pod is already occupied."))
+			if(pod.contents.len)
+				to_chat(AM, "<span class='notice'>The pod is already occupied.</span>")
 				return
 			else if(!pod.moving && (pod.dir in directions()))
 				AM.forceMove(pod)
@@ -458,7 +458,7 @@
 
 	tube_dirs = select_automatic_dirs(connected)
 
-	if(length(tube_dirs) == 2 && tube_dir_list.Find(tube_dirs[1]) > tube_dir_list.Find(tube_dirs[2]))
+	if(length(tube_dirs) == 2 && list_find(tube_dir_list, tube_dirs[1]) > list_find(tube_dir_list, tube_dirs[2]))
 		tube_dirs.Swap(1, 2)
 
 	generate_automatic_corners(tube_dirs)
@@ -531,7 +531,7 @@
 //  but it is probably safer to assume the existence of, and
 //  rely on, a sufficiently smart compiler/optimizer.
 /obj/structure/transit_tube/proc/parse_dirs(text)
-	var/static/list/direction_table = list()
+	var/global/list/direction_table = list()
 
 	if(text in direction_table)
 		return direction_table[text]

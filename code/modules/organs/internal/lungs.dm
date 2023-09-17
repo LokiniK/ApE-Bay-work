@@ -33,12 +33,12 @@
 /obj/item/organ/internal/lungs/proc/can_drown()
 	return (is_broken() || !has_gills)
 
-/obj/item/organ/internal/lungs/proc/remove_oxygen_deprivation(amount)
+/obj/item/organ/internal/lungs/proc/remove_oxygen_deprivation(var/amount)
 	var/last_suffocation = oxygen_deprivation
 	oxygen_deprivation = min(species.total_health,max(0,oxygen_deprivation - amount))
 	return -(oxygen_deprivation - last_suffocation)
 
-/obj/item/organ/internal/lungs/proc/add_oxygen_deprivation(amount)
+/obj/item/organ/internal/lungs/proc/add_oxygen_deprivation(var/amount)
 	var/last_suffocation = oxygen_deprivation
 	oxygen_deprivation = min(species.total_health,max(0,oxygen_deprivation + amount))
 	return (oxygen_deprivation - last_suffocation)
@@ -53,7 +53,7 @@
 	. = ..()
 	icon_state = "lungs-prosthetic"
 
-/obj/item/organ/internal/lungs/set_dna(datum/dna/new_dna)
+/obj/item/organ/internal/lungs/set_dna(var/datum/dna/new_dna)
 	..()
 	sync_breath_types()
 	max_pressure_diff = species.max_pressure_diff
@@ -84,9 +84,9 @@
 		if(prob(2))
 			if(active_breathing)
 				owner.visible_message(
-					"<B>\The [owner]</B> coughs up blood!",
-					SPAN_WARNING("You cough up blood!"),
-					"You hear someone coughing!",
+					"<B>[owner]</B> кашляет кровью!",
+					"<span class='warning'>Вы кашляете кровью!</span>",
+					"Вы слышите кашель!",
 				)
 			else
 				var/obj/item/organ/parent = owner.get_organ(parent_organ)
@@ -98,19 +98,19 @@
 		if(prob(4))
 			if(active_breathing)
 				owner.visible_message(
-					"<B>\The [owner]</B> gasps for air!",
-					SPAN_DANGER("You can't breathe!"),
-					"You hear someone gasp for air!",
+					"<B>[owner]</B> задыхается!",
+					"<span class='danger'>Вы задыхаетесь!</span>",
+					"Вы слышите как кто-то задыхается!",
 				)
 			else
-				to_chat(owner, SPAN_DANGER("You're having trouble getting enough [breath_type]!"))
+				to_chat(owner, "<span class='danger'>You're having trouble getting enough [breath_type]!</span>")
 
 			owner.losebreath = max(round(damage / 2), owner.losebreath)
 
 /obj/item/organ/internal/lungs/proc/rupture()
 	var/obj/item/organ/external/parent = owner.get_organ(parent_organ)
 	if(istype(parent))
-		owner.custom_pain("You feel a stabbing pain in your [parent.name]!", 50, affecting = parent)
+		owner.custom_pain("Вы чувствуете колющую боль в [parent.name]!", 50, affecting = parent)
 	bruise()
 
 //exposure to extreme pressures can rupture lungs
@@ -127,7 +127,7 @@
 		if(!is_bruised() && lung_rupture_prob) //only rupture if NOT already ruptured
 			rupture()
 
-/obj/item/organ/internal/lungs/proc/handle_breath(datum/gas_mixture/breath, forced)
+/obj/item/organ/internal/lungs/proc/handle_breath(datum/gas_mixture/breath, var/forced)
 
 	if(!owner)
 		return 1
@@ -241,47 +241,61 @@
 	last_int_pressure = 0
 
 /obj/item/organ/internal/lungs/proc/handle_temperature_effects(datum/gas_mixture/breath)
-	if ((breath.temperature < species.cold_level_1 || breath.temperature > species.heat_level_1) && !(MUTATION_COLD_RESISTANCE in owner.mutations))
-		var/breath_damage = 0
-		if (breath.temperature < species.cold_level_1)
-			if (prob(20))
-				to_chat(owner, SPAN_DANGER("You feel your face freezing and icicles forming in your lungs!"))
-			if (breath.temperature < species.cold_level_3)
-				breath_damage = COLD_GAS_DAMAGE_LEVEL_3
-			else if (breath.temperature < species.cold_level_2)
-				breath_damage = COLD_GAS_DAMAGE_LEVEL_2
+	// Hot air hurts :(
+	if((breath.temperature < species.cold_level_1 || breath.temperature > species.heat_level_1) && !(MUTATION_COLD_RESISTANCE in owner.mutations))
+		var/damage = 0
+		if(breath.temperature <= species.cold_level_1)
+			if(prob(20))
+				to_chat(owner, "<span class='danger'>Ваше лицо замерзает вместе с вашими легкими!</span>")
+			switch(breath.temperature)
+				if(species.cold_level_3 to species.cold_level_2)
+					damage = COLD_GAS_DAMAGE_LEVEL_3
+				if(species.cold_level_2 to species.cold_level_1)
+					damage = COLD_GAS_DAMAGE_LEVEL_2
+				else
+					damage = COLD_GAS_DAMAGE_LEVEL_1
+
+			if(prob(20))
+				owner.apply_damage(damage, BURN, BP_HEAD, used_weapon = "Excessive Cold")
 			else
-				breath_damage = COLD_GAS_DAMAGE_LEVEL_1
-			if (prob(20))
-				owner.apply_damage(breath_damage, DAMAGE_BURN, BP_HEAD, used_weapon = "Excessive Cold")
-			else
-				damage += breath_damage
+				src.damage += damage
 			owner.fire_alert = 1
-		else if (breath.temperature > species.heat_level_1)
-			if (prob(20))
-				to_chat(owner, SPAN_DANGER("You feel your face burning and a searing heat in your lungs!"))
-			if (breath.temperature > species.heat_level_3)
-				breath_damage = HEAT_GAS_DAMAGE_LEVEL_3
-			else if (breath.temperature > species.heat_level_2)
-				breath_damage = HEAT_GAS_DAMAGE_LEVEL_2
+		else if(breath.temperature >= species.heat_level_1)
+			if(prob(20))
+				to_chat(owner, "<span class='danger'>Ваше лицо горит вместе с вашими легкими!</span>")
+
+			switch(breath.temperature)
+				if(species.heat_level_1 to species.heat_level_2)
+					damage = HEAT_GAS_DAMAGE_LEVEL_1
+				if(species.heat_level_2 to species.heat_level_3)
+					damage = HEAT_GAS_DAMAGE_LEVEL_2
+				else
+					damage = HEAT_GAS_DAMAGE_LEVEL_3
+
+			if(prob(20))
+				owner.apply_damage(damage, BURN, BP_HEAD, used_weapon = "Excessive Heat")
 			else
-				breath_damage = HEAT_GAS_DAMAGE_LEVEL_1
-			if (prob(20))
-				owner.apply_damage(breath_damage, DAMAGE_BURN, BP_HEAD, used_weapon = "Excessive Heat")
-			else
-				damage += breath_damage
+				src.damage += damage
 			owner.fire_alert = 2
+
+		//breathing in hot/cold air also heats/cools you a bit
 		var/temp_adj = breath.temperature - owner.bodytemperature
-		if (temp_adj)
-			if (temp_adj < 0)
-				temp_adj /= (BODYTEMP_COLD_DIVISOR * 5)
-			else
-				temp_adj /= (BODYTEMP_HEAT_DIVISOR * 5)
-			temp_adj *= breath.total_moles / (MOLES_CELLSTANDARD * breath.volume / CELL_VOLUME)
-			owner.bodytemperature += clamp(temp_adj, BODYTEMP_COOLING_MAX, BODYTEMP_HEATING_MAX)
-	else if (breath.temperature >= species.heat_discomfort_level)
+		if (temp_adj < 0)
+			temp_adj /= (BODYTEMP_COLD_DIVISOR * 5)	//don't raise temperature as much as if we were directly exposed
+		else
+			temp_adj /= (BODYTEMP_HEAT_DIVISOR * 5)	//don't raise temperature as much as if we were directly exposed
+
+		var/relative_density = breath.total_moles / (MOLES_CELLSTANDARD * breath.volume/CELL_VOLUME)
+		temp_adj *= relative_density
+
+		if (temp_adj > BODYTEMP_HEATING_MAX) temp_adj = BODYTEMP_HEATING_MAX
+		if (temp_adj < BODYTEMP_COOLING_MAX) temp_adj = BODYTEMP_COOLING_MAX
+//		log_debug("Breath: [breath.temperature], [src]: [bodytemperature], Adjusting: [temp_adj]")
+		owner.bodytemperature += temp_adj
+
+	else if(breath.temperature >= species.heat_discomfort_level)
 		species.get_environment_discomfort(owner,"heat")
-	else if (breath.temperature <= species.cold_discomfort_level)
+	else if(breath.temperature <= species.cold_discomfort_level)
 		species.get_environment_discomfort(owner,"cold")
 
 /obj/item/organ/internal/lungs/listen()
@@ -303,7 +317,7 @@
 		breathtype += pick("straining","labored")
 	if(owner.shock_stage > 50)
 		breathtype += pick("shallow and rapid")
-	if(!length(breathtype))
+	if(!breathtype.len)
 		breathtype += "healthy"
 
 	. += "[english_list(breathtype)] breathing"

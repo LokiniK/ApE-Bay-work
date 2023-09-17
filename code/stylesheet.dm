@@ -1,4 +1,4 @@
-/client/script = {"<style>
+client/script = {"<style>
 body					{font-family: Verdana, sans-serif;}
 
 h1, h2, h3, h4, h5, h6	{color: #0000ff;font-family: Georgia, Verdana, sans-serif;}
@@ -36,7 +36,11 @@ em						{font-style: normal;font-weight: bold;}
 /* Admin: Channels */
 .mod_channel			{color: #735638;	font-weight: bold;}
 .mod_channel .admin		{color: #b82e00;	font-weight: bold;}
-.admin_channel			{color: #9611d4;	font-weight: bold;}
+.admin_channel			{color: #ff5097;	font-weight: bold;}
+
+.staff_channel			{color: #a66300;	font-weight: bold;}
+.staff_channel .admin	{color: #b82e00;	font-weight: bold;}
+.staff_channel .developer {color: #1b521f;	font-weight: bold;}
 
 /* Radio: Misc */
 .deadsay				{color: #530fad;}
@@ -99,13 +103,15 @@ h1.alert, h2.alert		{color: #000080;}
 .cult					{color: #800080; font-weight: bold; font-style: italic;}
 .cultannounce			{color: #800080; font-style: italic; font-size: 175%;}
 .mfauna					{color: #884422; font-weight: bold; font-size: 125%;}
-.antagdesc				{color: #ff0033; font-size: 125%}
+.antagdesc				{color: #ff0033}
 
 .reflex_shoot			{color: #000099; font-style: italic;}
 
 /* Languages */
 
 .alien					{color: #543354;}
+.tajaran				{color: #803b56;}
+.tajaran_signlang		{color: #941c1c;}
 .skrell					{color: #00ced1;}
 .soghun					{color: #228b22;}
 .yeosa					{color: #218b89;}
@@ -123,24 +129,14 @@ h1.alert, h2.alert		{color: #000080;}
 .arabic					{color: #128b11;}
 .spacer					{color: #9c660b;}
 .selenian       {color: #22228b;}
-
+.lirris					{color: #023638;}
+.alain					{color: #6a1b9a;}
 .interface				{color: #330033;}
+.german					{color: #4d5d53;}
 
 .good                   {color: #4f7529; font-weight: bold;}
 .bad                    {color: #ee0000; font-weight: bold;}
 
 BIG IMG.icon 			{width: 32px; height: 32px;}
-
-/* Admin: Misc */
-.who_dead				{color: #000000;}
-.who_observing			{color: #808080;}
-.who_new_account		{color: #ff0000;}
-.who_newish_account		{color: #ff8c00;}
-.who_new_account		{color: #000000;}
-.who_antag				{color: #ff0000;}
-
-/* Admin: PM */
-.pm						{color: #ff0000;}
-.staff_pm				{color: #0000FF;}
 
 </style>"}

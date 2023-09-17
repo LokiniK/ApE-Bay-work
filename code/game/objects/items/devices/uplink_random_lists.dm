@@ -4,7 +4,7 @@
 	var/reselect_probability	// Probability that we'll decide to keep this item if previously selected.
 								// Is done together with the keep_probability check. Being selected more than once does not affect this probability.
 
-/datum/uplink_random_item/New(uplink_item, keep_probability = 100, reselect_propbability = 33)
+/datum/uplink_random_item/New(var/uplink_item, var/keep_probability = 100, var/reselect_propbability = 33)
 	..()
 	src.uplink_item = uplink_item
 	src.keep_probability = keep_probability
@@ -17,7 +17,7 @@
 	..()
 	items = list()
 
-/datum/uplink_random_selection/proc/get_random_item(telecrystals, obj/item/device/uplink/U, list/bought_items)
+/datum/uplink_random_selection/proc/get_random_item(var/telecrystals, obj/item/device/uplink/U, var/list/bought_items)
 	var/const/attempts = 50
 
 	for(var/i = 0; i < attempts; i++)
@@ -34,8 +34,8 @@
 		return I
 	return uplink.items_assoc[/datum/uplink_item/item/stealthy_weapons/soap]
 
-var/global/list/uplink_random_selections_
-/proc/get_uplink_random_selection_by_type(uplist_selection_type)
+var/list/uplink_random_selections_
+/proc/get_uplink_random_selection_by_type(var/uplist_selection_type)
 	if(!uplink_random_selections_)
 		uplink_random_selections_ = init_subtypes(/datum/uplink_random_selection)
 		for(var/datum/entry in uplink_random_selections_)
@@ -44,6 +44,9 @@ var/global/list/uplink_random_selections_
 
 /datum/uplink_random_selection/default/New()
 	..()
+
+//inf	items += new/datum/uplink_random_item(/datum/uplink_item/item/armor/space_suit, 50, 10)
+//inf	items += new/datum/uplink_random_item(/datum/uplink_item/item/armor/heavy_armor)
 
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/visible_weapons/silenced)
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/visible_weapons/revolver)
@@ -54,7 +57,7 @@ var/global/list/uplink_random_selections_
 
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/stealthy_weapons/soap, 5, 100)
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/stealthy_weapons/concealed_cane, 50, 10)
-	items += new/datum/uplink_random_item(/datum/uplink_item/item/stealthy_weapons/sleepy)
+//inf	items += new/datum/uplink_random_item(/datum/uplink_item/item/stealthy_weapons/sleepy)
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/stealthy_weapons/cigarette_kit)
 
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/stealth_items/id)
@@ -62,7 +65,6 @@ var/global/list/uplink_random_selections_
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/stealth_items/chameleon_kit)
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/stealth_items/chameleon_projector)
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/stealth_items/voice)
-	items += new/datum/uplink_random_item(/datum/uplink_item/item/stealth_items/cosmetic_surgery_kit, reselect_propbability = 10)
 
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/tools/toolbox, reselect_propbability = 10)
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/tools/plastique)
@@ -70,19 +72,16 @@ var/global/list/uplink_random_selections_
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/tools/encryptionkey_binary)
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/tools/emag, 100, 50)
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/tools/clerical)
-	items += new/datum/uplink_random_item(/datum/uplink_item/item/tools/space_suit, 50, 10)
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/tools/thermal)
-	items += new/datum/uplink_random_item(/datum/uplink_item/item/tools/heavy_armor)
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/tools/powersink, 10, 10)
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/tools/ai_module, 25, 0)
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/tools/polychromic_dye_bottle)
-	items += new/datum/uplink_random_item(/datum/uplink_item/item/tools/vendorcoins, reselect_propbability = 5)
 
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/implants/imp_freedom)
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/implants/imp_compress)
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/implants/imp_explosive)
 
-	items += new/datum/uplink_random_item(/datum/uplink_item/item/medical/combatstim, reselect_propbability = 20)
+	items += new/datum/uplink_random_item(/datum/uplink_item/item/medical/sinpockets, reselect_propbability = 20)
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/medical/surgery, reselect_propbability = 10)
 	items += new/datum/uplink_random_item(/datum/uplink_item/item/medical/combat, reselect_propbability = 10)
 
@@ -117,7 +116,7 @@ var/global/list/uplink_random_selections_
 		var/new_thing = new/datum/uplink_random_item(uplink_item_type)
 		items += new_thing
 
-/datum/uplink_random_selection/blacklist/get_random_item(telecrystals, obj/item/device/uplink/U, list/bought_items)
+/datum/uplink_random_selection/blacklist/get_random_item(var/telecrystals, obj/item/device/uplink/U, var/list/bought_items)
 	var/const/attempts = 50
 	for(var/i = 0; i < attempts; i++)
 		var/datum/uplink_random_item/RI = pick(items)

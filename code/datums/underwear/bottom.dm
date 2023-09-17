@@ -14,8 +14,14 @@
 	icon_state = "briefs"
 	has_color = TRUE
 
-/datum/category_item/underwear/bottom/briefs/is_default(gender)
+/datum/category_item/underwear/bottom/briefs/is_default(var/gender)
 	return gender != FEMALE
+
+/datum/category_item/underwear/bottom/panties_noback
+	name = "Panties, noback"
+	underwear_name = "panties"
+	icon_state = "panties_noback"
+	has_color = TRUE
 
 /datum/category_item/underwear/bottom/boxers_loveheart
 	name = "Boxers, Loveheart"
@@ -39,7 +45,7 @@
 	icon_state = "panties"
 	has_color = TRUE
 
-/datum/category_item/underwear/bottom/panties/is_default(gender)
+/datum/category_item/underwear/bottom/panties/is_default(var/gender)
 	return gender == FEMALE
 
 /datum/category_item/underwear/bottom/lacy_thong

@@ -16,34 +16,48 @@
 /obj/structure/closet/secure_closet/freezer/meat
 	name = "meat fridge"
 	icon = 'icons/obj/closets/fridge.dmi'
-	icon_state = "closed"
-	closet_appearance = null
+	icon_state = "freezer"
+	door_anim_time = 0
+
 
 /obj/structure/closet/secure_closet/freezer/meat/WillContain()
 	return list(
-		/obj/item/reagent_containers/food/snacks/meat/beef = 5,
-		/obj/random/fish = 5,
-		/obj/item/storage/fancy/bugmeat = 6
+		/obj/item/reagent_containers/food/snacks/meat/beef = 8,
+		/obj/item/reagent_containers/food/snacks/fish = 4
 	)
 
 /obj/structure/closet/secure_closet/freezer/fridge
 	name = "refrigerator"
 	icon = 'icons/obj/closets/fridge.dmi'
-	icon_state = "closed"
-	closet_appearance = null
+	icon_state = "freezer"
+	door_anim_squish = 0.22
+	door_anim_angle = 123
+	door_anim_time = 0
 
 /obj/structure/closet/secure_closet/freezer/fridge/WillContain()
 	return list(
 		/obj/item/reagent_containers/food/drinks/milk = 6,
 		/obj/item/reagent_containers/food/drinks/soymilk = 4,
-		/obj/item/storage/fancy/egg_box/full = 4
+		/obj/item/storage/fancy/egg_box = 4
 	)
+
+/obj/structure/closet/secure_closet/freezer/fridge/empty
+	name = "refrigerator"
+	icon = 'icons/obj/closets/fridge.dmi'
+	icon_state = "freezer"
+	door_anim_squish = 0.22
+	door_anim_angle = 123
+	door_anim_time = 0
 
 /obj/structure/closet/secure_closet/freezer/money
 	name = "secure locker"
-	icon = 'icons/obj/closets/fridge.dmi'
-	icon_state = "closed"
+	icon = 'icons/obj/closets/closet.dmi'
 	closet_appearance = null
+	icon_state = "freezer"
+	door_anim_squish = 0.22
+	door_anim_angle = 123
+	door_anim_time = 4
+	desc = "This contains cold hard cash."
 	req_access = list(access_heads_vault)
 
 /obj/structure/closet/secure_closet/freezer/money/Initialize()

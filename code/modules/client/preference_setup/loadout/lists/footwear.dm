@@ -12,13 +12,16 @@
 /datum/gear/shoes/boots
 	display_name = "boot selection"
 	path = /obj/item/clothing/shoes
-	cost = 2
+	cost = 3
 
-/datum/gear/shoes/boots/New(boots = list())
+/datum/gear/shoes/boots/New()
 	..()
+	var/boots = list()
 	boots += /obj/item/clothing/shoes/jackboots
 	boots += /obj/item/clothing/shoes/workboots
 	boots += /obj/item/clothing/shoes/dutyboots
+	boots += /obj/item/clothing/shoes/jungleboots
+	boots += /obj/item/clothing/shoes/desertboots
 	gear_tweaks += new/datum/gear_tweak/path/specified_types_list(boots)
 
 /datum/gear/shoes/color
@@ -61,16 +64,3 @@
 	display_name = "high heels, colour select"
 	path = /obj/item/clothing/shoes/heels
 	flags = GEAR_HAS_COLOR_SELECTION
-
-/datum/gear/shoes/foamclog
-	display_name = "foam clogs"
-	path = /obj/item/clothing/shoes/foamclog
-	flags = GEAR_HAS_COLOR_SELECTION
-
-/datum/gear/shoes/flipflobster
-	display_name = "flip flobsters"
-	path = /obj/item/clothing/shoes/foamclog/flipflobster
-
-/datum/gear/shoes/slippers
-	display_name = "bunny slippers"
-	path = /obj/item/clothing/shoes/slippers

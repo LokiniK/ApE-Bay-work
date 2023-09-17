@@ -6,7 +6,7 @@
 	req_access = list(access_eva)
 
 /obj/machinery/suit_storage_unit/atmos
-	name = "atmospherics voidsuit storage unit"
+	name = "Atmospherics Voidsuit Storage Unit"
 	suit= /obj/item/clothing/suit/space/void/atmos
 	helmet = /obj/item/clothing/head/helmet/space/void/atmos
 	boots = /obj/item/clothing/shoes/magboots
@@ -14,13 +14,14 @@
 	mask = /obj/item/clothing/mask/breath
 	req_access = list(access_atmospherics)
 	islocked = 1
+	mycolour = "#00cccc"//inf
 
 /obj/machinery/suit_storage_unit/atmos/alt
 	suit= /obj/item/clothing/suit/space/void/atmos/alt
 	helmet = /obj/item/clothing/head/helmet/space/void/atmos/alt
 
 /obj/machinery/suit_storage_unit/engineering
-	name = "engineering voidsuit storage unit"
+	name = "Engineering Voidsuit Storage Unit"
 	suit= /obj/item/clothing/suit/space/void/engineering
 	helmet = /obj/item/clothing/head/helmet/space/void/engineering
 	boots = /obj/item/clothing/shoes/magboots
@@ -28,6 +29,7 @@
 	mask = /obj/item/clothing/mask/breath
 	req_access = list(access_construction)
 	islocked = 1
+	mycolour = "#ffbf00"//inf
 
 /obj/machinery/suit_storage_unit/engineering/unishi
 	req_access = null
@@ -44,7 +46,7 @@
 	mask = /obj/item/clothing/mask/breath
 
 /obj/machinery/suit_storage_unit/medical
-	name = "medical voidsuit storage unit"
+	name = "Medical Voidsuit Storage Unit"
 	suit= /obj/item/clothing/suit/space/void/medical
 	helmet = /obj/item/clothing/head/helmet/space/void/medical
 	boots = /obj/item/clothing/shoes/magboots
@@ -52,6 +54,7 @@
 	mask = /obj/item/clothing/mask/breath
 	req_access = list(access_medical)
 	islocked = 1
+	mycolour = "#55aaaa"//inf
 
 /obj/machinery/suit_storage_unit/medical/alt
 	suit= /obj/item/clothing/suit/space/void/medical/alt
@@ -59,7 +62,7 @@
 	mask = /obj/item/clothing/mask/breath
 
 /obj/machinery/suit_storage_unit/mining
-	name = "mining voidsuit storage unit"
+	name = "Mining Voidsuit Storage Unit"
 	suit= /obj/item/clothing/suit/space/void/mining
 	helmet = /obj/item/clothing/head/helmet/space/void/mining
 	boots = /obj/item/clothing/shoes/magboots
@@ -67,6 +70,7 @@
 	mask = /obj/item/clothing/mask/breath
 	req_access = list(access_mining)
 	islocked = 1
+	mycolour = "#b88a3b"//inf
 
 /obj/machinery/suit_storage_unit/mining/alt
 	suit= /obj/item/clothing/suit/space/void/mining/alt
@@ -74,7 +78,7 @@
 	mask = /obj/item/clothing/mask/breath
 
 /obj/machinery/suit_storage_unit/science
-	name = "excavation voidsuit storage unit"
+	name = "Excavation Voidsuit Storage Unit"
 	suit= /obj/item/clothing/suit/space/void/excavation
 	helmet = /obj/item/clothing/head/helmet/space/void/excavation
 	boots = /obj/item/clothing/shoes/magboots
@@ -82,9 +86,10 @@
 	mask = /obj/item/clothing/mask/breath
 	req_access = list(access_xenoarch)
 	islocked = 1
+	mycolour = "#cfaf2f"//inf
 
 /obj/machinery/suit_storage_unit/security
-	name = "security voidsuit storage unit"
+	name = "Security Voidsuit Storage Unit"
 	suit= /obj/item/clothing/suit/space/void/security
 	helmet = /obj/item/clothing/head/helmet/space/void/security
 	boots = /obj/item/clothing/shoes/magboots
@@ -92,6 +97,7 @@
 	mask = /obj/item/clothing/mask/breath
 	req_access = list(access_security)
 	islocked = 1
+	mycolour = "#cc0000"//inf
 
 /obj/machinery/suit_storage_unit/security/alt
 	suit= /obj/item/clothing/suit/space/void/security/alt
@@ -99,7 +105,7 @@
 	mask = /obj/item/clothing/mask/breath
 
 /obj/machinery/suit_storage_unit/merc
-	name = "nonstandard voidsuit storage unit"
+	name = "Nonstandard Voidsuit Storage Unit"
 	suit= /obj/item/clothing/suit/space/void/merc
 	helmet = /obj/item/clothing/head/helmet/space/void/merc
 	boots = /obj/item/clothing/shoes/magboots
@@ -107,12 +113,14 @@
 	mask = /obj/item/clothing/mask/breath
 	req_access = list(access_syndicate)
 	islocked = 1
+	mycolour = "#554444"//inf
 
-/obj/machinery/suit_storage_unit/retro
-	name = "retro voidsuit storage unit"
-	suit= /obj/item/clothing/suit/space/void/retro
-	helmet = /obj/item/clothing/head/helmet/space/void/retro
+/obj/machinery/suit_storage_unit/ceti
+	name = "CTI Voidsuit Storage Unit"
+	suit= /obj/item/clothing/suit/space/void/ceti
+	helmet = /obj/item/clothing/head/helmet/space/void/ceti
 	boots = /obj/item/clothing/shoes/magboots
 	tank = /obj/item/tank/oxygen
 	mask = /obj/item/clothing/mask/breath
-	islocked = FALSE
+	req_access = list(access_xenoarch)
+	islocked = 1

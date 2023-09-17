@@ -36,30 +36,13 @@
 		/obj/item/reagent_containers/hypospray/autoinjector/mindbreaker
 		)
 
-/obj/item/storage/box/syndie_kit/shuriken
-	startswith = list(
-		/obj/item/material/star/ninja,
-		/obj/item/material/star/ninja,
-		/obj/item/material/star/ninja,
-		/obj/item/material/star/ninja,
-		/obj/item/material/star/ninja,
-		/obj/item/material/star/ninja,
-	)
-
-/obj/item/storage/fancy/smokable/case/syndiecoins
-	startswith = list(
-		/obj/item/material/coin/challenge/syndie = 5
-	)
-
 // Space suit uplink kit
-/obj/item/storage/backpack/satchel/syndie_kit/space
+/obj/item/storage/backpack/dufflebag/syndie_kit/space
 	//name = "\improper EVA gear pack"
-
 	startswith = list(
-		/obj/item/clothing/suit/space/void/merc,
-		/obj/item/clothing/head/helmet/space/void/merc,
+		/obj/item/clothing/suit/space/void/merc/prepared,
 		/obj/item/clothing/mask/gas/syndicate,
-		/obj/item/tank/oxygen_emergency_double,
+		/obj/item/tank/emergency/oxygen/double,
 		)
 
 // Chameleon uplink kit
@@ -121,22 +104,47 @@
 
 /obj/item/storage/box/syndie_kit/syringegun
 	startswith = list(
-		/obj/item/gun/launcher/syringe/disguised = 1,
+		/obj/item/gun/launcher/syringe/disguised,
 		/obj/item/syringe_cartridge = 4,
 		/obj/item/reagent_containers/syringe = 4
 	)
 
 /obj/item/storage/box/syndie_kit/cigarette
-	name = "tricky smokes"
+	name = "\improper Tricky smokes"
 	desc = "Smokes so good, you'd think it was a trick!"
-	startswith = list(
-		/obj/item/flame/lighter/zippo = 1,
-		/obj/item/storage/fancy/smokable/antag/fire = 2,
-		/obj/item/storage/fancy/smokable/antag/smoke = 2,
-		/obj/item/storage/fancy/smokable/antag/mindbreaker = 1,
-		/obj/item/storage/fancy/smokable/antag/tricordrazine = 1
-	)
 
+/obj/item/storage/box/syndie_kit/cigarette/New()
+	..()
+	var/obj/item/storage/fancy/cigarettes/pack
+	pack = new /obj/item/storage/fancy/cigarettes(src)
+	fill_cigarre_package(pack, list(/datum/reagent/aluminium = 1, /datum/reagent/potassium = 1, /datum/reagent/sulfur = 1))
+	pack.desc += " 'F' has been scribbled on it."
+
+	pack = new /obj/item/storage/fancy/cigarettes(src)
+	fill_cigarre_package(pack, list(/datum/reagent/aluminium = 1, /datum/reagent/potassium = 1, /datum/reagent/sulfur = 1))
+	pack.desc += " 'F' has been scribbled on it."
+
+	pack = new /obj/item/storage/fancy/cigarettes(src)
+	fill_cigarre_package(pack, list(/datum/reagent/potassium = 1, /datum/reagent/sugar = 1, /datum/reagent/phosphorus = 1))
+	pack.desc += " 'S' has been scribbled on it."
+
+	pack = new /obj/item/storage/fancy/cigarettes(src)
+	fill_cigarre_package(pack, list(/datum/reagent/potassium = 1, /datum/reagent/sugar = 1, /datum/reagent/phosphorus = 1))
+	pack.desc += " 'S' has been scribbled on it."
+
+	pack = new /obj/item/storage/fancy/cigarettes(src)
+	fill_cigarre_package(pack, list(/datum/reagent/mindbreaker = 4))
+	pack.desc += " 'MB' has been scribbled on it."
+
+	pack = new /obj/item/storage/fancy/cigarettes(src)
+	fill_cigarre_package(pack, list(/datum/reagent/tricordrazine = 4))
+	pack.desc += " 'T' has been scribbled on it."
+
+	new /obj/item/flame/lighter/zippo(src)
+
+/proc/fill_cigarre_package(var/obj/item/storage/fancy/cigarettes/C, var/list/reagents)
+	for(var/reagent in reagents)
+		C.reagents.add_reagent(reagent, reagents[reagent] * C.max_storage_space)
 
 //Rig Electrowarfare and Voice Synthesiser kit
 /obj/item/storage/backpack/satchel/syndie_kit/ewar_voice
@@ -147,7 +155,12 @@
 
 /obj/item/storage/secure/briefcase/heavysniper
 	startswith = list(
-		/obj/item/gun/projectile/heavysniper,
+		//inf /obj/item/gun/projectile/heavysniper,
+		//[INF],
+		/obj/item/weaponparts/core_part/heavysniper,
+		/obj/item/weaponparts/stock/scope/heavysniper,
+		/obj/item/weaponparts/stock/barrel/heavysniper,
+		//[/INF],
 		/obj/item/storage/box/ammo/sniperammo
 	)
 
@@ -163,9 +176,4 @@
 	startswith = list(
 		/obj/item/clothing/suit/armor/pcarrier/merc,
 		/obj/item/clothing/head/helmet/merc
-	)
-/obj/item/storage/box/syndie_kit/corpse_cube
-	startswith = list(
-		/obj/item/device/dna_sampler,
-		/obj/item/reagent_containers/food/snacks/corpse_cube
 	)

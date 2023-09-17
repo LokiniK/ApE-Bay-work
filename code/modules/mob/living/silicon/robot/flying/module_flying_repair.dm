@@ -9,7 +9,8 @@
 	)
 	sprites = list(
 		"Drone" = "drone-engineer",
-		"Eyebot" = "eyebot-engineering"
+		"Eyebot" = "eyebot-engineering",
+		"Ver 06" = "wer6-Engineering"
 	)
 	equipment = list(
 		/obj/item/borg/sight/meson,
@@ -41,7 +42,8 @@
 		/obj/item/stack/material/cyborg/glass,
 		/obj/item/stack/material/cyborg/glass/reinforced,
 		/obj/item/stack/cable_coil/cyborg,
-		/obj/item/stack/material/cyborg/plasteel
+		/obj/item/stack/material/cyborg/plasteel,
+		/obj/item/rpd//INF
 	)
 	synths = list(
 		/datum/matter_synth/metal = 	30000,
@@ -51,10 +53,11 @@
 	)
 	emag = /obj/item/melee/baton/robot/electrified_arm
 	skills = list(
-		SKILL_ATMOS        = SKILL_MASTER,
-		SKILL_ENGINES      = SKILL_MASTER,
-		SKILL_CONSTRUCTION = SKILL_MASTER,
-		SKILL_ELECTRICAL   = SKILL_MASTER
+		SKILL_ATMOS        = SKILL_PROF,
+		SKILL_ENGINES      = SKILL_PROF,
+		SKILL_CONSTRUCTION = SKILL_PROF,
+		SKILL_ELECTRICAL   = SKILL_PROF,
+		SKILL_PILOT        = SKILL_ADEPT //INF
 	)
 
 /obj/item/robot_module/flying/repair/finalize_synths()
@@ -92,7 +95,7 @@
 	PL.synths = list(plasteel)
 	. = ..()
 
-/obj/item/robot_module/flying/repair/respawn_consumable(mob/living/silicon/robot/R, amount)
+/obj/item/robot_module/flying/repair/respawn_consumable(var/mob/living/silicon/robot/R, var/amount)
 	var/obj/item/device/lightreplacer/LR = locate() in equipment
 	if(LR)
 		LR.Charge(R, amount)

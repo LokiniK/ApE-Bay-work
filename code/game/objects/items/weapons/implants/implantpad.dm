@@ -3,10 +3,11 @@
 /obj/item/implantpad
 	name = "implant pad"
 	desc = "Used to reprogramm implants."
-	icon = 'icons/obj/tools/implanter.dmi'
+	icon = 'icons/obj/items.dmi'
 	icon_state = "implantpad-0"
 	item_state = "electronic"
 	w_class = ITEM_SIZE_SMALL
+	matter = list(MATERIAL_STEEL = 5000, MATERIAL_GLASS = 3000)
 	var/obj/item/implant/imp
 
 /obj/item/implantpad/on_update_icon()
@@ -16,7 +17,7 @@
 		icon_state = "implantpad-0"
 
 /obj/item/implantpad/attack_hand(mob/user)
-	if (imp && user.IsHolding(src))
+	if ((imp && (user.l_hand == src || user.r_hand == src)))
 		user.put_in_active_hand(imp)
 		imp.add_fingerprint(user)
 		add_fingerprint(user)
@@ -58,4 +59,4 @@
 	if (imp)
 		imp.interact(user)
 	else
-		to_chat(user,SPAN_WARNING("There's no implant loaded in \the [src]."))
+		to_chat(user,"<span class='warning'>There's no implant loaded in \the [src].</span>")

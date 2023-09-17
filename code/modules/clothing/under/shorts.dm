@@ -4,11 +4,12 @@
 	name = "athletic shorts"
 	icon_state = "shorts"
 	desc = "95% Polyester, 5% Spandex!"
+	w_class = ITEM_SIZE_SMALL //INF //they are smaller than jumpsuit
 	gender = PLURAL
 	body_parts_covered = LOWER_TORSO
 	item_icons = list(slot_w_uniform_str = 'icons/mob/onmob/onmob_under_pants.dmi')
 	sprite_sheets = list(
-		SPECIES_UNATHI = 'icons/mob/species/unathi/onmob_under_pants_unathi.dmi',
+		SPECIES_UNATHI = 'icons/mob/species/unathi/generated/onmob_under_pants_unathi.dmi',
 		)
 
 /obj/item/clothing/under/shorts/red
@@ -17,7 +18,7 @@
 
 /obj/item/clothing/under/shorts/green
 	name = "green athletic shorts"
-	color = "#159113"
+	color = "#3c1818"
 
 /obj/item/clothing/under/shorts/blue
 	name = "blue athletic shorts"

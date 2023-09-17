@@ -20,10 +20,14 @@
 	desc = "O Christmas tree, O Christmas tree..."
 	icon = 'icons/obj/flora/pinetrees.dmi'
 	icon_state = "pine_c"
+//INF	layer = BELOW_OBJ_LAYER
 
 /obj/structure/flora/tree/pine/xmas/New()
 	..()
 	icon_state = "pine_c"
+//[INF]
+	set_light(0.5, 1, 3, 5, "#ff6633")
+//[/INF]
 
 /obj/structure/flora/tree/dead
 	icon = 'icons/obj/flora/deadtrees.dmi'
@@ -32,6 +36,7 @@
 /obj/structure/flora/tree/dead/New()
 	..()
 	icon_state = "tree_[rand(1, 6)]"
+
 
 //grass
 /obj/structure/flora/grass
@@ -45,6 +50,7 @@
 /obj/structure/flora/grass/brown/New()
 	..()
 	icon_state = "snowgrass[rand(1, 3)]bb"
+
 
 /obj/structure/flora/grass/green
 	icon_state = "snowgrass1gb"
@@ -73,11 +79,12 @@
 
 /obj/structure/flora/pottedplant
 	name = "potted plant"
-	icon = 'icons/obj/flora/plants.dmi'
+	icon = 'icons/obj/plants.dmi'
 	icon_state = "plant-26"
 	layer = ABOVE_HUMAN_LAYER
 
 //newbushes
+
 /obj/structure/flora/ausbushes
 	name = "bush"
 	icon = 'icons/obj/flora/ausflora.dmi'
@@ -177,7 +184,7 @@
 
 /obj/structure/flora/ausbushes/ppflowers/New()
 	..()
-	icon_state = "ppflowers_[rand(1, 3)]"
+	icon_state = "ppflowers_[rand(1, 4)]"
 
 /obj/structure/flora/ausbushes/sparsegrass
 	icon_state = "sparsegrass_1"
@@ -193,12 +200,32 @@
 	..()
 	icon_state = "fullgrass_[rand(1, 3)]"
 
+//underwater plants and algae
+
+/obj/structure/flora/ausbushes/algae
+	icon_state = "seaweed"
+
+/obj/structure/flora/ausbushes/algae/glowing
+	icon_state = "glowweed1"
+
+/obj/structure/flora/ausbushes/algae/glowing/New()
+	..()
+	icon_state = "glowweed[rand(1, 3)]"
+	set_light(1)
+
+/obj/structure/flora/ausbushes/algae/random
+	icon_state = "lichen"
+
+/obj/structure/flora/ausbushes/algae/random/New()
+	..()
+	icon_state = pick("lichen", "seaweed", "grassybush_[rand(1, 4)]", "sparsegrass_[rand(1, 3)]", "fullgrass_[rand(1, 3)]")
+
 //potted plants credit: Flashkirby
 //potted plants 27-30: Cajoes
 /obj/structure/flora/pottedplant
 	name = "potted plant"
 	desc = "Really brings the room together."
-	icon = 'icons/obj/flora/plants.dmi'
+	icon = 'icons/obj/plants.dmi'
 	icon_state = "plant-01"
 	layer = ABOVE_HUMAN_LAYER
 
@@ -271,6 +298,11 @@
 	desc = "This is some kind of tropical plant. It reeks of rotten eggs."
 	icon_state = "plant-14"
 
+/obj/structure/flora/pottedplant/small
+	name = "small potted plant"
+	desc = "This is a pot of assorted small flora. Some look familiar."
+	icon_state = "plant-15"
+
 /obj/structure/flora/pottedplant/aquatic
 	name = "aquatic potted plant"
 	desc = "This is apparently an aquatic plant. It's probably fake."
@@ -335,7 +367,22 @@
 	desc = "This is a decorative shrub. It's been trimmed into the shape of an apple."
 	icon_state = "applebush"
 
+/obj/structure/flora/pottedplant/deskfern
+	name = "fancy ferny potted plant"
+	desc = "This leafy desk fern could do with a trim."
+	icon_state = "plant-27"
+
 /obj/structure/flora/pottedplant/floorleaf
 	name = "fancy leafy floor plant"
 	desc = "This plant has remarkably waxy leaves."
 	icon_state = "plant-28"
+
+/obj/structure/flora/pottedplant/deskleaf
+	name = "fancy leafy potted desk plant"
+	desc = "A tiny waxy leafed plant specimen."
+	icon_state = "plant-29"
+
+/obj/structure/flora/pottedplant/deskferntrim
+	name = "fancy trimmed ferny potted plant"
+	desc = "This leafy desk fern seems to have been trimmed too much."
+	icon_state = "plant-30"

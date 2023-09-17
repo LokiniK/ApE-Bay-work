@@ -16,7 +16,7 @@ var/global/list/image/splatter_cache=list()
 	blood_DNA = list()
 	generic_filth = TRUE
 	persistent = TRUE
-	appearance_flags = DEFAULT_APPEARANCE_FLAGS | NO_CLIENT_COLOR
+	appearance_flags = NO_CLIENT_COLOR
 	cleanable_scent = "blood"
 	scent_descriptor = SCENT_DESC_ODOR
 
@@ -29,20 +29,19 @@ var/global/list/image/splatter_cache=list()
 	var/blood_size = BLOOD_SIZE_MEDIUM // A relative size; larger-sized blood will not override smaller-sized blood, except maybe at mapload.
 
 /obj/effect/decal/cleanable/blood/reveal_blood()
-	if(!fluorescent || invisibility == 100)
-		set_invisibility(0)
-		fluorescent = ATOM_FLOURESCENCE_INACTIVE
+	if(!fluorescent)
+		fluorescent = 1
 		basecolor = COLOR_LUMINOL
 		update_icon()
 
 /obj/effect/decal/cleanable/blood/clean_blood()
-	fluorescent = ATOM_FLOURESCENCE_NONE
+	fluorescent = 0
 	if(invisibility != 100)
 		set_invisibility(100)
 		amount = 0
 		STOP_PROCESSING(SSobj, src)
 		remove_extension(src, /datum/extension/scent)
-		return TRUE
+	..(ignore=1)
 
 /obj/effect/decal/cleanable/blood/hide()
 	return
@@ -58,7 +57,7 @@ var/global/list/image/splatter_cache=list()
 	start_drying()
 
 // Returns true if overriden and needs deletion. If the argument is false, we will merge into any existing blood.
-/obj/effect/decal/cleanable/blood/proc/merge_with_blood(override = TRUE)
+/obj/effect/decal/cleanable/blood/proc/merge_with_blood(var/override = TRUE)
 	. = FALSE
 	if(blood_size == BLOOD_SIZE_NO_MERGE)
 		return
@@ -152,7 +151,7 @@ var/global/list/image/splatter_cache=list()
 			return
 		var/taken = rand(1,amount)
 		amount -= taken
-		to_chat(user, SPAN_NOTICE("You get some of \the [src] on your hands."))
+		to_chat(user, "<span class='notice'>You get some of \the [src] on your hands.</span>")
 		if (!user.blood_DNA)
 			user.blood_DNA = list()
 		user.blood_DNA |= blood_DNA.Copy()
@@ -165,7 +164,7 @@ var/global/list/image/splatter_cache=list()
 	random_icon_states = list("mgibbl1", "mgibbl2", "mgibbl3", "mgibbl4", "mgibbl5")
 	amount = 2
 	blood_size = BLOOD_SIZE_BIG
-	scent_intensity = /singleton/scent_intensity/strong
+	scent_intensity = /decl/scent_intensity/strong
 	scent_range = 3
 
 /obj/effect/decal/cleanable/blood/drip
@@ -177,7 +176,7 @@ var/global/list/image/splatter_cache=list()
 	random_icon_states = list("1","2","3","4","5")
 	amount = 0
 	blood_size = BLOOD_SIZE_SMALL
-	scent_intensity = /singleton/scent_intensity
+	scent_intensity = /decl/scent_intensity
 	scent_range = 1
 
 	var/list/drips
@@ -195,7 +194,7 @@ var/global/list/image/splatter_cache=list()
 	amount = 0
 	var/message
 	blood_size = BLOOD_SIZE_BIG
-	scent_intensity = /singleton/scent_intensity
+	scent_intensity = /decl/scent_intensity
 	scent_range = 1
 
 /obj/effect/decal/cleanable/blood/writing/New()
@@ -209,7 +208,7 @@ var/global/list/image/splatter_cache=list()
 
 /obj/effect/decal/cleanable/blood/writing/examine(mob/user)
 	. = ..()
-	to_chat(user, "It reads: [SPAN_COLOR(basecolor, "\"[message]\"")]")
+	to_chat(user, "It reads: <font color='[basecolor]'>\"[message]\"</font>")
 
 /obj/effect/decal/cleanable/blood/gibs
 	name = "gibs"
@@ -221,7 +220,7 @@ var/global/list/image/splatter_cache=list()
 	var/fleshcolor = "#ffffff"
 	blood_size = BLOOD_SIZE_NO_MERGE
 	cleanable_scent = "viscera"
-	scent_intensity = /singleton/scent_intensity/overpowering
+	scent_intensity = /decl/scent_intensity/strong
 	scent_range = 4
 
 /obj/effect/decal/cleanable/blood/gibs/on_update_icon()
@@ -240,10 +239,10 @@ var/global/list/image/splatter_cache=list()
 	overlays += giblets
 
 /obj/effect/decal/cleanable/blood/gibs/up
-	random_icon_states = list("gib1", "gib2", "gib3", "gib4", "gib5", "gib6","gibup1","gibup1","gibup1")
+	random_icon_states = list("gib1", "gib2", "gib3", /*INF "gib4",*/ "gib5", "gib6","gibup1","gibup1","gibup1")
 
 /obj/effect/decal/cleanable/blood/gibs/down
-	random_icon_states = list("gib1", "gib2", "gib3", "gib4", "gib5", "gib6","gibdown1","gibdown1","gibdown1")
+	random_icon_states = list("gib1", "gib2", "gib3",/*INF "gib4",*/ "gib5", "gib6","gibdown1","gibdown1","gibdown1")
 
 /obj/effect/decal/cleanable/blood/gibs/body
 	random_icon_states = list("gibhead", "gibtorso")
@@ -255,7 +254,7 @@ var/global/list/image/splatter_cache=list()
 	random_icon_states = list("gibmid1", "gibmid2", "gibmid3")
 
 
-/obj/effect/decal/cleanable/blood/gibs/proc/streak(list/directions)
+/obj/effect/decal/cleanable/blood/gibs/proc/streak(var/list/directions)
 	var/direction = pick(directions)
 	for (var/i = 0, i < pick(1, 200; 2, 150; 3, 50; 4), i++)
 		sleep(3)
@@ -284,7 +283,7 @@ var/global/list/image/splatter_cache=list()
 
 /obj/effect/decal/cleanable/mucus/Initialize()
 	. = ..()
-	addtimer(new Callback(src, .proc/set_dry), DRYING_TIME * 2)
+	addtimer(CALLBACK(src, .proc/set_dry), DRYING_TIME * 2)
 
 /obj/effect/decal/cleanable/mucus/proc/set_dry()
 	dry = TRUE

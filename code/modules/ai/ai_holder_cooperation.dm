@@ -17,7 +17,7 @@
 
 
 /datum/ai_holder/Destroy()
-	if (length(faction_friends)) //This list is shared amongst the faction
+	if (faction_friends.len) //This list is shared amongst the faction
 		faction_friends -= src
 	return ..()
 
@@ -25,14 +25,14 @@
 *  Call on initialization or if something weird happened like the mob switched factions.
 */
 /datum/ai_holder/proc/build_faction_friends()
-	if (length(faction_friends)) // Already have a list.
+	if (faction_friends.len) // Already have a list.
 		// Assume we're moving to a new faction.
 		faction_friends -= src   // Get us out of the current list shared by everyone else.
 		faction_friends = list() // Then make our list empty and unshared in case we become a loner.
 
 	// Find another AI-controlled mob in the same faction if possible.
 	var/mob/living/first_friend
-	for (var/mob/living/L in GLOB.alive_mobs)
+	for (var/mob/living/L in GLOB.living_mob_list_)
 		if (L.faction == holder.faction && L.ai_holder)
 			first_friend = L
 			break

@@ -1,6 +1,6 @@
 /datum/computer_file/program/card_mod
 	filename = "cardmod"
-	filedesc = "ID Card Modification Program"
+	filedesc = "ID card modification program"
 	nanomodule_path = /datum/nano_module/program/card_mod
 	program_icon_state = "id"
 	program_key_state = "id_key"
@@ -16,7 +16,7 @@
 	var/is_centcom = 0
 	var/show_assignments = 0
 
-/datum/nano_module/program/card_mod/ui_interact(mob/user, ui_key = "main", datum/nanoui/ui = null, force_open = 1, datum/topic_state/state = GLOB.default_state)
+/datum/nano_module/program/card_mod/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1, var/datum/topic_state/state = GLOB.default_state)
 	var/list/data = host.initial_data()
 	var/obj/item/stock_parts/computer/card_slot/card_slot = program.computer.get_component(PART_CARD)
 
@@ -100,9 +100,49 @@
 
 	return formatted
 
-/datum/nano_module/program/card_mod/proc/get_accesses(is_centcom = 0)
+/datum/nano_module/program/card_mod/proc/get_accesses(var/is_centcom = 0)
 	return null
 
+/proc/upd_card_info(var/rename, var/obj/item/card/id/me)
+	var/datum/computer_file/report/crew_record/active_record = RecordByName(rename)
+	if(!active_record)
+		me.age = "\[UNSET\]"
+		me.blood_type = "\[UNSET\]"
+		me.dna_hash = "\[UNSET\]"
+		me.fingerprint_hash = "\[UNSET\]"
+		me.sex = "\[UNSET\]"
+		me.military_branch = null
+		me.military_rank = null
+		me.front = null
+		me.side = null
+		return
+	else
+		me.front = active_record.photo_front
+		me.side = active_record.photo_side
+		var/list/datum/report_field/t = active_record.field_from_name("Age")
+		me.age = t.get_value()
+		t = active_record.field_from_name("Blood Type")
+		me.blood_type = t.get_value()
+		t = active_record.field_from_name("DNA")
+		me.dna_hash = t.get_value()
+		t = active_record.field_from_name("Fingerprint")
+		me.fingerprint_hash = t.get_value()
+		t = active_record.field_from_name("Sex")
+		me.sex = t.get_value()
+		if(GLOB.using_map.flags & MAP_HAS_BRANCH)
+			t = active_record.field_from_name("Branch")
+			for(var/B in mil_branches.branches)
+				var/datum/mil_branch/BR = mil_branches.branches[B]
+				if(t.get_value() == BR.name)
+					me.military_branch = BR
+		if((GLOB.using_map.flags & MAP_HAS_RANK)&&(me.military_branch))
+			var/datum/mil_branch/B = me.military_branch
+			t = active_record.field_from_name("Rank")
+			for(var/R in B.ranks)
+				var/datum/mil_rank/RA = B.ranks[R]
+				if(t.get_value() == RA.name)
+					me.military_rank = RA
+		return
 
 /datum/computer_file/program/card_mod/Topic(href, href_list)
 	if(..())
@@ -129,7 +169,7 @@
 				module.show_assignments = 1
 		if("print")
 			if(!authorized(user_id_card))
-				to_chat(usr, SPAN_WARNING("Access denied."))
+				to_chat(usr, "<span class='warning'>Access denied.</span>")
 				return
 			if(computer.has_component(PART_PRINTER)) //This option should never be called if there is no printer
 				if(module.mod_mode)
@@ -152,7 +192,7 @@
 								contents += "  [get_access_desc(A)]"
 
 						if(!computer.print_paper(contents,"access report"))
-							to_chat(usr, SPAN_NOTICE("Hardware error: Printer was unable to print the file. It may be out of paper."))
+							to_chat(usr, "<span class='notice'>Hardware error: Printer was unable to print the file. It may be out of paper.</span>")
 							return
 				else
 					var/contents = {"<h4>Crew Manifest</h4>
@@ -160,7 +200,7 @@
 									[html_crew_manifest()]
 									"}
 					if(!computer.print_paper(contents, "crew manifest ([stationtime2text()])"))
-						to_chat(usr, SPAN_NOTICE("Hardware error: Printer was unable to print the file. It may be out of paper."))
+						to_chat(usr, "<span class='notice'>Hardware error: Printer was unable to print the file. It may be out of paper.</span>")
 						return
 		if("eject")
 			var/obj/item/stock_parts/computer/card_slot/card_slot = computer.get_component(PART_CARD)
@@ -170,7 +210,7 @@
 				card_slot.insert_id(user.get_active_hand(), user)
 		if("terminate")
 			if(!authorized(user_id_card))
-				to_chat(usr, SPAN_WARNING("Access denied."))
+				to_chat(usr, "<span class='warning'>Access denied.</span>")
 				return
 			if(computer && can_run(user, 1))
 				id_card.assignment = "Terminated"
@@ -178,7 +218,7 @@
 				callHook("terminate_employee", list(id_card))
 		if("edit")
 			if(!authorized(user_id_card))
-				to_chat(usr, SPAN_WARNING("Access denied."))
+				to_chat(usr, "<span class='warning'>Access denied.</span>")
 				return
 			if(computer && can_run(user, 1))
 				if(href_list["name"])
@@ -200,7 +240,7 @@
 					id_card.associated_email_login["password"] = email_password
 		if("assign")
 			if(!authorized(user_id_card))
-				to_chat(usr, SPAN_WARNING("Access denied."))
+				to_chat(usr, "<span class='warning'>Access denied.</span>")
 				return
 			if(computer && can_run(user, 1) && id_card)
 				var/t1 = href_list["assign_target"]
@@ -216,7 +256,7 @@
 					else
 						var/datum/job/jobdatum = SSjobs.get_by_title(t1)
 						if(!jobdatum)
-							to_chat(usr, SPAN_WARNING("No log exists for this job: [t1]"))
+							to_chat(usr, "<span class='warning'>No log exists for this job: [t1]</span>")
 							return
 
 						access = jobdatum.get_access()
@@ -245,11 +285,11 @@
 	SSnano.update_uis(NM)
 	return 1
 
-/datum/computer_file/program/card_mod/proc/remove_nt_access(obj/item/card/id/id_card)
+/datum/computer_file/program/card_mod/proc/remove_nt_access(var/obj/item/card/id/id_card)
 	id_card.access -= get_access_ids(ACCESS_TYPE_STATION|ACCESS_TYPE_CENTCOM)
 
-/datum/computer_file/program/card_mod/proc/apply_access(obj/item/card/id/id_card, list/accesses)
+/datum/computer_file/program/card_mod/proc/apply_access(var/obj/item/card/id/id_card, var/list/accesses)
 	id_card.access |= accesses
 
-/datum/computer_file/program/card_mod/proc/authorized(obj/item/card/id/id_card)
+/datum/computer_file/program/card_mod/proc/authorized(var/obj/item/card/id/id_card)
 	return id_card && (access_change_ids in id_card.access)

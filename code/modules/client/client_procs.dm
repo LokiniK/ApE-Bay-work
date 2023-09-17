@@ -1,7 +1,7 @@
 	////////////
 	//SECURITY//
 	////////////
-#define UPLOAD_LIMIT		10485760	//Restricts client uploads to the server to 10MB //Boosted this thing. What's the worst that can happen?
+#define UPLOAD_LIMIT		5242880	//Restricts client uploads to the server to 3MB
 
 //#define TOPIC_DEBUGGING 1
 
@@ -36,17 +36,21 @@
 	#endif
 
 	// asset_cache
+	var/asset_cache_job
 	if(href_list["asset_cache_confirm_arrival"])
-//		to_chat(src, "ASSET JOB [href_list["asset_cache_confirm_arrival"]] ARRIVED.")
-		var/job = text2num(href_list["asset_cache_confirm_arrival"])
-		completed_asset_jobs += job
-		return
+		asset_cache_job = asset_cache_confirm_arrival(href_list["asset_cache_confirm_arrival"])
+		if (!asset_cache_job)
+			return
 
 	//search the href for script injection
 	if( findtext(href,"<script",1,0) )
 		to_world_log("Attempted use of scripts within a topic call, by [src]")
 		message_admins("Attempted use of scripts within a topic call, by [src]")
 		//qdel(usr)
+		return
+
+	// Tgui Topic middleware
+	if(!tgui_Topic(href_list))
 		return
 
 	//Admin PM
@@ -62,10 +66,10 @@
 
 	if(href_list["irc_msg"])
 		if(!holder && received_irc_pm < world.time - 6000) //Worse they can do is spam IRC for 10 minutes
-			to_chat(usr, SPAN_WARNING("You are no longer able to use this, it's been more then 10 minutes since an admin on IRC has responded to you"))
+			to_chat(usr, "<span class='warning'>You are no longer able to use this, it's been more then 10 minutes since an admin on IRC has responded to you</span>")
 			return
 		if(mute_irc)
-			to_chat(usr, SPAN_WARNING("You cannot use this as your client has been muted from sending messages to the admins on IRC"))
+			to_chat(usr, "<span class='warning'You cannot use this as your client has been muted from sending messages to the admins on IRC</span>")
 			return
 		cmd_admin_irc_pm(href_list["irc_msg"])
 		return
@@ -79,7 +83,16 @@
 		ticket.close(client_repository.get_lite_client(usr.client))
 
 	if (GLOB.href_logfile)
-		to_chat(GLOB.href_logfile, "<small>[time2text(world.timeofday,"hh:mm")] [src] (usr:[usr])</small> || [hsrc ? "[hsrc] " : ""][href]<br>")
+		to_file(GLOB.href_logfile, "<small>[time2text(world.timeofday,"hh:mm")] [src] (usr:[usr])</small> || [hsrc ? "[hsrc] " : ""][href]<br>")
+
+	//byond bug ID:2256651
+	if (asset_cache_job && (asset_cache_job in completed_asset_jobs))
+		to_chat(src, "<span class='danger'>An error has been detected in how your client is receiving resources. Attempting to correct.... (If you keep seeing these messages you might want to close byond and reconnect)</span>")
+		src << browse("...", "window=asset_cache_browser")
+		return
+	if (href_list["asset_cache_preload_data"])
+		asset_cache_preload_data(href_list["asset_cache_preload_data"])
+		return
 
 	switch(href_list["_src_"])
 		if("holder")	hsrc = holder
@@ -106,7 +119,7 @@
 	if(!user_acted(src))
 		return 0
 	if(filelength > UPLOAD_LIMIT)
-		to_chat(src, SPAN_COLOR("red", "Error: AllowUpload(): File Upload too large. Upload Limit: [UPLOAD_LIMIT/1024]KiB."))
+		to_chat(src, "<font color='red'>Error: AllowUpload(): File Upload too large. Upload Limit: [UPLOAD_LIMIT/1024]KiB.</font>")
 		return 0
 	return 1
 
@@ -117,13 +130,17 @@
 /client/New(TopicData)
 	TopicData = null							//Prevent calls to client.Topic from connect
 
+	// Load goonchat
+	chatOutput = new(src)
+
 	switch (connection)
 		if ("seeker", "web") // check for invalid connection type. do nothing if valid
 		else return null
 	var/bad_version = config.minimum_byond_version && byond_version < config.minimum_byond_version
 	var/bad_build = config.minimum_byond_build && byond_build < config.minimum_byond_build
 	if (bad_build || bad_version)
-		to_chat(src, "You are attempting to connect with a out of date version of BYOND. Please update to the latest version at http://www.byond.com/ before trying again.")
+		to_chat(src, "RU: Вы пытаетесь подключиться со старой версией BYOND. Пожалуйста, обновитесь до бета-версии для игры на сервере.\
+		<br>ENG: You are attempting to connect with a out of date version of BYOND. Please update to the latest beta version.")
 		qdel(src)
 		return
 
@@ -139,34 +156,52 @@
 		return
 
 	if(config.player_limit != 0)
-		if((length(GLOB.clients) >= config.player_limit) && !(ckey in admin_datums))
+		if((GLOB.clients.len >= config.player_limit) && !(ckey in GLOB.admin_datums))
 			alert(src,"This server is currently full and not accepting new connections.","Server Full","OK")
 			log_admin("[ckey] tried to join and was turned away due to the server being full (player_limit=[config.player_limit])")
 			qdel(src)
 			return
 
-	for (var/datum/ticket/T in tickets)
-		if (T.status == TICKET_OPEN && T.owner.ckey == ckey)
-			message_staff("[key_name_admin(src)] has joined the game with an open ticket. Status: [length(T.assigned_admins) ? "Assigned to: [english_list(T.assigned_admin_ckeys())]" : SPAN_DANGER("Unassigned.")]")
-			break
-
 	// Change the way they should download resources.
-	if(config.resource_urls && length(config.resource_urls))
+	if(config.resource_urls && config.resource_urls.len)
 		src.preload_rsc = pick(config.resource_urls)
 	else src.preload_rsc = 1 // If config.resource_urls is not set, preload like normal.
 
 	if(byond_version < DM_VERSION)
-		to_chat(src, SPAN_WARNING("You are running an older version of BYOND than the server and may experience issues."))
-		to_chat(src, SPAN_WARNING("It is recommended that you update to at least [DM_VERSION] at http://www.byond.com/download/."))
-	to_chat(src, SPAN_WARNING("If the title screen is black, resources are still downloading. Please be patient until the title screen appears."))
+		to_chat(src, "<span class='warning'>You are running an older version of BYOND than the server and may experience issues.</span>")
+		to_chat(src, "<span class='warning'>It is recommended that you update to at least [DM_VERSION] at http://www.byond.com/download/.</span>")
+	to_chat(src, "<span class='warning'>If the title screen is black, resources are still downloading. Please be patient until the title screen appears.</span>")
 	GLOB.clients += src
 	GLOB.ckey_directory[ckey] = src
 
 	//Admin Authorisation
-	holder = admin_datums[ckey]
+	holder = GLOB.admin_datums[ckey]
+
+	// inf Подсчет онлайна сотрудника ~bear1ake
 	if(holder)
 		GLOB.admins += src
 		holder.owner = src
+		handle_staff_login()
+		if(establish_db_connection())
+			var/sql_ckey = sanitizeSQL(src.ckey)
+			spawn while(1)
+				var/sum = 0
+				var/temp = 0
+				var/DBQuery/query_onilne = dbcon.NewQuery("SELECT sum FROM online_score WHERE ckey='[sql_ckey]' AND year=YEAR(NOW()) AND month=MONTH(NOW()) AND day=DAYOFMONTH(NOW());")
+				query_onilne.Execute()
+				if(query_onilne.NextRow())
+					temp = query_onilne.item[1]
+				sum = text2num(temp)
+				if(sum && sum > 0)
+					var/DBQuery/query_sum_upd = dbcon.NewQuery("UPDATE online_score SET sum= sum+1 WHERE ckey='[sql_ckey]' AND year=YEAR(NOW()) AND month=MONTH(NOW()) AND day=DAYOFMONTH(NOW());")
+					query_sum_upd.Execute()
+				else
+					var/DBQuery/query_o_s_ins = dbcon.NewQuery("INSERT INTO online_score(ckey,year,month,day,sum) VALUES ('[sql_ckey]', YEAR(NOW()), MONTH(NOW()), DAYOFMONTH(NOW()), 1);")
+					query_o_s_ins.Execute()
+				sleep(600)
+		else
+			log_admin("Онлайн сотрудника [ckey] не будет считаться, проверьте соединение с базой данных")
+	// /inf
 
 	//preferences datum - also holds some persistant data for the client (because we may as well keep these datums to a minimum)
 	prefs = SScharacter_setup.preferences_datums[ckey]
@@ -174,16 +209,21 @@
 		prefs = new /datum/preferences(src)
 	prefs.last_ip = address				//these are gonna be used for banning
 	prefs.last_id = computer_id			//these are gonna be used for banning
-	fps = prefs.clientfps
+	apply_fps(prefs.clientfps ? prefs.clientfps : config.clientfps)
+	load_player_discord(src)
 
 	. = ..()	//calls mob.Login()
+
+	connection_time = world.time
+	connection_realtime = world.realtime
+	connection_timeofday = world.timeofday
 
 	GLOB.using_map.map_info(src)
 
 	if (config.event)
 		to_chat(src, "<h1 class='alert'>Event</h1>")
 		to_chat(src, "<h2 class='alert'>An event is taking place. OOC Info:</h2>")
-		to_chat(src, SPAN_CLASS("alert", "[config.event]"))
+		to_chat(src, "<span class='alert'>[config.event]</span>")
 		to_chat(src, "<br>")
 
 	if(holder)
@@ -202,62 +242,59 @@
 
 	send_resources()
 
-	if (GLOB.changelog_hash && prefs.lastchangelog != GLOB.changelog_hash) //bolds the changelog button on the interface so we know there are updates.
-		to_chat(src, SPAN_INFO("You have unread updates in the changelog."))
+	if (SSmisc.changelog_hash && prefs.lastchangelog != SSmisc.changelog_hash) //bolds the changelog button on the interface so we know there are updates.
+		to_chat(src, "<span class='info'>You have unread updates in the changelog.</span>")
 		winset(src, "rpane.changelog", "background-color=#eaeaea;font-style=bold")
 		if(config.aggressive_changelog)
 			src.changes()
 
-	if(!winexists(src, "asset_cache_browser")) // The client is using a custom skin, tell them.
-		to_chat(src, SPAN_WARNING("Unable to access asset cache browser, if you are using a custom skin file, please allow DS to download the updated version, if you are not, then make a bug report. This is not a critical issue but can cause issues with resource downloading, as it is impossible to know when extra resources arrived to you."))
+	if(prefs.lastchangelog_infinity != GLOB.changelog_hash_infinity)
+		to_chat(src, "<span class='info'>You have unread updates in the Infinity changelog.</span>")
+		winset(src, "rpane.changelog_infinity", "background-color=#8053ad;font-style=bold")
+		if(config.aggressive_changelog)
+			src.changes_infinity()
 
-	if(!tooltips)
-		tooltips = new /datum/tooltip(src)
+	if(isnum(player_age) && player_age < 7)
+		src.lore_splash()
+		to_chat(src, "<span class = 'notice'>Greetings, and welcome to the server! A link to the beginner's lore page has been opened, please read through it! This window will stop automatically opening once your account here is greater than 7 days old.</span>")
+
+	if(!winexists(src, "asset_cache_browser")) // The client is using a custom skin, tell them.
+		to_chat(src, "<span class='warning'>Unable to access asset cache browser, if you are using a custom skin file, please allow DS to download the updated version, if you are not, then make a bug report. This is not a critical issue but can cause issues with resource downloading, as it is impossible to know when extra resources arrived to you.</span>")
 
 	if(holder)
 		src.control_freak = 0 //Devs need 0 for profiler access
 
-	// This turns out to be a touch too much when a bunch of people are connecting at once from a restart during init.
-	if (GAME_STATE & RUNLEVELS_DEFAULT)
-		spawn()
-		if (!check_rights(R_MOD, FALSE, src))
-			// Check connections
-			var/list/connections = fetch_connections()
-			var/list/ckeys = _unique_ckeys_from_connections(connections) - ckey
-			if (length(ckeys))
-				log_and_message_staff(SPAN_INFO("[key_name_admin(src)] has connection details associated with [length(ckeys)] other ckeys in the log."))
+//[INF]
+	if( (get_preference_value(/datum/client_preference/goonchat) == GLOB.PREF_YES) && (!istype(mob, /mob/new_player)) ) // На случай перезахода ~bear1ake
+		chatOutput.start()
 
-			// Check bans
-			var/list/bans = _find_bans_in_connections(connections)
-			if (length(bans))
-				log_and_message_staff(SPAN_DANGER("[key_name_admin(src)] has connection details associated with [length(bans)] active bans."))
+	if(!istype(mob, world.mob))
+		prefs?.apply_post_login_preferences()
+//[/INF]
+
+	if(SSinput.initialized)
+		set_macros()
 
 	//////////////
 	//DISCONNECT//
 	//////////////
 /client/Del()
-	if (!QDELETED(src))
-		Destroy()
-	return ..()
-
-
-/client/Destroy()
-	for (var/datum/ticket/T in tickets)
-		if (T.status == TICKET_OPEN && T.owner.ckey == ckey)
-			message_staff("[key_name_admin(src)] has left the game with an open ticket. Status: [length(T.assigned_admins) ? "Assigned to: [english_list(T.assigned_admin_ckeys())]" : SPAN_DANGER("Unassigned.")]")
-			break
-	if (holder)
+	ticket_panels -= src
+	if(src && watched_variables_window)
+		STOP_PROCESSING(SSprocessing, watched_variables_window)
+	if(holder)
+		handle_staff_logout()
 		holder.owner = null
 		GLOB.admins -= src
-	if (watched_variables_window)
-		STOP_PROCESSING(SSprocessing, watched_variables_window)
-	QDEL_NULL(chatOutput)
 	GLOB.ckey_directory -= ckey
-	ticket_panels -= src
 	GLOB.clients -= src
+	return ..()
+
+/client/Destroy()
 	..()
 	return QDEL_HINT_HARDDEL_NOW
 
+// here because it's similar to below
 
 // Returns null if no DB connection can be established, or -1 if the requested key was not found in the database
 
@@ -268,7 +305,7 @@
 
 	var/sql_ckey = sql_sanitize_text(ckey(key))
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT datediff(Now(),firstseen) as age FROM erro_player WHERE ckey = '[sql_ckey]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT datediff(Now(), firstseen) as age FROM erro_player WHERE ckey = '[sql_ckey]'")
 	query.Execute()
 
 	if(query.NextRow())
@@ -288,12 +325,12 @@
 
 	var/sql_ckey = sql_sanitize_text(src.ckey)
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id, datediff(Now(),firstseen) as age FROM erro_player WHERE ckey = '[sql_ckey]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT ckey, datediff(Now(),firstseen) as age FROM erro_player WHERE ckey = '[sql_ckey]'")
 	query.Execute()
-	var/sql_id = 0
+	var/sql_ckey_verify
 	player_age = 0	// New players won't have an entry so knowing we have a connection we set this to zero to be updated if their is a record.
 	while(query.NextRow())
-		sql_id = query.item[1]
+		sql_ckey_verify = query.item[1]
 		player_age = text2num(query.item[2])
 		break
 
@@ -316,30 +353,33 @@
 	if(query_staffwarn.NextRow())
 		src.staffwarn = query_staffwarn.item[1]
 
-	//Just the standard check to see if it's actually a number
-	if(sql_id)
-		if(istext(sql_id))
-			sql_id = text2num(sql_id)
-		if(!isnum(sql_id))
-			return
+	var/admin_rank = "Player"
+	if(src.holder)
+		admin_rank = src.holder.rank
+		for(var/client/C in GLOB.clients)
+			if(C.staffwarn)
+				C.mob.send_staffwarn(src, "is connected", 0)
 
 	var/sql_ip = sql_sanitize_text(src.address)
 	var/sql_computerid = sql_sanitize_text(src.computer_id)
-	var/sql_admin_rank = sql_sanitize_text("Player")
+	var/sql_admin_rank = sql_sanitize_text(admin_rank)
 
 
-	if(sql_id)
+	if(sql_ckey_verify)
 		//Player already identified previously, we need to just update the 'lastseen', 'ip' and 'computer_id' variables
-		var/DBQuery/query_update = dbcon.NewQuery("UPDATE erro_player SET lastseen = Now(), ip = '[sql_ip]', computerid = '[sql_computerid]', lastadminrank = '[sql_admin_rank]' WHERE id = [sql_id]")
+		var/DBQuery/query_update = dbcon.NewQuery("UPDATE erro_player SET lastseen = Now(), ip = '[sql_ip]', computerid = '[sql_computerid]', lastadminrank = '[sql_admin_rank]' WHERE ckey = '[sql_ckey_verify]'")
 		query_update.Execute()
 	else
 		//New player!! Need to insert all the stuff
-		var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO erro_player (id, ckey, firstseen, lastseen, ip, computerid, lastadminrank) VALUES (null, '[sql_ckey]', Now(), Now(), '[sql_ip]', '[sql_computerid]', '[sql_admin_rank]')")
+		var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO erro_player (ckey, firstseen, lastseen, ip, computerid, lastadminrank) VALUES ('[sql_ckey]', Now(), Now(), '[sql_ip]', '[sql_computerid]', '[sql_admin_rank]')")
 		query_insert.Execute()
 
-	//Logging player access
-	var/serverip = "[world.internet_address]:[world.port]"
-	var/DBQuery/query_accesslog = dbcon.NewQuery("INSERT INTO `erro_connection_log`(`id`,`datetime`,`serverip`,`ckey`,`ip`,`computerid`) VALUES(null,Now(),'[serverip]','[sql_ckey]','[sql_ip]','[sql_computerid]');")
+	var/temp_address
+	if(!world.internet_address)
+		temp_address = "193.70.42.67"
+	else
+		temp_address = world.internet_address
+	var/DBQuery/query_accesslog = dbcon.NewQuery("INSERT INTO `erro_connection_log`(`id`,`datetime`,`server_ip`,`server_port`,`ckey`,`ip`,`computerid`) VALUES(null,Now(),'[temp_address]','[world.port]','[sql_ckey]','[sql_ip]','[sql_computerid]');")
 	query_accesslog.Execute()
 
 
@@ -355,16 +395,18 @@
 	var/seconds = inactivity/10
 	return "[round(seconds / 60)] minute\s, [seconds % 60] second\s"
 
+// Byond seemingly calls stat, each tick.
+// Calling things each tick can get expensive real quick.
+// So we slow this down a little.
+// See: http://www.byond.com/docs/ref/info.html#/client/proc/Stat
 
 /client/Stat()
-	if (!usr)
+	if(!usr)
 		return
 	// Add always-visible stat panel calls here, to define a consistent display order.
 	statpanel("Status")
-	..()
-	if (config.stat_delay > 0)
-		sleep(config.stat_delay)
 
+	. = ..()
 
 //Sends resource files to client cache
 /client/proc/getFiles()
@@ -387,34 +429,37 @@
 		'html/images/xynlogo.png',
 		'html/images/daislogo.png',
 		'html/images/eclogo.png',
-		'html/images/FleetLogo.png',
+		'html/images/fleetlogo.png',
 		'html/images/sfplogo.png',
-		'html/images/falogo.png'
+		'html/images/sierralogo.png',//inf
+		'html/images/foundlogo.png',//inf
+		'html/images/ccalogo.png'//inf
 		)
-	addtimer(new Callback(src, .proc/after_send_resources), 1 SECOND)
+	spawn(10) // Removing this spawn causes all clients to not get verbs.
+		// Load info on what assets the client has
+		show_browser(src, 'code/modules/asset_cache/validate_assets.html', "window=asset_cache_browser")
+		// Precache the client with all other assets slowly, so as to not block other browse() calls
+		addtimer(CALLBACK(GLOBAL_PROC, /proc/getFilesSlow, src, SSassets.preload, FALSE), 5 SECONDS)
 
-
-/client/proc/after_send_resources()
-	var/singleton/asset_cache/asset_cache = GET_SINGLETON(/singleton/asset_cache)
-	getFilesSlow(src, asset_cache.cache, register_asset = FALSE)
-
-
-/mob/proc/MayRespawn()
+mob/proc/MayRespawn()
 	return 0
 
-/client/proc/MayRespawn()
+client/proc/MayRespawn()
 	if(mob)
 		return mob.MayRespawn()
 
 	// Something went wrong, client is usually kicked or transfered to a new mob at this point
 	return 0
 
-/client/verb/character_setup()
+client/verb/character_setup()
 	set name = "Character Setup"
 	set category = "OOC"
 	if(prefs)
 		prefs.open_setup_window(usr)
 
+/client/proc/apply_fps(var/client_fps)
+	if(world.byond_version >= 511 && byond_version >= 511 && client_fps >= CLIENT_MIN_FPS && client_fps <= CLIENT_MAX_FPS)
+		vars["fps"] = client_fps
 
 /client/MouseDrag(src_object, over_object, src_location, over_location, src_control, over_control, params)
 	. = ..()
@@ -426,6 +471,19 @@
 	if (istype(B))
 		if(B.current_build_mode && src_control == "mapwindow.map" && src_control == over_control)
 			build_drag(src,B.current_build_mode,src_object,over_object,src_location,over_location,src_control,over_control,params)
+
+/client/MouseUp(object, location, control, params)
+	. = ..()
+	var/mob/living/M = mob
+	if(istype(M))
+		M.OnMouseUp(object, location, control, params)
+
+/client/MouseDown(object, location, control, params)
+	. = ..()
+	var/mob/living/M = mob
+	if(istype(M) && !M.in_throw_mode)
+		M.OnMouseDown(object, location, control, params)
+
 
 /client/verb/toggle_fullscreen()
 	set name = "Toggle Fullscreen"
@@ -495,3 +553,48 @@
 
 		pct += delta
 		winset(src, "mainwindow.mainvsplit", "splitter=[pct]")
+
+/client/proc/load_player_discord(client/C)
+	establish_db_connection()
+	if(!dbcon.IsConnected())
+		return
+
+	var/sql_ckey = sql_sanitize_text(C.ckey)
+
+	var/DBQuery/query = dbcon.NewQuery("SELECT discord_id, discord_name FROM erro_player WHERE ckey = '[sql_ckey]'")
+	query.Execute()
+
+	if(query.NextRow())
+		discord_id = sanitize_text(query.item[1])
+		discord_name = sanitize_text(query.item[2])
+
+/client/verb/link_discord_account()
+	set name = "Привязка Discord"
+	set category = "Special Verbs"
+	set desc = "Привязать аккаунт Discord для удобного просмотра игровой статистики на нашем Discord-сервере."
+
+	if(!config.discordurl)
+		return
+
+	if(IsGuestKey(key))
+		to_chat(usr, "Гостевой аккаунт не может быть связан.")
+		return
+
+	load_player_discord(usr)
+
+	if(discord_id && length(discord_id) < 32)
+		to_chat(usr, "<span class='darkmblue'>Аккаунт Discord уже привязан! Чтобы отвязать используйте команду <span class='boldannounce'>!отвязать_аккаунт</span> в канале <b>#дом-бота<b> в Discord-сообществе!</span>")
+		return
+
+	var/token = md5("[world.time+rand(1000,1000000)]")
+	if(dbcon.IsConnected())
+		var/sql_ckey = sql_sanitize_text(ckey(key))
+		var/DBQuery/query_update_token = dbcon.NewQuery("UPDATE erro_player SET discord_id='[token]' WHERE ckey='[sql_ckey]'")
+
+		if(!query_update_token.Execute())
+			to_chat(usr, "<span class='warning'>Ошибка записи токена в БД! Обратитесь к администрации.</span>")
+			log_debug("link_discord_account: failed db update discord_id for ckey [ckey]")
+			return
+
+		to_chat(usr, "<span class='darkmblue'>Для завершения используйте команду <span class='boldannounce'>!привязать_аккаунт [token]</span> в канале <b>#дом-бота<b> в Discord-сообществе!</span>")
+		load_player_discord(usr)

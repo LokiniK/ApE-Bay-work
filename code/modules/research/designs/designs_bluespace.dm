@@ -1,6 +1,17 @@
+/datum/design/item/bluespace
+	category_items = "Bluespace"
+
 /datum/design/item/bluespace/AssembleDesignName()
 	..()
 	name = "Bluespace device ([item_name])"
+
+/datum/design/item/bluespace/beacon
+	name = "tracking beacon"
+	id = "beacon"
+	req_tech = list(TECH_BLUESPACE = 1)
+	materials = list (MATERIAL_ALUMINIUM = 20, MATERIAL_GLASS = 10)
+	build_path = /obj/item/device/radio/beacon
+	sort_string = "VADAA"
 
 /datum/design/item/bluespace/gps
 	name = "triangulating device"
@@ -38,3 +49,12 @@
 	build_path = /obj/item/storage/backpack/holding
 	sort_string = "VAFAA"
 
+/datum/design/item/dufflebag_holding
+	name = "dufflebag of holding"
+	desc = "A variation of the popular Bag of Holding, the dufflebag of holding is, functionally, identical to the bag of holding, but comes in an easier to carry form."
+	id = "dufflebag_holding"
+	req_tech = list(TECH_BLUESPACE = 4, TECH_MATERIAL = 6)
+	materials = list(MATERIAL_GOLD = 3000, MATERIAL_DIAMOND = 1500, MATERIAL_URANIUM = 250, MATERIAL_PLASTIC = 250)
+	build_path = /obj/item/storage/backpack/holding/duffle
+	sort_string = "VAFAB"
+	category_items = "Bluespace"

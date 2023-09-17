@@ -29,9 +29,10 @@
 	meat_type = /obj/item/reagent_containers/food/snacks/meat/monkey
 
 	rarity_value = 0.1
-	total_health = 150
+	total_health = 120 //inf, was 150
 	brute_mod = 1.5
 	burn_mod = 1.5
+	blood_volume = 220 //inf, was NOTHING (560)
 
 	spawn_flags = SPECIES_IS_RESTRICTED
 
@@ -54,8 +55,6 @@
 		TAG_FACTION =   FACTION_TEST_SUBJECTS
 	)
 
-	ingest_amount = 6
-
 	var/list/no_touchie = list(/obj/item/mirror,
 							   /obj/item/storage/mirror)
 
@@ -69,7 +68,7 @@
 	)
 	..()
 
-/datum/species/monkey/handle_npc(mob/living/carbon/human/H)
+/datum/species/monkey/handle_npc(var/mob/living/carbon/human/H)
 	if(H.stat != CONSCIOUS)
 		return
 	if(prob(33) && isturf(H.loc) && !H.pulledby) //won't move if being pulled
@@ -94,7 +93,7 @@
 		for(var/obj/O in range(1,get_turf(H)))
 			if(O.simulated && O.Adjacent(H) && !is_type_in_list(O, no_touchie))
 				touchables += O
-		if(length(touchables))
+		if(touchables.len)
 			var/obj/touchy = pick(touchables)
 			touchy.attack_hand(H)
 
@@ -113,7 +112,7 @@
 	if(!H.restrained() && H.lying && H.shock_stage >= 60 && prob(3))
 		H.custom_emote("thrashes in agony")
 
-/datum/species/monkey/handle_post_spawn(mob/living/carbon/human/H)
+/datum/species/monkey/handle_post_spawn(var/mob/living/carbon/human/H)
 	..()
 	H.item_state = lowertext(name)
 
@@ -145,6 +144,7 @@
 	greater_form = SPECIES_SKRELL
 	flesh_color = "#8cd7a3"
 	blood_color = "#1d2cbf"
+	reagent_tag = IS_SKRELL
 	tail = null
 	force_cultural_info = list(
 		TAG_CULTURE =   CULTURE_NEARA,
@@ -165,14 +165,10 @@
 	greater_form = SPECIES_UNATHI
 	flesh_color = "#34af10"
 	base_color = "#066000"
+	reagent_tag = IS_UNATHI
 	force_cultural_info = list(
 		TAG_CULTURE =   CULTURE_STOK,
 		TAG_HOMEWORLD = HOME_SYSTEM_STATELESS,
 		TAG_FACTION =   FACTION_TEST_SUBJECTS
 	)
 
-	traits = list(
-		/singleton/trait/boon/filtered_blood = TRAIT_LEVEL_EXISTS,
-		/singleton/trait/boon/cast_iron_stomach = TRAIT_LEVEL_EXISTS,
-		/singleton/trait/malus/sugar = TRAIT_LEVEL_MAJOR
-	)

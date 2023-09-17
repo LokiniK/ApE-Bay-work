@@ -6,17 +6,16 @@
 	var/list/obj/machinery/vending/infectedVendingMachines = list()
 	var/obj/machinery/vending/originMachine
 
-
 /datum/event/brand_intelligence/announce()
-	command_announcement.Announce("Rampant brand intelligence has been detected aboard the [location_name()]. The origin is believed to be \a \"[initial(originMachine.name)]\" type. Infection of other machines is likely.", "[location_name()] Machine Monitoring", zlevels = affecting_z)
-
+//	command_announcement.Announce("Rampant brand intelligence has been detected aboard the [location_name()]. The origin is believed to be \a \"[initial(originMachine.name)]\" type. Fix it, before it spreads to other vending machines.", "Machine Learning Alert", zlevels = affecting_z)
+	command_announcement.Announce("Аномальное развитие искусственного интеллекта автоматов [initial(originMachine.name)] было обнаружено на [location_name()]. Требуется устранить угрозу от сбойных машин до распространения ошибки на другие аппараты.", "Машинная Аномалия", zlevels = affecting_z)
 
 /datum/event/brand_intelligence/start()
 	for(var/obj/machinery/vending/V in SSmachines.machinery)
 		if(V.z in affecting_z)
 			vendingMachines += weakref(V)
 
-	if(!length(vendingMachines))
+	if(!vendingMachines.len)
 		kill()
 		return
 	var/weakref/W = pick_n_take(vendingMachines)
@@ -26,7 +25,7 @@
 	originMachine.shooting_chance = 15
 
 /datum/event/brand_intelligence/tick()
-	if(!length(vendingMachines) || QDELETED(originMachine) || originMachine.shut_up || !originMachine.shoot_inventory)	//if every machine is infected, or if the original vending machine is missing or has it's voice switch flipped or fixed
+	if(!vendingMachines.len || QDELETED(originMachine) || originMachine.shut_up || !originMachine.shoot_inventory)	//if every machine is infected, or if the original vending machine is missing or has it's voice switch flipped or fixed
 		kill()
 		return
 
@@ -57,7 +56,8 @@
 			continue
 		infectedMachine.shut_up = 1
 		infectedMachine.shoot_inventory = 0
-	command_announcement.Announce("All traces of the rampant brand intelligence have disappeared from the systems.", "[location_name()] Firewall Subroutines")
+//	priority_announcement.Announce("All traces of the rampant brand intelligence have disappeared from the systems.", "[location_name()] Firewall Subroutines")
+	command_announcement.Announce("Все следы аномального развития искусственного интеллекта раздатчиков исчезли из систем судна.", "[location_name()] Firewall Subroutines")
 	originMachine = null
 	infectedVendingMachines.Cut()
 	vendingMachines.Cut()

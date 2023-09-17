@@ -8,7 +8,7 @@
 	if(radio_controller)
 		radio_controller.remove_object(source, frequency)
 
-/proc/get_frequency_default_name(display_freq)
+/proc/get_frequency_default_name(var/display_freq)
 	var/freq_text
 
 	// the name of the channel
@@ -37,7 +37,6 @@
 	var/list/receiver_reception = new
 
 /proc/get_message_server(z)
-	RETURN_TYPE(/obj/machinery/message_server)
 	if(message_servers)
 		var/list/zlevels = GLOB.using_map.contact_levels
 		if(z)
@@ -47,21 +46,20 @@
 				return MS
 	return null
 
-/proc/check_signal(datum/signal/signal)
+/proc/check_signal(var/datum/signal/signal)
 	return signal && signal.data["done"]
 
-/proc/get_sender_reception(atom/sender, datum/signal/signal)
+/proc/get_sender_reception(var/atom/sender, var/datum/signal/signal)
 	return check_signal(signal) ? TELECOMMS_RECEPTION_SENDER : TELECOMMS_RECEPTION_NONE
 
-/proc/get_receiver_reception(receiver, datum/signal/signal)
+/proc/get_receiver_reception(var/receiver, var/datum/signal/signal)
 	if(receiver && check_signal(signal))
 		var/turf/pos = get_turf(receiver)
 		if(pos && (pos.z in signal.data["level"]))
 			return TELECOMMS_RECEPTION_RECEIVER
 	return TELECOMMS_RECEPTION_NONE
 
-/proc/get_reception(atom/sender, receiver, message = "", do_sleep = 1)
-	RETURN_TYPE(/datum/reception)
+/proc/get_reception(var/atom/sender, var/receiver, var/message = "", var/do_sleep = 1)
 	var/datum/reception/reception = new
 
 	// check if telecomms I/O route 1459 is stable
@@ -74,8 +72,7 @@
 
 	return reception
 
-/proc/get_receptions(atom/sender, list/atom/receivers, do_sleep = 1)
-	RETURN_TYPE(/datum/receptions)
+/proc/get_receptions(var/atom/sender, var/list/atom/receivers, var/do_sleep = 1)
 	var/datum/receptions/receptions = new
 	receptions.message_server = get_message_server()
 

@@ -5,7 +5,7 @@
 
 /obj/effect/wingrille_spawn
 	name = "window grille spawner"
-	icon = 'icons/obj/structures/structures.dmi'
+	icon = 'icons/obj/structures_inf.dmi'
 	icon_state = "wingrille"
 	density = TRUE
 	anchored = TRUE
@@ -79,11 +79,11 @@
 	for(var/obj/effect/wingrille_spawn/other in neighbours)
 		if(!other.activated) other.activate()
 
-/obj/effect/wingrille_spawn/proc/handle_window_spawn(obj/structure/window/W)
+/obj/effect/wingrille_spawn/proc/handle_window_spawn(var/obj/structure/window/W)
 	return
 
 // Currently unused, could be useful for pre-wired electrified windows.
-/obj/effect/wingrille_spawn/proc/handle_grille_spawn(obj/structure/grille/G)
+/obj/effect/wingrille_spawn/proc/handle_grille_spawn(var/obj/structure/grille/G)
 	return
 
 /obj/effect/wingrille_spawn/reinforced
@@ -104,17 +104,17 @@
 /obj/effect/wingrille_spawn/phoron
 	name = "phoron window grille spawner"
 	icon_state = "p-wingrille"
-	win_path = /obj/structure/window/boron_basic
+	win_path = /obj/structure/window/phoronbasic
 
 /obj/effect/wingrille_spawn/reinforced_phoron
 	name = "reinforced phoron window grille spawner"
 	icon_state = "pr-wingrille"
-	win_path = /obj/structure/window/boron_reinforced
+	win_path = /obj/structure/window/phoronreinforced
 
 /obj/effect/wingrille_spawn/reinforced_phoron/full
 	name = "reinforced phoron window grille spawner - full tile"
 	fulltile = TRUE
-	win_path = /obj/structure/window/boron_reinforced/full
+	win_path = /obj/structure/window/phoronreinforced/full
 
 /obj/effect/wingrille_spawn/reinforced/polarized
 	name = "polarized window grille spawner"
@@ -127,6 +127,6 @@
 	fulltile = TRUE
 	win_path = /obj/structure/window/reinforced/polarized/full
 
-/obj/effect/wingrille_spawn/reinforced/polarized/handle_window_spawn(obj/structure/window/reinforced/polarized/P)
+/obj/effect/wingrille_spawn/reinforced/polarized/handle_window_spawn(var/obj/structure/window/reinforced/polarized/P)
 	if(id)
 		P.id = id

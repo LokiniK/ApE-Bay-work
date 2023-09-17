@@ -3,33 +3,43 @@
 	waterproof = FALSE
 	var/lit = 0
 
-/obj/item/flame/afterattack(obj/O, mob/user, proximity)
+/obj/item/flame/afterattack(var/obj/O, var/mob/user, proximity)
 	..()
 	if(proximity && lit && istype(O))
 		O.HandleObjectHeating(src, user, 700)
 
-/obj/item/flame/proc/extinguish(mob/user, no_message)
+/obj/item/flame/proc/extinguish(var/mob/user, var/no_message)
 	lit = 0
-	damtype = DAMAGE_BRUTE
+	damtype = "brute"
 	STOP_PROCESSING(SSobj, src)
 
-/obj/item/flame/water_act(depth)
+/obj/item/flame/water_act(var/depth)
 	..()
 	if(!waterproof && lit)
 		if(submerged(depth))
 			extinguish(no_message = TRUE)
 
-
-/obj/item/flame/IsFlameSource()
-	return lit
-
+/proc/isflamesource(var/atom/A)
+	if(!istype(A))
+		return FALSE
+	if(isWelder(A))
+		var/obj/item/weldingtool/WT = A
+		return (WT.isOn())
+	else if(istype(A, /obj/item/flame))
+		var/obj/item/flame/F = A
+		return (F.lit)
+	else if(istype(A, /obj/item/clothing/mask/smokable) && !istype(A, /obj/item/clothing/mask/smokable/pipe))
+		var/obj/item/clothing/mask/smokable/S = A
+		return (S.lit)
+	else if(istype(A, /obj/item/device/assembly/igniter))
+		return TRUE
+	return FALSE
 
 ///////////
 //MATCHES//
 ///////////
 /obj/item/flame/match
 	name = "match"
-	pluralname = "matche"
 	desc = "A simple match stick, used for lighting fine smokables."
 	icon = 'icons/obj/cigarettes.dmi'
 	icon_state = "match_unlit"
@@ -52,7 +62,7 @@
 	if(location)
 		location.hotspot_expose(700, 5)
 
-/obj/item/flame/match/dropped(mob/user)
+/obj/item/flame/match/dropped(var/mob/user)
 	//If dropped, put ourselves out
 	//not before lighting up the turf we land on, though.
 	if(lit)
@@ -62,12 +72,13 @@
 		extinguish()
 	return ..()
 
-/obj/item/flame/match/extinguish(mob/user, no_message)
+/obj/item/flame/match/extinguish(var/mob/user, var/no_message)
 	. = ..()
 	name = "burnt match"
 	desc = "A match. This one has seen better days."
 	burnt = 1
 	update_icon()
+	set_light(0)
 
 /obj/item/flame/match/on_update_icon()
 	..()

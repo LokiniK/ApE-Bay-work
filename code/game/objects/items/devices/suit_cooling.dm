@@ -4,7 +4,7 @@
 	w_class = ITEM_SIZE_LARGE
 	icon = 'icons/obj/suitcooler.dmi'
 	icon_state = "suitcooler0"
-	item_state = "coolingpack"
+	item_state = "coolingpack"			// beautiful codersprites until someone makes a prettier one.
 	slot_flags = SLOT_BACK
 
 	//copied from tank.dm
@@ -25,7 +25,7 @@
 	var/charge_consumption = 2 KILOWATTS	// energy usage at full power
 	var/thermostat = T20C
 
-/obj/item/device/suit_cooling_unit/ui_action_click(mob/living/user)
+/obj/item/device/suit_cooling_unit/ui_action_click()
 	toggle(usr)
 
 /obj/item/device/suit_cooling_unit/Initialize()
@@ -69,7 +69,7 @@
 	if(!istype(H))
 		return 0
 
-	return (H.back == src) || (H.s_store == src)
+	return (H.back == src) || (H.s_store == src) || (H.belt == src)
 
 /obj/item/device/suit_cooling_unit/proc/turn_on()
 	if(!cell)
@@ -80,12 +80,12 @@
 	on = 1
 	update_icon()
 
-/obj/item/device/suit_cooling_unit/proc/turn_off(failed)
+/obj/item/device/suit_cooling_unit/proc/turn_off(var/failed)
 	if(failed) visible_message("\The [src] clicks and whines as it powers down.")
 	on = 0
 	update_icon()
 
-/obj/item/device/suit_cooling_unit/attack_self(mob/user)
+/obj/item/device/suit_cooling_unit/attack_self(var/mob/user)
 	if(cover_open && cell)
 		if(ishuman(user))
 			user.put_in_hands(cell)
@@ -102,46 +102,37 @@
 
 	toggle(user)
 
-/obj/item/device/suit_cooling_unit/proc/toggle(mob/user)
+/obj/item/device/suit_cooling_unit/proc/toggle(var/mob/user)
 	if(on)
 		turn_off()
 	else
 		turn_on()
-	to_chat(user, SPAN_NOTICE("You switch \the [src] [on ? "on" : "off"]."))
+	to_chat(user, "<span class='notice'>You switch \the [src] [on ? "on" : "off"].</span>")
 
-
-/obj/item/device/suit_cooling_unit/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Screwdriver - Toggle cover
-	if (isScrewdriver(tool))
-		cover_open = !cover_open
-		playsound(src, 'sound/items/Screwdriver.ogg', 50, TRUE)
+/obj/item/device/suit_cooling_unit/attackby(obj/item/W as obj, mob/user as mob)
+	if(isScrewdriver(W))
+		if(cover_open)
+			cover_open = 0
+			to_chat(user, "You screw the panel into place.")
+		else
+			cover_open = 1
+			to_chat(user, "You unscrew the panel.")
 		update_icon()
-		user.visible_message(
-			SPAN_NOTICE("\The [user] [cover_open ? "opens" : "closes"] \a [src]'s panel with \a [tool]."),
-			SPAN_NOTICE("You [cover_open ? "open" : "close"] \the [src]'s panel with \the [tool].")
-		)
-		return TRUE
+		return
 
-	// Power Cell - Install cell
-	if (istype(tool, /obj/item/cell))
-		if (!cover_open)
-			USE_FEEDBACK_FAILURE("\The [src]'s panel is closed.")
-			return TRUE
-		if (cell)
-			USE_FEEDBACK_FAILURE("\The [src] already has \a [cell] installed.")
-			return TRUE
-		if (!user.unEquip(tool, src))
-			FEEDBACK_UNEQUIP_FAILURE(user, tool)
-			return TRUE
-		cell = tool
+	if (istype(W, /obj/item/cell))
+		if(cover_open)
+			if(cell)
+				to_chat(user, "There is a [cell] already installed here.")
+			else
+				if(!user.unEquip(W, src))
+					return
+				cell = W
+				to_chat(user, "You insert the [cell].")
 		update_icon()
-		user.visible_message(
-			SPAN_NOTICE("\The [user] installs \a [tool] into \a [src]."),
-			SPAN_NOTICE("You install \the [tool] into \the [src].")
-		)
+		return
 
 	return ..()
-
 
 /obj/item/device/suit_cooling_unit/on_update_icon()
 	overlays.Cut()
@@ -187,3 +178,80 @@
 
 	if (cell)
 		to_chat(user, "The charge meter reads [round(cell.percent())]%.")
+
+
+/obj/item/device/suit_cooling_unit/miniature
+	name = "miniature cooling device"
+	desc = "Minituarized heat sink that can be hooked up to around waist. Weaker than it's bigger counterpart."
+	w_class = ITEM_SIZE_NORMAL
+	icon = 'icons/obj/suitcooler.dmi'
+	icon_state = "miniaturesuitcooler0"
+	item_state = "coolingbelt"
+	max_cooling = 6
+	charge_consumption = 2.4 KILOWATTS
+	slot_flags = SLOT_BELT
+	matter = list(MATERIAL_STEEL = 10000, MATERIAL_ALUMINIUM = 5000, MATERIAL_GLASS = 3000)
+
+/obj/item/device/suit_cooling_unit/miniature/on_update_icon()
+	overlays.Cut()
+	if (cover_open)
+		if (cell)
+			icon_state = "miniaturesuitcooler1"
+		else
+			icon_state = "miniaturesuitcooler2"
+		return
+
+	icon_state = "miniaturesuitcooler0"
+
+	if(!cell || !on)
+		return
+
+	switch(round(cell.percent()))
+		if(86 to INFINITY)
+			overlays.Add("minibattery-0")
+		if(69 to 85)
+			overlays.Add("minibattery-1")
+		if(52 to 68)
+			overlays.Add("minibattery-2")
+		if(35 to 51)
+			overlays.Add("minibattery-3")
+		if(18 to 34)
+			overlays.Add("minibattery-4")
+		if(-INFINITY to 17)
+			overlays.Add("minibattery-5")
+
+
+/obj/item/device/suit_cooling_unit/miniature/Process()
+	if (!on || !cell)
+		return
+
+	if (!is_in_slot())
+		return
+
+	var/mob/living/carbon/human/H = loc
+	if ((H.pressure_alert == -1) || (H.pressure_alert == -2))
+		return
+
+	var/temp_adj = min(H.bodytemperature - thermostat, max_cooling)
+
+	if (temp_adj < 0.5)	//only cools, doesn't heat, also we don't need extreme precision
+		return
+
+	var/charge_usage = (temp_adj/max_cooling)*charge_consumption
+
+	H.bodytemperature -= temp_adj
+
+	cell.use(charge_usage * CELLRATE)
+	update_icon()
+
+	if(cell.charge <= 0)
+		turn_off(1)
+
+
+/obj/item/device/suit_cooling_unit/miniature/empty
+
+
+/obj/item/device/suit_cooling_unit/empty/Initialize()
+	. = ..()
+	START_PROCESSING(SSobj, src)
+	cell = null

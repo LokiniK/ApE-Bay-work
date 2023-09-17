@@ -1,4 +1,4 @@
-/mob/living/simple_animal/hostile/meat
+/mob/living/simple_animal/hostile/meat/
 	name = "horror"
 	desc = "A monstrously huge wall of flesh, it looks like you took who knows how many humans and put them together..."
 	icon = 'icons/mob/simple_animal/nightmaremonsters.dmi'
@@ -13,7 +13,6 @@
 	response_harm   = "pokes"
 	maxHealth = 250
 	health = 250
-	movement_cooldown = 7
 	natural_weapon = /obj/item/natural_weapon/meatbits
 	heat_damage_per_tick = 20
 	cold_damage_per_tick = 0
@@ -57,7 +56,6 @@
 	response_harm   = "pokes"
 	maxHealth = 250
 	health = 250
-	movement_cooldown = 8
 	natural_weapon = /obj/item/natural_weapon/meatbits
 	heat_damage_per_tick = 20
 	cold_damage_per_tick = 0
@@ -124,7 +122,6 @@
 	response_harm   = "pokes"
 	maxHealth = 100
 	health = 100
-	movement_cooldown = 5
 	natural_weapon = /obj/item/natural_weapon/claws/weak
 	heat_damage_per_tick = 100
 	cold_damage_per_tick = 0
@@ -160,7 +157,6 @@
 	response_harm   = "pokes"
 	maxHealth = 200
 	health = 200
-	movement_cooldown = 5
 	natural_weapon = /obj/item/natural_weapon/claws
 	heat_damage_per_tick = 100
 	cold_damage_per_tick = 0
@@ -194,7 +190,6 @@
 	response_harm   = "pokes"
 	maxHealth = 150
 	health = 150
-	movement_cooldown = 5
 	natural_weapon = /obj/item/natural_weapon/claws
 	heat_damage_per_tick = 100
 	cold_damage_per_tick = 0
@@ -228,7 +223,6 @@
 	response_harm   = "pokes"
 	maxHealth = 50
 	health = 50
-	movement_cooldown = 2
 	natural_weapon = /obj/item/natural_weapon/claws
 	heat_damage_per_tick = 100
 	cold_damage_per_tick = 0

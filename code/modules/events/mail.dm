@@ -37,7 +37,7 @@
 			to_receive.Add(CR.get_name())
 
 	// Nobody got any mail :(
-	if(!length(to_receive))
+	if(!to_receive.len)
 		log_debug("Nobody got any mail. Aborting event.")
 		kill(TRUE)
 

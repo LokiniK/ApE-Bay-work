@@ -4,7 +4,7 @@
 	icon_keyboard = "tech_key"
 
 /obj/machinery/computer/telecomms/server
-	name = "telecommunications server monitor"
+	name = "Telecommunications Server Monitor"
 	icon_screen = "comm_logs"
 	machine_name = "telecommunications server monitor console"
 	machine_desc = "A terminal used to view and browse the logs of a telecommunications network."
@@ -37,7 +37,7 @@
 		if(0)
 			dat += "<br>[temp]<br>"
 			dat += "<br>Current Network: <a href='?src=\ref[src];network=1'>[network]</a><br>"
-			if(length(servers))
+			if(servers.len)
 				dat += "<br>Detected Telecommunication Servers:<ul>"
 				for(var/obj/machinery/telecomms/T in servers)
 					dat += "<li><a href='?src=\ref[src];viewserver=[T.id]'>\ref[T] [T.name]</a> ([T.id])</li>"
@@ -71,37 +71,40 @@
 				// If the log is a speech file
 				if(C.input_type == "Speech File")
 
-					dat += "<li>[SPAN_COLOR("#008f00", C.name)]  <a href='?src=\ref[src];delete=[i]'>[SPAN_COLOR("#ff0000", "\[X\]")]</a><br>"
+					dat += "<li><font color = #008f00>[C.name]</font>  <font color = #ff0000><a href='?src=\ref[src];delete=[i]'>\[X\]</a></font><br>"
 
 					// -- Determine race of orator --
 
 					var/race = C.parameters["race"]			   // The actual race of the mob
 					var/language = C.parameters["language"] // The language spoken, or null/""
+					var/time = C.parameters["messagetime"] //inf
+
 
 					// -- If the orator is a human, or universal translate is active, OR mob has universal speech on --
 
 					if(universal_translate || C.parameters["uspeech"] || C.parameters["intelligible"])
-						dat += "<u>[SPAN_COLOR("#18743e", "Data type")]</u>: [C.input_type]<br>"
-						dat += "<u>[SPAN_COLOR("#18743e", "Source")]</u>: [C.parameters["name"]] (Job: [C.parameters["job"]])<br>"
-						dat += "<u>[SPAN_COLOR("#18743e", "Class")]</u>: [race]<br>"
-						dat += "<u>[SPAN_COLOR("#18743e", "Contents")]</u>: \"[C.parameters["message"]]\"<br>"
+						dat += "<u><font color = #18743e>Data type</font></u>: [C.input_type]<br>"
+						dat += "<u><font color = #18743e>Message Receiving Time</font></u>: [time]<br>" //inf
+						dat += "<u><font color = #18743e>Source</font></u>: [C.parameters["name"]] (Job: [C.parameters["job"]])<br>"
+						dat += "<u><font color = #18743e>Class</font></u>: [race]<br>"
+						dat += "<u><font color = #18743e>Contents</font></u>: \"[C.parameters["message"]]\"<br>"
 						if(language)
-							dat += "<u>[SPAN_COLOR("#18743e", "Language")]</u>: [language]<br/>"
+							dat += "<u><font color = #18743e>Language</font></u>: [language]<br/>"
 
 					// -- Orator is not human and universal translate not active --
 
 					else
-						dat += "<u>[SPAN_COLOR("#18743e", "Data type")]</u>: Audio File<br>"
-						dat += "<u>[SPAN_COLOR("#18743e", "Source")]</u>: <i>Unidentifiable</i><br>"
-						dat += "<u>[SPAN_COLOR("#18743e", "Class")]</u>: [race]<br>"
-						dat += "<u>[SPAN_COLOR("#18743e", "Contents")]</u>: <i>Unintelligble</i><br>"
+						dat += "<u><font color = #18743e>Data type</font></u>: Audio File<br>"
+						dat += "<u><font color = #18743e>Source</font></u>: <i>Unidentifiable</i><br>"
+						dat += "<u><font color = #18743e>Class</font></u>: [race]<br>"
+						dat += "<u><font color = #18743e>Contents</font></u>: <i>Unintelligble</i><br>"
 
 					dat += "</li><br>"
 
 				else if(C.input_type == "Execution Error")
 
-					dat += "<li>[SPAN_COLOR("#990000", C.name)]  [SPAN_COLOR("#ff0000", "<a href='?src=\ref[src];delete=[i]'>\[X\]</a>")]<br>"
-					dat += "<u>[SPAN_COLOR("#787700", "Output")]</u>: \"[C.parameters["message"]]\"<br>"
+					dat += "<li><font color = #990000>[C.name]</font>  <font color = #ff0000><a href='?src=\ref[src];delete=[i]'>\[X\]</a></font><br>"
+					dat += "<u><font color = #787700>Output</font></u>: \"[C.parameters["message"]]\"<br>"
 					dat += "</li><br>"
 
 
@@ -135,25 +138,25 @@
 				screen = 0
 
 			if("scan")
-				if(length(servers) > 0)
-					temp = SPAN_COLOR("#d70b00", "- FAILED: CANNOT PROBE WHEN BUFFER FULL -")
+				if(servers.len > 0)
+					temp = "<font color = #d70b00>- FAILED: CANNOT PROBE WHEN BUFFER FULL -</font>"
 
 				else
 					for(var/obj/machinery/telecomms/server/T in range(25, src))
 						if(T.network == network)
 							servers.Add(T)
 
-					if(!length(servers))
-						temp = SPAN_COLOR("#d70b00", "- FAILED: UNABLE TO LOCATE SERVERS IN \[[network]\] -")
+					if(!servers.len)
+						temp = "<font color = #d70b00>- FAILED: UNABLE TO LOCATE SERVERS IN \[[network]\] -</font>"
 					else
-						temp = SPAN_COLOR("#336699", "- [length(servers)] SERVERS PROBED & BUFFERED -")
+						temp = "<font color = #336699>- [servers.len] SERVERS PROBED & BUFFERED -</font>"
 
 					screen = 0
 
 	if(href_list["delete"])
 
 		if(!src.allowed(usr) && !emagged)
-			to_chat(usr, SPAN_WARNING("ACCESS DENIED."))
+			to_chat(usr, "<span class='warning'>ACCESS DENIED.</span>")
 			return
 
 		if(SelectedServer)
@@ -164,13 +167,13 @@
 			if(!D)
 				return TOPIC_REFRESH
 
-			temp = SPAN_COLOR("#336699", "- DELETED ENTRY: [D.name] -")
+			temp = "<font color = #336699>- DELETED ENTRY: [D.name] -</font>"
 
 			SelectedServer.log_entries.Remove(D)
 			qdel(D)
 
 		else
-			temp = SPAN_COLOR("#d70b00", "- FAILED: NO SELECTED MACHINE -")
+			temp = "<font color = #d70b00>- FAILED: NO SELECTED MACHINE -</font>"
 
 	if(href_list["network"])
 
@@ -178,22 +181,22 @@
 
 		if(newnet && ((usr in range(1, src) || issilicon(usr))))
 			if(length(newnet) > 15)
-				temp = SPAN_COLOR("#d70b00", "- FAILED: NETWORK TAG STRING TOO LENGHTLY -")
+				temp = "<font color = #d70b00>- FAILED: NETWORK TAG STRING TOO LENGHTLY -</font>"
 
 			else
 
 				network = newnet
 				screen = 0
 				servers = list()
-				temp = SPAN_COLOR("#336699", "- NEW NETWORK TAG SET IN ADDRESS \[[network]\] -")
+				temp = "<font color = #336699>- NEW NETWORK TAG SET IN ADDRESS \[[network]\] -</font>"
 
 	updateUsrDialog()
 
-/obj/machinery/computer/telecomms/server/emag_act(remaining_charges, mob/user)
+/obj/machinery/computer/telecomms/server/emag_act(var/remaining_charges, var/mob/user)
 	if(!emagged)
 		playsound(src.loc, 'sound/effects/sparks4.ogg', 75, 1)
 		emagged = TRUE
 		req_access.Cut()
-		to_chat(user, SPAN_NOTICE("You disable the security protocols"))
+		to_chat(user, "<span class='notice'>You you disable the security protocols</span>")
 		src.updateUsrDialog()
 		return 1

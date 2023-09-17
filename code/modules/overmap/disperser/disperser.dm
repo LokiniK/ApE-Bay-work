@@ -2,10 +2,10 @@
 //This is just basic construction and deconstruction and the like
 
 /obj/machinery/disperser
-	icon = 'icons/obj/machines/disperser.dmi'
+	icon = 'icons/obj/disperser.dmi'
 	density = TRUE
 	anchored = TRUE
-	construct_state = /singleton/machine_construction/default/panel_closed
+	construct_state = /decl/machine_construction/default/panel_closed
 
 /obj/machinery/disperser/examine(mob/user)
 	. = ..()
@@ -15,11 +15,11 @@
 /obj/machinery/disperser/attackby(obj/item/I, mob/user)
 	if(isWrench(I))
 		if(panel_open)
-			user.visible_message(SPAN_NOTICE("\The [user] rotates \the [src] with \the [I]."), SPAN_NOTICE("You rotate \the [src] with \the [I]."))
+			user.visible_message("<span class='notice'>\The [user] rotates \the [src] with \the [I].</span>", "<span class='notice'>You rotate \the [src] with \the [I].</span>")
 			set_dir(turn(dir, 90))
 			playsound(src, 'sound/items/jaws_pry.ogg', 50, 1)
 		else
-			to_chat(user,SPAN_NOTICE("The maintenance panel must be screwed open for this!"))
+			to_chat(user,"<span class='notice'>The maintenance panel must be screwed open for this!</span>")
 	else
 		return ..()
 
@@ -43,4 +43,4 @@
 		<br>A sign on it reads: <i>KEEP AWAY FROM LIVING MATERIAL!</i>"
 	icon_state = "back"
 	density = FALSE
-	layer = ABOVE_HUMAN_LAYER //So the charges go inside us.
+	layer = STRUCTURE_LAYER

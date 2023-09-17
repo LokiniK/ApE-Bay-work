@@ -1,4 +1,4 @@
-var/global/maze_cell_count = 0
+var/maze_cell_count = 0
 
 /datum/maze_cell
 	var/name
@@ -8,7 +8,7 @@ var/global/maze_cell_count = 0
 	var/ox
 	var/oy
 
-/datum/maze_cell/New(nx,ny,nox,noy)
+/datum/maze_cell/New(var/nx,var/ny,var/nox,var/noy)
 	maze_cell_count++
 	uid = maze_cell_count
 	name = "cell #[uid]"

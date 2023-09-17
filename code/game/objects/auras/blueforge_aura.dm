@@ -4,13 +4,13 @@
 	icon_state = "eyes_blueforged_s"
 	layer = MOB_LAYER
 
-/obj/aura/blueforge_aura/aura_check_life()
+/obj/aura/blueforge_aura/life_tick()
 	user.adjustToxLoss(-10)
-	return EMPTY_BITFIELD
+	return 0
 
-/obj/aura/blueforge_aura/aura_check_bullet(obj/item/projectile/proj, def_zone	)
-	if (proj.damtype == DAMAGE_BURN)
-		proj.damage *= 2
-	else if (proj.agony || proj.stun)
+/obj/aura/blueforge_aura/bullet_act(var/obj/item/projectile/P)
+	if(P.damtype == BURN)
+		P.damage *=2
+	else if(P.agony || P.stun)
 		return AURA_FALSE
-	return EMPTY_BITFIELD
+	return 0

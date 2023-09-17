@@ -1,7 +1,7 @@
 /obj/item/screwdriver
 	name = "screwdriver"
 	desc = "Your archetypal flathead screwdriver, with a nice, heavy polymer handle."
-	icon = 'icons/obj/tools/screwdriver.dmi'
+	icon = 'icons/obj/tools.dmi'
 	icon_state = "screwdriver_preview"
 	item_state = "screwdriver"
 	obj_flags = OBJ_FLAG_CONDUCTIBLE
@@ -16,7 +16,6 @@
 	attack_verb = list("stabbed")
 	lock_picking_level = 5
 	sharp = TRUE
-	item_flags = ITEM_FLAG_CAN_HIDE_IN_SHOES
 
 	var/build_from_parts = TRUE
 	var/valid_colours = list(COLOR_RED, COLOR_CYAN_BLUE, COLOR_PURPLE, COLOR_CHESTNUT, COLOR_GREEN, COLOR_TEAL, COLOR_ASSEMBLY_YELLOW, COLOR_BOTTLE_GREEN, COLOR_VIOLET, COLOR_GRAY80, COLOR_GRAY20)

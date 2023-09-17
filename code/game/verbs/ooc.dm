@@ -1,15 +1,21 @@
-/client/verb/ooc(message as text)
+/client/verb/ooc(message = "" as text)
 	set name = "OOC"
 	set category = "OOC"
 
-	sanitize_and_communicate(/singleton/communication_channel/ooc, src, message)
+	if(!message)
+		message = input(src.mob, "", "ooc \"text\"") as text|null
 
-/client/verb/looc(message as text)
+	sanitize_and_communicate(/decl/communication_channel/ooc, src, message)
+
+/client/verb/looc(message = "" as text)
 	set name = "LOOC"
 	set desc = "Local OOC, seen only by those in view. Remember: Just because you see someone that doesn't mean they see you."
 	set category = "OOC"
 
-	sanitize_and_communicate(/singleton/communication_channel/ooc/looc, src, message)
+	if(!message)
+		message = input(src.mob, "", "looc \"text\"") as text|null
+
+	sanitize_and_communicate(/decl/communication_channel/ooc/looc, src, message)
 
 /client/verb/fix_chat()
 	set name = "Fix Chat"
@@ -18,7 +24,7 @@
 		var/action = alert(src, "Invalid Chat Output data found!\nRecreate data?", "Wot?", "Recreate Chat Output data", "Cancel")
 		if (action != "Recreate Chat Output data")
 			return
-		chatOutput = new /datum/chatOutput (src)
+		chatOutput = new /datum/chatOutput(src)
 		chatOutput.start()
 		action = alert(src, "Goon chat reloading, wait a bit and tell me if it's fixed", "", "Fixed", "Nope")
 		if (action == "Fixed")
@@ -82,7 +88,7 @@
 			log_game("GOONCHAT: [key_name(src)] Had to fix their goonchat by manually calling start()")
 		else
 			chatOutput.load()
-			alert(src, "How about now? (give it a moment (it may also try to load twice))", "", "Yes", "No")
+			action = alert(src, "How about now? (give it a moment (it may also try to load twice))", "", "Yes", "No")
 			if (action == "Yes")
 				log_game("GOONCHAT: [key_name(src)] Had to fix their goonchat by manually calling start() and forcing a load()")
 			else
@@ -91,3 +97,55 @@
 					winset(src, "output", list2params(list("on-show" = "", "is-disabled" = "false", "is-visible" = "true")))
 					winset(src, "browseroutput", "is-disabled=true;is-visible=false")
 				log_game("GOONCHAT: [key_name(src)] Failed to fix their goonchat window after manually calling start() and forcing a load()")
+
+
+/client/verb/fix_chat_2()
+	set name = "Fix Chat 2"
+	set category = "OOC"
+	if (!chatOutput || !istype(chatOutput))
+		var/action = alert(src, "Invalid Chat Output data found!\nRecreate data?", "Wot?", "Recreate Chat Output data", "Cancel")
+		if (action != "Recreate Chat Output data")
+			return
+		chatOutput = new /datum/chatOutput(src)
+		chatOutput.start()
+		action = alert(src, "Goon chat reloading, wait a bit and tell me if it's fixed", "", "Fixed", "Nope")
+		if (action == "Fixed")
+			log_game("GOONCHAT: [key_name(src)] Had to fix their goonchat by re-creating the chatOutput datum")
+		else
+			chatOutput.load()
+			action = alert(src, "How about now? (give it a moment (it may also try to load twice))", "", "Yes", "No")
+			if (action == "Yes")
+				log_game("GOONCHAT: [key_name(src)] Had to fix their goonchat by re-creating the chatOutput datum and forcing a load()")
+			else
+				action = alert(src, "Welp, I'm all out of ideas. Try closing byond and reconnecting.\nWe could also disable fancy chat and re-enable oldchat", "", "Thanks anyways", "Switch to old chat")
+				if (action == "Switch to old chat")
+					winset(src, "output", "is-visible=true;is-disabled=false")
+					winset(src, "browseroutput", "is-visible=false")
+				log_game("GOONCHAT: [key_name(src)] Failed to fix their goonchat window after recreating the chatOutput and forcing a load()")
+
+	else
+		force_white_theme()
+		winset(src, "output", "is-visible=true;is-disabled=false")
+		winset(src, "browseroutput", "is-visible=false")
+		chatOutput.loaded = FALSE
+		chatOutput.start()
+
+		var/action = alert(src, "First attempt\nIs your chat fixed?", "", "YES", "NO")
+		if (action == "YES")
+			log_game("GOONCHAT: [key_name(src)] Fix2 fixed chat in one step")
+		else
+			force_white_theme()
+			winset(src, "output", "is-visible=true;is-disabled=false")
+			winset(src, "browseroutput", "is-visible=false")
+
+			sleep(1 SECOND)
+
+			chatOutput.loaded = FALSE
+			chatOutput.start()
+
+			action = alert(src, "Second attempt\nIs your chat fixed?", "", "YES", "NO")
+
+			if (action == "YES")
+				log_game("GOONCHAT: [key_name(src)] Fix2 fixed chat in two steps")
+			else
+				log_game("GOONCHAT: [key_name(src)] Fix2 didn't fix chat")

@@ -9,10 +9,20 @@
 
 	..()
 
+//	if (stat != DEAD && can_progress())
+//		update_progression()
+
 	blinded = null
 
 	//Status updates, death etc.
 	update_icons()
+
+/mob/living/carbon/alien/proc/can_progress()
+	if(auto_progress == 1)
+		return 1
+	else
+		return 0
+
 
 /mob/living/carbon/alien/handle_mutations_and_radiation()
 
@@ -121,7 +131,7 @@
 
 	return 1
 
-/mob/living/carbon/alien/handle_environment(datum/gas_mixture/environment)
+/mob/living/carbon/alien/handle_environment(var/datum/gas_mixture/environment)
 	// Both alien subtypes survive in vaccum and suffer in high temperatures,
 	// so I'll just define this once, for both (see radiation comment above)
 	if(!environment) return
@@ -130,7 +140,7 @@
 		adjustFireLoss((environment.temperature - (T0C+66))/5) // Might be too high, check in testing.
 		if (fire) fire.icon_state = "fire2"
 		if(prob(20))
-			to_chat(src, SPAN_DANGER("You feel a searing heat!"))
+			to_chat(src, "<span class='danger'>You feel a searing heat!</span>")
 	else
 		if (fire) fire.icon_state = "fire0"
 

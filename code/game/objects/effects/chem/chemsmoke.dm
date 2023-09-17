@@ -6,10 +6,10 @@
 	layer = ABOVE_PROJECTILE_LAYER
 	time_to_live = 300
 	pass_flags = PASS_FLAG_TABLE | PASS_FLAG_GRILLE
-	var/splash_amount = 5 //atoms moving through a smoke cloud get splashed with up to 10 units of reagent
+	var/splash_amount = 10 //atoms moving through a smoke cloud get splashed with up to 10 units of reagent
 	var/turf/destination
 
-/obj/effect/effect/smoke/chem/New(newloc, smoke_duration, turf/dest_turf = null, icon/cached_icon = null)
+/obj/effect/effect/smoke/chem/New(var/newloc, smoke_duration, turf/dest_turf = null, icon/cached_icon = null)
 	time_to_live = smoke_duration
 
 	..()
@@ -46,6 +46,7 @@
 			if(!istype(AM, /obj/effect/effect/smoke/chem))
 				reagents.splash(AM, splash_amount, copy = 1)
 
+
 /////////////////////////////////////////////
 // Chem Smoke Effect System
 /////////////////////////////////////////////
@@ -56,7 +57,6 @@
 	var/list/targetTurfs
 	var/list/wallList
 	var/density
-	var/smokeVolume
 	var/show_log = 1
 
 /datum/effect/effect/system/smoke_spread/chem/spores
@@ -79,13 +79,12 @@
 // Calculates the max range smoke can travel, then gets all turfs in that view range.
 // Culls the selected turfs to a (roughly) circle shape, then calls smokeFlow() to make
 // sure the smoke can actually path to the turfs. This culls any turfs it can't reach.
-/datum/effect/effect/system/smoke_spread/chem/set_up(datum/reagents/carry = null, n = 10, c = 0, loca, direct)
+/datum/effect/effect/system/smoke_spread/chem/set_up(var/datum/reagents/carry = null, n = 10, c = 0, loca, direct)
 	range = n * 0.3
 	cardinals = c
 	carry.trans_to_obj(chemholder, carry.total_volume, copy = 1)
-	smokeVolume = n
 
-	if(isturf(loca))
+	if(istype(loca, /turf/))
 		location = loca
 	else
 		location = get_turf(loca)
@@ -105,7 +104,7 @@
 	smokeFlow() //pathing check
 
 	//set the density of the cloud - for diluting reagents
-	density = max(1, length(targetTurfs) / 4) //clamp the cloud density minimum to 1 so it cant multiply the reagents
+	density = max(1, targetTurfs.len / 4) //clamp the cloud density minimum to 1 so it cant multiply the reagents
 
 	//Admin messaging
 	var/contained = carry.get_reagents()
@@ -133,7 +132,7 @@
 	if(!location)
 		return
 
-	if(length(chemholder.reagents.reagent_list)) //reagent application - only run if there are extra reagents in the smoke
+	if(chemholder.reagents.reagent_list.len) //reagent application - only run if there are extra reagents in the smoke
 		for(var/turf/T in wallList)
 			chemholder.reagents.touch_turf(T)
 		for(var/turf/T in targetTurfs)
@@ -153,12 +152,12 @@
 		I = icon('icons/effects/96x96.dmi', "smoke")
 
 	//Calculate smoke duration
-	var/smoke_duration = smokeVolume * 1.5 SECONDS
+	var/smoke_duration = 150
 
 	var/pressure = 0
 	var/datum/gas_mixture/environment = location.return_air()
 	if(environment) pressure = environment.return_pressure()
-	smoke_duration = clamp(smoke_duration * pressure / (ONE_ATMOSPHERE / 3), 5, smoke_duration)
+	smoke_duration = between(5, smoke_duration*pressure/(ONE_ATMOSPHERE/3), smoke_duration)
 
 	var/const/arcLength = 2.3559 //distance between each smoke cloud
 
@@ -166,12 +165,12 @@
 		var/radius = i * 1.5
 		if(!radius)
 			spawn(0)
-				spawnSmoke(location, I, smoke_duration, 1)
+				spawnSmoke(location, I, 1, 1)
 			continue
 
 		var/offset = 0
 		var/points = round((radius * 2 * M_PI) / arcLength)
-		var/angle = round(RAD_TO_DEG * arcLength / radius, 1)
+		var/angle = round(ToDegrees(arcLength / radius), 1)
 
 		if(!IsInteger(radius))
 			offset = 45		//degrees
@@ -185,21 +184,21 @@
 				continue
 			if(T in targetTurfs)
 				spawn(0)
-					spawnSmoke(T, I, smoke_duration, range)
+					spawnSmoke(T, I, range)
 
 //------------------------------------------
 // Randomizes and spawns the smoke effect.
 // Also handles deleting the smoke once the effect is finished.
 //------------------------------------------
-/datum/effect/effect/system/smoke_spread/chem/proc/spawnSmoke(turf/T, icon/I, smoke_duration, dist = 1, splash_initial=0, obj/effect/effect/smoke/chem/passed_smoke)
+/datum/effect/effect/system/smoke_spread/chem/proc/spawnSmoke(var/turf/T, var/icon/I, var/smoke_duration, var/dist = 1, var/splash_initial=0, var/obj/effect/effect/smoke/chem/passed_smoke)
 
 	var/obj/effect/effect/smoke/chem/smoke
 	if(passed_smoke)
 		smoke = passed_smoke
 	else
-		smoke = new /obj/effect/effect/smoke/chem(location, smoke_duration + rand(1.5 SECONDS, 3 SECONDS), T, I)
+		smoke = new /obj/effect/effect/smoke/chem(location, smoke_duration + rand(0, 20), T, I)
 
-	if(length(chemholder.reagents.reagent_list))
+	if(chemholder.reagents.reagent_list.len)
 		chemholder.reagents.trans_to_obj(smoke, chemholder.reagents.total_volume / dist, copy = 1) //copy reagents to the smoke so mob/breathe() can handle inhaling the reagents
 
 	//Kinda ugly, but needed unless the system is reworked
@@ -207,7 +206,7 @@
 		smoke.initial_splash()
 
 
-/datum/effect/effect/system/smoke_spread/chem/spores/spawnSmoke(turf/T, icon/I, smoke_duration, dist = 1)
+/datum/effect/effect/system/smoke_spread/chem/spores/spawnSmoke(var/turf/T, var/icon/I, var/smoke_duration, var/dist = 1)
 	var/obj/effect/effect/smoke/chem/spores = new /obj/effect/effect/smoke/chem(location)
 	spores.SetName("cloud of [seed.seed_name] [seed.seed_noun]")
 	..(T, I, smoke_duration, dist, passed_smoke=spores)
@@ -220,7 +219,7 @@
 
 	pending += location
 
-	while(length(pending))
+	while(pending.len)
 		for(var/turf/current in pending)
 			for(var/D in GLOB.cardinal)
 				var/turf/target = get_step(current, D)

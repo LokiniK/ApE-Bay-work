@@ -24,10 +24,10 @@
 	// Yay, you're no longer growing 3 arms
 	var/deactivation_message=""
 
-/datum/dna/gene/disability/can_activate(mob/M,flags)
+/datum/dna/gene/disability/can_activate(var/mob/M,var/flags)
 	return 1 // Always set!
 
-/datum/dna/gene/disability/activate(mob/M, connected, flags)
+/datum/dna/gene/disability/activate(var/mob/M, var/connected, var/flags)
 	if(mutation && !(mutation in M.mutations))
 		M.mutations.Add(mutation)
 	if(disability)
@@ -35,11 +35,11 @@
 	if(sdisability)
 		M.set_sdisability(sdisability)
 	if(activation_message)
-		to_chat(M, SPAN_WARNING("[activation_message]"))
+		to_chat(M, "<span class='warning'>[activation_message]</span>")
 	else
 		testing("[name] has no activation message.")
 
-/datum/dna/gene/disability/deactivate(mob/M, connected, flags)
+/datum/dna/gene/disability/deactivate(var/mob/M, var/connected, var/flags)
 	if(mutation && (mutation in M.mutations))
 		M.mutations.Remove(mutation)
 	if(disability)
@@ -47,7 +47,7 @@
 	if(sdisability)
 		M.unset_sdisability(sdisability)
 	if(deactivation_message)
-		to_chat(M, SPAN_WARNING("[deactivation_message]"))
+		to_chat(M, "<span class='warning'>[deactivation_message]</span>")
 	else
 		testing("[name] has no deactivation message.")
 
@@ -84,6 +84,14 @@
 /datum/dna/gene/disability/clumsy/New()
 	block=GLOB.CLUMSYBLOCK
 
+/datum/dna/gene/disability/tourettes
+	name="Tourettes"
+	activation_message="You twitch."
+	disability=TOURETTES
+
+/datum/dna/gene/disability/tourettes/New()
+	block=GLOB.TWITCHBLOCK
+
 /datum/dna/gene/disability/nervousness
 	name="Nervousness"
 	activation_message="You feel nervous."
@@ -108,7 +116,7 @@
 /datum/dna/gene/disability/deaf/New()
 	block=GLOB.DEAFBLOCK
 
-/datum/dna/gene/disability/deaf/activate(mob/M, connected, flags)
+/datum/dna/gene/disability/deaf/activate(var/mob/M, var/connected, var/flags)
 	..(M,connected,flags)
 	M.ear_deaf = 1
 

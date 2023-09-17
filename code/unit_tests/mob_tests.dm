@@ -32,10 +32,10 @@
 		if(H.need_breathe())
 			var/species_organ = H.species.breathing_organ
 			var/obj/item/organ/internal/lungs/L
-			H.apply_effect(20, EFFECT_STUN, 0)
+			H.apply_effect(20, STUN, 0)
 			L = H.internal_organs_by_name[species_organ]
 			L.last_successful_breath = -INFINITY
-			test_subjects[S.name] = list(H, damage_check(H, DAMAGE_OXY))
+			test_subjects[S.name] = list(H, damage_check(H, OXY))
 	return 1
 
 /datum/unit_test/human_breath/check_result()
@@ -47,7 +47,7 @@
 	var/failcount = 0
 	for(var/i in test_subjects)
 		var/mob/living/carbon/human/H = test_subjects[i][1]
-		var/ending_oxyloss = damage_check(H, DAMAGE_OXY)
+		var/ending_oxyloss = damage_check(H, OXY)
 		var/starting_oxyloss = test_subjects[i][2]
 		if(starting_oxyloss >= ending_oxyloss)
 			failcount++
@@ -62,22 +62,21 @@
 
 // ============================================================================
 
-var/global/default_mobloc = null
+/var/default_mobloc = null
 
-/proc/create_test_mob_with_mind(turf/mobloc = null, mobtype = /mob/living/carbon/human)
-	RETURN_TYPE(/list)
+proc/create_test_mob_with_mind(var/turf/mobloc = null, var/mobtype = /mob/living/carbon/human)
 	var/list/test_result = list("result" = FAILURE, "msg"    = "", "mobref" = null)
 
 	if(isnull(mobloc))
 		if(!default_mobloc)
-			for(var/turf/simulated/floor/tiled/T in world)
-				var/pressure = T.zone?.air.return_pressure()
-				if (isnull(pressure))
-					continue
-
+			for(var/obj/effect/landmark/test/safe_turf/safe in world)
+				default_mobloc = safe
+				break
+/*			for(var/turf/simulated/floor/tiled/T in world)
+				var/pressure = T.zone.air.return_pressure()
 				if(90 < pressure && pressure < 120) // Find a turf between 90 and 120
 					default_mobloc = T
-					break
+					break*/
 		mobloc = default_mobloc
 	if(!mobloc)
 		test_result["msg"] = "Unable to find a location to create test mob"
@@ -96,26 +95,26 @@ var/global/default_mobloc = null
 //Generic Check
 // TODO: Need to make sure I didn't just recreate the wheel here.
 
-/proc/damage_check(mob/living/M, damage_type)
+proc/damage_check(var/mob/living/M, var/damage_type)
 	var/loss = null
 
 	switch(damage_type)
-		if (DAMAGE_BRUTE)
+		if(BRUTE)
 			loss = M.getBruteLoss()
-		if (DAMAGE_BURN)
+		if(BURN)
 			loss = M.getFireLoss()
-		if (DAMAGE_TOXIN)
+		if(TOX)
 			loss = M.getToxLoss()
-		if (DAMAGE_OXY)
+		if(OXY)
 			loss = M.getOxyLoss()
 			if(istype(M,/mob/living/carbon/human))
 				var/mob/living/carbon/human/H = M
 				var/obj/item/organ/internal/lungs/L = H.internal_organs_by_name["lungs"]
 				if(L)
 					loss = L.oxygen_deprivation
-		if (DAMAGE_GENETIC)
+		if(CLONE)
 			loss = M.getCloneLoss()
-		if (DAMAGE_PAIN)
+		if(PAIN)
 			loss = M.getHalLoss()
 
 	if(!loss && istype(M, /mob/living/carbon/human))
@@ -142,7 +141,7 @@ var/global/default_mobloc = null
 	name = "MOB: Template for mob damage"
 	template = /datum/unit_test/mob_damage
 	var/mob/living/carbon/human/testmob = null
-	var/damagetype = DAMAGE_BRUTE
+	var/damagetype = BRUTE
 	var/mob_type = /mob/living/carbon/human
 	var/expected_vulnerability = STANDARD
 	var/check_health = 0
@@ -150,7 +149,7 @@ var/global/default_mobloc = null
 
 /datum/unit_test/mob_damage/start_test()
 	var/list/test = create_test_mob_with_mind(null, mob_type)
-	var/damage_amount = 4	// Do not raise, if damage >= 5 there is a % chance to reduce damage by half in /obj/item/organ/external/take_damage()
+	var/damage_amount = 4	// Do not raise, if damage >= 5 there is a % chance to reduce damage by half in /obj/item/organ/external/take_damage() //inf
 							// Which makes checks impossible.
 
 	if(isnull(test))
@@ -179,7 +178,7 @@ var/global/default_mobloc = null
 
 	var/initial_health = H.health
 
-	if (damagetype == DAMAGE_OXY && H.need_breathe())
+	if(damagetype == OXY && H.need_breathe())
 		var/species_organ = H.species.breathing_organ
 		var/obj/item/organ/internal/lungs/L
 		if(species_organ)
@@ -239,29 +238,29 @@ var/global/default_mobloc = null
 // Human damage check.
 // =================================================================
 
-/datum/unit_test/mob_damage/brute
+datum/unit_test/mob_damage/brute
 	name = "MOB: Human Brute damage check"
-	damagetype = DAMAGE_BRUTE
+	damagetype = BRUTE
 
-/datum/unit_test/mob_damage/burn
-	name = "MOB: Human Burn damage check"
-	damagetype = DAMAGE_BURN
+datum/unit_test/mob_damage/fire
+	name = "MOB: Human Fire damage check"
+	damagetype = BURN
 
-/datum/unit_test/mob_damage/tox
+datum/unit_test/mob_damage/tox
 	name = "MOB: Human Toxin damage check"
-	damagetype = DAMAGE_TOXIN
+	damagetype = TOX
 
-/datum/unit_test/mob_damage/oxy
+datum/unit_test/mob_damage/oxy
 	name = "MOB: Human Oxygen damage check"
-	damagetype = DAMAGE_OXY
+	damagetype = OXY
 
-/datum/unit_test/mob_damage/genetic
-	name = "MOB: Human Genetic damage check"
-	damagetype = DAMAGE_GENETIC
+datum/unit_test/mob_damage/clone
+	name = "MOB: Human Clone damage check"
+	damagetype = CLONE
 
-/datum/unit_test/mob_damage/pain
-	name = "MOB: Human Pain damage check"
-	damagetype = DAMAGE_PAIN
+datum/unit_test/mob_damage/halloss
+	name = "MOB: Human Halloss damage check"
+	damagetype = PAIN
 
 // =================================================================
 // Unathi
@@ -274,28 +273,98 @@ var/global/default_mobloc = null
 
 /datum/unit_test/mob_damage/unathi/brute
 	name = "MOB: Unathi Brute Damage Check"
-	damagetype = DAMAGE_BRUTE
+	damagetype = BRUTE
 	expected_vulnerability = ARMORED
 
 /datum/unit_test/mob_damage/unathi/fire
 	name = "MOB: Unathi Fire Damage Check"
-	damagetype = DAMAGE_BURN
+	damagetype = BURN
 
 /datum/unit_test/mob_damage/unathi/tox
 	name = "MOB: Unathi Toxins Damage Check"
-	damagetype = DAMAGE_TOXIN
+	damagetype = TOX
 
 /datum/unit_test/mob_damage/unathi/oxy
 	name = "MOB: Unathi Oxygen Damage Check"
-	damagetype = DAMAGE_OXY
+	damagetype = OXY
 
-/datum/unit_test/mob_damage/unathi/genetic
-	name = "MOB: Unathi Genetic Damage Check"
-	damagetype = DAMAGE_GENETIC
+/datum/unit_test/mob_damage/unathi/clone
+	name = "MOB: Unathi Clone Damage Check"
+	damagetype = CLONE
 
-/datum/unit_test/mob_damage/unathi/pain
-	name = "MOB: Unathi Pain Damage Check"
-	damagetype = DAMAGE_PAIN
+/datum/unit_test/mob_damage/unathi/halloss
+	name = "MOB: Unathi Halloss Damage Check"
+	damagetype = PAIN
+
+// =================================================================
+// SpessKahjit aka Tajaran
+// =================================================================
+
+datum/unit_test/mob_damage/tajaran
+	name = "MOB: Tajaran damage check template"
+	template = /datum/unit_test/mob_damage/tajaran
+	mob_type = /mob/living/carbon/human/tajaran
+
+datum/unit_test/mob_damage/tajaran/brute
+	name = "MOB: Tajaran Brute Damage Check"
+	damagetype = BRUTE
+	expected_vulnerability = EXTRA_VULNERABLE
+
+datum/unit_test/mob_damage/tajaran/fire
+	name = "MOB: Tajaran Fire Damage Check"
+	damagetype = BURN
+	expected_vulnerability = EXTRA_VULNERABLE
+
+datum/unit_test/mob_damage/tajaran/tox
+	name = "MOB: Tajaran Toxins Damage Check"
+	damagetype = TOX
+
+datum/unit_test/mob_damage/tajaran/oxy
+	name = "MOB: Tajaran Oxygen Damage Check"
+	damagetype = OXY
+
+datum/unit_test/mob_damage/tajaran/clone
+	name = "MOB: Tajaran Clone Damage Check"
+	damagetype = CLONE
+
+datum/unit_test/mob_damage/tajaran/halloss
+	name = "MOB: Tajaran Halloss Damage Check"
+	damagetype = PAIN
+
+// =================================================================
+// Resomi
+// =================================================================
+
+datum/unit_test/mob_damage/resomi
+	name = "MOB: Resomi damage check template"
+	template = /datum/unit_test/mob_damage/resomi
+	mob_type = /mob/living/carbon/human/resomi
+
+datum/unit_test/mob_damage/resomi/brute
+	name = "MOB: Resomi Brute Damage Check"
+	damagetype = BRUTE
+	expected_vulnerability = EXTRA_VULNERABLE
+
+datum/unit_test/mob_damage/resomi/fire
+	name = "MOB: Resomi Fire Damage Check"
+	damagetype = BURN
+	expected_vulnerability = EXTRA_VULNERABLE
+
+datum/unit_test/mob_damage/resomi/tox
+	name = "MOB: Resomi Toxins Damage Check"
+	damagetype = TOX
+
+datum/unit_test/mob_damage/resomi/oxy
+	name = "MOB: Resomi Oxygen Damage Check"
+	damagetype = OXY
+
+datum/unit_test/mob_damage/resomi/clone
+	name = "MOB: Resomi Clone Damage Check"
+	damagetype = CLONE
+
+datum/unit_test/mob_damage/resomi/halloss
+	name = "MOB: Resomi Halloss Damage Check"
+	damagetype = PAIN
 
 // =================================================================
 // Skrell
@@ -308,30 +377,30 @@ var/global/default_mobloc = null
 
 /datum/unit_test/mob_damage/skrell/brute
 	name = "MOB: Skrell Brute Damage Check"
-	damagetype = DAMAGE_BRUTE
+	damagetype = BRUTE
 
 /datum/unit_test/mob_damage/skrell/fire
 	name = "MOB: Skrell Fire Damage Check"
-	damagetype = DAMAGE_BURN
+	damagetype = BURN
 	expected_vulnerability = ARMORED
 
 /datum/unit_test/mob_damage/skrell/tox
 	name = "MOB: Skrell Toxins Damage Check"
-	damagetype = DAMAGE_TOXIN
+	damagetype = TOX
 	expected_vulnerability = ARMORED
 
 /datum/unit_test/mob_damage/skrell/oxy
 	name = "MOB: Skrell Oxygen Damage Check"
-	damagetype = DAMAGE_OXY
+	damagetype = OXY
 	expected_vulnerability = EXTRA_VULNERABLE
 
-/datum/unit_test/mob_damage/skrell/genetic
-	name = "MOB: Skrell Genetic Damage Check"
-	damagetype = DAMAGE_GENETIC
+/datum/unit_test/mob_damage/skrell/clone
+	name = "MOB: Skrell Clone Damage Check"
+	damagetype = CLONE
 
-/datum/unit_test/mob_damage/skrell/pain
-	name = "MOB: Skrell Pain Damage Check"
-	damagetype = DAMAGE_PAIN
+/datum/unit_test/mob_damage/skrell/halloss
+	name = "MOB: Skrell Halloss Damage Check"
+	damagetype = PAIN
 
 // =================================================================
 // Vox
@@ -344,29 +413,29 @@ var/global/default_mobloc = null
 
 /datum/unit_test/mob_damage/vox/brute
 	name = "MOB: Vox Brute Damage Check"
-	damagetype = DAMAGE_BRUTE
+	damagetype = BRUTE
 
 /datum/unit_test/mob_damage/vox/fire
 	name = "MOB: Vox Fire Damage Check"
-	damagetype = DAMAGE_BURN
+	damagetype = BURN
 
 /datum/unit_test/mob_damage/vox/tox
 	name = "MOB: Vox Toxins Damage Check"
-	damagetype = DAMAGE_TOXIN
+	damagetype = TOX
 
 /datum/unit_test/mob_damage/vox/oxy
 	name = "MOB: Vox Oxygen Damage Check"
-	damagetype = DAMAGE_OXY
+	damagetype = OXY
 
-/datum/unit_test/mob_damage/vox/genetic
-	name = "MOB: Vox Genetic Damage Check"
-	damagetype = DAMAGE_GENETIC
+/datum/unit_test/mob_damage/vox/clone
+	name = "MOB: Vox Clone Damage Check"
+	damagetype = CLONE
 	expected_vulnerability = IMMUNE
 
 
-/datum/unit_test/mob_damage/vox/pain
-	name = "MOB: Vox Pain Damage Check"
-	damagetype = DAMAGE_PAIN
+/datum/unit_test/mob_damage/vox/halloss
+	name = "MOB: Vox Halloss Damage Check"
+	damagetype = PAIN
 
 // =================================================================
 // Diona
@@ -379,29 +448,29 @@ var/global/default_mobloc = null
 
 /datum/unit_test/mob_damage/diona/brute
 	name = "MOB: Diona Brute Damage Check"
-	damagetype = DAMAGE_BRUTE
+	damagetype = BRUTE
 
 /datum/unit_test/mob_damage/diona/fire
 	name = "MOB: Diona Fire Damage Check"
-	damagetype = DAMAGE_BURN
+	damagetype = BURN
 
 /datum/unit_test/mob_damage/diona/tox
 	name = "MOB: Diona Toxins Damage Check"
-	damagetype = DAMAGE_TOXIN
+	damagetype = TOX
 
 /datum/unit_test/mob_damage/diona/oxy
 	name = "MOB: Diona Oxygen Damage Check"
-	damagetype = DAMAGE_OXY
+	damagetype = OXY
 	expected_vulnerability = IMMUNE
 
-/datum/unit_test/mob_damage/diona/genetic
-	name = "MOB: Diona Genetic Damage Check"
-	damagetype = DAMAGE_GENETIC
+/datum/unit_test/mob_damage/diona/clone
+	name = "MOB: Diona Clone Damage Check"
+	damagetype = CLONE
 	expected_vulnerability = IMMUNE
 
-/datum/unit_test/mob_damage/diona/pain
-	name = "MOB: Diona Pain Damage Check"
-	damagetype = DAMAGE_PAIN
+/datum/unit_test/mob_damage/diona/halloss
+	name = "MOB: Diona Halloss Damage Check"
+	damagetype = PAIN
 	expected_vulnerability = IMMUNE
 
 // =================================================================
@@ -415,30 +484,30 @@ var/global/default_mobloc = null
 
 /datum/unit_test/mob_damage/nabber/brute
 	name = "MOB: GAS Brute Damage Check"
-	damagetype = DAMAGE_BRUTE
+	damagetype = BRUTE
 	expected_vulnerability = ARMORED
 
 /datum/unit_test/mob_damage/nabber/fire
 	name = "MOB: GAS Fire Damage Check"
-	damagetype = DAMAGE_BURN
+	damagetype = BURN
 	expected_vulnerability = EXTRA_VULNERABLE
 
 /datum/unit_test/mob_damage/nabber/tox
 	name = "MOB: GAS Toxins Damage Check"
-	damagetype = DAMAGE_TOXIN
+	damagetype = TOX
 
 /datum/unit_test/mob_damage/nabber/oxy
 	name = "MOB: GAS Oxygen Damage Check"
-	damagetype = DAMAGE_OXY
+	damagetype = OXY
 	expected_vulnerability = ARMORED
 
-/datum/unit_test/mob_damage/nabber/genetic
-	name = "MOB: GAS Genetic Damage Check"
-	damagetype = DAMAGE_GENETIC
+/datum/unit_test/mob_damage/nabber/clone
+	name = "MOB: GAS Clone Damage Check"
+	damagetype = CLONE
 
-/datum/unit_test/mob_damage/nabber/pain
-	name = "MOB: GAS Pain Damage Check"
-	damagetype = DAMAGE_PAIN
+/datum/unit_test/mob_damage/nabber/halloss
+	name = "MOB: GAS Halloss Damage Check"
+	damagetype = PAIN
 
 // =================================================================
 // SPECIAL WHITTLE SNOWFLAKES aka IPC
@@ -451,30 +520,30 @@ var/global/default_mobloc = null
 
 /datum/unit_test/mob_damage/machine/brute
 	name = "MOB: IPC Brute Damage Check"
-	damagetype = DAMAGE_BRUTE
+	damagetype = BRUTE
 
 /datum/unit_test/mob_damage/machine/fire
 	name = "MOB: IPC Fire Damage Check"
-	damagetype = DAMAGE_BURN
+	damagetype = BURN
 
 /datum/unit_test/mob_damage/machine/tox
 	name = "MOB: IPC Toxins Damage Check"
-	damagetype = DAMAGE_TOXIN
+	damagetype = TOX
 	expected_vulnerability = IMMUNE
 
 /datum/unit_test/mob_damage/machine/oxy
 	name = "MOB: IPC Oxygen Damage Check"
-	damagetype = DAMAGE_OXY
+	damagetype = OXY
 	expected_vulnerability = IMMUNE
 
-/datum/unit_test/mob_damage/machine/genetic
-	name = "MOB: IPC Genetic Damage Check"
-	damagetype = DAMAGE_GENETIC
+/datum/unit_test/mob_damage/machine/clone
+	name = "MOB: IPC Clone Damage Check"
+	damagetype = CLONE
 	expected_vulnerability = IMMUNE
 
-/datum/unit_test/mob_damage/machine/pain
-	name = "MOB: IPC Pain Damage Check"
-	damagetype = DAMAGE_PAIN
+/datum/unit_test/mob_damage/machine/halloss
+	name = "MOB: IPC Halloss Damage Check"
+	damagetype = PAIN
 	expected_vulnerability = IMMUNE
 
 
@@ -483,25 +552,47 @@ var/global/default_mobloc = null
 
 /datum/unit_test/robot_module_icons
 	name = "MOB: Robot module icon check"
-	var/icon_file = 'icons/mob/screen1_robot.dmi'
+	var/list/icon_files = list('icons/mob/screen1_robot.dmi', 'infinity/icons/mob/screen1_robot.dmi')	// INF WAS		var/icon_files = list('icons/mob/screen1_robot.dmi)
 
 /datum/unit_test/robot_module_icons/start_test()
 	var/failed = 0
+/*[ORIG]
 	if(!isicon(icon_file))
 		fail("[icon_file] is not a valid icon file.")
 		return 1
 
 	var/list/valid_states = icon_states(icon_file)
 
-	if(!length(valid_states))
+	if(!valid_states.len)
 		return 1
 
-	for(var/i = 1 to length(SSrobots.all_module_names))
+	for(var/i=1, i<=SSrobots.all_module_names.len, i++)
 		var/modname = lowertext(SSrobots.all_module_names[i])
 		var/bad_msg = "[ascii_red]--------------- [modname]"
 		if(!(modname in valid_states))
 			log_unit_test("[bad_msg] does not contain a valid icon state in [icon_file][ascii_reset]")
 			failed=1
+[/ORIG]*/
+//[INF]
+	var/list/valid_states = list()
+	for(var/icon_file in icon_files)
+		if(!isicon(icon_file))
+			fail("[icon_file] is not a valid icon file.")
+			failed=1
+			continue
+
+		valid_states += icon_states(icon_file)
+
+	if(!valid_states.len)
+		return 1
+
+	for(var/i=1, i<=SSrobots.all_module_names.len, i++)
+		var/modname = lowertext(SSrobots.all_module_names[i])
+		var/bad_msg = "[ascii_red]--------------- [modname]"
+		if(!(modname in valid_states))
+			log_unit_test("[bad_msg] does not contain a valid icon state in icons[ascii_reset]")
+			failed=1
+//[/INF]
 
 	if(failed)
 		fail("Some icon states did not exist")
@@ -523,11 +614,11 @@ var/global/default_mobloc = null
 	for(var/species_name in all_species)
 		var/datum/species/S = all_species[species_name]
 		if(S.base_skin_colours)
-			if(!(S.appearance_flags & SPECIES_APPEARANCE_HAS_BASE_SKIN_COLOURS))
-				log_unit_test("[S.name] has a skin colour list but no SPECIES_APPEARANCE_HAS_BASE_SKIN_COLOURS flag.")
+			if(!(S.appearance_flags & HAS_BASE_SKIN_COLOURS))
+				log_unit_test("[S.name] has a skin colour list but no HAS_BASE_SKIN_COLOURS flag.")
 				failcount++
 				continue
-			if(!(length(S.base_skin_colours) >= 2))
+			if(!(S.base_skin_colours.len >= 2))
 				log_unit_test("[S.name] needs at least two items in the base_skin_colour list.")
 				failcount++
 				continue
@@ -550,8 +641,8 @@ var/global/default_mobloc = null
 				failcount++
 				continue
 
-		else if(S.appearance_flags & SPECIES_APPEARANCE_HAS_BASE_SKIN_COLOURS)
-			log_unit_test("[S.name] has a SPECIES_APPEARANCE_HAS_BASE_SKIN_COLOURS flag but no skin colour list.")
+		else if(S.appearance_flags & HAS_BASE_SKIN_COLOURS)
+			log_unit_test("[S.name] has a HAS_BASE_SKIN_COLOURS flag but no skin colour list.")
 			failcount++
 			continue
 

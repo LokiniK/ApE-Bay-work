@@ -15,7 +15,7 @@
 	var/expand = 1
 	var/metal = 0
 
-/obj/effect/effect/foam/New(loc, ismetal = 0)
+/obj/effect/effect/foam/New(var/loc, var/ismetal = 0)
 	..(loc)
 	icon_state = "[ismetal? "m" : ""]foam"
 	metal = ismetal
@@ -23,7 +23,7 @@
 	spawn(3 + metal * 3)
 		Process()
 		checkReagents()
-	addtimer(new Callback(src, .proc/remove_foam), 12 SECONDS)
+	addtimer(CALLBACK(src, .proc/remove_foam), 12 SECONDS)
 
 /obj/effect/effect/foam/proc/remove_foam()
 	STOP_PROCESSING(SSobj, src)
@@ -72,7 +72,7 @@
 		spawn(5)
 			qdel(src)
 
-/obj/effect/effect/foam/Crossed(atom/movable/AM)
+/obj/effect/effect/foam/Crossed(var/atom/movable/AM)
 	if(metal)
 		return
 	if(istype(AM, /mob/living))
@@ -84,9 +84,9 @@
 	var/list/carried_reagents	// the IDs of reagents present when the foam was mixed
 	var/metal = 0				// 0 = foam, 1 = metalfoam, 2 = ironfoam
 
-/datum/effect/effect/system/foam_spread/set_up(amt=5, loca, datum/reagents/carry = null, metalfoam = 0)
+/datum/effect/effect/system/foam_spread/set_up(amt=5, loca, var/datum/reagents/carry = null, var/metalfoam = 0)
 	amount = round(sqrt(amt / 3), 1)
-	if(isturf(loca))
+	if(istype(loca, /turf/))
 		location = loca
 	else
 		location = get_turf(loca)
@@ -125,7 +125,7 @@
 	icon = 'icons/effects/effects.dmi'
 	icon_state = "metalfoam"
 	density = TRUE
-	opacity = 1 // changed in New()
+	opacity = TRUE // changed in New()
 	anchored = TRUE
 	name = "foamed metal"
 	desc = "A lightweight foamed metal wall."
@@ -153,60 +153,28 @@
 	if(metal == 1 || prob(50))
 		qdel(src)
 
-/obj/structure/foamedmetal/attack_hand(mob/user)
+/obj/structure/foamedmetal/attack_hand(var/mob/user)
 	if ((MUTATION_HULK in user.mutations) || (prob(75 - metal * 25)))
-		user.visible_message(SPAN_WARNING("[user] smashes through the foamed metal."), SPAN_NOTICE("You smash through the metal foam wall."))
+		user.visible_message("<span class='warning'>[user] smashes through the foamed metal.</span>", "<span class='notice'>You smash through the metal foam wall.</span>")
 		qdel(src)
 	else
-		to_chat(user, SPAN_NOTICE("You hit the metal foam but bounce off it."))
+		to_chat(user, "<span class='notice'>You hit the metal foam but bounce off it.</span>")
 	return
 
+/obj/structure/foamedmetal/attackby(var/obj/item/I, var/mob/user)
+	if(istype(I, /obj/item/grab))
+		var/obj/item/grab/G = I
+		G.affecting.loc = src.loc
+		visible_message("<span class='warning'>[G.assailant] smashes [G.affecting] through the foamed metal wall.</span>")
+		qdel(I)
+		qdel(src)
+		return
 
-/obj/structure/foamedmetal/use_grab(obj/item/grab/grab, list/click_params)
-	// Harm intent - Smash through foam
-	if (grab.assailant.a_intent == I_HURT)
-		if (!Adjacent(grab.affecting))
-			USE_FEEDBACK_GRAB_FAILURE("\The [grab.affecting] must be next to \the [src] to smash them into it.")
-			return TRUE
-		grab.assailant.visible_message(
-			SPAN_WARNING("\The [grab.assailant] smashes \the [grab.affecting] through \the [src]!"),
-			SPAN_DANGER("You smash \the [grab.affecting] through \the [src]!"),
-			exclude_mobs = list(grab.affecting)
-		)
-		grab.affecting.show_message(
-			SPAN_DANGER("\The [grab.assailant] smashes you through \the [src]!"),
-			VISIBLE_MESSAGE,
-			SPAN_DANGER("You feel yourself being smashed through something!")
-		)
-		qdel(grab)
-		qdel_self()
-		return TRUE
-
-	return ..()
-
-
-/obj/structure/foamedmetal/use_weapon(obj/item/weapon, mob/user, list/click_params)
-	// Snowflake damage handling - TODO: Use standardized damage
-	if (weapon.force > 0 && !HAS_FLAGS(weapon.item_flags, ITEM_FLAG_NO_BLUDGEON))
-		user.setClickCooldown(user.get_attack_speed(weapon))
-		user.do_attack_animation(src)
-		if (prob(weapon.force * 20 - metal * 25))
-			playsound(src, damage_hitsound, 75, TRUE)
-			user.visible_message(
-				SPAN_WARNING("\The [user] smashes through \the [src] with \a [weapon]!"),
-				SPAN_DANGER("You smash through \the [src] with \the [weapon]!")
-			)
-			qdel_self()
-			return TRUE
-		playsound(src, damage_hitsound, 50, TRUE)
-		user.visible_message(
-			SPAN_WARNING("\The [user] hits \the [src] with \a [weapon]!"),
-			SPAN_DANGER("You hit \the [src] with \the [weapon]!")
-		)
-		return TRUE
-
-	return ..()
-
+	if(prob(I.force * 20 - metal * 25))
+		user.visible_message("<span class='warning'>[user] smashes through the foamed metal.</span>", "<span class='notice'>You smash through the foamed metal with \the [I].</span>")
+		qdel(src)
+	else
+		to_chat(user, "<span class='notice'>You hit the metal foam to no effect.</span>")
 
 /obj/structure/foamedmetal/CanPass(atom/movable/mover, turf/target, height=1.5, air_group = 0)
 	if(air_group)

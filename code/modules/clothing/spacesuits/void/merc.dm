@@ -7,26 +7,17 @@
 	armor = list(
 		melee = ARMOR_MELEE_RESISTANT,
 		bullet = ARMOR_BALLISTIC_RESISTANT,
-		laser = ARMOR_LASER_HANDGUNS,
+		laser = ARMOR_LASER_MAJOR,
 		energy = ARMOR_ENERGY_MINOR,
 		bomb = ARMOR_BOMB_PADDED,
 		bio = ARMOR_BIO_SHIELDED,
 		rad = ARMOR_RAD_SMALL
 		)
 	siemens_coefficient = 0.3
-	species_restricted = list(SPECIES_HUMAN,SPECIES_SKRELL,SPECIES_UNATHI,SPECIES_IPC, SPECIES_VOX)
-	sprite_sheets = list(
-		SPECIES_SKRELL = 'icons/mob/species/skrell/onmob_head_skrell.dmi',
-		SPECIES_UNATHI = 'icons/mob/species/unathi/onmob_head_unathi.dmi',
-		SPECIES_VOX = 'icons/mob/species/vox/onmob_head_vox.dmi'
-		)
-	sprite_sheets_obj = list(
-		SPECIES_UNATHI = 'icons/obj/clothing/species/unathi/obj_head_unathi.dmi',
-		SPECIES_SKRELL = 'icons/obj/clothing/species/skrell/obj_head_skrell.dmi',
-		SPECIES_VOX = 'icons/obj/clothing/species/vox/obj_head_vox.dmi'
-		)
+	species_restricted = list(SPECIES_HUMAN, SPECIES_IPC)
 	camera = /obj/machinery/camera/network/mercenary
-	light_overlay = "explorer_light"
+	light_overlay = "helmet_light_green" //todo: species-specific light overlays
+	tint = 1 //INF, WAS NOTHING (0)
 
 /obj/item/clothing/suit/space/void/merc
 	icon_state = "rig-syndie"
@@ -40,7 +31,7 @@
 	armor = list(
 		melee = ARMOR_MELEE_RESISTANT,
 		bullet = ARMOR_BALLISTIC_RESISTANT,
-		laser = ARMOR_LASER_HANDGUNS,
+		laser = ARMOR_LASER_MAJOR,
 		energy = ARMOR_ENERGY_MINOR,
 		bomb = ARMOR_BOMB_PADDED,
 		bio = ARMOR_BIO_SHIELDED,
@@ -48,20 +39,13 @@
 		)
 	allowed = list(/obj/item/device/flashlight,/obj/item/tank,/obj/item/device/suit_cooling_unit,/obj/item/gun,/obj/item/ammo_magazine,/obj/item/ammo_casing,/obj/item/melee/baton,/obj/item/melee/energy/sword,/obj/item/handcuffs)
 	siemens_coefficient = 0.3
-	species_restricted = list(SPECIES_HUMAN,SPECIES_SKRELL,SPECIES_UNATHI,SPECIES_IPC, SPECIES_VOX)
-	sprite_sheets = list(
-		SPECIES_UNATHI = 'icons/mob/species/unathi/onmob_suit_unathi.dmi',
-		SPECIES_VOX = 'icons/mob/species/vox/onmob_suit_vox.dmi'
-		)
-	sprite_sheets_obj = list(
-		SPECIES_UNATHI = 'icons/obj/clothing/species/unathi/obj_suit_unathi.dmi',
-		SPECIES_SKRELL = 'icons/obj/clothing/species/skrell/obj_suit_skrell.dmi',
-		SPECIES_VOX = 'icons/obj/clothing/species/vox/obj_suit_vox.dmi'
-		)
+	species_restricted = list(SPECIES_HUMAN, SPECIES_SKRELL, SPECIES_IPC)
 
+/obj/item/clothing/suit/space/void/merc/New()
+	..()
+	slowdown_per_slot[slot_wear_suit] = 1
 
 /obj/item/clothing/suit/space/void/merc/prepared
 	helmet = /obj/item/clothing/head/helmet/space/void/merc
 	boots = /obj/item/clothing/shoes/magboots
 	tank = /obj/item/tank/oxygen
-	item_flags = ITEM_FLAG_THICKMATERIAL | ITEM_FLAG_INVALID_FOR_CHAMELEON

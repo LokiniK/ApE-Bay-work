@@ -5,7 +5,22 @@
 		"Service" = TRUE,
 		"Supply" = TRUE
 		)
-	sprites = list("Drone" = "drone-service")
+	languages = list(
+		LANGUAGE_HUMAN_EURO     = TRUE,
+		LANGUAGE_HUMAN_ARABIC   = TRUE,
+		LANGUAGE_HUMAN_INDIAN   = TRUE,
+		LANGUAGE_HUMAN_CHINESE  = TRUE,
+		LANGUAGE_HUMAN_IBERIAN  = TRUE,
+		LANGUAGE_HUMAN_RUSSIAN  = TRUE,
+		LANGUAGE_HUMAN_SELENIAN = TRUE,
+		LANGUAGE_UNATHI_SINTA   = TRUE,
+		LANGUAGE_SKRELLIAN      = TRUE,
+		LANGUAGE_SPACER         = TRUE
+		)
+	sprites = list(
+		"Drone" = "drone-service",
+		"Ver 06" = "wer6-Service" //INF
+	)
 	equipment = list(
 		/obj/item/device/flash,
 		/obj/item/pen/robopen,
@@ -22,11 +37,11 @@
 	emag = /obj/item/stamp/chameleon
 	synths = list(/datum/matter_synth/package_wrap)
 	skills = list(
-		SKILL_BUREAUCRACY         = SKILL_MASTER,
-		SKILL_FINANCE             = SKILL_MASTER,
-		SKILL_COMPUTER            = SKILL_EXPERIENCED,
-		SKILL_SCIENCE             = SKILL_EXPERIENCED,
-		SKILL_DEVICES             = SKILL_EXPERIENCED
+		SKILL_BUREAUCRACY         = SKILL_PROF,
+		SKILL_FINANCE             = SKILL_PROF,
+		SKILL_COMPUTER            = SKILL_EXPERT,
+		SKILL_SCIENCE             = SKILL_EXPERT,
+		SKILL_DEVICES             = SKILL_EXPERT
 	)
 
 /obj/item/robot_module/flying/filing/finalize_synths()

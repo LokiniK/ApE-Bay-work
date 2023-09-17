@@ -10,26 +10,22 @@
 	required_access = access_merchant
 	var/obj/machinery/merchant_pad/pad = null
 	var/current_merchant = 0
-	var/show_trades = FALSE
-	var/hailed_merchant = FALSE
+	var/show_trades = 0
+	var/hailed_merchant = 0
 	var/last_comms = null
 	var/temp = null
-	/// Stores the money deposited into the merchant program
-	var/bank = 0
+	var/bank = 0 //A straight up money till
 
 /datum/nano_module/program/merchant
 	name = "Merchant's List"
 
-/datum/computer_file/program/merchant/proc/get_merchant(index)
-	if (!index)
-		return
-	var/count = length(GLOB.trader_types)
-	if (!count)
-		return
-	var/trader_type = GLOB.trader_types[clamp(index, 1, count)]
-	return GLOB.traders[trader_type]
+/datum/computer_file/program/merchant/proc/get_merchant(var/num)
+	if(num > SStrade.traders.len)
+		num = SStrade.traders.len
+	if(num)
+		return SStrade.traders[num]
 
-/datum/nano_module/program/merchant/ui_interact(mob/user, ui_key = "main", datum/nanoui/ui = null, force_open = 1, datum/topic_state/state = GLOB.default_state)
+/datum/nano_module/program/merchant/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1, var/datum/topic_state/state = GLOB.default_state)
 	var/list/data = host.initial_data()
 	var/show_trade = 0
 	var/hailed = 0
@@ -51,8 +47,8 @@
 		data["hailed"]     = hailed
 		if(show_trade)
 			var/list/trades = list()
-			if(length(T.trading_items))
-				for(var/i in 1 to length(T.trading_items))
+			if(T.trading_items.len)
+				for(var/i in 1 to T.trading_items.len)
 					trades += T.print_trading_items(i)
 			data["trades"] = trades
 	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
@@ -69,15 +65,15 @@
 
 /datum/computer_file/program/merchant/proc/test_fire()
 	if(pad && pad.get_target())
-		return TRUE
-	return FALSE
+		return 1
+	return 0
 
-/datum/computer_file/program/merchant/proc/get_response(datum/trade_response/tr)
+/datum/computer_file/program/merchant/proc/get_response(var/datum/trade_response/tr)
 	last_comms = tr.text
 	bank += tr.money_delta
 	return tr.success
 
-/datum/computer_file/program/merchant/proc/offer_money(datum/trader/T, num, skill)
+/datum/computer_file/program/merchant/proc/offer_money(var/datum/trader/T, var/num, skill)
 	var/quantity = 1
 	if(pad)
 		get_response(T.offer_money_for_bulk(quantity, num, bank, get_turf(pad), skill))
@@ -97,18 +93,18 @@
 	else
 		last_comms = "PAD NOT CONNECTED"
 
-/datum/computer_file/program/merchant/proc/bribe(datum/trader/T, amt)
+/datum/computer_file/program/merchant/proc/bribe(var/datum/trader/T, var/amt)
 	if(bank < amt)
 		last_comms = "ERROR: NOT ENOUGH FUNDS."
 		return
 	get_response(T.bribe_to_stay_longer(amt))
 
-/datum/computer_file/program/merchant/proc/offer_item(datum/trader/T, num, skill)
+/datum/computer_file/program/merchant/proc/offer_item(var/datum/trader/T, var/num, skill)
 	var/quantity = 1
 	if(pad)
 		var/list/targets = pad.get_targets()
 		for(var/target in targets)
-			if(!computer.emagged() && istype(target,/mob/living/carbon/human))
+			if(!computer_emagged && istype(target,/mob/living/carbon/human))
 				last_comms = "SAFETY LOCK ENABLED: SENTIENT MATTER UNTRANSMITTABLE"
 				return
 		get_response(T.offer_items_for_bulk(quantity, targets, num, get_turf(pad), skill))
@@ -126,14 +122,14 @@
 	if(pad)
 		var/list/targets = pad.get_targets()
 		for(var/target in targets)
-			if(!computer.emagged() && istype(target,/mob/living/carbon/human))
+			if(!computer_emagged && istype(target,/mob/living/carbon/human))
 				last_comms = "SAFETY LOCK ENABLED: SENTIENT MATTER UNTRANSMITTABLE"
 				return
 		get_response(T.offer_items_for_bulk(quantity, targets, num, get_turf(pad), skill))
 	else
 		last_comms = "PAD NOT CONNECTED"
 
-/datum/computer_file/program/merchant/proc/sell_items(datum/trader/T, skill)
+/datum/computer_file/program/merchant/proc/sell_items(var/datum/trader/T, skill)
 	if(pad)
 		var/list/targets = pad.get_targets()
 		get_response(T.sell_items(targets, skill))
@@ -156,6 +152,9 @@
 	if(!pad)
 		last_comms = "PAD NOT CONNECTED. CANNOT TRANSFER"
 		return
+	if(bank <= 0)
+		last_comms = "NO CASH DETECTED"
+		return
 	var/turf/T = get_turf(pad)
 	var/obj/item/spacecash/bundle/B = new(T)
 	B.worth = bank
@@ -164,90 +163,90 @@
 
 /datum/computer_file/program/merchant/Topic(href, href_list)
 	if(..())
-		return TOPIC_HANDLED
+		return 1
 	var/mob/user = usr
 	if(href_list["PRG_connect_pad"])
-		. = TOPIC_HANDLED
+		. = 1
 		connect_pad()
 	if(href_list["PRG_continue"])
-		. = TOPIC_HANDLED
+		. = 1
 		temp = null
 	if(href_list["PRG_transfer_to_bank"])
-		. = TOPIC_HANDLED
+		. = 1
 		transfer_to_bank()
 	if(href_list["PRG_get_money"])
-		. = TOPIC_HANDLED
+		. = 1
 		get_money()
 	if(href_list["PRG_main_menu"])
-		. = TOPIC_HANDLED
+		. = 1
 		current_merchant = 0
 	if(href_list["PRG_merchant_list"])
-		if (!length(GLOB.trader_types))
-			. = TOPIC_NOACTION
+		if(SStrade.traders.len == 0)
+			. = 0
 			temp = "Cannot find any traders within broadcasting range."
 		else
-			. = TOPIC_HANDLED
+			. = 1
 			current_merchant = 1
-			hailed_merchant = FALSE
+			hailed_merchant = 0
 			last_comms = null
 	if(href_list["PRG_test_fire"])
-		. = TOPIC_HANDLED
+		. = 1
 		if(test_fire())
 			temp = "Test Fire Successful"
 		else
 			temp = "Test Fire Unsuccessful"
 	if(href_list["PRG_scroll"])
-		. = TOPIC_HANDLED
+		. = 1
 		var/scrolled = 0
 		switch(href_list["PRG_scroll"])
 			if("right")
 				scrolled = 1
 			if("left")
 				scrolled = -1
-		var/new_merchant  = clamp(current_merchant + scrolled, 1, length(GLOB.trader_types))
+		var/new_merchant  = Clamp(current_merchant + scrolled, 1, SStrade.traders.len)
 		if(new_merchant != current_merchant)
-			hailed_merchant = FALSE
+			hailed_merchant = 0
 			last_comms = null
 		current_merchant = new_merchant
 	if(current_merchant)
 		var/datum/trader/T = get_merchant(current_merchant)
 		if(!hailed_merchant)
 			if(href_list["PRG_hail"])
-				. = TOPIC_HANDLED
+				. = 1
 				hailed_merchant = get_response(T.hail(user))
-				show_trades = FALSE
-			. = TOPIC_HANDLED
+				show_trades = 0
+			. = 1
 		else
 			if(href_list["PRG_show_trades"])
-				. = TOPIC_HANDLED
+				. = 1
 				show_trades = !show_trades
 			if(href_list["PRG_insult"])
-				. = TOPIC_HANDLED
+				. = 1
 				get_response(T.insult())
 			if(href_list["PRG_compliment"])
-				. = TOPIC_HANDLED
+				. = 1
 				get_response(T.compliment())
 			if(href_list["PRG_offer_item"])
-				. = TOPIC_HANDLED
+				. = 1
 				offer_item(T,text2num(href_list["PRG_offer_item"]) + 1, user.get_skill_value(SKILL_FINANCE))
 			if(href_list["PRG_offer_item_for_bulk"])
-				. = TOPIC_HANDLED
+				. = 1
 				offer_item_bulk(T,text2num(href_list["PRG_offer_item_for_bulk"]) + 1, user.get_skill_value(SKILL_FINANCE))
 			if(href_list["PRG_how_much_do_you_want"])
-				. = TOPIC_HANDLED
+				. = 1
 				get_response(T.how_much_do_you_want(text2num(href_list["PRG_how_much_do_you_want"]) + 1, user.get_skill_value(SKILL_FINANCE)))
 			if(href_list["PRG_offer_money_for_item"])
-				. = TOPIC_HANDLED
+				. = 1
 				offer_money(T, text2num(href_list["PRG_offer_money_for_item"])+1, user.get_skill_value(SKILL_FINANCE))
 			if(href_list["PRG_offer_money_for_bulk"])
-				. = TOPIC_HANDLED
+				. = 1
 				offer_bulk(T, text2num(href_list["PRG_offer_money_for_bulk"])+1, user.get_skill_value(SKILL_FINANCE))
 			if(href_list["PRG_what_do_you_want"])
-				. = TOPIC_HANDLED
+				. = 1
 				get_response(T.what_do_you_want())
 			if(href_list["PRG_sell_items"])
-				. = TOPIC_HANDLED
+				. = 1
 				sell_items(T, user.get_skill_value(SKILL_FINANCE))
 			if(href_list["PRG_bribe"])
-				. = TOPIC_HANDLED
+				. = 1
 				bribe(T, text2num(href_list["PRG_bribe"]))

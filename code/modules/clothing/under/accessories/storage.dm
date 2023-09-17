@@ -1,21 +1,19 @@
 /obj/item/clothing/accessory/storage
-	abstract_type = /obj/item/clothing/accessory/storage
 	name = "base storage accessory"
-	icon_state = null
+	icon_state = "webbing"
 	slot = ACCESSORY_SLOT_UTILITY
 	w_class = ITEM_SIZE_NORMAL
-	accessory_flags = ACCESSORY_REMOVABLE | ACCESSORY_HIGH_VISIBILITY
-	on_rolled_down = ACCESSORY_ROLLED_NONE
+	high_visibility = 1
+	on_rolled = list("down" = "none")
 
 	var/obj/item/storage/internal/container
 	var/max_w_class = ITEM_SIZE_SMALL
 	var/slots
 
-
 /obj/item/clothing/accessory/storage/Initialize()
 	. = ..()
-	if (. == INITIALIZE_HINT_QDEL)
-		return
+	INIT_SKIP_QDELETED
+	INIT_DISALLOW_TYPE(/obj/item/clothing/accessory/storage)
 	if (!slots)
 		. = INITIALIZE_HINT_QDEL
 		crash_with("[type] created with no slots")
@@ -24,30 +22,25 @@
 	else
 		container = new /obj/item/storage/internal/pockets (src, slots, max_w_class)
 
-
 /obj/item/clothing/accessory/storage/attack_hand(mob/user)
 	if (container)
-		if (parent)
+		if (has_suit)
 			container.open(user)
 		else if (container.handle_attack_hand(user))
 			..(user)
 
-
 /obj/item/clothing/accessory/storage/MouseDrop(obj/over_object)
-	if (!parent && container?.handle_mousedrop(usr, over_object))
+	if (!has_suit && container?.handle_mousedrop(usr, over_object))
 		..(over_object)
-
 
 /obj/item/clothing/accessory/storage/attackby(obj/item/I, mob/user)
 	if (container)
 		return container.attackby(I, user)
 
-
 /obj/item/clothing/accessory/storage/emp_act(severity)
 	if (container)
 		container.emp_act(severity)
 	..()
-
 
 /obj/item/clothing/accessory/storage/attack_self(mob/user)
 	add_fingerprint(user)
@@ -64,15 +57,16 @@
 		return
 	container.finish_bulk_removal()
 	visible_message("\The [user] empties \the [src].", range = 5)
-
+	return TRUE
 
 /obj/item/clothing/accessory/storage/pockets
 	name = "pockets"
 	desc = "A bag-like receptacle fastened to an article of clothing to hold small items."
 	icon_state = ""
 	slots = 2 STORAGE_FREEFORM
-	accessory_flags = ACCESSORY_HIGH_VISIBILITY | ACCESSORY_HIDDEN
-
+	high_visibility = FALSE
+	removable = FALSE
+	hidden = TRUE
 
 /obj/item/clothing/accessory/storage/webbing
 	name = "webbing"
@@ -81,14 +75,12 @@
 	slots = 3 STORAGE_SLOTS
 	body_location = UPPER_TORSO
 
-
 /obj/item/clothing/accessory/storage/webbing_large
 	name = "large webbing"
 	desc = "A sturdy mess of straps and buckles with small pockets and pouches."
 	icon_state = "webbing_large"
 	slots = 4 STORAGE_FREEFORM
 	body_location = UPPER_TORSO
-
 
 /obj/item/clothing/accessory/storage/black_vest
 	name = "black webbing vest"
@@ -97,14 +89,12 @@
 	slots = 5 STORAGE_FREEFORM
 	body_location = UPPER_TORSO
 
-
 /obj/item/clothing/accessory/storage/brown_vest
 	name = "brown webbing vest"
 	desc = "A sturdy brown vest with lots of small pockets and pouches."
 	icon_state = "vest_brown"
 	slots = 5 STORAGE_FREEFORM
 	body_location = UPPER_TORSO
-
 
 /obj/item/clothing/accessory/storage/white_vest
 	name = "white webbing vest"
@@ -113,14 +103,12 @@
 	slots = 5 STORAGE_FREEFORM
 	body_location = UPPER_TORSO
 
-
 /obj/item/clothing/accessory/storage/black_drop
 	name = "black drop bag"
 	desc = "A robust black leg bag with plenty of room inside."
 	icon_state = "thigh_black"
 	slots = 5 STORAGE_FREEFORM
 	body_location = LEGS
-
 
 /obj/item/clothing/accessory/storage/brown_drop
 	name = "brown drop bag"
@@ -129,14 +117,12 @@
 	slots = 5 STORAGE_FREEFORM
 	body_location = LEGS
 
-
 /obj/item/clothing/accessory/storage/white_drop
 	name = "white drop bag"
 	desc = "A stoic white leg bag with plenty of room inside."
 	icon_state = "thigh_white"
 	slots = 5 STORAGE_FREEFORM
 	body_location = LEGS
-
 
 /obj/item/clothing/accessory/storage/knifeharness
 	name = "decorated harness"
@@ -145,17 +131,16 @@
 	slots = 2 STORAGE_SLOTS
 	max_w_class = ITEM_SIZE_NORMAL
 
-
 /obj/item/clothing/accessory/storage/knifeharness/Initialize()
 	. = ..()
+	INIT_SKIP_QDELETED
 	if (container)
 		container.can_hold = list(
 			/obj/item/material/hatchet,
 			/obj/item/material/knife
 		)
 		for (var/i = 1 to abs(slots))
-			new /obj/item/material/knife/unathi (container)
-
+			new /obj/item/material/knife/table/unathi (container)
 
 /obj/item/clothing/accessory/storage/bandolier
 	name = "bandolier"
@@ -164,9 +149,9 @@
 	slots = 10 STORAGE_SLOTS
 	max_w_class = ITEM_SIZE_NORMAL
 
-
 /obj/item/clothing/accessory/storage/bandolier/Initialize()
 	. = ..()
+	INIT_SKIP_QDELETED
 	if (container)
 		container.can_hold = list(
 			/obj/item/ammo_casing,
@@ -176,7 +161,7 @@
 			/obj/item/rcd_ammo,
 			/obj/item/reagent_containers/syringe,
 			/obj/item/reagent_containers/hypospray,
-			/obj/item/reagent_containers/hypospray/autoinjector/inaprovaline,
+			/obj/item/reagent_containers/hypospray/autoinjector,
 			/obj/item/syringe_cartridge,
 			/obj/item/plastique,
 			/obj/item/clothing/mask/smokable,
@@ -194,9 +179,9 @@
 			/obj/item/storage/pill_bottle
 		)
 
-
 /obj/item/clothing/accessory/storage/bandolier/safari/Initialize()
 	. = ..()
+	INIT_SKIP_QDELETED
 	if (container)
 		for(var/i = 1 to abs(slots))
 			new /obj/item/net_shell (container)

@@ -1,4 +1,4 @@
-// 'Interfaces' are procs that the ai_holder datum uses to communicate its will to the mob its attached.
+// 'Interfaces' are procs that the ai_holderdatum uses to communicate its will to the mob its attached.
 // The reason for using this proc in the middle is to ensure the AI has some form of compatibility with most mob types,
 // since some actions work very differently between mob types (e.g. executing an attack as a simple animal compared to a human).
 // The AI can just call holder.IAttack(target) and the mob is responsible for determining how to actually attack the target.
@@ -72,20 +72,22 @@
 
 // Respects move cooldowns as if it had a client.
 // Also tries to avoid being superdumb with moving into certain tiles (unless that's desired).
-/mob/living/proc/IMove(turf/newloc, safety = TRUE)
+/mob/living/proc/IMove(dir, safety = TRUE)
 
-	if (!newloc)
-		return MOVEMENT_FAILED
+	var/turf/newloc
+	if (istype(dir, /turf))
+		newloc = dir
+		dir = get_dir(src, dir)
+	else
+		newloc = get_step(src, dir)
 
-	var/dir = get_dir(src, newloc)
+	if (!checkMoveCooldown())
+		return MOVEMENT_ON_COOLDOWN
 
 	// Check to make sure moving to newloc won't actually kill us. e.g. we're a slime and trying to walk onto water.
 	if (istype(newloc))
 		if (safety && !newloc.is_safe_to_enter(src))
 			return MOVEMENT_FAILED
-
-	if (!Process_Spacemove())
-		return MOVEMENT_FAILED
 
 	// Move()ing to another tile successfully returns 32 because BYOND. Would rather deal with TRUE/FALSE-esque terms.
 	// Note that moving to the same tile will be 'successful'.
@@ -96,7 +98,10 @@
 	if (!old_T.Adjacent(newloc))
 		return MOVEMENT_FAILED
 
-	. = SelfMove(dir) ? MOVEMENT_SUCCESSFUL : MOVEMENT_FAILED
+	. = Move(newloc, dir) ? MOVEMENT_SUCCESSFUL : MOVEMENT_FAILED
 	if (. == MOVEMENT_SUCCESSFUL)
 		set_dir(get_dir(old_T, newloc))
+		// Apply movement delay.
+		// Player movement has more factors but its all in the client and fixing that would be its own project.
+		SetMoveCooldown(movement_delay())
 	return

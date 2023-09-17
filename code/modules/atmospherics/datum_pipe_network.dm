@@ -14,10 +14,10 @@
 		line_member.network = null
 	for(var/obj/machinery/atmospherics/normal_member in normal_members)
 		normal_member.reassign_network(src, null)
-	gases.Cut()  // Do not qdel the gases, we don't own them
-	leaks.Cut()
-	normal_members.Cut()
-	line_members.Cut()
+	LAZYCLEARLIST(gases)  // Do not qdel the gases, we don't own them
+	LAZYCLEARLIST(leaks)
+	LAZYCLEARLIST(normal_members)
+	LAZYCLEARLIST(line_members)
 	return ..()
 
 /datum/pipe_network/Process()
@@ -41,7 +41,7 @@
 
 	update_network_gases()
 
-	if((length(normal_members)>0)||(length(line_members)>0))
+	if((normal_members.len>0)||(line_members.len>0))
 		START_PROCESSING_PIPENET(src)
 		return 1
 	qdel(src)

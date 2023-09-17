@@ -10,6 +10,7 @@
 
 /obj/effect/overmap/visitable/ship/landable/skrellscoutship
 	name = "light skrellian vessel"
+	scanner_name = "light skrellian vessel"
 	shuttle = "Skrellian Scout"
 	multiz = 1
 	icon_state = "ship"
@@ -24,11 +25,12 @@
 
 
 /obj/effect/overmap/visitable/ship/landable/skrellscoutship/New()
-	name = "SSV [pick("Xilvuxix", "Zuuvixix", "Quizuu", "Vulzxixvuu","Quumzoox","Quuvuzxuu")]"
+	scanner_name = "SSV [pick("Xilvuxix", "Zuuvixix", "Quizuu", "Vulzxixvuu","Quumzoox","Quuvuzxuu")]"
 	..()
 
 /obj/effect/overmap/visitable/ship/landable/skrellscoutshuttle
 	name = "SSV-S"
+	scanner_name = "SSV-S"
 	shuttle = "Skrellian Shuttle"
 	fore_dir = WEST
 	color = "#880088"
@@ -44,7 +46,7 @@
 		/area/ship/skrellscoutship/command/bridge, /area/ship/skrellscoutship/wings/port, /area/ship/skrellscoutship/wings/starboard,
 		/area/ship/skrellscoutship/brig, /area/ship/skrellscoutship/portcheckpoint, /area/ship/skrellscoutship/forestorage,
 		/area/ship/skrellscoutship/externalwing/port, /area/ship/skrellscoutship/externalwing/starboard, /area/ship/skrellscoutship/corridor,
-		/area/ship/skrellscoutship/crew/quarters, /area/ship/skrellscoutship/crew/medbay, /area/ship/skrellscoutship/crew/labs,
+		/area/ship/skrellscoutship/crew/quarters, /area/ship/skrellscoutship/crew/medbay, /area/ship/skrellscoutship/crew/kitchen,
 		/area/ship/skrellscoutship/maintenance/power, /area/ship/skrellscoutship/hangar, /area/ship/skrellscoutship/command/armory,
 		/area/ship/skrellscoutship/dock, /area/ship/skrellscoutship/maintenance/atmos, /area/ship/skrellscoutship/robotics,
 		/area/ship/skrellscoutship/crew/rec
@@ -52,7 +54,7 @@
 	defer_initialisation = TRUE
 	knockdown = FALSE
 	flags = SHUTTLE_FLAGS_PROCESS
-	skill_needed = SKILL_UNSKILLED
+	skill_needed = SKILL_NONE
 	ceiling_type = /turf/simulated/floor/shuttle_ceiling/skrell
 
 /obj/effect/shuttle_landmark/skrellscoutship/start
@@ -67,7 +69,7 @@
 	shuttle_area = /area/ship/skrellscoutshuttle
 	defer_initialisation = TRUE
 	flags = SHUTTLE_FLAGS_PROCESS
-	skill_needed = SKILL_UNSKILLED
+	skill_needed = SKILL_NONE
 	ceiling_type = /turf/simulated/floor/shuttle_ceiling/skrell
 	mothershuttle = "Skrellian Scout"
 

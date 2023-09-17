@@ -13,7 +13,7 @@
 /datum/map/torch/send_welcome()
 	var/obj/effect/overmap/visitable/ship/torch = SSshuttle.ship_by_type(/obj/effect/overmap/visitable/ship/torch)
 
-	var/welcome_text = "<center><img src = sollogo.png /><br />[FONT_LARGE("<b>SEV Torch</b> Sensor Readings:")]<br>"
+	var/welcome_text = "<center><img src = sollogo.png /><br /><font size = 3><b>SEV Torch</b> Sensor Readings:</font><br>"
 	welcome_text += "Report generated on [stationdate2text()] at [stationtime2text()]</center><br /><br />"
 	welcome_text += "<hr>Current system:<br /><b>[torch ? system_name : "Unknown"]</b><br /><br>"
 
@@ -35,13 +35,22 @@
 				continue
 			space_things |= O
 
+		var/list/distress_calls
 		for(var/obj/effect/overmap/visitable/O in space_things)
 			var/location_desc = " at present co-ordinates."
 			if(O.loc != torch.loc)
-				var/bearing = get_bearing(torch, O)
+				var/bearing = round(90 - Atan2(O.x - torch.x, O.y - torch.y),5) //fucking triangles how do they work
+				if(bearing < 0)
+					bearing += 360
 				location_desc = ", bearing [bearing]."
+			if(O.has_distress_beacon)
+				LAZYADD(distress_calls, "[O.has_distress_beacon][location_desc]")
 			welcome_text += "<li>\A <b>[O.name]</b>[location_desc]</li>"
 
+		if(LAZYLEN(distress_calls))
+			welcome_text += "<br><b>Distress calls logged:</b><br>[jointext(distress_calls, "<br>")]<br>"
+		else
+			welcome_text += "<br>No distress calls logged.<br />"
 		welcome_text += "<hr>"
 
 	post_comm_message("SEV Torch Sensor Readings", welcome_text)

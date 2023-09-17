@@ -6,27 +6,28 @@
 	set category = "IC"
 	return
 
-
 /mob/verb/say_verb(message as text)
 	set name = "Say"
 	set category = "IC"
+	remove_typing_indicator()
 	usr.say(message)
-
 
 /mob/verb/me_verb(message as text)
 	set name = "Me"
 	set category = "IC"
+
 	message = sanitize(message)
+
+	remove_typing_indicator()
 	if(use_me)
 		usr.emote("me",usr.emote_type,message)
 	else
 		usr.emote(message)
 
+/mob/proc/say_dead(var/message)
+	communicate(/decl/communication_channel/dsay, client, message)
 
-/mob/proc/say_dead(message)
-	communicate(/singleton/communication_channel/dsay, client, message)
-
-/mob/proc/say_understands(mob/other,datum/language/speaking = null)
+/mob/proc/say_understands(var/mob/other,var/datum/language/speaking = null)
 
 	if (src.stat == 2)		//Dead
 		return 1
@@ -52,23 +53,41 @@
 
 	//Language check.
 	for(var/datum/language/L in src.languages)
-		if(speaking.name == L.name)
+		if(speaking.name == L.name && !(L.flags & BAD_SPEAKER)) //INF
 			return 1
 
 	return 0
 
-/mob/proc/say_quote(message, datum/language/speaking = null)
-	var/ending = copytext(message, -1)
+/mob/proc/say_quote(var/message, var/datum/language/speaking = null)
+	var/ending = copytext(message, length(message) - 1)
 	if(speaking)
 		return speaking.get_spoken_verb(ending)
 
 	var/verb = pick(speak_emote)
-	if(verb == "says") //a little bit of a hack, but we can't let speak_emote default to an empty list without breaking other things
-		if(ending == "!")
-			verb = pick("exclaims","shouts","yells")
-		else if(ending == "?")
-			verb ="asks"
+	if(verb == "говорит") //a little bit of a hack, but we can't let speak_emote default to an empty list without breaking other things
+		if(ending == "!!")
+			verb = "кричит"
+		else if(copytext(ending, length(ending)) == "!")
+			verb = pick("восклицает")
+		else if(copytext(ending, length(ending)) == "?")
+			verb = "спрашивает"
 	return verb
+
+/// Transforms the speech emphasis mods from [/atom/movable/proc/say_emphasis] into the appropriate HTML tags. Includes escaping.
+#define ENCODE_HTML_EMPHASIS(input, char, html, varname) \
+	var/static/regex/##varname = regex("(?<!\\\\)[char](.+?)(?<!\\\\)[char]", "g");\
+	input = varname.Replace_char(input, "<[html]>$1</[html]>")
+
+/// Scans the input sentence for speech emphasis modifiers, notably |italics|, +bold+, and _underline_ -mothblocks
+/// Infinity: _italics_ and +bold+
+/mob/proc/say_emphasis(input)
+	ENCODE_HTML_EMPHASIS(input, "_", "i", italics)
+	ENCODE_HTML_EMPHASIS(input, "\\+", "b", bold)
+	var/static/regex/remove_escape_backlashes = regex("\\\\(_|\\+)", "g") // Removes backslashes used to escape text modification.
+	input = remove_escape_backlashes.Replace_char(input, "$1")
+	return input
+
+#undef ENCODE_HTML_EMPHASIS
 
 /mob/proc/get_ear()
 	// returns an atom representing a location on the map from which this
@@ -78,8 +97,8 @@
 
 	return get_turf(src)
 
-/mob/proc/say_test(text)
-	var/ending = copytext(text, -1)
+/mob/proc/say_test(var/text)
+	var/ending = copytext(text, length(text))
 	if (ending == "?")
 		return "1"
 	else if (ending == "!")
@@ -89,8 +108,8 @@
 //parses the message mode code (e.g. :h, :w) from text, such as that supplied to say.
 //returns the message mode string or null for no message mode.
 //standard mode is the mode returned for the special ';' radio code.
-/mob/proc/parse_message_mode(message, standard_mode="headset")
-	if(length(message) >= 1 && copytext_char(message,1,2) == get_prefix_key(/singleton/prefix/radio_main_channel))
+/mob/proc/parse_message_mode(var/message, var/standard_mode="headset")
+	if(length(message) >= 1 && copytext_char(message,1,2) == get_prefix_key(/decl/prefix/radio_main_channel))
 		return standard_mode
 
 	if(length(message) >= 2)
@@ -101,9 +120,9 @@
 
 //parses the language code (e.g. :j) from text, such as that supplied to say.
 //returns the language object only if the code corresponds to a language that src can speak, otherwise null.
-/mob/proc/parse_language(message)
+/mob/proc/parse_language(var/message)
 	var/prefix = copytext_char(message,1,2)
-	if(length(message) >= 1 && prefix == get_prefix_key(/singleton/prefix/audible_emote))
+	if(length(message) >= 1 && prefix == get_prefix_key(/decl/prefix/audible_emote))
 		return all_languages["Noise"]
 
 	if(length(message) >= 2 && is_language_prefix(prefix))

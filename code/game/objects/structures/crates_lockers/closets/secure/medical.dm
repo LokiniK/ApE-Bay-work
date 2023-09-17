@@ -14,7 +14,7 @@
 /obj/structure/closet/secure_closet/medical1
 	name = "medical equipment closet"
 	desc = "Filled with medical junk."
-	closet_appearance = /singleton/closet_appearance/secure_closet/medical
+	icon_state = "med"
 	req_access = list(access_medical_equip)
 
 /obj/structure/closet/secure_closet/medical1/WillContain()
@@ -27,13 +27,14 @@
 		/obj/item/reagent_containers/glass/bottle/antitoxin = 2,
 		/obj/random/firstaid,
 		/obj/item/storage/box/masks,
-		/obj/item/storage/box/latexgloves
+		/obj/item/storage/box/gloves
 	)
 
 /obj/structure/closet/secure_closet/medical2
 	name = "anesthetics closet"
 	desc = "Used to knock people out."
 	req_access = list(access_surgery)
+	icon_state = "med"
 
 /obj/structure/closet/secure_closet/medical2/WillContain()
 	return list(
@@ -44,7 +45,7 @@
 /obj/structure/closet/secure_closet/medical3
 	name = "medical doctor's locker"
 	req_access = list(access_medical_equip)
-	closet_appearance = /singleton/closet_appearance/secure_closet/medical/alt
+	icon_state = "med"
 
 /obj/structure/closet/secure_closet/medical3/WillContain()
 	return list(
@@ -68,7 +69,7 @@
 /obj/structure/closet/secure_closet/paramedic
 	name = "paramedic locker"
 	desc = "Supplies for a first responder."
-	closet_appearance = /singleton/closet_appearance/secure_closet/medical
+	icon_state = "med"
 	req_access = list(access_medical_equip)
 
 /obj/structure/closet/secure_closet/paramedic/WillContain()
@@ -83,12 +84,12 @@
 	    /obj/item/clothing/suit/storage/toggle/labcoat,
 	    /obj/item/device/radio/headset/headset_med,
 	    /obj/item/device/flashlight,
-	    /obj/item/tank/oxygen_emergency_extended,
+	    /obj/item/tank/emergency/oxygen/engi,
 	    /obj/item/clothing/glasses/hud/health,
 	    /obj/item/device/scanner/health,
 	    /obj/item/device/radio/off,
 	    /obj/random/medical,
-	    /obj/item/crowbar,
+	    /obj/item/crowbar/prybar,
 	    /obj/item/extinguisher/mini,
 	    /obj/item/storage/box/freezer,
 	    /obj/item/clothing/accessory/storage/white_vest,
@@ -97,7 +98,7 @@
 /obj/structure/closet/secure_closet/CMO
 	name = "chief medical officer's locker"
 	req_access = list(access_cmo)
-	closet_appearance = /singleton/closet_appearance/secure_closet/cmo
+	icon_state = "cmo"
 
 /obj/structure/closet/secure_closet/CMO/WillContain()
 	return list(
@@ -120,7 +121,8 @@
 /obj/structure/closet/secure_closet/chemical
 	name = "chemical closet"
 	desc = "Store dangerous chemicals in here."
-	closet_appearance = /singleton/closet_appearance/secure_closet/medical
+	icon_state = "med"
+	icon_door = "chemical"
 	req_access = list(access_chemistry)
 
 /obj/structure/closet/secure_closet/chemical/WillContain()
@@ -133,7 +135,7 @@
 /obj/structure/closet/secure_closet/medical_wall
 	name = "first aid closet"
 	desc = "It's a secure wall-mounted storage unit for first aid supplies."
-	closet_appearance = /singleton/closet_appearance/wall/medical
+	closet_appearance = /decl/closet_appearance/wall/medical
 	anchored = TRUE
 	density = FALSE
 	wall_mounted = TRUE
@@ -142,7 +144,7 @@
 
 /obj/structure/closet/secure_closet/counselor
 	name = "counselor's locker"
-	closet_appearance = /singleton/closet_appearance/secure_closet/medical
+	icon_state = "med"
 	req_access = list(access_psychiatrist)
 
 /obj/structure/closet/secure_closet/counselor/WillContain()
@@ -165,7 +167,7 @@
 
 /obj/structure/closet/secure_closet/virology
 	name = "virologist's locker"
-	closet_appearance = /singleton/closet_appearance/secure_closet/medical/virology
+	closet_appearance = /decl/closet_appearance/secure_closet/medical/virology
 
 	req_access = list(access_virology)
 
@@ -180,7 +182,7 @@
 		/obj/item/reagent_containers/syringe/antiviral,
 		/obj/item/reagent_containers/glass/bottle/antitoxin,
 		/obj/item/storage/box/masks,
-		/obj/item/storage/box/latexgloves,
+		/obj/item/storage/box/gloves,
 		/obj/item/clothing/under/rank/virologist,
 		/obj/item/clothing/shoes/white,
 		/obj/item/clothing/suit/storage/toggle/labcoat/virologist,
@@ -192,7 +194,7 @@
 /obj/structure/closet/secure_closet/psychiatry
 	name = "Psychiatrist's locker"
 	desc = "Everything you need to keep the lunatics at bay."
-	closet_appearance = /singleton/closet_appearance/secure_closet/medical/alt
+	closet_appearance = /decl/closet_appearance/secure_closet/medical/alt
 	req_access = list(access_psychiatrist)
 
 /obj/structure/closet/secure_closet/psychiatry/WillContain()

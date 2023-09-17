@@ -1,15 +1,15 @@
 /obj/item/disk/botany
 	name = "flora data disk"
 	desc = "A small disk used for carrying data on plant genetics."
-	icon = 'icons/obj/machines/hydroponics_machines.dmi'
+	icon = 'icons/obj/hydroponics_machines.dmi'
 	icon_state = "disk"
 	w_class = ITEM_SIZE_TINY
 
 	var/list/genes = list()
 	var/genesource = "unknown"
 
-/obj/item/disk/botany/attack_self(mob/user as mob)
-	if(length(genes))
+/obj/item/disk/botany/attack_self(var/mob/user as mob)
+	if(genes.len)
 		var/choice = alert(user, "Are you sure you want to wipe the disk?", "Xenobotany Data", "No", "Yes")
 		if(src && user && genes && choice && choice == "Yes" && user.Adjacent(get_turf(src)))
 			to_chat(user, "You wipe the disk data.")
@@ -24,7 +24,7 @@
 	startswith = list(/obj/item/disk/botany = 14)
 
 /obj/machinery/botany
-	icon = 'icons/obj/machines/hydroponics_machines.dmi'
+	icon = 'icons/obj/hydroponics_machines.dmi'
 	icon_state = "hydrotray3"
 	density = TRUE
 	anchored = TRUE
@@ -80,7 +80,7 @@
 
 	if(isScrewdriver(W))
 		open = !open
-		to_chat(user, SPAN_NOTICE("You [open ? "open" : "close"] the maintenance panel."))
+		to_chat(user, "<span class='notice'>You [open ? "open" : "close"] the maintenance panel.</span>")
 		return
 
 	if(open)
@@ -95,7 +95,7 @@
 		else
 			var/obj/item/disk/botany/B = W
 
-			if(B.genes && length(B.genes))
+			if(B.genes && B.genes.len)
 				if(!disk_needs_genes)
 					to_chat(user, "That disk already has gene data loaded.")
 					return
@@ -119,7 +119,7 @@
 	var/datum/seed/genetics // Currently scanned seed genetic structure.
 	var/degradation = 0     // Increments with each scan, stops allowing gene mods after a certain point.
 
-/obj/machinery/botany/extractor/ui_interact(mob/user, ui_key = "main", datum/nanoui/ui = null, force_open = 1)
+/obj/machinery/botany/extractor/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1)
 
 	if(!user)
 		return
@@ -168,7 +168,7 @@
 		seed.dropInto(loc)
 
 		if(seed.seed.name == "new line" || isnull(SSplants.seeds[seed.seed.name]))
-			seed.seed.uid = length(SSplants.seeds) + 1
+			seed.seed.uid = sequential_id(/datum/seed/)
 			seed.seed.name = "[seed.seed.uid]"
 			SSplants.seeds[seed.seed.name] = seed.seed
 
@@ -203,7 +203,7 @@
 		active = 1
 
 		if(seed && seed.seed)
-			if(prob(user.skill_fail_chance(SKILL_BOTANY, 100, SKILL_TRAINED)))
+			if(prob(user.skill_fail_chance(SKILL_BOTANY, 100, SKILL_ADEPT)))
 				failed_task = 1
 			else
 				genetics = seed.seed
@@ -231,8 +231,8 @@
 		loaded_disk.desc += " The label reads \'gene [SSplants.gene_tag_masks[href_list["get_gene"]]], sampled from [genetics.display_name]\'."
 		eject_disk = 1
 
-		degradation += rand(20,60) + user.skill_fail_chance(SKILL_BOTANY, 100, SKILL_TRAINED)
-		var/expertise = max(0, user.get_skill_value(SKILL_BOTANY) - SKILL_TRAINED)
+		degradation += rand(20,60) + user.skill_fail_chance(SKILL_BOTANY, 100, SKILL_ADEPT)
+		var/expertise = max(0, user.get_skill_value(SKILL_BOTANY) - SKILL_ADEPT)
 		degradation = max(0, degradation - 10*expertise)
 
 		if(degradation >= 100)
@@ -252,10 +252,11 @@
 // of destroying it based on the size/complexity of the plasmid.
 /obj/machinery/botany/editor
 	name = "bioballistic delivery system"
+	icon = 'icons/obj/structures_inf.dmi'
 	icon_state = "traitgun"
 	disk_needs_genes = 1
 
-/obj/machinery/botany/editor/ui_interact(mob/user, ui_key = "main", datum/nanoui/ui = null, force_open = 1)
+/obj/machinery/botany/editor/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1)
 
 	if(!user)
 		return
@@ -269,7 +270,7 @@
 	else
 		data["degradation"] = 0
 
-	if(loaded_disk && length(loaded_disk.genes))
+	if(loaded_disk && loaded_disk.genes.len)
 		data["disk"] = 1
 		data["sourceName"] = loaded_disk.genesource
 		data["locus"] = ""
@@ -318,7 +319,7 @@
 
 		for(var/datum/plantgene/gene in loaded_disk.genes)
 			seed.seed.apply_gene(gene)
-			var/expertise = max(user.get_skill_value(SKILL_BOTANY) - SKILL_TRAINED)
+			var/expertise = max(user.get_skill_value(SKILL_BOTANY) - SKILL_ADEPT)
 			seed.modified += rand(5,10) + min(-5, 30 * expertise)
 
 	usr.set_machine(src)

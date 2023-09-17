@@ -15,10 +15,10 @@
 		"Corporate Representative",
 		"Corporate Executive"
 		)
-	outfit_type = /singleton/hierarchy/outfit/job/torch/passenger/workplace_liaison
+	outfit_type = /decl/hierarchy/outfit/job/torch/passenger/workplace_liaison
 	allowed_branches = list(/datum/mil_branch/civilian)
 	allowed_ranks = list(/datum/mil_rank/civ/contractor)
-	min_skill = list(   SKILL_BUREAUCRACY	= SKILL_EXPERIENCED,
+	min_skill = list(   SKILL_BUREAUCRACY	= SKILL_EXPERT,
 	                    SKILL_FINANCE		= SKILL_BASIC)
 	skill_points = 20
 

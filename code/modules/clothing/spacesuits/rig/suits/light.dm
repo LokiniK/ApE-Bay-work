@@ -4,6 +4,7 @@
 	desc = "A lighter, less armoured rig suit."
 	icon_state = "ninja_rig"
 	suit_type = "light suit"
+	allowed = list(/obj/item/gun,/obj/item/ammo_magazine,/obj/item/ammo_casing,/obj/item/melee/baton,/obj/item/handcuffs,/obj/item/tank,/obj/item/device/suit_cooling_unit,/obj/item/cell)
 	armor = list(
 		melee = ARMOR_MELEE_KNIVES,
 		bullet = ARMOR_BALLISTIC_PISTOL,
@@ -13,9 +14,9 @@
 		)
 	siemens_coefficient = 0.4
 	emp_protection = 10
-	online_slowdown = 0.5
-	offline_slowdown = 1
+	online_slowdown = 0
 	item_flags = ITEM_FLAG_THICKMATERIAL
+	offline_slowdown = TINT_NONE
 	offline_vision_restriction = TINT_NONE
 	max_pressure_protection = LIGHT_RIG_MAX_PRESSURE
 	min_pressure_protection = 0
@@ -25,34 +26,43 @@
 	boot_type =  /obj/item/clothing/shoes/magboots/rig/light
 	glove_type = /obj/item/clothing/gloves/rig/light
 
+	sprite_sheets = list(
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_rig_back_resomi.dmi',
+		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/rig_back.dmi'
+		)
+
 /obj/item/clothing/suit/space/rig/light
-	name = "suit"
 	breach_threshold = 18 //comparable to voidsuits
-	species_restricted = list(SPECIES_HUMAN,SPECIES_IPC)
-	allowed = list(
-		/obj/item/gun,
-		/obj/item/ammo_magazine,
-		/obj/item/ammo_casing,
-		/obj/item/melee/baton,
-		/obj/item/handcuffs,
-		/obj/item/tank,
-		/obj/item/device/suit_cooling_unit,
-		/obj/item/cell
-	)
-	max_w_class = ITEM_SIZE_SMALL
-	slots = 3 STORAGE_FREEFORM
+	sprite_sheets = list(
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_suit_resomi.dmi',
+		SPECIES_TAJARA = 'icons/mob/species/tajaran/suit.dmi'
+		)
+	species_restricted = list(SPECIES_HUMAN,SPECIES_IPC,SPECIES_RESOMI)
 
 /obj/item/clothing/gloves/rig/light
 	name = "gloves"
-	species_restricted = list(SPECIES_HUMAN,SPECIES_IPC)
+	species_restricted = list(SPECIES_HUMAN,SPECIES_IPC,SPECIES_RESOMI)
 
 /obj/item/clothing/shoes/magboots/rig/light
 	name = "shoes"
-	species_restricted = list(SPECIES_HUMAN,SPECIES_IPC)
+	species_restricted = list(SPECIES_HUMAN,SPECIES_IPC,SPECIES_RESOMI)
+
+	stealth_step = TRUE
+
+	sprite_sheets = list(
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_feet_resomi.dmi'
+	)
 
 /obj/item/clothing/head/helmet/space/rig/light
 	name = "hood"
-	species_restricted = list(SPECIES_HUMAN,SPECIES_IPC)
+	species_restricted = list(SPECIES_HUMAN,SPECIES_IPC,SPECIES_RESOMI)
+
+	sprite_sheets = list(
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_head_resomi.dmi',
+		SPECIES_TAJARA = 'icons/mob/species/tajaran/helmet.dmi'
+
+	)
+	tint = 1 //INF, WAS NOTHING
 
 /obj/item/rig/light/hacker
 	name = "cybersuit control module"
@@ -70,8 +80,12 @@
 	glove_type = /obj/item/clothing/gloves/lightrig/hacker
 	boot_type = /obj/item/clothing/shoes/lightrig/hacker
 
+	sprite_sheets = list(
+		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/rig_back.dmi'
+		)
+
 	initial_modules = list(
-		/obj/item/rig_module/ai_container,
+//INF		/obj/item/rig_module/ai_container,
 		/obj/item/rig_module/power_sink,
 		/obj/item/rig_module/datajack,
 		/obj/item/rig_module/electrowarfare_suite,
@@ -105,13 +119,13 @@
 	armor = list(
 		melee = ARMOR_MELEE_KNIVES,
 		bullet = ARMOR_BALLISTIC_PISTOL,
-		laser = ARMOR_LASER_HANDGUNS,
-		energy = ARMOR_ENERGY_RESISTANT,
+		laser = ARMOR_LASER_SMALL,
+		energy = ARMOR_ENERGY_MINOR,
 		bomb = ARMOR_BOMB_PADDED,
 		bio = ARMOR_BIO_SHIELDED
 		)
 	siemens_coefficient = 0.2 //heavy hardsuit level shock protection
-	emp_protection = 30
+	emp_protection = 20
 	online_slowdown = 0
 	aimove_power_usage = 50
 	chest_type = /obj/item/clothing/suit/space/rig/light/ninja
@@ -127,13 +141,18 @@
 		/obj/item/rig_module/vision,
 		/obj/item/rig_module/voice,
 		/obj/item/rig_module/fabricator/energy_net,
-		/obj/item/rig_module/chem_dispenser/ninja,
+		/obj/item/rig_module/chem_dispenser/combat,
 		/obj/item/rig_module/grenade_launcher/ninja,
 		/obj/item/rig_module/ai_container,
 		/obj/item/rig_module/power_sink,
 		/obj/item/rig_module/datajack,
 		/obj/item/rig_module/self_destruct,
 		/obj/item/rig_module/cooling_unit
+		)
+
+	sprite_sheets = list(
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_rig_back_resomi.dmi',
+		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/rig_back.dmi'
 		)
 
 /obj/item/rig/light/ninja/verb/rename_suit()
@@ -171,6 +190,10 @@
 	name = "insulated gloves"
 	siemens_coefficient = 0
 	species_restricted = list(SPECIES_HUMAN,SPECIES_IPC)
+
+	sprite_sheets = list(
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_hands_resomi.dmi'
+	)
 
 /obj/item/clothing/suit/space/rig/light/ninja
 	breach_threshold = 38 //comparable to regular hardsuits

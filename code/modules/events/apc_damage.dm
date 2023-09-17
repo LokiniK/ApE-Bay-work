@@ -26,7 +26,7 @@
 		if(newEpicentre.name == "lightsout")
 			possibleEpicentres += newEpicentre
 
-	if(!length(possibleEpicentres))
+	if(!possibleEpicentres.len)
 		return
 
 	var/epicentre = pick(possibleEpicentres)
@@ -39,11 +39,11 @@
 				apcs += apc
 				apcs += apc
 
-	if(!length(apcs))
+	if(!apcs.len)
 		return
 
 	return pick(apcs)
 
-/datum/event/apc_damage/proc/is_valid_apc(obj/machinery/power/apc/apc)
+/datum/event/apc_damage/proc/is_valid_apc(var/obj/machinery/power/apc/apc)
 	var/turf/T = get_turf(apc)
 	return !apc.is_critical && !apc.emagged && T && (T.z in GLOB.using_map.player_levels)

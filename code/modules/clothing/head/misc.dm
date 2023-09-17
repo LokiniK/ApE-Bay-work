@@ -18,6 +18,12 @@
 	slot_flags = SLOT_HEAD | SLOT_EARS
 	body_parts_covered = 0
 
+/obj/item/clothing/head/wig_longbraided
+	name = "black wig longbraided"
+	icon_state = "wig_longbraided"
+	desc = "Looks nice."
+	body_parts_covered = 0
+
 /obj/item/clothing/head/hairflower/blue
 	icon_state = "hairflower_blue"
 
@@ -39,7 +45,7 @@
 	item_state = "pwig"
 
 /obj/item/clothing/head/that
-	name = "tophat"
+	name = "top-hat"
 	desc = "It's an amish looking hat."
 	icon_state = "tophat"
 	item_state = "tophat"
@@ -59,7 +65,7 @@
 	body_parts_covered = 0
 
 /obj/item/clothing/head/plaguedoctorhat
-	name = "plague doctor hat"
+	name = "plague doctor's hat"
 	desc = "These were once used by Plague doctors. They're pretty much useless."
 	icon_state = "plaguedoctor"
 	permeability_coefficient = 0.01
@@ -72,6 +78,7 @@
 	icon_state = "hasturhood"
 	flags_inv = BLOCKHAIR
 	body_parts_covered = HEAD|FACE|EYES
+	tint = 1  //INF, WAS NOTHING(0)
 
 /obj/item/clothing/head/nursehat
 	name = "nurse's hat"
@@ -91,7 +98,6 @@
 	flags_inv = HIDEMASK|HIDEEARS|HIDEEYES|HIDEFACE|BLOCKHAIR
 	siemens_coefficient = 2.0
 	body_parts_covered = HEAD|FACE|EYES
-	item_flags = null
 
 /obj/item/clothing/head/cueball
 	name = "cueball helmet"
@@ -100,7 +106,6 @@
 	item_state = "cueball"
 	flags_inv = BLOCKHAIR
 	body_parts_covered = HEAD|FACE|EYES
-	item_flags = null
 
 /obj/item/clothing/head/cardborg
 	name = "cardborg helmet"
@@ -109,11 +114,31 @@
 	item_state = "cardborg_h"
 	flags_inv = HIDEMASK|HIDEEARS|HIDEEYES|HIDEFACE
 	body_parts_covered = HEAD|FACE|EYES
-	item_flags = null
+	tint = 1  //INF, WAS NOTHING(0)
 
 /obj/item/clothing/head/cardborg/Initialize()
 	. = ..()
 	set_extension(src, /datum/extension/appearance/cardborg)
+
+/obj/item/clothing/head/justice
+	name = "justice hat"
+	desc = "fight for what's righteous!"
+	icon_state = "justicered"
+	flags_inv = BLOCKHAIR
+	body_parts_covered = HEAD|EYES
+	tint = 1  //INF, WAS NOTHING(0)
+
+/obj/item/clothing/head/justice/blue
+	icon_state = "justiceblue"
+
+/obj/item/clothing/head/justice/yellow
+	icon_state = "justiceyellow"
+
+/obj/item/clothing/head/justice/green
+	icon_state = "justicegreen"
+
+/obj/item/clothing/head/justice/pink
+	icon_state = "justicepink"
 
 /obj/item/clothing/head/rabbitears
 	name = "rabbit ears"
@@ -153,8 +178,19 @@
 /obj/item/clothing/head/bandana
 	name = "pirate bandana"
 	desc = "Yarr."
-	icon_state = "pirate_bandana"
+	icon_state = "bandana"
 	body_parts_covered = 0
+
+/obj/item/clothing/head/bandana/green
+	name = "green bandana"
+	desc = "It's a green bandana with some fine nanotech lining."
+	icon_state = "greenbandana"
+	item_state = "greenbandana"
+
+/obj/item/clothing/head/bandana/orange //themij: Taryn Kifer
+	name = "orange bandana"
+	desc = "An orange piece of cloth, worn on the head."
+	icon_state = "orange_bandana"
 
 /obj/item/clothing/head/bowler
 	name = "bowler-hat"
@@ -240,6 +276,7 @@
 	flags_inv = BLOCKHAIR
 	siemens_coefficient = 0.7
 	body_parts_covered = HEAD|FACE|EYES
+	tint = 1  //INF, WAS NOTHING(0)
 
 /obj/item/clothing/head/bearpelt
 	name = "bear pelt hat"
@@ -260,7 +297,7 @@
 	flags_inv = HIDEMASK|HIDEEARS|HIDEEYES|HIDEFACE|BLOCKHAIR
 	siemens_coefficient = 2.0
 	body_parts_covered = HEAD|FACE|EYES
-	item_flags = null
+	tint = 1  //INF, WAS NOTHING(0)
 
 /obj/item/clothing/head/philosopher_wig
 	name = "natural philosopher's wig"
@@ -292,6 +329,14 @@
 	icon_state = "turban"
 	body_parts_covered = 0
 	flags_inv = BLOCKHEADHAIR //Shows beards!
+
+/obj/item/clothing/head/cap/sec
+	name = "big security cap"
+	desc = "A security cap. This one pretty big."
+	icon_state = "unathi_seccap"
+	item_state = "unathi_seccap"
+	species_restricted = list(SPECIES_UNATHI)
+	flags_inv = BLOCKHEADHAIR
 
 /obj/item/clothing/head/cowboy_hat
 	name = "cowboy hat"
@@ -343,7 +388,6 @@
 	name = "face cover"
 	desc = "A helmet made of plastic. It's completely opaque. This will stop the stare."
 	icon_state = "facecover"
-	valid_accessory_slots = null
 	tint = TINT_BLIND
 	flags_inv = HIDEMASK|HIDEEARS|HIDEEYES|HIDEFACE|BLOCKHAIR
 	body_parts_covered = HEAD|FACE|EYES
@@ -358,35 +402,3 @@
 	name = "\improper SAARE beret"
 	desc = "A gray beret with the emblem of Strategic Assault and Asset Retention Enterprises, a private military corporation. For mercenaries that are more inclined towards style than safety."
 	icon_state = "beret_corporate_saare"
-
-/obj/item/clothing/head/deckcrew
-	name = "deck crew helmet"
-	desc = "A helmet with ear protection and a visor, used in hangars on many ships."
-	icon_state = "deckcrew"
-	flags_inv = BLOCKHEADHAIR
-	volume_multiplier = 0.1
-
-/obj/item/clothing/head/deckcrew/green
-	name = "green deck crew helmet"
-	desc = "A helmet with ear protection and a visor, used by support staff in Fleet hangars."
-	icon_state = "deckcrew_g"
-
-/obj/item/clothing/head/deckcrew/blue
-	name = "blue deck crew helmet"
-	desc = "A helmet with ear protection and a visor, used by tug operators in Fleet hangars."
-	icon_state = "deckcrew_b"
-
-/obj/item/clothing/head/deckcrew/yellow
-	name = "yellow deck crew helmet"
-	desc = "A helmet with ear protection and a visor, used by traffic control in Fleet hangars."
-	icon_state = "deckcrew_y"
-
-/obj/item/clothing/head/deckcrew/purple
-	name = "purple deck crew helmet"
-	desc = "A helmet with ear protection and a visor, used by fueling personnel in Fleet hangars."
-	icon_state = "deckcrew_p"
-
-/obj/item/clothing/head/deckcrew/red
-	name = "red deck crew helmet"
-	desc = "A helmet with ear protection and a visor, used by munitions handlers in Fleet hangars."
-	icon_state = "deckcrew_r"

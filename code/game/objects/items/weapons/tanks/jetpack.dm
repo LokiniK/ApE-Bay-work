@@ -2,12 +2,10 @@
 
 /obj/item/tank/jetpack
 	name = "jetpack (empty)"
-	desc = "The O'Neill Manufacturing VMU-12-U is a tank-based maneuvering pack that uses compressed gas for propulsion in zero-gravity areas. Use with caution."
-	icon = 'icons/obj/jetpacks.dmi'
+	desc = "A tank of compressed gas for use as propulsion in zero-gravity areas. Use with caution."
 	icon_state = "jetpack"
 	gauge_icon = null
 	w_class = ITEM_SIZE_HUGE
-	tank_size = TANK_SIZE_HUGE
 	item_state = "jetpack"
 	distribute_pressure = ONE_ATMOSPHERE*O2STANDARD
 	var/datum/effect/effect/system/trail/ion/ion_trail
@@ -22,14 +20,13 @@
 	ion_trail.set_up(src)
 
 /obj/item/tank/jetpack/Destroy()
-	qdel(ion_trail)
-	..()
+	QDEL_NULL(ion_trail)
+	. = ..()
 
 /obj/item/tank/jetpack/examine(mob/living/user)
 	. = ..()
 	if(air_contents.total_moles < 5)
-		to_chat(user, SPAN_DANGER("The meter on \the [src] indicates you are almost out of gas!"))
-		playsound(src.loc, 'sound/effects/caution.ogg', 50, 1, -6)
+		to_chat(user, "<span class='danger'>The meter on \the [src] indicates you are almost out of gas!</span>")
 
 /obj/item/tank/jetpack/verb/toggle_rockets()
 	set name = "Toggle Jetpack Stabilization"
@@ -55,7 +52,6 @@
 		M.update_action_buttons()
 
 	to_chat(usr, "You toggle the thrusters [on? "on":"off"].")
-	playsound(src.loc, 'sound/effects/turret/open.wav', 50, 1, -6)
 
 /obj/item/tank/jetpack/proc/allow_thrust(num, mob/living/user)
 	if(!(src.on))
@@ -71,27 +67,27 @@
 
 	qdel(G)
 
-/obj/item/tank/jetpack/ui_action_click(mob/living/user)
+/obj/item/tank/jetpack/ui_action_click()
 	toggle()
 
 
 /obj/item/tank/jetpack/void
-	name = "void maneuvering unit"
-	desc = "An ancient model of a zero-gravity propulsion unit, used by the first pioneers of human space travel. Surprisingly reliable."
+	name = "void jetpack (oxygen)"
+	desc = "It works well in a void."
 	icon_state = "jetpack-void"
 	item_state =  "jetpack-void"
 	starting_pressure = list(GAS_OXYGEN = 6*ONE_ATMOSPHERE)
 
 /obj/item/tank/jetpack/oxygen
 	name = "jetpack (oxygen)"
-	desc = "The O'Neill Manufacturing VMU-15-O is a tank-based propulsion unit that uses compressed oxygen for moving in zero-gravity areas. Use with caution."
+	desc = "A tank of compressed oxygen for use as propulsion in zero-gravity areas. Use with caution."
 	icon_state = "jetpack"
 	item_state = "jetpack"
 	starting_pressure = list(GAS_OXYGEN = 6*ONE_ATMOSPHERE)
 
 /obj/item/tank/jetpack/carbondioxide
 	name = "jetpack (carbon dioxide)"
-	desc = "The O'Neill Manufacturing VMU-11-C is a tank-based propulsion unit that utilizes compressed carbon dioxide for moving in zero-gravity areas. <span class='danger'>The label on the side indicates it should not be used as a source for internals.</span>"
+	desc = "A tank of compressed carbon dioxide for use as propulsion in zero-gravity areas. Painted black to indicate that it should not be used as a source for internals."
 	distribute_pressure = 0
 	icon_state = "jetpack-black"
 	item_state =  "jetpack-black"
@@ -100,6 +96,10 @@
 /obj/item/tank/jetpack/rig
 	name = "jetpack"
 	var/obj/item/rig/holder
+
+/obj/item/tank/jetpack/rig/examine()
+	. = ..()
+	CRASH("A [name] was examined")
 
 /obj/item/tank/jetpack/rig/allow_thrust(num, mob/living/user as mob)
 

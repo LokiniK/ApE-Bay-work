@@ -16,7 +16,7 @@
 	var/timer_id
 
 // This is not great.
-/turf/simulated/proc/wet_floor(wet_val = 1, overwrite = FALSE)
+/turf/simulated/proc/wet_floor(var/wet_val = 1, var/overwrite = FALSE)
 	if(wet_val < wet && !overwrite)
 		return
 
@@ -25,12 +25,12 @@
 		wet_overlay = image('icons/effects/water.dmi',src,"wet_floor")
 		overlays += wet_overlay
 
-	timer_id = addtimer(new Callback(src,/turf/simulated/proc/unwet_floor),8 SECONDS, TIMER_STOPPABLE|TIMER_UNIQUE|TIMER_NO_HASH_WAIT|TIMER_OVERRIDE)
+	timer_id = addtimer(CALLBACK(src,/turf/simulated/proc/unwet_floor),8 SECONDS, TIMER_STOPPABLE|TIMER_UNIQUE|TIMER_NO_HASH_WAIT|TIMER_OVERRIDE)
 
-/turf/simulated/proc/unwet_floor(check_very_wet = TRUE)
+/turf/simulated/proc/unwet_floor(var/check_very_wet = TRUE)
 	if(check_very_wet && wet >= 2)
 		wet--
-		timer_id = addtimer(new Callback(src,/turf/simulated/proc/unwet_floor), 8 SECONDS, TIMER_STOPPABLE|TIMER_UNIQUE|TIMER_NO_HASH_WAIT|TIMER_OVERRIDE)
+		timer_id = addtimer(CALLBACK(src,/turf/simulated/proc/unwet_floor), 8 SECONDS, TIMER_STOPPABLE|TIMER_UNIQUE|TIMER_NO_HASH_WAIT|TIMER_OVERRIDE)
 		return
 
 	wet = 0
@@ -49,7 +49,7 @@
 		holy = 1
 	levelupdate()
 
-/turf/simulated/proc/AddTracks(typepath,bloodDNA,comingdir,goingdir,bloodcolor=COLOR_BLOOD_HUMAN)
+/turf/simulated/proc/AddTracks(var/typepath,var/bloodDNA,var/comingdir,var/goingdir,var/bloodcolor=COLOR_BLOOD_HUMAN)
 	var/obj/effect/decal/cleanable/blood/tracks/tracks = locate(typepath) in src
 	if(!tracks)
 		tracks = new typepath(src)
@@ -107,7 +107,7 @@
 
 		if(src.wet)
 
-			if(M.buckled || (!MOVING_QUICKLY(M) && prob(min(100, 100/(wet/10))) ) )
+			if(M.buckled || (MOVING_DELIBERATELY(M) && prob(min(100, 100/(wet/10))) ) )
 				return
 
 			// skillcheck for slipping
@@ -124,12 +124,15 @@
 				slip_stun = 10
 
 			if(M.slip("the [floor_type] floor", slip_stun))
-				addtimer(new Callback(M, /mob/proc/slip_handler, M.dir, slip_dist - 1, 1), 1)
-
+				addtimer(CALLBACK(M, /mob/proc/slip_handler, M.dir, slip_dist - 1, 1), 1)
+			else
+				M.inertia_dir = 0
+		else
+			M.inertia_dir = 0
 
 /mob/proc/slip_handler(dir, dist, delay)
 	if (dist > 0)
-		addtimer(new Callback(src, .proc/slip_handler, dir, dist - 1, delay), delay)
+		addtimer(CALLBACK(src, .proc/slip_handler, dir, dist - 1, delay), delay)
 	step(src, dir)
 
 //returns 1 if made bloody, returns 0 otherwise
@@ -156,13 +159,13 @@
 	else if( istype(M, /mob/living/silicon/robot ))
 		new /obj/effect/decal/cleanable/blood/oil(src)
 
-/turf/simulated/proc/can_build_cable(mob/user)
+/turf/simulated/proc/can_build_cable(var/mob/user)
 	return 0
 
-/turf/simulated/attackby(obj/item/thing, mob/user)
+/turf/simulated/attackby(var/obj/item/thing, var/mob/user)
 	if(isCoil(thing) && can_build_cable(user))
 		var/obj/item/stack/cable_coil/coil = thing
-		coil.PlaceCableOnTurf(src, user)
+		coil.turf_place(src, user)
 		return
 	return ..()
 
@@ -171,7 +174,11 @@
 		fluid_update()
 	. = ..()
 
-/turf/simulated/damage_health(damage, damage_type, damage_flags, severity, skip_can_damage_check = FALSE)
-	if (HAS_FLAGS(damage_flags, DAMAGE_FLAG_TURF_BREAKER))
-		damage *= 4
+/turf/simulated/Destroy()
+	if (zone)
+		if (can_safely_remove_from_zone())
+			c_copy_air()
+			zone.remove(src)
+		else
+			zone.rebuild()
 	. = ..()

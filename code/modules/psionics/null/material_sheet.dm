@@ -1,4 +1,4 @@
-/obj/item/stack/material/withstand_psi_stress(stress, atom/source)
+/obj/item/stack/material/withstand_psi_stress(var/stress, var/atom/source)
 	. = ..(stress, source)
 	if(amount > 0 && . > 0 && disrupts_psionics())
 		if(. > amount)
@@ -13,10 +13,13 @@
 
 /obj/item/stack/material/nullglass
 	name = "nullglass"
-	icon_state = "diamond"
-	plural_icon_state = "diamond-mult"
-	max_icon_state = "diamond-max"
+	//[inf]
+	icon_state = "sheet-sheen"
+	plural_icon_state = "sheet-sheen-mult"
+	max_icon_state = "sheet-sheen-max"
+	//[/inf]
 	default_type = MATERIAL_NULLGLASS
 
 /obj/item/stack/material/nullglass/fifty
 	amount = 50
+

@@ -1,13 +1,13 @@
 /obj/machinery/fusion_fuel_injector
 	name = "fuel injector"
-	icon = 'icons/obj/machines/power/fusion_fuel_injectors.dmi'
-	icon_state = "injector"
+	icon = 'icons/obj/machines/power/fusion.dmi'
+	icon_state = "injector0"
 	density = TRUE
 	anchored = FALSE
 	req_access = list(access_engine)
 	idle_power_usage = 10
 	active_power_usage = 500
-	construct_state = /singleton/machine_construction/default/panel_closed
+	construct_state = /decl/machine_construction/default/panel_closed
 	uncreated_component_parts = null
 	stat_immune = 0
 	base_type = /obj/machinery/fusion_fuel_injector
@@ -25,14 +25,6 @@
 		fusion.set_tag(null, initial_id_tag)
 	. = ..()
 
-/obj/machinery/fusion_fuel_injector/on_update_icon()
-	overlays.Cut()
-	if(panel_open)
-		overlays += "[icon_state]_panel"
-	if(injecting && cur_assembly)
-		overlays += emissive_appearance(icon, "[icon_state]_lights")
-		overlays += "[icon_state]_lights"
-
 /obj/machinery/fusion_fuel_injector/Destroy()
 	if(cur_assembly)
 		cur_assembly.dropInto(loc)
@@ -44,7 +36,7 @@
 
 /obj/machinery/fusion_fuel_injector/Process()
 	if(injecting)
-		if(inoperable())
+		if(stat & (BROKEN|NOPOWER))
 			StopInjecting()
 		else
 			Inject()
@@ -52,32 +44,33 @@
 /obj/machinery/fusion_fuel_injector/attackby(obj/item/W, mob/user)
 
 	if(isMultitool(W))
-		var/datum/extension/local_network_member/fusion = get_extension(src, /datum/extension/local_network_member)
-		fusion.get_new_tag(user)
+		var/datum/extension/local_network_member/lanm = get_extension(src, /datum/extension/local_network_member)
+		lanm.get_new_tag(user) //inf, was: 		lanm.set_tag(null, initial_id_tag)
 		return
 
 	if(istype(W, /obj/item/fuel_assembly))
+
 		if(injecting)
-			to_chat(user, SPAN_WARNING("Shut \the [src] off before playing with the fuel rod!"))
+			to_chat(user, "<span class='warning'>Shut \the [src] off before playing with the fuel rod!</span>")
 			return
 		if(!user.unEquip(W, src))
 			return
 		if(cur_assembly)
-			visible_message(SPAN_NOTICE("\The [user] swaps \the [src]'s [cur_assembly] for \a [W]."))
+			visible_message("<span class='notice'>\The [user] swaps \the [src]'s [cur_assembly] for \a [W].</span>")
 		else
-			visible_message(SPAN_NOTICE("\The [user] inserts \a [W] into \the [src]."))
+			visible_message("<span class='notice'>\The [user] inserts \a [W] into \the [src].</span>")
 		if(cur_assembly)
 			cur_assembly.dropInto(loc)
 			user.put_in_hands(cur_assembly)
 		cur_assembly = W
 		return
 
-	if(isWelder(W))
+	if(isWrench(W))
 		if(injecting)
-			to_chat(user, SPAN_WARNING("Shut \the [src] off first!"))
+			to_chat(user, "<span class='warning'>Shut \the [src] off first!</span>")
 			return
 		anchored = !anchored
-		playsound(src.loc, 'sound/items/Welder.ogg', 75, 1)
+		playsound(src.loc, 'sound/items/Ratchet.ogg', 75, 1)
 		if(anchored)
 			user.visible_message("\The [user] secures \the [src] to the floor.")
 		else
@@ -88,29 +81,29 @@
 
 /obj/machinery/fusion_fuel_injector/physical_attack_hand(mob/user)
 	if(injecting)
-		to_chat(user, SPAN_WARNING("Shut \the [src] off before playing with the fuel rod!"))
+		to_chat(user, "<span class='warning'>Shut \the [src] off before playing with the fuel rod!</span>")
 		return TRUE
 
 	if(cur_assembly)
 		cur_assembly.dropInto(loc)
 		user.put_in_hands(cur_assembly)
-		visible_message(SPAN_NOTICE("\The [user] removes \the [cur_assembly] from \the [src]."))
+		visible_message("<span class='notice'>\The [user] removes \the [cur_assembly] from \the [src].</span>")
 		cur_assembly = null
 		return TRUE
 	else
-		to_chat(user, SPAN_WARNING("There is no fuel rod in \the [src]."))
+		to_chat(user, "<span class='warning'>There is no fuel rod in \the [src].</span>")
 		return TRUE
 
 /obj/machinery/fusion_fuel_injector/proc/BeginInjecting()
 	if(!injecting && cur_assembly)
+		icon_state = "injector1"
 		injecting = 1
-		update_icon()
 		update_use_power(POWER_USE_IDLE)
 
 /obj/machinery/fusion_fuel_injector/proc/StopInjecting()
 	if(injecting)
 		injecting = 0
-		update_icon()
+		icon_state = "injector0"
 		update_use_power(POWER_USE_OFF)
 
 /obj/machinery/fusion_fuel_injector/proc/Inject()
@@ -132,11 +125,9 @@
 					amount_left += cur_assembly.rod_quantities[reagent]
 		if(cur_assembly)
 			cur_assembly.percent_depleted = amount_left / cur_assembly.initial_amount
-		overlays += emissive_appearance(icon, "[icon_state]_lights_emitting")
-		overlays += "[icon_state]_lights_emitting"
+		flick("injector-emitting",src)
 	else
 		StopInjecting()
-		update_icon()
 
 /obj/machinery/fusion_fuel_injector/verb/rotate_clock()
 	set category = "Object"

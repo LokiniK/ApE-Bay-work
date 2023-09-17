@@ -1,7 +1,7 @@
 /obj/structure/closet/secure_closet/hydroponics
 	name = "botanist's locker"
 	req_access = list(access_hydroponics)
-	closet_appearance = /singleton/closet_appearance/secure_closet/hydroponics
+	icon_state = "hydro"
 
 /obj/structure/closet/secure_closet/hydroponics/WillContain()
 	return list(
@@ -11,6 +11,7 @@
 		/obj/item/device/scanner/plant,
 		/obj/item/device/radio/headset/headset_service,
 		/obj/item/clothing/mask/bandana/botany,
+		/obj/item/clothing/head/bandana/green,
 		/obj/item/material/minihoe,
 		/obj/item/material/hatchet,
 		/obj/item/wirecutters/clippers,

@@ -3,7 +3,7 @@
 /obj/machinery/flasher
 	name = "mounted flash"
 	desc = "A wall-mounted flashbulb device."
-	icon = 'icons/obj/structures/mounted_flash.dmi'
+	icon = 'icons/obj/stationobjs.dmi'
 	icon_state = "mflash1"
 	var/range = 2 //this is roughly the size of brig cell
 	var/disable = 0
@@ -19,13 +19,13 @@
 		/obj/item/stock_parts/power/apc
 	)
 	public_methods = list(
-		/singleton/public_access/public_method/flasher_flash
+		/decl/public_access/public_method/flasher_flash
 	)
-	stock_part_presets = list(/singleton/stock_part_preset/radio/receiver/flasher = 1)
+	stock_part_presets = list(/decl/stock_part_preset/radio/receiver/flasher = 1)
 
 
 /obj/machinery/flasher/on_update_icon()
-	if (operable())
+	if ( !(stat & (BROKEN|NOPOWER)) )
 		icon_state = "[base_state]1"
 //		src.sd_SetLuminosity(2)
 	else
@@ -38,9 +38,9 @@
 		add_fingerprint(user, 0, W)
 		src.disable = !src.disable
 		if (src.disable)
-			user.visible_message(SPAN_WARNING("[user] has disconnected the [src]'s flashbulb!"), SPAN_WARNING("You disconnect the [src]'s flashbulb!"))
+			user.visible_message("<span class='warning'>[user] has disconnected the [src]'s flashbulb!</span>", "<span class='warning'>You disconnect the [src]'s flashbulb!</span>")
 		if (!src.disable)
-			user.visible_message(SPAN_WARNING("[user] has connected the [src]'s flashbulb!"), SPAN_WARNING("You connect the [src]'s flashbulb!"))
+			user.visible_message("<span class='warning'>[user] has connected the [src]'s flashbulb!</span>", "<span class='warning'>You connect the [src]'s flashbulb!</span>")
 	else
 		..()
 
@@ -55,16 +55,16 @@
 	if (!(powered()))
 		return
 
-	if ((src.disable) || (src.last_flash && world.time < src.last_flash + 150))
+	if ((disable) || (last_flash && world.time < last_flash + 150))
 		return
 
-	playsound(src.loc, 'sound/weapons/flash.ogg', 100, 1)
+	playsound(loc, 'sound/weapons/flash.ogg', 100, 1)
 	flick("[base_state]_flash", src)
-	src.last_flash = world.time
+	last_flash = world.time
 	use_power_oneoff(1500)
 
 	for (var/mob/living/O in viewers(src, null))
-		if (get_dist(src, O) > src.range)
+		if (get_dist(src, O) > range)
 			continue
 
 		var/flash_time = strength
@@ -83,10 +83,10 @@
 					H.flash_eyes()
 					E.damage += rand(1, 5)
 
-		if(!O.blinded)
+		if(!O.blinded && !isAI(O))
 			do_flash(O, flash_time)
 
-/obj/machinery/flasher/proc/do_flash(mob/living/victim, flash_time)
+/obj/machinery/flasher/proc/do_flash(var/mob/living/victim, var/flash_time)
 	victim.flash_eyes()
 	victim.eye_blurry += flash_time
 	victim.confused += (flash_time + 2)
@@ -94,14 +94,16 @@
 	victim.Weaken(3)
 
 /obj/machinery/flasher/emp_act(severity)
-	if (operable() && prob(75 / severity))
+	if(stat & (BROKEN|NOPOWER))
+		..(severity)
+		return
+	if(prob(75/severity))
 		flash()
 	..(severity)
 
 /obj/machinery/flasher/portable //Portable version of the flasher. Only flashes when anchored
 	name = "portable flasher"
 	desc = "A portable flashing device. Wrench to activate and deactivate. Cannot detect slow movements."
-	icon = 'icons/obj/portable_flash.dmi'
 	icon_state = "pflash1"
 	strength = 8
 	anchored = FALSE
@@ -116,7 +118,7 @@
 		var/mob/living/carbon/M = AM
 		if(!MOVING_DELIBERATELY(M))
 			flash()
-
+	
 	if(isanimal(AM))
 		flash()
 
@@ -126,11 +128,11 @@
 		src.anchored = !src.anchored
 
 		if (!src.anchored)
-			user.show_message(text(SPAN_WARNING("[src] can now be moved.")))
+			user.show_message(text("<span class='warning'>[src] can now be moved.</span>"))
 			src.overlays.Cut()
 
 		else if (src.anchored)
-			user.show_message(text(SPAN_WARNING("[src] is now secured.")))
+			user.show_message(text("<span class='warning'>[src] is now secured.</span>"))
 			src.overlays += "[base_state]-s"
 
 /obj/machinery/button/flasher
@@ -138,11 +140,11 @@
 	desc = "A remote control switch for a mounted flasher."
 	cooldown = 5 SECONDS
 
-/singleton/public_access/public_method/flasher_flash
+/decl/public_access/public_method/flasher_flash
 	name = "flash"
 	desc = "Performs a flash, if possible."
 	call_proc = /obj/machinery/flasher/proc/flash
 
-/singleton/stock_part_preset/radio/receiver/flasher
+/decl/stock_part_preset/radio/receiver/flasher
 	frequency = BUTTON_FREQ
-	receive_and_call = list("button_active" = /singleton/public_access/public_method/flasher_flash)
+	receive_and_call = list("button_active" = /decl/public_access/public_method/flasher_flash)

@@ -1,9 +1,13 @@
 //quality code theft
 #include "blueriver_areas.dm"
 /obj/effect/overmap/visitable/sector/arcticplanet
-	name = "arctic dwarf planet"
-	desc = "Sensor array detects an arctic planet with a small vessel on the planet's surface. Scans further indicate strange energy emissions from below the planet's surface."
-	sector_flags = EMPTY_BITFIELD
+	scanner_name = "arctic planetoid"
+	scanner_desc = @{"[i]Stellar Body[/i]: UNKNOWN
+[i]Class[/i]: L-Class Planetoid
+[i]Habitability[/i]: Moderate (Low Temperature)
+[b]Notice[/b]: Sensor array detects an arctic planet with a small vessle on the planet's surface. Scans further indicate strange energy levels below the planet's surface"}
+	sector_flags = 0
+	known = 1
 	icon_state = "globe"
 	initial_generic_waypoints = list(
 		"nav_blueriv_1",
@@ -20,7 +24,7 @@
 	name = "Bluespace River"
 	id = "awaysite_blue"
 	spawn_cost = 2
-	description = "An arctic planet and an alien underground surface"
+	description = "Two z-level map with an arctic planet and an alien underground surface"
 	suffixes = list("blueriver/blueriver-1.dmm", "blueriver/blueriver-2.dmm")
 	generate_mining_by_z = 2
 	area_usage_test_exempted_root_areas = list(/area/bluespaceriver)
@@ -149,7 +153,7 @@
 	desc = "You feel a sense of dread from just looking at this wall. Its surface seems to be constantly moving, as if it were breathing."
 	icon = 'riverturfs.dmi'
 	icon_state = "evilwall_1"
-	opacity = 1
+	opacity = TRUE
 	density = TRUE
 	temperature = 233
 
@@ -181,14 +185,26 @@
 /obj/structure/deity
 	icon = 'icons/obj/cult.dmi'
 	icon_state = "tomealtar"
-	health_max = 10
+	var/health = 10
 	density = TRUE
 	anchored = TRUE
 
+/obj/structure/deity/attackby(obj/item/W as obj, mob/user as mob)
+	user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
+	user.do_attack_animation(src)
+	playsound(get_turf(src), 'sound/effects/Glasshit.ogg', 50, 1)
+	user.visible_message(
+		"<span class='danger'>[user] hits \the [src] with \the [W]!</span>",
+		"<span class='danger'>You hit \the [src] with \the [W]!</span>",
+		"<span class='danger'>You hear something breaking!</span>"
+		)
+	take_damage(W.force)
 
-/obj/structure/deity/on_death()
-	visible_message(SPAN_DANGER("\The [src] crumbles!"))
-	qdel(src)
+/obj/structure/deity/take_damage(var/amount)
+	health -= amount
+	if(health < 0)
+		src.visible_message("\The [src] crumbles!")
+		qdel(src)
 
-/obj/structure/deity/bullet_act(obj/item/projectile/P)
-	damage_health(P.get_structure_damage(), P.damage_type)
+/obj/structure/deity/bullet_act(var/obj/item/projectile/P)
+	take_damage(P.damage)

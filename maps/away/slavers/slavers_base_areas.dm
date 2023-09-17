@@ -40,4 +40,3 @@
 /area/slavers_base/hangar
 	name = "\improper Slavers Base Hangar"
 	icon_state = "hangar"
-	turfs_airless = TRUE

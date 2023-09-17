@@ -2,37 +2,31 @@ SUBSYSTEM_DEF(inactivity)
 	name = "Inactivity"
 	wait = 1 MINUTE
 	priority = SS_PRIORITY_INACTIVITY
-	flags = SS_BACKGROUND
+	flags = SS_NO_INIT
+	var/tmp/list/client_list
+	var/number_kicked = 0
 
-	/// The current run of clients to check for inactivity.
-	var/static/list/client/queue = list()
-
-
-/datum/controller/subsystem/inactivity/Recover()
-	queue.Cut()
-
-
-/datum/controller/subsystem/inactivity/Initialize(start_uptime)
+/datum/controller/subsystem/inactivity/fire(resumed = FALSE)
 	if (!config.kick_inactive)
 		suspend()
-
-
-/datum/controller/subsystem/inactivity/fire(resumed, no_mc_tick)
+		return
 	if (!resumed)
-		if (!length(GLOB.clients))
-			return
-		queue = GLOB.clients.Copy()
-	var/kick_time = config.kick_inactive MINUTES
-	var/cut_until = 1
-	for (var/client/client as anything in queue)
-		++cut_until
-		if (QDELETED(client))
-			continue
-		if (client.inactivity > kick_time && !client.holder)
-			log_access("AFK: [key_name(client)]")
-			to_chat_immediate(SPAN_WARNING("You were inactive for [config.kick_inactive] minutes and have been disconnected."))
-			qdel(client)
+		client_list = GLOB.clients.Copy()
+
+	while(client_list.len)
+		var/client/C = client_list[client_list.len]
+		client_list.len--
+//		if(!C.holder && C.is_afk(config.kick_inactive MINUTES) && !isobserver(C.mob)) inf@dev: bay
+		if((C.holder && check_rights(R_ADMIN, 0, C) || isnewplayer(C)) && C.is_afk(config.kick_inactive MINUTES))
+			log_misc("AFK: [key_name(C)]")
+//			to_chat(C, "<SPAN CLASS='warning'>You have been inactive for more than [config.kick_inactive] minute\s and have been disconnected.</SPAN>")
+			to_chat(C, SPAN_WARNING("Вы не проявляли активность в течение [config.kick_inactive] минут и были отсоеденены."))
+			if(C.holder && check_rights(R_ADMIN, 0, C))
+				to_chat(C, SPAN_NOTICE(" * Прожмите de-admin в следующий раз перед длительным отходом. * "))
+			qdel(C)
+			number_kicked++
 		if (MC_TICK_CHECK)
-			queue.Cut(1, cut_until)
 			return
-	queue.Cut()
+
+/datum/controller/subsystem/inactivity/stat_entry()
+	..("Kicked AFK staff: [number_kicked]")

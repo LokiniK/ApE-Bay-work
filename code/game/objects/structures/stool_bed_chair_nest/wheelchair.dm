@@ -3,20 +3,10 @@
 	desc = "Now we're getting somewhere."
 	icon_state = "wheelchair"
 	anchored = FALSE
-	bed_flags = BED_FLAG_CANNOT_BE_DISMANTLED | BED_FLAG_CANNOT_BE_PADDED
+	movement_handlers = list(/datum/movement_handler/deny_multiz, /datum/movement_handler/delay = list(5), /datum/movement_handler/move_relay_self) //inf, was: movement_handlers = list(/datum/movement_handler/deny_multiz, /datum/movement_handler/delay = list(2), /datum/movement_handler/move_relay_self)
 	var/driving = 0
 	var/mob/living/pulling = null
 	var/bloodiness
-
-
-/obj/structure/bed/chair/wheelchair/Initialize()
-	. = ..()
-	movement_handlers = list(
-		/datum/movement_handler/deny_multiz,
-		/datum/movement_handler/delay = list(config.walk_delay),
-		/datum/movement_handler/move_relay_self
-	)
-
 
 /obj/structure/bed/chair/wheelchair/on_update_icon()
 	return
@@ -24,11 +14,16 @@
 /obj/structure/bed/chair/wheelchair/set_dir()
 	..()
 	overlays.Cut()
-	var/image/O = image(icon = 'icons/obj/structures/furniture.dmi', icon_state = "w_overlay", dir = src.dir)
+	var/image/O = image(icon = 'icons/obj/furniture.dmi', icon_state = "w_overlay", dir = src.dir)
 	O.layer = ABOVE_HUMAN_LAYER
 	overlays += O
 	if(buckled_mob)
 		buckled_mob.set_dir(dir)
+
+/obj/structure/bed/chair/wheelchair/attackby(obj/item/W as obj, mob/user as mob)
+	if(isWrench(W) || istype(W,/obj/item/stack) || isWirecutter(W))
+		return
+	..()
 
 /obj/structure/bed/chair/wheelchair/relaymove(mob/user, direction)
 	// Redundant check?
@@ -36,7 +31,7 @@
 		if(user==pulling)
 			pulling = null
 			user.pulledby = null
-			to_chat(user, SPAN_WARNING("You lost your grip!"))
+			to_chat(user, "<span class='warning'>You lost your grip!</span>")
 		return
 	if(buckled_mob && pulling && user == buckled_mob)
 		if(pulling.stat || pulling.stunned || pulling.weakened || pulling.paralysis || pulling.lying || pulling.restrained())
@@ -54,10 +49,10 @@
 		if(user==pulling)
 			return
 	if(pulling && (get_dir(src.loc, pulling.loc) == direction))
-		to_chat(user, SPAN_WARNING("You cannot go there."))
+		to_chat(user, "<span class='warning'>You cannot go there.</span>")
 		return
 	if(pulling && buckled_mob && (buckled_mob == user))
-		to_chat(user, SPAN_WARNING("You cannot drive while being pushed."))
+		to_chat(user, "<span class='warning'>You cannot drive while being pushed.</span>")
 		return
 
 	// Let's roll
@@ -105,7 +100,7 @@
 					unbuckle_mob()
 			if (pulling && (get_dist(src, pulling) > 1))
 				pulling.pulledby = null
-				to_chat(pulling, SPAN_WARNING("You lost your grip!"))
+				to_chat(pulling, "<span class='warning'>You lost your grip!</span>")
 				pulling = null
 		else
 			if (occupant && (src.loc != occupant.loc))
@@ -118,13 +113,12 @@
 		user_unbuckle_mob(user)
 	return
 
-/obj/structure/bed/chair/wheelchair/CtrlClick(mob/user)
+/obj/structure/bed/chair/wheelchair/CtrlClick(var/mob/user)
 	if(in_range(src, user))
-		if(!ishuman(user))
-			return FALSE
+		if(!ishuman(user))	return
 		if(user == buckled_mob)
-			to_chat(user, SPAN_WARNING("You realize you are unable to push the wheelchair you sit in."))
-			return TRUE
+			to_chat(user, "<span class='warning'>You realize you are unable to push the wheelchair you sit in.</span>")
+			return
 		if(!pulling)
 			pulling = user
 			user.pulledby = src
@@ -152,26 +146,26 @@
 			occupant.throw_at(A, 3, 3)
 
 		var/def_zone = ran_zone()
-		var/blocked = 100 * occupant.get_blocked_ratio(def_zone, DAMAGE_BRUTE, damage = 10)
+		var/blocked = 100 * occupant.get_blocked_ratio(def_zone, BRUTE, damage = 10)
 		occupant.throw_at(A, 3, 3)
-		occupant.apply_effect(6, EFFECT_STUN, blocked)
-		occupant.apply_effect(6, EFFECT_WEAKEN, blocked)
-		occupant.apply_effect(6, EFFECT_STUTTER, blocked)
-		occupant.apply_damage(10, DAMAGE_BRUTE, def_zone)
+		occupant.apply_effect(6, STUN, blocked)
+		occupant.apply_effect(6, WEAKEN, blocked)
+		occupant.apply_effect(6, STUTTER, blocked)
+		occupant.apply_damage(10, BRUTE, def_zone)
 		playsound(src.loc, 'sound/weapons/punch1.ogg', 50, 1, -1)
 		if(istype(A, /mob/living))
 			var/mob/living/victim = A
 			def_zone = ran_zone()
-			blocked = 100 * victim.get_blocked_ratio(def_zone, DAMAGE_BRUTE, damage = 10)
-			victim.apply_effect(6, EFFECT_STUN, blocked)
-			victim.apply_effect(6, EFFECT_WEAKEN, blocked)
-			victim.apply_effect(6, EFFECT_STUTTER, blocked)
-			victim.apply_damage(10, DAMAGE_BRUTE, def_zone)
+			blocked = 100 * victim.get_blocked_ratio(def_zone, BRUTE, damage = 10)
+			victim.apply_effect(6, STUN, blocked)
+			victim.apply_effect(6, WEAKEN, blocked)
+			victim.apply_effect(6, STUTTER, blocked)
+			victim.apply_damage(10, BRUTE, def_zone)
 		if(pulling)
-			occupant.visible_message(SPAN_DANGER("[pulling] has thrusted \the [name] into \the [A], throwing \the [occupant] out of it!"))
+			occupant.visible_message("<span class='danger'>[pulling] has thrusted \the [name] into \the [A], throwing \the [occupant] out of it!</span>")
 			admin_attack_log(pulling, occupant, "Crashed their victim into \an [A].", "Was crashed into \an [A].", "smashed into \the [A] using")
 		else
-			occupant.visible_message(SPAN_DANGER("[occupant] crashed into \the [A]!"))
+			occupant.visible_message("<span class='danger'>[occupant] crashed into \the [A]!</span>")
 
 /obj/structure/bed/chair/wheelchair/proc/create_track()
 	var/obj/effect/decal/cleanable/blood/tracks/B = new(loc)

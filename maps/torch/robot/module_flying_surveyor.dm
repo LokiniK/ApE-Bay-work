@@ -5,7 +5,7 @@
 		"Science" = TRUE,
 		"Exploration" = TRUE
 	)
-	networks = list(NETWORK_RESEARCH)
+	networks = list(NETWORK_EXPEDITION)
 	sprites = list(
 		"Drone"  = "drone-science",
 		"Eyebot" = "eyebot-science"
@@ -16,11 +16,11 @@
 		/obj/item/stack/flag/red
 	)
 	skills = list(
-		SKILL_ELECTRICAL          = SKILL_MASTER,
-		SKILL_ATMOS               = SKILL_MASTER,
-		SKILL_PILOT               = SKILL_EXPERIENCED,
-		SKILL_BOTANY              = SKILL_MASTER,
-		SKILL_EVA                 = SKILL_MASTER,
+		SKILL_ELECTRICAL          = SKILL_PROF,
+		SKILL_ATMOS               = SKILL_PROF,
+		SKILL_PILOT               = SKILL_EXPERT,
+		SKILL_BOTANY              = SKILL_PROF,
+		SKILL_EVA                 = SKILL_PROF,
 		SKILL_MECH                = HAS_PERK,
 	)
 
@@ -52,7 +52,7 @@
 	for(var/flag_type in flag_types)
 		equipment += new flag_type(src)
 
-/obj/item/robot_module/flying/surveyor/respawn_consumable(mob/living/silicon/robot/R, amount)
+/obj/item/robot_module/flying/surveyor/respawn_consumable(var/mob/living/silicon/robot/R, var/amount)
 	var/obj/item/gun/launcher/net/borg/gun = locate() in equipment
 	if(!gun)
 		gun = new(src)
@@ -68,3 +68,4 @@
 		if(flag.amount < flag.max_amount)
 			flag.add(1)
 	..()
+

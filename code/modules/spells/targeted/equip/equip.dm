@@ -38,5 +38,5 @@
 			for(var/obj/item/to_remove in summoned_items)
 				qdel(to_remove)
 
-/spell/targeted/equip_item/proc/summon_item(newtype)
+/spell/targeted/equip_item/proc/summon_item(var/newtype)
 	return new newtype

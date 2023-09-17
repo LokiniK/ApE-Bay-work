@@ -15,26 +15,18 @@
 	var/datum/preferences/prefs = null
 	var/adminobs		= null
 
-	///datum that controls the displaying and hiding of tooltips
-	var/datum/tooltip/tooltips
-
 	var/adminhelped = 0
 
 	var/staffwarn = null
 
-	/// List that stores the object and parameters related to the selected target during mouse events in the client. Allows the client to remember the target selected during a "MouseDown" event or update the selection during a "MouseDrag" event.
-	var/list/selected_target[2]
+	var/discord_id = null
+	var/discord_name = null
 
 		///////////////
 		//SOUND STUFF//
 		///////////////
-
-	/// Whether or not the client is currently playing the "ship hum" ambience sound.
-	var/playing_vent_ambience = FALSE
-
-	/// The next threshold time for the client to be able to play basic ambience sounds.
-	var/next_ambience_time = 0
-
+	var/ambience_playing= null
+	var/played			= 0
 
 		////////////
 		//SECURITY//
@@ -62,4 +54,25 @@
 	*/
 	preload_rsc = 0
 
+	///goonchat chatoutput of the client
+	var/datum/chatOutput/chatOutput
+
 	var/fullscreen = FALSE
+
+	    //////////
+		//ASSETS//
+		//////////
+	// List of all asset filenames sent to this client by the asset cache, along with their assoicated md5s
+	var/list/sent_assets = list()
+	/// List of all completed blocking send jobs awaiting acknowledgement by send_asset
+	var/list/completed_asset_jobs = list()
+	/// Last asset send job id.
+	var/last_asset_job = 0
+	var/last_completed_asset_job = 0
+
+ 	///world.time they connected
+	var/connection_time
+ 	///world.realtime they connected
+	var/connection_realtime
+ 	///world.timeofday they connected
+	var/connection_timeofday

@@ -25,7 +25,7 @@
 	attack_name = "claws"
 	var/blocked_by_gloves = TRUE
 
-/datum/unarmed_attack/claws/is_usable(mob/living/carbon/human/user, mob/living/carbon/human/target, zone)
+/datum/unarmed_attack/claws/is_usable(var/mob/living/carbon/human/user, var/mob/living/carbon/human/target, var/zone)
 	if(user.gloves && blocked_by_gloves)
 		var/obj/item/clothing/gloves/gloves = user.gloves
 		if(istype(gloves) && !gloves.clipped)
@@ -35,48 +35,48 @@
 	else
 		return 1
 
-/datum/unarmed_attack/claws/show_attack(mob/living/carbon/human/user, mob/living/carbon/human/target, zone, attack_damage)
+/datum/unarmed_attack/claws/show_attack(var/mob/living/carbon/human/user, var/mob/living/carbon/human/target, var/zone, var/attack_damage)
 	var/obj/item/organ/external/affecting = target.get_organ(zone)
 
 	if (!affecting)
 		to_chat(user, SPAN_WARNING("\The [target] does not have that bodypart!"))
 		return
 
-	attack_damage = clamp(attack_damage, 1, 5)
+	attack_damage = Clamp(attack_damage, 1, 5)
 
 	if(target == user)
-		user.visible_message(SPAN_DANGER("[user] [pick(attack_verb)] \himself in the [affecting.name]!"))
+		user.visible_message("<span class='danger'>[user] [pick(attack_verb)] \himself in the [affecting.name]!</span>")
 		return 0
 
 	switch(zone)
 		if(BP_HEAD, BP_MOUTH, BP_EYES)
 			// ----- HEAD ----- //
 			switch(attack_damage)
-				if(1 to 2) user.visible_message(SPAN_DANGER("[user] scratched [target] across \his cheek!"))
+				if(1 to 2) user.visible_message("<span class='danger'>[user] scratched [target] across \his cheek!</span>")
 				if(3 to 4)
 					user.visible_message(pick(
-						80; user.visible_message(SPAN_CLASS("danger", "[user] [pick(attack_verb)] [target]'s [pick("face", "neck", affecting.name)]!")),
-						20; user.visible_message(SPAN_CLASS("danger", "[user] [pick(attack_verb)] [pick("[target] in the [affecting.name]", "[target] across \his [pick("face", "neck", affecting.name)]")]!")),
+						80; user.visible_message("<span class='danger'>[user] [pick(attack_verb)] [target]'s [pick("face", "neck", affecting.name)]!</span>"),
+						20; user.visible_message("<span class='danger'>[user] [pick(attack_verb)] [pick("[target] in the [affecting.name]", "[target] across \his [pick("face", "neck", affecting.name)]")]!</span>"),
 						))
 				if(5)
 					user.visible_message(pick(
-						SPAN_CLASS("danger", "[user] rakes \his [pick(attack_noun)] across [target]'s [pick("face", "neck", affecting.name)]!"),
-						SPAN_CLASS("danger", "[user] tears \his [pick(attack_noun)] into [target]'s [pick("face", "neck", affecting.name)]!"),
+						"<span class='danger'>[user] rakes \his [pick(attack_noun)] across [target]'s [pick("face", "neck", affecting.name)]!</span>",
+						"<span class='danger'>[user] tears \his [pick(attack_noun)] into [target]'s [pick("face", "neck", affecting.name)]!</span>",
 						))
 		else
 			// ----- BODY ----- //
 			switch(attack_damage)
-				if(1 to 2)	user.visible_message(SPAN_CLASS("danger", "[user] [pick("scratched", "grazed")] [target]'s [affecting.name]!"))
+				if(1 to 2)	user.visible_message("<span class='danger'>[user] [pick("scratched", "grazed")] [target]'s [affecting.name]!</span>")
 				if(3 to 4)
 					user.visible_message(pick(
-						80; user.visible_message(SPAN_DANGER("[user] [pick(attack_verb)] [target]'s [affecting.name]!")),
-						20; user.visible_message(SPAN_CLASS("danger", "[user] [pick(attack_verb)] [pick("[target] in the [affecting.name]", "[target] across \his [affecting.name]")]!")),
+						80; user.visible_message("<span class='danger'>[user] [pick(attack_verb)] [target]'s [affecting.name]!</span>"),
+						20; user.visible_message("<span class='danger'>[user] [pick(attack_verb)] [pick("[target] in the [affecting.name]", "[target] across \his [affecting.name]")]!</span>"),
 						))
-				if(5)		user.visible_message(SPAN_CLASS("danger", "[user] tears \his [pick(attack_noun)] [pick("deep into", "into", "across")] [target]'s [affecting.name]!"))
+				if(5)		user.visible_message("<span class='danger'>[user] tears \his [pick(attack_noun)] [pick("deep into", "into", "across")] [target]'s [affecting.name]!</span>")
 
 /datum/unarmed_attack/claws/strong
 	attack_verb = list("slashed")
-	damage = 5
+	damage = 10
 	shredding = TRUE
 	attack_name = "strong claws"
 
@@ -85,7 +85,7 @@
 
 /datum/unarmed_attack/bite/strong
 	attack_verb = list("mauled")
-	damage = 8
+	damage = 15
 	shredding = TRUE
 	attack_name = "strong bite"
 
@@ -95,7 +95,7 @@
 	damage = 2
 	attack_name = "glomp"
 
-/datum/unarmed_attack/slime_glomp/apply_effects(mob/living/carbon/human/user,mob/living/carbon/human/target,armour,attack_damage,zone)
+/datum/unarmed_attack/slime_glomp/apply_effects(var/mob/living/carbon/human/user,var/mob/living/carbon/human/target,var/armour,var/attack_damage,var/zone)
 	..()
 	user.apply_stored_shock_to(target)
 
@@ -106,9 +106,9 @@
 /datum/unarmed_attack/stomp/weak/get_unarmed_damage()
 	return damage
 
-/datum/unarmed_attack/stomp/weak/show_attack(mob/living/carbon/human/user, mob/living/carbon/human/target, zone, attack_damage)
+/datum/unarmed_attack/stomp/weak/show_attack(var/mob/living/carbon/human/user, var/mob/living/carbon/human/target, var/zone, var/attack_damage)
 	var/obj/item/organ/external/affecting = target.get_organ(zone)
-	user.visible_message(SPAN_WARNING("[user] jumped up and down on \the [target]'s [affecting.name]!"))
+	user.visible_message("<span class='warning'>[user] jumped up and down on \the [target]'s [affecting.name]!</span>")
 	playsound(user.loc, attack_sound, 25, 1, -1)
 
 /datum/unarmed_attack/tail //generally meant for people like unathi
@@ -116,7 +116,7 @@
 	attack_noun = list ("tail")
 	attack_name = "tail swipe"
 
-/datum/unarmed_attack/tail/is_usable(mob/living/carbon/human/user, mob/living/carbon/human/target, zone) //ensures that you can't tail someone in the skull
+/datum/unarmed_attack/tail/is_usable(var/mob/living/carbon/human/user, var/mob/living/carbon/human/target, var/zone) //ensures that you can't tail someone in the skull
 
 	if(!(zone in list(BP_L_LEG, BP_R_LEG, BP_L_FOOT, BP_R_FOOT, BP_GROIN)))
 
@@ -137,20 +137,20 @@
 
 	return 0
 
-/datum/unarmed_attack/tail/show_attack(mob/living/carbon/human/user, mob/living/carbon/human/target, zone, attack_damage)
+/datum/unarmed_attack/tail/show_attack(var/mob/living/carbon/human/user, var/mob/living/carbon/human/target, var/zone, var/attack_damage)
 
 	var/obj/item/organ/external/affecting = target.get_organ(zone)
 
 	var/organ = affecting.name
-	attack_damage = clamp(attack_damage, 1, 6)
+	attack_damage = Clamp(attack_damage, 1, 6)
 	attack_damage = 3 + attack_damage - rand(1, 5)
 	switch(attack_damage)
 
-		if(1 to 5)	user.visible_message(SPAN_DANGER("[user] glanced [target] with their [pick(attack_noun)] in the [organ]!"))
+		if(1 to 5)	user.visible_message("<span class='danger'>[user] glanced [target] with their [pick(attack_noun)] in the [organ]!</span>")
 
-		if(6 to 7)	user.visible_message(SPAN_DANGER("[user] [pick(attack_verb)] [target] in \his [organ] with their [pick(attack_noun)]!"))
+		if(6 to 7)	user.visible_message("<span class='danger'>[user] [pick(attack_verb)] [target] in \his [organ] with their [pick(attack_noun)]!</span>")
 
-		if(8)		user.visible_message(SPAN_DANGER("[user] landed a heavy blow with their [pick(attack_noun)] against [target]'s [organ]!"))
+		if(8)		user.visible_message("<span class='danger'>[user] landed a heavy blow with their [pick(attack_noun)] against [target]'s [organ]!</span>")
 
 /datum/unarmed_attack/nabber
 	attack_verb = list("mauled", "slashed", "struck", "pierced")
@@ -170,14 +170,27 @@
 	attack_name = "starborn strike"
 
 /datum/unarmed_attack/punch/starborn/get_damage_type()
-	return DAMAGE_BURN
+	return BURN
 
 /datum/unarmed_attack/bite/venom
+	var/poison_per_bite = 8
+	var/poison_type = /datum/reagent/toxin/yeosvenom
 	attack_verb = list("bit", "sank their fangs into")
 	attack_sound = 'sound/weapons/bite.ogg'
-	damage = 5
-	delay = 120
 	attack_name = "venomous bite"
+	damage = 1
+	delay = 30
+/datum/unarmed_attack/bite/venom/apply_effects(var/mob/living/carbon/human/user,var/mob/living/carbon/human/target,var/armour,var/attack_damage,var/zone)
+	..()
+	if(istype(src) && target && ishuman(target))
+		var/mob/living/carbon/human/H = target
+		var/obj/item/clothing/suit/space/S = H.get_covering_equipped_item_by_zone(zone)
+		if(istype(S) && !length(S.breaches))
+			return
+		if(target.reagents)
+			target.reagents.add_reagent(src.poison_type, rand(0.875 * src.poison_per_bite, src.poison_per_bite))
+			if(prob(src.poison_per_bite))
+				to_chat(H, SPAN_WARNING("You feel a tiny prick."))
 
 /datum/unarmed_attack/bite/venom/get_damage_type()
-	return DAMAGE_TOXIN
+	return BRUTE

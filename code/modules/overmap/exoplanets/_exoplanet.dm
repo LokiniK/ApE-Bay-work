@@ -4,7 +4,7 @@ GLOBAL_VAR(planet_repopulation_disabled)
 	name = "exoplanet"
 	icon_state = "globe"
 	sector_flags = OVERMAP_SECTOR_KNOWN
-	sensor_visibility = 60
+	known = TRUE
 	var/area/planetary_area
 	var/list/seeds = list()
 	var/list/fauna_types = list()		// possible types of mobs to spawn
@@ -73,7 +73,7 @@ GLOBAL_VAR(planet_repopulation_disabled)
 	if (isnum(habitability_distribution))
 		habitability_class = habitability_distribution
 	else
-		habitability_class = pickweight_index(habitability_distribution)
+		habitability_class = pickweightindex(habitability_distribution)
 
 /obj/effect/overmap/visitable/sector/exoplanet/New(nloc, max_x, max_y)
 	if (!GLOB.using_map.use_overmap)
@@ -105,8 +105,6 @@ GLOBAL_VAR(planet_repopulation_disabled)
 
 	for (var/T in subtypesof(/datum/map_template/ruin/exoplanet))
 		var/datum/map_template/ruin/exoplanet/ruin = T
-		if (initial(ruin.template_flags) & TEMPLATE_FLAG_RUIN_STARTS_DISALLOWED)
-			continue
 		if (ruin_tags_whitelist && !(ruin_tags_whitelist & initial(ruin.ruin_tags)))
 			continue
 		if (ruin_tags_blacklist & initial(ruin.ruin_tags))
@@ -119,19 +117,6 @@ GLOBAL_VAR(planet_repopulation_disabled)
 	generate_atmosphere()
 	for (var/datum/exoplanet_theme/T in themes)
 		T.adjust_atmosphere(src)
-	if (atmosphere)
-		//Set up gases for living things
-		if (!length(breathgas))
-			var/list/goodgases = gas_data.gases.Copy()
-			var/gasnum = min(rand(1,3), length(goodgases))
-			for (var/i = 1 to gasnum)
-				var/gas = pick(goodgases)
-				breathgas[gas] = round(0.4*goodgases[gas], 0.1)
-				goodgases -= gas
-		if (!badgas)
-			var/list/badgases = gas_data.gases.Copy()
-			badgases -= atmosphere.gas
-			badgas = pick(badgases)
 	generate_flora()
 	generate_map()
 	generate_features()
@@ -145,7 +130,7 @@ GLOBAL_VAR(planet_repopulation_disabled)
 
 //attempt at more consistent history generation for xenoarch finds.
 /obj/effect/overmap/visitable/sector/exoplanet/proc/get_engravings()
-	if (!length(actors))
+	if (!actors.len)
 		actors += pick("alien humanoid","an amorphic blob","a short, hairy being","a rodent-like creature","a robot","a primate","a reptilian alien","an unidentifiable object","a statue","a starship","unusual devices","a structure")
 		actors += pick("alien humanoids","amorphic blobs","short, hairy beings","rodent-like creatures","robots","primates","reptilian aliens")
 
@@ -158,7 +143,7 @@ GLOBAL_VAR(planet_repopulation_disabled)
 	return engravings
 
 /obj/effect/overmap/visitable/sector/exoplanet/Process(wait, tick)
-	if (length(animals) < 0.5*max_animal_count && !repopulating)
+	if (animals.len < 0.5*max_animal_count && !repopulating)
 		repopulating = TRUE
 		max_animal_count = round(max_animal_count * 0.5)
 
@@ -172,10 +157,10 @@ GLOBAL_VAR(planet_repopulation_disabled)
 		var/zone/Z
 		for (var/i = 1 to maxx)
 			var/turf/simulated/T = locate(i, 2, zlevel)
-			if (istype(T) && T.zone && length(T.zone.contents) > (maxx*maxy*0.25)) //if it's a zone quarter of zlevel, good enough odds it's planetary main one
+			if (istype(T) && T.zone && T.zone.contents.len > (maxx*maxy*0.25)) //if it's a zone quarter of zlevel, good enough odds it's planetary main one
 				Z = T.zone
 				break
-		if (Z && !length(Z.fire_tiles) && !atmosphere.compare(Z.air)) //let fire die out first if there is one
+		if (Z && !Z.fire_tiles.len && !atmosphere.compare(Z.air)) //let fire die out first if there is one
 			var/datum/gas_mixture/daddy = new() //make a fake 'planet' zone gas
 			daddy.copy_from(atmosphere)
 			daddy.group_multiplier = Z.air.group_multiplier
@@ -243,7 +228,8 @@ GLOBAL_VAR(planet_repopulation_disabled)
 	..()
 	return INITIALIZE_HINT_LATELOAD
 
-/obj/effect/landmark/exoplanet_spawn/LateInitialize(mapload)
+/obj/effect/landmark/exoplanet_spawn/LateInitialize()
+	. = ..()
 	var/obj/effect/overmap/visitable/sector/exoplanet/E = map_sectors["[z]"]
 	if (istype(E))
 		do_spawn(E)
@@ -255,8 +241,8 @@ GLOBAL_VAR(planet_repopulation_disabled)
 	var/new_type = landmark_type
 	while(num)
 		attempts--
-		var/turf/T = locate(rand(TRANSITIONEDGE + LANDING_ZONE_RADIUS, maxx - TRANSITIONEDGE - LANDING_ZONE_RADIUS), rand(TRANSITIONEDGE + LANDING_ZONE_RADIUS, maxy - TRANSITIONEDGE - LANDING_ZONE_RADIUS),map_z[length(map_z)])
-		if (!T || (T in places) || T.density) // Don't allow two landmarks on one turf, and don't use a dense turf.
+		var/turf/T = locate(rand(TRANSITIONEDGE + LANDING_ZONE_RADIUS, maxx - TRANSITIONEDGE - LANDING_ZONE_RADIUS), rand(TRANSITIONEDGE + LANDING_ZONE_RADIUS, maxy - TRANSITIONEDGE - LANDING_ZONE_RADIUS),map_z[map_z.len])
+		if (!T || (T in places)) // Two landmarks on one turf is forbidden as the landmark code doesn't work with it.
 			continue
 		if (attempts >= 0) // While we have the patience, try to find better spawn points. If out of patience, put them down wherever, so long as there are no repeats.
 			var/valid = TRUE
@@ -280,9 +266,9 @@ GLOBAL_VAR(planet_repopulation_disabled)
 
 /obj/effect/overmap/visitable/sector/exoplanet/get_scan_data(mob/user)
 	. = ..()
-	var/list/extra_data = list()
+	var/list/extra_data = list("<br>")
 	if (atmosphere)
-		if (user.skill_check(SKILL_SCIENCE, SKILL_TRAINED))
+		if (user.skill_check(SKILL_SCIENCE, SKILL_ADEPT))
 			var/list/gases = list()
 			for (var/g in atmosphere.gas)
 				if (atmosphere.gas[g] > atmosphere.total_moles * 0.05)
@@ -292,15 +278,15 @@ GLOBAL_VAR(planet_repopulation_disabled)
 			extra_data += "Atmosphere pressure [atmosphere.return_pressure()*inaccuracy] kPa, temperature [atmosphere.temperature*inaccuracy] K"
 		else if (user.skill_check(SKILL_SCIENCE, SKILL_BASIC))
 			extra_data += "Atmosphere present"
-		extra_data += ""
+		extra_data += "<br>"
 
-	if (length(seeds) && user.skill_check(SKILL_SCIENCE, SKILL_BASIC))
+	if (seeds.len && user.skill_check(SKILL_SCIENCE, SKILL_BASIC))
 		extra_data += "Xenoflora detected"
 
-	if (length(animals) && user.skill_check(SKILL_SCIENCE, SKILL_BASIC))
+	if (animals.len && user.skill_check(SKILL_SCIENCE, SKILL_BASIC))
 		extra_data += "Life traces detected"
 
-	if (LAZYLEN(spawned_features) && user.skill_check(SKILL_SCIENCE, SKILL_TRAINED))
+	if (LAZYLEN(spawned_features) && user.skill_check(SKILL_SCIENCE, SKILL_ADEPT))
 		var/ruin_num = 0
 		for (var/datum/map_template/ruin/exoplanet/R in spawned_features)
 			if (!(R.ruin_tags & RUIN_NATURAL))

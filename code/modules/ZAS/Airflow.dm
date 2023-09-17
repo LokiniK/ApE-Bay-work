@@ -2,36 +2,36 @@
 Contains helper procs for airflow, handled in /connection_group.
 */
 
-/mob/var/last_airflow_stun = 0
-/mob/proc/airflow_stun()
+mob/var/tmp/last_airflow_stun = 0
+mob/proc/airflow_stun()
 	if(stat == 2)
 		return 0
 	if(last_airflow_stun > world.time - vsc.airflow_stun_cooldown)	return 0
 
 	if(!(status_flags & CANSTUN) && !(status_flags & CANWEAKEN))
-		to_chat(src, SPAN_NOTICE("You stay upright as the air rushes past you."))
+		to_chat(src, "<span class='notice'>You stay upright as the air rushes past you.</span>")
 		return 0
 	if(buckled)
-		to_chat(src, SPAN_NOTICE("Air suddenly rushes past you!"))
+		to_chat(src, "<span class='notice'>Air suddenly rushes past you!</span>")
 		return 0
 	if(!lying)
-		to_chat(src, SPAN_WARNING("The sudden rush of air knocks you over!"))
+		to_chat(src, "<span class='warning'>The sudden rush of air knocks you over!</span>")
 	Weaken(5)
 	last_airflow_stun = world.time
 
-/mob/living/silicon/airflow_stun()
+mob/living/silicon/airflow_stun()
 	return
 
-/mob/living/carbon/slime/airflow_stun()
+mob/living/carbon/slime/airflow_stun()
 	return
 
-/mob/living/carbon/human/airflow_stun()
+mob/living/carbon/human/airflow_stun()
 	if(!slip_chance())
-		to_chat(src, SPAN_NOTICE("Air suddenly rushes past you!"))
+		to_chat(src, "<span class='notice'>Air suddenly rushes past you!</span>")
 		return 0
 	..()
 
-/atom/movable/proc/check_airflow_movable(n)
+atom/movable/proc/check_airflow_movable(n)
 
 	if(anchored && !ismob(src)) return 0
 
@@ -39,16 +39,16 @@ Contains helper procs for airflow, handled in /connection_group.
 
 	return 1
 
-/mob/check_airflow_movable(n)
+mob/check_airflow_movable(n)
 	if(n < vsc.airflow_heavy_pressure)
 		return 0
 	return 1
 
-/mob/living/silicon/check_airflow_movable()
+mob/living/silicon/check_airflow_movable()
 	return 0
 
 
-/obj/check_airflow_movable(n)
+obj/check_airflow_movable(n)
 	if(isnull(w_class))
 		if(n < vsc.airflow_dense_pressure) return 0 //most non-item objs don't have a w_class yet
 	else
@@ -66,11 +66,11 @@ Contains helper procs for airflow, handled in /connection_group.
 	return ..()
 
 
-/atom/movable/var/turf/airflow_dest
-/atom/movable/var/airflow_speed = 0
-/atom/movable/var/airflow_time = 0
-/atom/movable/var/last_airflow = 0
-/atom/movable/var/airborne_acceleration = 0
+/atom/movable/var/tmp/turf/airflow_dest
+/atom/movable/var/tmp/airflow_speed = 0
+/atom/movable/var/tmp/airflow_time = 0
+/atom/movable/var/tmp/last_airflow = 0
+/atom/movable/var/tmp/airborne_acceleration = 0
 
 /atom/movable/proc/AirflowCanMove(n)
 	return 1
@@ -90,7 +90,7 @@ Contains helper procs for airflow, handled in /connection_group.
 		if(airborne_acceleration > 1)
 			airflow_hit(A)
 		else if(istype(src, /mob/living/carbon/human))
-			to_chat(src, SPAN_NOTICE("You are pinned against [A] by airflow!"))
+			to_chat(src, "<span class='notice'>You are pinned against [A] by airflow!</span>")
 			airborne_acceleration = 0
 	else
 		airflow_speed = 0
@@ -98,43 +98,43 @@ Contains helper procs for airflow, handled in /connection_group.
 		airborne_acceleration = 0
 		. = ..()
 
-/atom/movable/proc/airflow_hit(atom/A)
+atom/movable/proc/airflow_hit(atom/A)
 	airflow_speed = 0
 	airflow_dest = null
 	airborne_acceleration = 0
 
-/mob/airflow_hit(atom/A)
+mob/airflow_hit(atom/A)
 	for(var/mob/M in hearers(src))
-		M.show_message(SPAN_DANGER("\The [src] slams into \a [A]!"),1,SPAN_DANGER("You hear a loud slam!"),2)
+		M.show_message("<span class='danger'>\The [src] slams into \a [A]!</span>",1,"<span class='danger'>You hear a loud slam!</span>",2)
 	playsound(src.loc, "smash.ogg", 25, 1, -1)
 	var/weak_amt = istype(A,/obj/item) ? A:w_class : rand(1,5) //Heheheh
 	Weaken(weak_amt)
 	. = ..()
 
-/obj/airflow_hit(atom/A)
+obj/airflow_hit(atom/A)
 	for(var/mob/M in hearers(src))
-		M.show_message(SPAN_DANGER("\The [src] slams into \a [A]!"),1,SPAN_DANGER("You hear a loud slam!"),2)
+		M.show_message("<span class='danger'>\The [src] slams into \a [A]!</span>",1,"<span class='danger'>You hear a loud slam!</span>",2)
 	playsound(src.loc, "smash.ogg", 25, 1, -1)
 	. = ..()
 
-/obj/item/airflow_hit(atom/A)
+obj/item/airflow_hit(atom/A)
 	airflow_speed = 0
 	airflow_dest = null
 
-/mob/living/carbon/human/airflow_hit(atom/A)
+mob/living/carbon/human/airflow_hit(atom/A)
 //	for(var/mob/M in hearers(src))
-//		M.show_message(SPAN_DANGER("[src] slams into [A]!"),1,SPAN_DANGER("You hear a loud slam!"),2)
+//		M.show_message("<span class='danger'>[src] slams into [A]!</span>",1,"<span class='danger'>You hear a loud slam!</span>",2)
 	playsound(src.loc, "punch", 25, 1, -1)
 	if (prob(33))
 		loc:add_blood(src)
 		bloody_body(src)
 	var/b_loss = min(airflow_speed, (airborne_acceleration*2)) * vsc.airflow_damage
 
-	apply_damage(b_loss/3, DAMAGE_BRUTE, BP_HEAD, used_weapon = "Airflow")
+	apply_damage(b_loss/3, BRUTE, BP_HEAD, used_weapon = "Airflow")
 
-	apply_damage(b_loss/3, DAMAGE_BRUTE, BP_CHEST, used_weapon =  "Airflow")
+	apply_damage(b_loss/3, BRUTE, BP_CHEST, used_weapon =  "Airflow")
 
-	apply_damage(b_loss/3, DAMAGE_BRUTE, BP_GROIN, used_weapon =  "Airflow")
+	apply_damage(b_loss/3, BRUTE, BP_GROIN, used_weapon =  "Airflow")
 
 	if(airflow_speed > 10)
 		Paralyse(round(airflow_speed * vsc.airflow_stun))
@@ -143,7 +143,7 @@ Contains helper procs for airflow, handled in /connection_group.
 		Stun(round(airflow_speed * vsc.airflow_stun/2))
 	. = ..()
 
-/zone/proc/movables()
+zone/proc/movables()
 	. = list()
 	for(var/turf/T in contents)
 		for(var/atom/movable/A in T)

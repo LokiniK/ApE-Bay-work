@@ -4,7 +4,7 @@
 /obj/machinery/light_switch
 	name = "light switch"
 	desc = "It turns lights on and off. What are you, simple?"
-	icon = 'icons/obj/structures/buttons.dmi'
+	icon = 'icons/obj/buttons.dmi'
 	icon_state = "light0"
 	anchored = TRUE
 	idle_power_usage = 20
@@ -34,21 +34,21 @@
 		overlay.layer = ABOVE_LIGHTING_LAYER
 
 	overlays.Cut()
-	if(inoperable())
+	if(stat & (NOPOWER|BROKEN))
 		icon_state = "light-p"
 		set_light(0)
 	else
 		icon_state = "light[on]"
 		overlay.icon_state = "light[on]-overlay"
 		overlays += overlay
-		set_light(0.1, 0.1, 1, 2, on ? "#82ff4c" : "#f86060")
+		set_light(0.3, 0.1, 1, 2, on ? "#82ff4c" : "#f86060")
 
 /obj/machinery/light_switch/examine(mob/user, distance)
 	. = ..()
 	if(distance)
 		to_chat(user, "A light switch. It is [on? "on" : "off"].")
 
-/obj/machinery/light_switch/proc/set_state(newstate)
+/obj/machinery/light_switch/proc/set_state(var/newstate)
 	if(on != newstate)
 		on = newstate
 		connected_area.set_lightswitch(on)
@@ -70,7 +70,8 @@
 	if(istype(tool, /obj/item/screwdriver))
 		new /obj/item/frame/light_switch(user.loc, 1)
 		qdel(src)
-
+	else
+		return attack_hand(user)
 
 /obj/machinery/light_switch/powered()
 	. = ..(power_channel, connected_area) //tie our powered status to the connected area
@@ -82,7 +83,7 @@
 		sync_state()
 
 /obj/machinery/light_switch/emp_act(severity)
-	if(inoperable())
+	if(stat & (BROKEN|NOPOWER))
 		..(severity)
 		return
 	power_change()

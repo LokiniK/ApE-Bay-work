@@ -65,8 +65,8 @@ research holder datum.
 
 //Checks to see if design has all the required pre-reqs.
 //Input: datum/design; Output: 0/1 (false/true)
-/datum/research/proc/DesignHasReqs(datum/design/D)
-	if(length(D.req_tech) == 0)
+/datum/research/proc/DesignHasReqs(var/datum/design/D)
+	if(D.req_tech.len == 0)
 		return 1
 
 	var/list/k_tech = list()
@@ -82,7 +82,7 @@ research holder datum.
 
 //Adds a tech to known_tech list. Checks to make sure there aren't duplicates and updates existing tech's levels if needed.
 //Input: datum/tech; Output: Null
-/datum/research/proc/AddTech2Known(datum/tech/T)
+/datum/research/proc/AddTech2Known(var/datum/tech/T)
 	for(var/datum/tech/known in known_tech)
 		if(T.id == known.id)
 			if(T.level > known.level)
@@ -90,11 +90,11 @@ research holder datum.
 			return
 	return
 
-/datum/research/proc/AddDesign2Known(datum/design/D)
-	if(!length(known_designs)) // Special case
+/datum/research/proc/AddDesign2Known(var/datum/design/D)
+	if(!known_designs.len) // Special case
 		known_designs.Add(D)
 		return
-	for(var/i = 1 to length(known_designs))
+	for(var/i = 1 to known_designs.len)
 		var/datum/design/A = known_designs[i]
 		if(A.id == D.id) // We are guaranteed to reach this if the ids are the same, because sort_string will also be the same
 			return
@@ -111,12 +111,12 @@ research holder datum.
 		if(DesignHasReqs(PD))
 			AddDesign2Known(PD)
 	for(var/datum/tech/T in known_tech)
-		T = clamp(T.level, 0, 20)
+		T = between(0, T.level, 20)
 	return
 
 //Refreshes the levels of a given tech.
 //Input: Tech's ID and Level; Output: null
-/datum/research/proc/UpdateTech(ID, level)
+/datum/research/proc/UpdateTech(var/ID, var/level)
 	// If a "brain expansion" event is active, we gain 1 extra level
 	for(var/datum/event/E in SSevent.active_events)
 		if(istype(E, /datum/event/brain_expansion))
@@ -129,7 +129,7 @@ research holder datum.
 	return
 
 // A simple helper proc to find the name of a tech with a given ID.
-/proc/CallTechName(ID)
+/proc/CallTechName(var/ID)
 	for(var/T in subtypesof(/datum/tech))
 		var/datum/tech/check_tech = T
 		if(initial(check_tech.id) == ID)
@@ -200,7 +200,7 @@ research holder datum.
 /obj/item/disk/tech_disk
 	name = "fabricator data disk"
 	desc = "A disk for storing fabricator learning data for backup."
-	icon = 'icons/obj/datadisks.dmi'
+	icon = 'icons/obj/cloning.dmi'
 	icon_state = "datadisk2"
 	item_state = "card-id"
 	w_class = ITEM_SIZE_SMALL
@@ -211,7 +211,7 @@ research holder datum.
 /obj/item/disk/design_disk
 	name = "component design disk"
 	desc = "A disk for storing device design data for construction in lathes."
-	icon = 'icons/obj/datadisks.dmi'
+	icon = 'icons/obj/cloning.dmi'
 	icon_state = "datadisk2"
 	item_state = "card-id"
 	w_class = ITEM_SIZE_SMALL

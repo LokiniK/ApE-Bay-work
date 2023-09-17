@@ -1,7 +1,7 @@
 /obj/item/mop
 	desc = "The world of janitalia wouldn't be complete without a mop."
 	name = "mop"
-	icon = 'icons/obj/janitor_tools.dmi'
+	icon = 'icons/obj/janitor.dmi'
 	icon_state = "mop"
 	force = 5
 	throwforce = 10.0
@@ -34,13 +34,13 @@
 			if(F.fluid_amount > FLUID_SHALLOW)
 				to_chat(user, SPAN_WARNING("There is too much water here to be mopped up."))
 			else
-				user.visible_message(SPAN_NOTICE("\The [user] begins to mop up \the [T]."))
+				user.visible_message("<span class='notice'>\The [user] begins to mop up \the [T].</span>")
 				if(do_after(user, mopspeed, T, do_flags = DO_DEFAULT | DO_PUBLIC_PROGRESS) && F && !QDELETED(F))
 					if(F.fluid_amount > FLUID_SHALLOW)
 						to_chat(user, SPAN_WARNING("There is too much water here to be mopped up."))
 					else
 						qdel(F)
-						to_chat(user, SPAN_NOTICE("You have finished mopping!"))
+						to_chat(user, "<span class='notice'>You have finished mopping!</span>")
 			return
 		moppable = TRUE
 
@@ -49,19 +49,24 @@
 
 	if(moppable)
 		if(reagents.total_volume < 1)
-			to_chat(user, SPAN_NOTICE("Your mop is dry!"))
+			to_chat(user, "<span class='notice'>Your mop is dry!</span>")
 			return
 		var/turf/T = get_turf(A)
 		if(!T)
 			return
 
-		user.visible_message(SPAN_WARNING("\The [user] begins to clean \the [T]."))
+		user.visible_message("<span class='warning'>\The [user] begins to clean \the [T].</span>")
 
 		if(do_after(user, mopspeed, T, do_flags = DO_DEFAULT | DO_PUBLIC_PROGRESS))
 			if(T)
 				T.clean(src, user)
-			to_chat(user, SPAN_NOTICE("You have finished mopping!"))
+			to_chat(user, "<span class='notice'>You have finished mopping!</span>")
 
+
+/obj/effect/attackby(obj/item/I, mob/user)
+	if(istype(I, /obj/item/mop) || istype(I, /obj/item/soap))
+		return
+	..()
 
 /obj/item/mop/advanced
 	desc = "The most advanced tool in a custodian's arsenal, with a cleaner synthesizer to boot! Just think of all the viscera you will clean up with this!"
@@ -85,7 +90,7 @@
 		START_PROCESSING(SSobj, src)
 	else
 		STOP_PROCESSING(SSobj,src)
-	to_chat(user, SPAN_NOTICE("You set the condenser switch to the '[refill_enabled ? "ON" : "OFF"]' position."))
+	to_chat(user, "<span class='notice'>You set the condenser switch to the '[refill_enabled ? "ON" : "OFF"]' position.</span>")
 	playsound(user, 'sound/machines/click.ogg', 30, 1)
 
 /obj/item/mop/advanced/Process()
@@ -94,7 +99,7 @@
 
 /obj/item/mop/advanced/examine(mob/user)
 	. = ..()
-	to_chat(user, SPAN_NOTICE("The condenser switch is set to <b>[refill_enabled ? "ON" : "OFF"]</b>."))
+	to_chat(user, "<span class='notice'>The condenser switch is set to <b>[refill_enabled ? "ON" : "OFF"]</b>.</span>")
 
 /obj/item/mop/advanced/Destroy()
 	if(refill_enabled)

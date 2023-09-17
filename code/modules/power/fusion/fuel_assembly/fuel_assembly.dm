@@ -1,6 +1,6 @@
 /obj/item/fuel_assembly
 	name = "fuel rod assembly"
-	icon = 'icons/obj/fusion_fuel_assembly.dmi'
+	icon = 'icons/obj/machines/power/fusion.dmi'
 	icon_state = "fuel_assembly"
 	layer = 4
 
@@ -12,7 +12,7 @@
 	var/radioactivity = 0
 	var/initial_amount
 
-/obj/item/fuel_assembly/New(newloc, _material, _colour)
+/obj/item/fuel_assembly/New(var/newloc, var/_material, var/_colour)
 	fuel_type = _material
 	fuel_colour = _colour
 	..(newloc)
@@ -43,7 +43,7 @@
 		SetName("[fuel_type] fuel rod assembly")
 		desc = "A fuel rod for a fusion reactor. This one is made from [fuel_type]."
 
-	icon_state = "fuel_assembly"
+	icon_state = "blank"
 	var/image/I = image(icon, "fuel_assembly")
 	I.color = fuel_colour
 	overlays += list(I, image(icon, "fuel_assembly_bracket"))
@@ -61,17 +61,17 @@
 	return ..()
 
 // Mapper shorthand.
-/obj/item/fuel_assembly/deuterium/New(newloc)
+/obj/item/fuel_assembly/deuterium/New(var/newloc)
 	..(newloc, MATERIAL_DEUTERIUM)
 
-/obj/item/fuel_assembly/tritium/New(newloc)
+/obj/item/fuel_assembly/tritium/New(var/newloc)
 	..(newloc, MATERIAL_TRITIUM)
 
-/obj/item/fuel_assembly/phoron/New(newloc)
+/obj/item/fuel_assembly/phoron/New(var/newloc)
 	..(newloc, MATERIAL_PHORON)
 
-/obj/item/fuel_assembly/supermatter/New(newloc)
+/obj/item/fuel_assembly/supermatter/New(var/newloc)
 	..(newloc, MATERIAL_SUPERMATTER)
 
-/obj/item/fuel_assembly/hydrogen/New(newloc)
+/obj/item/fuel_assembly/hydrogen/New(var/newloc)
 	..(newloc, MATERIAL_HYDROGEN)

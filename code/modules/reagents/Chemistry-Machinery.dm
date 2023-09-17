@@ -14,8 +14,8 @@
 	desc = "This large machine uses a complex filtration system to split, merge, condense, or bottle up any kind of chemical, for all your medicinal* needs."
 	density = TRUE
 	anchored = TRUE
-	icon = 'icons/obj/machines/medical/mixer.dmi'
-	icon_state = "mixer"
+	icon = 'icons/obj/chemical.dmi'
+	icon_state = "mixer0"
 	layer = BELOW_OBJ_LAYER
 	idle_power_usage = 20
 	clicksound = "button"
@@ -24,7 +24,7 @@
 	var/obj/item/reagent_containers/beaker = null
 	var/obj/item/storage/pill_bottle/loaded_pill_bottle = null
 
-	var/to_beaker = FALSE // If TRUE, reagents will move from buffer -> beaker. If FALSE, reagents will be destroyed when moved from the buffer.
+	var/to_beaker = TRUE // If TRUE, reagents will move from buffer -> beaker. If FALSE, reagents will be destroyed when moved from the buffer.
 	var/useramount = 30 // Last used amount
 	var/pillamount = 10
 	var/max_pill_count = 20
@@ -46,42 +46,28 @@
 	create_reagents(reagent_limit)
 	..()
 
-/obj/machinery/chem_master/on_update_icon()
-	overlays.Cut()
-	if(panel_open)
-		overlays += "[icon_state]_panel"
-	if(is_powered())
-		overlays += emissive_appearance(icon, "[icon_state]_lights")
-		overlays += "[icon_state]_lights"
-	if((beaker) || (loaded_pill_bottle))
-		if(!is_powered())
-			overlays += "[icon_state]_working_nopower"
-		else
-			overlays += emissive_appearance(icon, "[icon_state]_lights_working")
-			overlays += "[icon_state]_lights_working"
-			overlays += "[icon_state]_working"
-
 /obj/machinery/chem_master/ex_act(severity)
 	switch(severity)
-		if(EX_ACT_DEVASTATING)
+		if(1.0)
 			qdel(src)
 			return
-		if(EX_ACT_HEAVY)
+		if(2.0)
 			if (prob(50))
 				qdel(src)
 				return
 
-/obj/machinery/chem_master/attackby(obj/item/B as obj, mob/user as mob)
+/obj/machinery/chem_master/attackby(var/obj/item/B as obj, var/mob/user as mob)
 
-	if(istype(B, /obj/item/reagent_containers/glass) || istype(B, /obj/item/reagent_containers/ivbag))
+	if(istype(B, /obj/item/reagent_containers/glass))
 
 		if(beaker)
-			to_chat(user, "A container is already loaded into the machine.")
+			to_chat(user, "A beaker is already loaded into the machine.")
 			return
 		if(!user.unEquip(B, src))
 			return
 		beaker = B
-		to_chat(user, "You add the container to the machine!")
+		to_chat(user, "You add the beaker to the machine!")
+		icon_state = "mixer1"
 		atom_flags |= ATOM_FLAG_OPEN_CONTAINER
 
 	else if(istype(B, /obj/item/storage/pill_bottle))
@@ -93,7 +79,6 @@
 			return
 		loaded_pill_bottle = B
 		to_chat(user, "You add the pill bottle into the dispenser slot!")
-	update_icon()
 
 /obj/machinery/chem_master/proc/eject_beaker(mob/user)
 	if(!beaker)
@@ -102,17 +87,17 @@
 	user.put_in_hands(B)
 	beaker = null
 	reagents.clear_reagents()
-	update_icon()
+	icon_state = "mixer0"
 	atom_flags &= ~ATOM_FLAG_OPEN_CONTAINER
 
 /obj/machinery/chem_master/proc/get_remaining_volume()
-	return clamp(reagent_limit - reagents.total_volume, 0, reagent_limit)
+	return Clamp(reagent_limit - reagents.total_volume, 0, reagent_limit)
 
 /obj/machinery/chem_master/AltClick(mob/user)
 	if(CanDefaultInteract(user))
 		eject_beaker(user)
-		return TRUE
-	return ..()
+	else
+		..()
 
 /obj/machinery/chem_master/Topic(href, href_list, state)
 	if(..())
@@ -138,7 +123,7 @@
 				var/datum/reagent/their_reagent = locate(href_list["add"]) in R.reagent_list
 				if(their_reagent)
 					var/mult = 1
-					var/amount = clamp((text2num(href_list["amount"])), 0, get_remaining_volume())
+					var/amount = Clamp((text2num(href_list["amount"])), 0, get_remaining_volume())
 					if(sloppy)
 						var/contaminants = fetch_contaminants(user, R, their_reagent)
 						for(var/datum/reagent/reagent in contaminants)
@@ -152,14 +137,14 @@
 			if(their_reagent)
 				useramount = input("Select the amount of reagents to transfer.", 30, useramount) as null|num
 				if(useramount)
-					useramount = clamp(useramount, 0, 200)
+					useramount = Clamp(useramount, 0, 200)
 					Topic(href, list("amount" = "[useramount]", "add" = href_list["addcustom"]), state)
 
 		else if (href_list["remove"])
 			if(href_list["amount"] && beaker)
 				var/datum/reagent/my_reagents = locate(href_list["remove"]) in reagents.reagent_list
 				if(my_reagents)
-					var/amount = clamp((text2num(href_list["amount"])), 0, 200)
+					var/amount = Clamp((text2num(href_list["amount"])), 0, 200)
 					var/contaminants = fetch_contaminants(user, reagents, my_reagents)
 					if(to_beaker)
 						reagents.trans_type_to(beaker, my_reagents.type, amount)
@@ -175,24 +160,24 @@
 			if(my_reagents)
 				useramount = input("Select the amount to transfer.", 30, useramount) as null|num
 				if(useramount)
-					useramount = clamp(useramount, 0, 200)
+					useramount = Clamp(useramount, 0, 200)
 					Topic(href, list("amount" = "[useramount]", "remove" = href_list["removecustom"]), state)
-
+		
 		else if (href_list["pill_dosage"])
 			var/initial_dosage = initial(pill_dosage)
 			var/new_dosage = input("Select a new dosage for your pills.", initial_dosage, "Pill Dosage") as null|num
 			if (!new_dosage)
 				return
-			new_dosage = clamp(new_dosage, 0, initial_dosage)
+			new_dosage = Clamp(new_dosage, 0, initial_dosage)
 			pill_dosage = new_dosage
 			to_chat(user, SPAN_NOTICE("You configure \the [src] to create pills with a maximum dosage of [pill_dosage] units."))
-
+		
 		else if (href_list["bottle_dosage"])
 			var/initial_dosage = initial(bottle_dosage)
 			var/new_dosage = input("Select a new dosage for your bottles.", initial_dosage, "Bottle Dosage") as null|num
 			if (!new_dosage)
 				return
-			new_dosage = clamp(new_dosage, 0, initial_dosage)
+			new_dosage = Clamp(new_dosage, 0, initial_dosage)
 			bottle_dosage = new_dosage
 			to_chat(user, SPAN_NOTICE("You configure \the [src] to fill bottles with [bottle_dosage] units of reagents."))
 
@@ -222,7 +207,7 @@
 				count = input("Select the number of pills to make.", "Max [max_pill_count]", pillamount) as null|num
 				if (!count)
 					return
-				count = clamp(count, 1, max_pill_count)
+				count = Clamp(count, 1, max_pill_count)
 
 			if(reagents.total_volume/count < 1) //Sanity checking.
 				return
@@ -247,7 +232,7 @@
 					P.color = reagents.get_color()
 				reagents.trans_to_obj(P,amount_per_pill)
 				if(loaded_pill_bottle)
-					if(length(loaded_pill_bottle.contents) < loaded_pill_bottle.max_storage_space)
+					if(loaded_pill_bottle.contents.len < loaded_pill_bottle.max_storage_space)
 						P.forceMove(loaded_pill_bottle)
 
 		else if (href_list["createbottle"])
@@ -299,14 +284,14 @@
 	ui_interact(user)
 	return TRUE
 
-/obj/machinery/chem_master/ui_interact(mob/user, ui_key = "main", datum/nanoui/ui = null, force_open = TRUE)
+/obj/machinery/chem_master/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = TRUE)
 	if(!(user.client in has_sprites))
 		spawn()
 			has_sprites += user.client
 			for(var/i = 1 to MAX_PILL_SPRITE)
-				send_rsc(usr, icon('icons/obj/pills.dmi', "pill" + num2text(i)), "pill[i].png")
+				send_rsc(usr, icon('icons/obj/chemical.dmi', "pill" + num2text(i)), "pill[i].png")
 			for(var/sprite in BOTTLE_SPRITES)
-				send_rsc(usr, icon('icons/obj/chemical_storage.dmi', sprite), "[sprite].png")
+				send_rsc(usr, icon('icons/obj/chemical.dmi', sprite), "[sprite].png")
 
 	var/data = list()
 	if (analyzed_reagent)
@@ -317,7 +302,7 @@
 
 	if (loaded_pill_bottle)
 		data["loadedPillBottle"] = loaded_pill_bottle
-		data["pillBottleBlurb"] = "Eject Pill Bottle \[[length(loaded_pill_bottle.contents)]/[loaded_pill_bottle.max_storage_space]\]"
+		data["pillBottleBlurb"] = "Eject Pill Bottle \[[loaded_pill_bottle.contents.len]/[loaded_pill_bottle.max_storage_space]\]"
 
 	data["isSloppy"] = sloppy
 	data["isTransferringToBeaker"] = to_beaker
@@ -357,7 +342,7 @@
 			pill_sprite["index"] = i
 			pill_sprite["image"] = "<img src=\"pill[i].png\" />"
 			data["pillSprites"] += list(pill_sprite)
-
+		
 		data["bottleSprites"] = list()
 		for(var/sprite in BOTTLE_SPRITES)
 			var/bottle_sprite = list()
@@ -390,4 +375,4 @@
 #undef CHEMMASTER_OPTIONS_CONDIMENTS
 
 #undef CHEMMASTER_SWITCH_SPRITE_PILL
-#undef CHEMMASTER_SWITCH_SPRITE_BOTTLE
+#undef CHEMMASTER_SWITCH_SPRITE_BOTTLE 

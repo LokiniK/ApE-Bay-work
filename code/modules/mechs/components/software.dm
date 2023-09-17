@@ -1,3 +1,5 @@
+#define T_BOARD_MECH(name)	"exosuit software (" + (name) + ")"
+
 /obj/item/circuitboard/exosystem
 	name = "exosuit software template"
 	icon = 'icons/obj/module.dmi'
@@ -6,24 +8,26 @@
 	var/list/contains_software = list()
 
 /obj/item/circuitboard/exosystem/engineering
-	name = "exosuit software (engineering systems)"
+	name = T_BOARD_MECH("engineering systems")
 	contains_software = list(MECH_SOFTWARE_ENGINEERING)
 	origin_tech = list(TECH_DATA = 1)
 
 /obj/item/circuitboard/exosystem/utility
-	name = "exosuit software (utility systems)"
+	name = T_BOARD_MECH("utility systems")
 	contains_software = list(MECH_SOFTWARE_UTILITY)
 	icon_state = "mcontroller"
 	origin_tech = list(TECH_DATA = 1)
 
 /obj/item/circuitboard/exosystem/medical
-	name = "exosuit software (medical systems)"
+	name = T_BOARD_MECH("medical systems")
 	contains_software = list(MECH_SOFTWARE_MEDICAL)
 	icon_state = "mcontroller"
 	origin_tech = list(TECH_DATA = 3,TECH_BIO = 2)
 
 /obj/item/circuitboard/exosystem/weapons
-	name = "exosuit software (basic weapon systems)"
+	name = T_BOARD_MECH("basic weapon systems")
 	contains_software = list(MECH_SOFTWARE_WEAPONS)
 	icon_state = "mainboard"
 	origin_tech = list(TECH_DATA = 4, TECH_COMBAT = 3)
+
+#undef T_BOARD_MECH

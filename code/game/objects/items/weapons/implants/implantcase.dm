@@ -3,7 +3,7 @@
 /obj/item/implantcase
 	name = "glass case"
 	desc = "A case containing an implant."
-	icon = 'icons/obj/tools/implanter.dmi'
+	icon = 'icons/obj/items.dmi'
 	icon_state = "implantcase-0"
 	item_state = "implantcase"
 	throw_speed = 1
@@ -17,6 +17,10 @@
 		update_description()
 	..()
 	update_icon()
+
+/obj/item/implantcase/Destroy()
+	QDEL_NULL(imp)
+	. = ..()
 
 /obj/item/implantcase/proc/update_description()
 	if (imp)
@@ -64,7 +68,7 @@
 		update_icon()
 		M.update_icon()
 	else if (istype(I, /obj/item/implant) && user.unEquip(I, src))
-		to_chat(usr, SPAN_NOTICE("You slide \the [I] into \the [src]."))
+		to_chat(usr, "<span class='notice'>You slide \the [I] into \the [src].</span>")
 		imp = I
 		update_description()
 		update_icon()

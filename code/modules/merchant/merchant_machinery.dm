@@ -1,8 +1,8 @@
 /obj/machinery/merchant_pad
-	name = "teleportation pad"
+	name = "Teleportation Pad"
 	desc = "Place things here to trade."
-	icon = 'icons/obj/machines/teleporter.dmi'
-	icon_state = "pad"
+	icon = 'icons/obj/stationobjs.dmi'
+	icon_state = "tele0"
 	anchored = TRUE
 	density = FALSE
 

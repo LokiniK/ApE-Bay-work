@@ -140,6 +140,7 @@
 /area/miningstation/hangar)
 "ay" = (
 /obj/machinery/alarm{
+	alarm_id = "xenobio2_alarm";
 	dir = 4;
 	pixel_x = -24
 	},
@@ -247,9 +248,7 @@
 /turf/simulated/floor/plating,
 /area/miningstation/hangar)
 "aM" = (
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/miningstation/power)
 "aN" = (
 /obj/structure/cable{
@@ -257,9 +256,7 @@
 	d2 = 4;
 	icon_state = "2-4"
 	},
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/miningstation/power)
 "aO" = (
 /obj/structure/cable{
@@ -267,9 +264,7 @@
 	d2 = 8;
 	icon_state = "4-8"
 	},
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/miningstation/power)
 "aP" = (
 /obj/structure/cable{
@@ -287,9 +282,7 @@
 	d2 = 4;
 	icon_state = "2-4"
 	},
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/miningstation/power)
 "aQ" = (
 /obj/machinery/power/tracker,
@@ -297,9 +290,7 @@
 	d2 = 2;
 	icon_state = "0-2"
 	},
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/miningstation/power)
 "aR" = (
 /obj/structure/cable{
@@ -307,9 +298,7 @@
 	d2 = 8;
 	icon_state = "2-8"
 	},
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/miningstation/power)
 "aS" = (
 /obj/structure/sign/warning/hot_exhaust,
@@ -322,9 +311,7 @@
 	d2 = 4;
 	icon_state = "0-4"
 	},
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/miningstation/power)
 "aV" = (
 /obj/structure/cable{
@@ -342,9 +329,7 @@
 	d2 = 8;
 	icon_state = "2-8"
 	},
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/miningstation/power)
 "aW" = (
 /obj/structure/cable{
@@ -369,6 +354,18 @@
 /obj/structure/fuel_port,
 /turf/simulated/wall/titanium,
 /area/miningstation/fix)
+"aZ" = (
+/obj/vehicle/train/cargo/trolley,
+/turf/simulated/floor/tiled/monotile,
+/area/miningstation/hangar)
+"ba" = (
+/obj/vehicle/train/cargo/engine,
+/obj/machinery/light{
+	dir = 4;
+	icon_state = "tube1"
+	},
+/turf/simulated/floor/tiled/monotile,
+/area/miningstation/hangar)
 "bb" = (
 /obj/effect/floor_decal/industrial/warning{
 	dir = 10;
@@ -554,9 +551,7 @@
 	d2 = 4;
 	icon_state = "1-4"
 	},
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/miningstation/power)
 "br" = (
 /obj/structure/cable{
@@ -569,9 +564,7 @@
 	d2 = 4;
 	icon_state = "1-4"
 	},
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/miningstation/power)
 "bs" = (
 /obj/structure/cable{
@@ -584,9 +577,7 @@
 	d2 = 8;
 	icon_state = "4-8"
 	},
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/miningstation/power)
 "bt" = (
 /obj/structure/cable{
@@ -594,9 +585,7 @@
 	d2 = 8;
 	icon_state = "1-8"
 	},
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/miningstation/power)
 "bu" = (
 /obj/machinery/atmospherics/unary/vent_pump/on,
@@ -658,7 +647,7 @@
 "bE" = (
 /obj/structure/catwalk,
 /obj/structure/closet/toolcloset,
-/turf/simulated/floor/plating,
+/turf/simulated/floor/airless/ceiling,
 /area/miningstation/power)
 "bF" = (
 /obj/structure/cable{
@@ -667,12 +656,12 @@
 	icon_state = "1-2"
 	},
 /obj/structure/catwalk,
-/turf/simulated/floor/plating,
+/turf/simulated/floor/airless/ceiling,
 /area/miningstation/power)
 "bG" = (
 /obj/structure/catwalk,
 /obj/machinery/atmospherics/unary/vent_pump/high_volume/airlock,
-/turf/simulated/floor/plating,
+/turf/simulated/floor/airless/ceiling,
 /area/miningstation/power)
 "bH" = (
 /obj/structure/cable{
@@ -690,9 +679,7 @@
 	d2 = 2;
 	icon_state = "1-2"
 	},
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/miningstation/power)
 "bI" = (
 /obj/machinery/atmospherics/unary/vent_scrubber/on{
@@ -719,12 +706,16 @@
 /obj/effect/paint/black,
 /turf/simulated/wall/r_titanium,
 /area/miningstation/prep2)
+"bO" = (
+/obj/structure/catwalk,
+/turf/simulated/floor/airless/ceiling,
+/area/miningstation/power)
 "bP" = (
 /obj/effect/paint/black,
 /turf/simulated/wall/r_titanium,
 /area/miningstation/hangarhall)
 "bQ" = (
-/obj/structure/closet/firecloset,
+/obj/structure/closet/walllocker/firecloset,
 /obj/effect/floor_decal/industrial/hatch,
 /obj/effect/floor_decal/industrial/hatch/yellow,
 /turf/simulated/floor/tiled/techfloor/grid,
@@ -759,6 +750,14 @@
 /area/miningstation/dorms)
 "bX" = (
 /obj/machinery/alarm,
+/turf/simulated/floor/tiled/techfloor/grid,
+/area/miningstation/hangarhall)
+"bY" = (
+/obj/vehicle/train/cargo/trolley,
+/turf/simulated/floor/tiled/techfloor/grid,
+/area/miningstation/hangarhall)
+"bZ" = (
+/obj/vehicle/train/cargo/engine,
 /turf/simulated/floor/tiled/techfloor/grid,
 /area/miningstation/hangarhall)
 "ca" = (
@@ -945,9 +944,7 @@
 	d2 = 8;
 	icon_state = "0-8"
 	},
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/miningstation/power)
 "cE" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
@@ -1639,9 +1636,7 @@
 	d2 = 8;
 	icon_state = "0-8"
 	},
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/miningstation/power)
 "dV" = (
 /obj/machinery/firealarm{
@@ -2391,9 +2386,7 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
 	dir = 9
 	},
-/turf/simulated/floor/plating{
-	map_airless = 1
-	},
+/turf/simulated/floor/plating,
 /area/miningstation/atmos)
 "fK" = (
 /obj/structure/table/rack,
@@ -2650,7 +2643,7 @@
 /turf/simulated/floor/tiled/techfloor/grid,
 /area/miningstation/operationshall)
 "gx" = (
-/obj/structure/closet/firecloset,
+/obj/structure/closet/walllocker/firecloset,
 /obj/effect/floor_decal/industrial/hatch,
 /obj/effect/floor_decal/industrial/hatch/yellow,
 /turf/simulated/floor/tiled/techfloor/grid,
@@ -2775,7 +2768,7 @@
 /turf/simulated/floor/tiled/techfloor/grid,
 /area/miningstation/operationshall2)
 "gP" = (
-/obj/structure/closet/firecloset,
+/obj/structure/closet/walllocker/firecloset,
 /obj/effect/floor_decal/industrial/hatch,
 /turf/simulated/floor/tiled/techfloor/grid,
 /area/miningstation/operationshall2)
@@ -3405,6 +3398,7 @@
 "hY" = (
 /obj/structure/table/steel,
 /obj/machinery/alarm{
+	alarm_id = "xenobio2_alarm";
 	dir = 4;
 	pixel_x = -24
 	},
@@ -3582,8 +3576,8 @@
 /turf/simulated/floor/tiled/techfloor,
 /area/miningstation/bridge)
 "it" = (
-/obj/random/ironing_board_structure,
-/obj/item/ironing_iron,
+/obj/structure/bed/roller/ironingboard,
+/obj/item/ironingiron,
 /obj/machinery/alarm{
 	dir = 8;
 	pixel_x = 25;
@@ -3615,9 +3609,7 @@
 /area/miningstation/intensive)
 "iw" = (
 /obj/item/pipe/injector,
-/turf/simulated/floor/plating{
-	map_airless = 1
-	},
+/turf/simulated/floor/plating,
 /area/miningstation/atmos)
 "ix" = (
 /obj/machinery/power/terminal,
@@ -3889,8 +3881,8 @@
 /turf/simulated/floor/tiled/white,
 /area/miningstation/bathroom)
 "iU" = (
-/obj/random/ironing_board_structure,
-/obj/item/ironing_iron,
+/obj/structure/bed/roller/ironingboard,
+/obj/item/ironingiron,
 /obj/item/device/radio/intercom{
 	dir = 8;
 	pixel_x = 21
@@ -4276,7 +4268,7 @@
 /turf/simulated/floor/tiled/techfloor/grid,
 /area/miningstation/hangarhall)
 "jP" = (
-/obj/structure/iv_stand,
+/obj/structure/iv_drip,
 /obj/effect/floor_decal/corner/blue{
 	dir = 6
 	},
@@ -4382,6 +4374,7 @@
 /area/miningstation/chief)
 "kd" = (
 /obj/machinery/alarm{
+	alarm_id = "xenobio2_alarm";
 	dir = 4;
 	pixel_x = -24
 	},
@@ -4431,7 +4424,7 @@
 /turf/simulated/floor/tiled/techfloor,
 /area/miningstation/chief)
 "km" = (
-/obj/item/storage/fancy/smokable/cigar{
+/obj/item/storage/fancy/cigar{
 	pixel_x = 31;
 	pixel_y = 7
 	},
@@ -4515,7 +4508,7 @@
 /turf/simulated/floor/tiled/techfloor/grid,
 /area/miningstation/dormhall)
 "kA" = (
-/obj/structure/closet/firecloset,
+/obj/structure/closet/walllocker/firecloset,
 /obj/effect/floor_decal/industrial/hatch,
 /obj/effect/floor_decal/industrial/hatch/yellow,
 /turf/simulated/floor/tiled/techfloor/grid,
@@ -4717,6 +4710,7 @@
 /area/miningstation/dorms3)
 "la" = (
 /obj/machinery/alarm{
+	alarm_id = "xenobio2_alarm";
 	dir = 4;
 	pixel_x = -24
 	},
@@ -5629,7 +5623,7 @@
 /turf/simulated/floor/tiled/white,
 /area/miningstation/physician1)
 "nc" = (
-/obj/structure/iv_stand,
+/obj/structure/iv_drip,
 /obj/effect/floor_decal/corner/blue{
 	dir = 9
 	},
@@ -5651,7 +5645,7 @@
 /obj/effect/floor_decal/corner/blue{
 	dir = 6
 	},
-/obj/structure/roller_bed,
+/obj/structure/bed/roller,
 /turf/simulated/floor/tiled/white,
 /area/miningstation/intensive)
 "nf" = (
@@ -5780,6 +5774,7 @@
 /area/miningstation/kitchen)
 "nv" = (
 /obj/machinery/alarm{
+	alarm_id = "xenobio2_alarm";
 	dir = 4;
 	pixel_x = -24
 	},
@@ -6704,6 +6699,17 @@
 	},
 /turf/simulated/floor/tiled/white,
 /area/miningstation/kitchen)
+"pt" = (
+/obj/structure/table/marble,
+/obj/machinery/reagent_temperature/cooler,
+/obj/effect/floor_decal/corner/blue{
+	dir = 4
+	},
+/obj/effect/floor_decal/corner/blue{
+	dir = 8
+	},
+/turf/simulated/floor/tiled/white,
+/area/miningstation/kitchen)
 "pu" = (
 /obj/machinery/atmospherics/unary/vent_pump/on{
 	dir = 1
@@ -6907,7 +6913,7 @@
 /turf/simulated/floor/tiled/white,
 /area/miningstation/intensive)
 "pQ" = (
-/obj/item/scalpel/basic,
+/obj/item/scalpel,
 /obj/effect/floor_decal/corner/blue{
 	dir = 5
 	},
@@ -7653,9 +7659,7 @@
 	icon_state = "1-4"
 	},
 /obj/machinery/light,
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/miningstation/power)
 "rt" = (
 /obj/structure/cable{
@@ -7669,9 +7673,7 @@
 	icon_state = "4-8"
 	},
 /obj/machinery/light,
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/miningstation/power)
 "ru" = (
 /obj/structure/table/woodentable/maple,
@@ -7851,7 +7853,7 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 9
 	},
-/turf/simulated/floor/plating,
+/turf/simulated/floor/airless/ceiling,
 /area/miningstation/power)
 "vE" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
@@ -7940,7 +7942,7 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 6
 	},
-/turf/simulated/floor/plating,
+/turf/simulated/floor/airless/ceiling,
 /area/miningstation/power)
 "yC" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
@@ -8582,6 +8584,7 @@
 /turf/simulated/floor/tiled/techfloor/grid,
 /area/miningstation/hangarhall)
 "TJ" = (
+/obj/vehicle/train/cargo/trolley,
 /obj/machinery/light{
 	dir = 1
 	},
@@ -18387,7 +18390,7 @@ cE
 ag
 kj
 bP
-bS
+bY
 bS
 jO
 di
@@ -18691,7 +18694,7 @@ cE
 ag
 ag
 bP
-bS
+bY
 bS
 bS
 de
@@ -18843,7 +18846,7 @@ fe
 bv
 ag
 bP
-bS
+bZ
 bS
 bS
 de
@@ -20808,10 +20811,10 @@ ag
 ag
 aj
 ag
-ag
-ag
-ag
-aj
+aZ
+aZ
+aZ
+ba
 ag
 aD
 ag
@@ -22338,7 +22341,7 @@ dT
 aO
 bx
 bE
-cy
+bO
 cf
 cB
 cT
@@ -23134,7 +23137,7 @@ nw
 oi
 of
 oG
-oG
+pt
 pA
 pL
 mr

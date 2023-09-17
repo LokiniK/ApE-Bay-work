@@ -1,4 +1,4 @@
-var/global/list/admin_ranks = list()								//list of all ranks with associated rights
+var/list/admin_ranks = list()								//list of all ranks with associated rights
 
 //load our rank - > rights associations
 /proc/load_admin_ranks()
@@ -15,15 +15,15 @@ var/global/list/admin_ranks = list()								//list of all ranks with associated 
 		if(copytext(line,1,2) == "#")	continue
 
 		var/list/List = splittext(line,"+")
-		if(!length(List))					continue
+		if(!List.len)					continue
 
 		var/rank = ckeyEx(List[1])
 		switch(rank)
 			if(null,"")		continue
-			if("Removed")	continue				//Reserved
+			if("Удален")	continue				//Reserved
 
 		var/rights = 0
-		for(var/i=2, i<=length(List), i++)
+		for(var/i=2, i<=List.len, i++)
 			switch(ckey(List[i]))
 				if("@","prev")					rights |= previous_rights
 				if("buildmode","build")			rights |= R_BUILDMODE
@@ -33,18 +33,25 @@ var/global/list/admin_ranks = list()								//list of all ranks with associated 
 				if("server")					rights |= R_SERVER
 				if("debug")						rights |= R_DEBUG
 				if("permissions","rights")		rights |= R_PERMISSIONS
-				if("possess")					rights |= R_POSSESS
+				if("judge")						rights |= R_JUDGE	//INF WAS	if("possess")						rights |= R_POSSESS
 				if("stealth")					rights |= R_STEALTH
 				if("rejuv","rejuvinate")		rights |= R_REJUVINATE
 				if("varedit")					rights |= R_VAREDIT
-				if("everything","host","all")	rights |= (R_HOST | R_BUILDMODE | R_ADMIN | R_BAN | R_FUN | R_SERVER | R_DEBUG | R_PERMISSIONS | R_POSSESS | R_STEALTH | R_REJUVINATE | R_VAREDIT | R_SOUNDS | R_SPAWN | R_MOD)
+				if("everything","host","all")	rights |= (R_HOST | R_BUILDMODE | R_ADMIN | R_BAN | R_FUN | R_SERVER | R_DEBUG | R_PERMISSIONS | R_JUDGE | R_STEALTH | R_REJUVINATE | R_VAREDIT | R_SOUNDS | R_SPAWN | R_MOD| R_XENO)	//INF WAS	if("everything","host","all")	rights |= (R_HOST | R_BUILDMODE | R_ADMIN | R_BAN | R_FUN | R_SERVER | R_DEBUG | R_PERMISSIONS | R_POSSESS | R_STEALTH | R_REJUVINATE | R_VAREDIT | R_SOUNDS | R_SPAWN | R_MOD)
 				if("sound","sounds")			rights |= R_SOUNDS
 				if("spawn","create")			rights |= R_SPAWN
 				if("mod")						rights |= R_MOD
+				if("xeno")						rights |= R_XENO	//INF
 
 		admin_ranks[rank] = rights
 		previous_rights = rights
 
+	#ifdef TESTING
+	var/msg = "Permission Sets Built:\n"
+	for(var/rank in admin_ranks)
+		msg += "\t[rank] - [admin_ranks[rank]]\n"
+	testing(msg)
+	#endif
 
 /hook/startup/proc/loadAdmins()
 	load_admins()
@@ -52,10 +59,11 @@ var/global/list/admin_ranks = list()								//list of all ranks with associated 
 
 /proc/load_admins()
 	//clear the datums references
-	admin_datums.Cut()
-	for(var/client/C as anything in GLOB.admins)
+	GLOB.admin_datums.Cut()
+	for(var/client/C in GLOB.admins)
 		C.remove_admin_verbs()
 		C.holder = null
+	load_admin_ranks()
 	GLOB.admins.Cut()
 
 	// Flush profiler access.
@@ -63,8 +71,6 @@ var/global/list/admin_ranks = list()								//list of all ranks with associated 
 		world.SetConfig("APP/admin", admin, null)
 
 	if(config.admin_legacy_system)
-		load_admin_ranks()
-
 		//load text from file
 		var/list/Lines = file2list("config/admins.txt")
 
@@ -75,7 +81,7 @@ var/global/list/admin_ranks = list()								//list of all ranks with associated 
 
 			//Split the line at every "-"
 			var/list/List = splittext(line, "-")
-			if(!length(List))					continue
+			if(!List.len)					continue
 
 			//ckey is before the first "-"
 			var/ckey = ckey(List[1])
@@ -83,7 +89,7 @@ var/global/list/admin_ranks = list()								//list of all ranks with associated 
 
 			//rank follows the first "-"
 			var/rank = ""
-			if(length(List) >= 2)
+			if(List.len >= 2)
 				rank = ckeyEx(List[2])
 
 			//load permissions associated with this rank
@@ -111,7 +117,7 @@ var/global/list/admin_ranks = list()								//list of all ranks with associated 
 		while(query.NextRow())
 			var/ckey = query.item[1]
 			var/rank = query.item[2]
-			if(rank == "Removed")	continue	//This person was de-adminned. They are only in the admin list for archive purposes.
+			if(rank == "Удален")	continue	//This person was de-adminned. They are only in the admin list for archive purposes.
 
 			var/rights = query.item[4]
 			if(istext(rights))	rights = text2num(rights)
@@ -119,9 +125,40 @@ var/global/list/admin_ranks = list()								//list of all ranks with associated 
 
 			//find the client for a ckey if they are connected and associate them with the new admin datum
 			D.associate(GLOB.ckey_directory[ckey])
-		if(!admin_datums)
+		if(!GLOB.admin_datums)
 			error("The database query in load_admins() resulted in no admins being added to the list. Reverting to legacy system.")
 			log_misc("The database query in load_admins() resulted in no admins being added to the list. Reverting to legacy system.")
 			config.admin_legacy_system = 1
 			load_admins()
 			return
+
+	#ifdef TESTING
+	var/msg = "Admins Built:\n"
+	for(var/ckey in GLOB.admin_datums)
+		var/rank
+		var/datum/admins/D = GLOB.admin_datums[ckey]
+		if(D)	rank = D.rank
+		msg += "\t[ckey] - [rank]\n"
+	testing(msg)
+	#endif
+
+
+#ifdef TESTING
+/client/verb/changerank(newrank in admin_ranks)
+	if(holder)
+		holder.rank = newrank
+		holder.rights = admin_ranks[newrank]
+	else
+		holder = new /datum/admins(newrank,admin_ranks[newrank],ckey)
+	remove_admin_verbs()
+	holder.associate(src)
+
+/client/verb/changerights(newrights as num)
+	if(holder)
+		holder.rights = newrights
+	else
+		holder = new /datum/admins("testing",newrights,ckey)
+	remove_admin_verbs()
+	holder.associate(src)
+
+#endif

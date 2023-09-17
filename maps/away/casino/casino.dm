@@ -2,10 +2,16 @@
 #include "../mining/mining_areas.dm"
 
 /obj/effect/overmap/visitable/ship/casino
-	name = "passenger liner"
-	desc = "Sensors detect an undamaged vessel without any signs of activity."
+	name = "spacecraft"
+	desc = "Spacefaring vessel. No IFF detected."
+	scanner_name = "passenger liner"
+	scanner_desc = @{"[i]Registration[/i]: Passenger liner
+[i]Class[/i]: Small ship (Low Displacement)
+[i]Transponder[/i]: Transmitting (CIV), non-hostile
+[b]Notice[/b]: Sensors detect an undamaged vessel without any signs of activity"}
 	color = "#bd6100"
 	vessel_mass = 5000
+	contact_class = /decl/ship_contact_class/ship
 	max_speed = 1/(2 SECONDS)
 	burn_delay = 1 SECOND
 	initial_generic_waypoints = list(
@@ -21,7 +27,7 @@
 	)
 
 /obj/effect/overmap/visitable/ship/casino/New(nloc, max_x, max_y)
-	name = "IPV [pick("Fortuna","Gold Rush","Ebisu","Lucky Paw","Four Leaves")], \a [name]"
+	scanner_name = "IPV [pick("Fortuna","Gold Rush","Ebisu","Lucky Paw","Four Leaves")], \a [name]"
 	..()
 
 /datum/map_template/ruin/away_site/casino
@@ -29,7 +35,7 @@
 	id = "awaysite_casino"
 	description = "A casino ship!"
 	suffixes = list("casino/casino.dmm")
-	spawn_cost = 1
+	spawn_cost = 0.5 // INF, WAS 1
 	shuttles_to_initialise = list(/datum/shuttle/autodock/overmap/casino_cutter)
 	area_usage_test_exempted_root_areas = list(/area/casino)
 	apc_test_exempt_areas = list(
@@ -95,9 +101,9 @@
 
 /obj/structure/casino/roulette/attack_hand(mob/user as mob)
 	if (busy)
-		to_chat(user,"[SPAN_NOTICE("You cannot spin now! \The [src] is already spinning.")] ")
+		to_chat(user,"<span class='notice'>You cannot spin now! \The [src] is already spinning.</span> ")
 		return
-	visible_message(SPAN_NOTICE("\ [user]  spins the roulette and throws inside little ball."))
+	visible_message("<span class='notice'>\ [user]  spins the roulette and throws inside little ball.</span>")
 	busy = 1
 	var/n = rand(0,36)
 	var/color = "green"
@@ -113,7 +119,7 @@
 	else
 		color="red"
 	spawn(5 SECONDS)
-		visible_message(SPAN_NOTICE("\The [src] stops spinning, the ball landing on [n], [color]."))
+		visible_message("<span class='notice'>\The [src] stops spinning, the ball landing on [n], [color].</span>")
 		busy=0
 
 /obj/structure/casino/roulette_chart
@@ -153,12 +159,6 @@
 
 /obj/structure/casino/craps/craps_down
 	icon_state = "craps_down"
-
-/obj/structure/casino/pod_controller
-	name = "escape pod controller"
-	desc = "An escape pod controller. This one seems to have crashed and doesn't respond to commands."
-	icon = 'icons/obj/doors/airlock_machines.dmi'
-	icon_state = "airlock_control_off"
 
 //========================used bullet casings=======================
 /obj/item/ammo_casing/rifle/used/Initialize()

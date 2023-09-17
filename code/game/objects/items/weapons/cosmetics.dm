@@ -2,7 +2,7 @@
 	gender = PLURAL
 	name = "red lipstick"
 	desc = "A generic brand of lipstick."
-	icon = 'icons/obj/lipsticks.dmi'
+	icon = 'icons/obj/items.dmi'
 	icon_state = "lipstick"
 	w_class = ITEM_SIZE_TINY
 	slot_flags = SLOT_EARS
@@ -30,7 +30,7 @@
 	name = "[colour] lipstick"
 
 /obj/item/lipstick/attack_self(mob/user as mob)
-	to_chat(user, SPAN_NOTICE("You twist \the [src] [open ? "closed" : "open"]."))
+	to_chat(user, "<span class='notice'>You twist \the [src] [open ? "closed" : "open"].</span>")
 	open = !open
 	if(open)
 		icon_state = "[initial(icon_state)]_[colour]"
@@ -50,21 +50,21 @@
 		if(user.a_intent == I_HELP && target_zone == BP_HEAD)
 			head.write_on(user, src.name)
 		else if(head.has_lips)
-			if(H.makeup_style)	//if they already have lipstick on
-				to_chat(user, SPAN_NOTICE("You need to wipe off the old lipstick first!"))
+			if(H.lip_style)	//if they already have lipstick on
+				to_chat(user, "<span class='notice'>You need to wipe off the old lipstick first!</span>")
 				return
 			if(H == user)
-				user.visible_message(SPAN_NOTICE("[user] does their lips with \the [src]."), \
-									 SPAN_NOTICE("You take a moment to apply \the [src]. Perfect!"))
-				H.makeup_style = colour
+				user.visible_message("<span class='notice'>[user] does their lips with \the [src].</span>", \
+									 "<span class='notice'>You take a moment to apply \the [src]. Perfect!</span>")
+				H.lip_style = colour
 				H.update_body()
 			else
-				user.visible_message(SPAN_WARNING("[user] begins to do [H]'s lips with \the [src]."), \
-									 SPAN_NOTICE("You begin to apply \the [src]."))
-				if(do_after(user, 4 SECONDS, H, DO_EQUIP))
-					user.visible_message(SPAN_NOTICE("[user] does [H]'s lips with \the [src]."), \
-										 SPAN_NOTICE("You apply \the [src]."))
-					H.makeup_style = colour
+				user.visible_message("<span class='warning'>[user] begins to do [H]'s lips with \the [src].</span>", \
+									 "<span class='notice'>You begin to apply \the [src].</span>")
+				if(do_after(user, 4 SECONDS, H, do_flags = DO_DEFAULT & ~DO_SHOW_PROGRESS))
+					user.visible_message("<span class='notice'>[user] does [H]'s lips with \the [src].</span>", \
+										 "<span class='notice'>You apply \the [src].</span>")
+					H.lip_style = colour
 					H.update_body()
 	else if(istype(A, /obj/item/organ/external/head))
 		var/obj/item/organ/external/head/head = A
@@ -78,7 +78,7 @@
 	desc = "A pristine comb made from flexible plastic."
 	w_class = ITEM_SIZE_TINY
 	slot_flags = SLOT_EARS
-	icon = 'icons/obj/lavatory.dmi'
+	icon = 'icons/obj/items.dmi'
 	icon_state = "comb"
 	item_state = "comb"
 
@@ -86,9 +86,33 @@
 	. = ..()
 	color = get_random_colour(lower = 150)
 
-/obj/item/haircomb/attack_self(mob/living/carbon/human/user)
+/obj/item/haircomb/attack_self(var/mob/living/carbon/human/user)
 	if(!user.incapacitated())
-		user.visible_message(SPAN_NOTICE("\The [user] uses \the [src] to comb their hair with incredible style and sophistication. What a [user.gender == FEMALE ? "lady" : "guy"]."))
+		user.visible_message("<span class='notice'>\The [user] uses \the [src] to comb their hair with incredible style and sophistication. What a [user.gender == FEMALE ? "lady" : "guy"].</span>")
+
+/obj/item/haircomb/brush/attack(atom/A, mob/user as mob)
+	if(brushing)
+		return
+	brushing = TRUE
+	if(ishuman(A))
+		var/mob/living/carbon/human/H = A
+		var/cover = "hair"
+		switch(H.get_species())
+			if(SPECIES_VOX)          cover = "quills"
+			if(SPECIES_RESOMI)       cover = "feathers"
+			if(SPECIES_TAJARA)       cover = "fur"
+			if(SPECIES_UNATHI)       cover = "scale"
+			if(SPECIES_SKRELL)       cover = "skin"
+			if(SPECIES_IPC)          cover = "body"
+			if(SPECIES_DIONA)        cover = "foliage"
+
+		if(do_after(user, 10, H))
+			if(user.a_intent == I_HURT && cover != "skin" && cover != "body")
+				user.visible_message("<span class='warning'>The [user] brushes [H]'s <b>against</b> [cover] with \the [src]!</span>")
+			else
+				user.visible_message("<span class='notice'>The [user] brushes [H]'s [cover] with \the [src].</span>")
+
+	brushing = FALSE
 
 /obj/item/haircomb/brush
 	name = "hairbrush"
@@ -97,11 +121,12 @@
 	slot_flags = null
 	icon_state = "brush"
 	item_state = "brush"
+	var/brushing = FALSE
 
 /obj/item/haircomb/brush/attack_self(mob/living/carbon/human/user)
 	if(!user.incapacitated())
-		var/datum/sprite_accessory/hair/hair_style = GLOB.hair_styles_list[user.head_hair_style]
+		var/datum/sprite_accessory/hair/hair_style = GLOB.hair_styles_list[user.h_style]
 		if(hair_style.flags & VERY_SHORT)
-			user.visible_message(SPAN_NOTICE("\The [user] just sort of runs \the [src] over their scalp."))
+			user.visible_message("<span class='notice'>\The [user] just sort of runs \the [src] over their scalp.</span>")
 		else
-			user.visible_message(SPAN_NOTICE("\The [user] meticulously brushes their hair with \the [src]."))
+			user.visible_message("<span class='notice'>\The [user] meticulously brushes their hair with \the [src].</span>")

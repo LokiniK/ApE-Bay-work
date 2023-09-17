@@ -11,16 +11,19 @@ The "dust" will damage the hull of the station causin minor hull breaches.
 	var/last_wave
 
 /datum/event/dust/announce()
-	command_announcement.Announce("The [location_name()] is now passing through a belt of space dust.", "[location_name()] Sensor Array", zlevels = affecting_z)
+//	command_announcement.Announce("The [location_name()] is now passing through a belt of space dust.", "Сенсоры [location_name()]", zlevels = affecting_z)
+	priority_announcement.Announce("Объект [location_name()] вошел в зону скопления космической пыли.", "Сенсоры [location_name()]", zlevels = affecting_z)
+
 
 /datum/event/dust/tick()
 	if(world.time > last_wave + min_delay && prob(10))
 		dust_swarm(severity, affecting_z)
 
 /datum/event/dust/end()
-	command_announcement.Announce("The [location_name()] has now passed through the belt of space dust.", "[location_name()] Sensor Array", zlevels = affecting_z)
+//	command_announcement.Announce("The [location_name()] has now passed through the belt of space dust.", "Сенсоры [location_name()]", zlevels = affecting_z)
+	priority_announcement.Announce("Объект [location_name()] покинул зону скопления космической пыли.", "Сенсоры [location_name()]", zlevels = affecting_z)
 
-/proc/dust_swarm(strength = EVENT_LEVEL_MUNDANE, list/zlevels)
+/proc/dust_swarm(var/strength = EVENT_LEVEL_MUNDANE, var/list/zlevels)
 	var/numbers = rand(strength * 10, strength * 15)
 
 	var/start_dir = pick(GLOB.cardinal)
@@ -45,7 +48,7 @@ The "dust" will damage the hull of the station causin minor hull breaches.
 	var/list/starters = getcircle(startloc, 3)
 	starters += startloc
 
-	var/rocks_per_tile = round(numbers/length(starters))
+	var/rocks_per_tile = round(numbers/starters.len)
 	for(var/turf/T in starters)
 		for(var/i = 1 to rocks_per_tile)
 			var/obj/item/projectile/bullet/rock/R = new(T)

@@ -1,18 +1,20 @@
-GLOBAL_LIST_INIT(mimic_protected, list(
-	/obj/machinery,
-	/obj/structure/table,
-	/obj/structure/cable,
-	/obj/structure/window,
-	/obj/structure/wall_frame,
-	/obj/structure/grille,
-	/obj/structure/catwalk,
-	/obj/structure/ladder,
-	/obj/structure/stairs,
-	/obj/structure/sign,
-	/obj/structure/railing,
-	/obj/item/modular_computer,
-	/obj/item/projectile/animate
-))
+//
+// Abstract Class
+//
+
+var/global/list/protected_objects = list(/obj/machinery,
+										 /obj/structure/table,
+										 /obj/structure/cable,
+										 /obj/structure/window,
+										 /obj/structure/wall_frame,
+										 /obj/structure/grille,
+										 /obj/structure/catwalk,
+										 /obj/structure/ladder,
+										 /obj/structure/stairs,
+										 /obj/structure/sign,
+										 /obj/structure/railing,
+										 /obj/item/modular_computer,
+										 /obj/item/projectile/animate)
 
 /mob/living/simple_animal/hostile/mimic
 	name = "crate"
@@ -21,7 +23,7 @@ GLOBAL_LIST_INIT(mimic_protected, list(
 	icon_state = "base"
 	icon_living = "base"
 
-	meat_type = /obj/item/reagent_containers/food/snacks/fish/unknown
+	meat_type = /obj/item/reagent_containers/food/snacks/fish
 	response_help = "touches"
 	response_disarm = "pushes"
 	response_harm = "hits"
@@ -62,17 +64,16 @@ GLOBAL_LIST_INIT(mimic_protected, list(
 		return . - M.creator.resolve()
 
 
-/mob/living/simple_animal/hostile/mimic/Initialize(mapload, obj/o, mob/living/creator)
-	. = ..()
+/mob/living/simple_animal/hostile/mimic/New(newloc, var/obj/o, var/mob/living/creator)
+	..()
 	if(o)
 		if(ispath(o))
-			o = new o(loc)
+			o = new o(newloc)
 		CopyObject(o,creator)
 
+/mob/living/simple_animal/hostile/mimic/proc/CopyObject(var/obj/O, var/mob/living/creator)
 
-/mob/living/simple_animal/hostile/mimic/proc/CopyObject(obj/O, mob/living/creator)
-
-	if((istype(O, /obj/item) || istype(O, /obj/structure)) && !is_type_in_list(O, GLOB.mimic_protected))
+	if((istype(O, /obj/item) || istype(O, /obj/structure)) && !is_type_in_list(O, protected_objects))
 		O.forceMove(src)
 		copy_of = weakref(O)
 		appearance = O
@@ -136,7 +137,7 @@ GLOBAL_LIST_INIT(mimic_protected, list(
 		if(istype(L))
 			if(prob(15))
 				L.Weaken(1)
-				L.visible_message(SPAN_DANGER("\the [src] knocks down \the [L]!"))
+				L.visible_message("<span class='danger'>\the [src] knocks down \the [L]!</span>")
 
 /mob/living/simple_animal/hostile/mimic/Destroy()
 	copy_of = null
@@ -163,7 +164,7 @@ GLOBAL_LIST_INIT(mimic_protected, list(
 		set_AI_busy(FALSE)
 		awake = 1
 
-/mob/living/simple_animal/hostile/mimic/sleeping/adjustBruteLoss(damage)
+/mob/living/simple_animal/hostile/mimic/sleeping/adjustBruteLoss(var/damage)
 	trigger()
 	..(damage)
 

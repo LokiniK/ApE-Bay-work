@@ -55,15 +55,15 @@
 			if(1)
 				src.audible_message("\The [src] growls.")
 			if(2)
-				src.audible_message(SPAN_WARNING("\The [src] barks threateningly!"))
+				src.audible_message("<span class='warning'>\The [src] barks threateningly!</span>")
 			if(3)
-				src.visible_message(SPAN_DANGER("\The [src] snaps at the air!"))
+				src.visible_message("<span class='danger'>\The [src] snaps at the air!</span>")
 
-/mob/living/simple_animal/faithful_hound/hear_say(message, verb = "says", datum/language/language = null, alt_name = "", italics = 0, mob/speaker = null, sound/speech_sound, sound_vol)
+/mob/living/simple_animal/faithful_hound/hear_say(var/message, var/verb = "says", var/datum/language/language = null, var/alt_name = "", var/italics = 0, var/mob/speaker = null, var/sound/speech_sound, var/sound_vol)
 	if(password && findtext(message,password))
 		allowed_mobs |= speaker
 		spawn(10)
-			src.visible_message(SPAN_NOTICE("\The [src] nods in understanding towards \the [speaker]."))
+			src.visible_message("<span class='notice'>\The [src] nods in understanding towards \the [speaker].</span>")
 
 /datum/ai_holder/simple_animal/faithful_hound
 	wander = FALSE

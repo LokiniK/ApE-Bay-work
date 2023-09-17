@@ -1,14 +1,14 @@
 /obj/machinery/sleeper
 	name = "sleeper"
 	desc = "A fancy bed with built-in injectors, a dialysis machine, and a limited health scanner."
-	icon = 'icons/obj/machines/medical/sleeper.dmi'
-	icon_state = "sleeper"
+	icon = 'icons/obj/Cryogenic2.dmi'
+	icon_state = "sleeper_0"
 	density = TRUE
 	anchored = TRUE
 	clicksound = 'sound/machines/buttonbeep.ogg'
 	clickvol = 30
 	base_type = /obj/machinery/sleeper
-	construct_state = /singleton/machine_construction/default/panel_closed
+	construct_state = /decl/machine_construction/default/panel_closed
 	uncreated_component_parts = null
 	stat_immune = 0
 	machine_name = "sleeper"
@@ -44,12 +44,12 @@
 			to_chat(user, "It is loaded with a beaker.")
 		if(occupant)
 			occupant.examine(arglist(args))
-		if (emagged && user.skill_check(SKILL_MEDICAL, SKILL_EXPERIENCED))
-			to_chat(user, SPAN_WARNING("The sleeper chemical synthesis controls look tampered with."))
+		if (emagged && user.skill_check(SKILL_MEDICAL, SKILL_EXPERT))
+			to_chat(user, "The sleeper chemical synthesis controls look tampered with.")
 
 
 /obj/machinery/sleeper/Process()
-	if(inoperable())
+	if(stat & (NOPOWER|BROKEN))
 		return
 
 	if(filtering > 0)
@@ -78,28 +78,53 @@
 		if (occupant.stat == UNCONSCIOUS && prob(2))
 			to_chat(occupant, SPAN_NOTICE(SPAN_BOLD("... [pick("comfy", "feels slow", "warm")] ...")))
 
+/obj/machinery/sleeper/verb/eject_sleeper()
+	set src in oview(1)
+	set category = "Object"
+	set name = "Eject Body Sleeper "
+
+	if (usr.incapacitated())
+		return
+	usr.visible_message(
+		SPAN_NOTICE("\The [usr] opens \the [src]."),
+		SPAN_NOTICE("You eject \the [initial(name)]'s occupant."),
+		SPAN_ITALIC("You hear a pressurized hiss, then a sound like glass creaking.")
+	)
+	go_out()
+	add_fingerprint(usr)
+
+/obj/machinery/sleeper/attackby(obj/item/grab/normal/G, mob/user)
+	if(istype(G))
+		var/mob/M = G.affecting
+		if(!user_can_move_target_inside(M, user))
+			return
+		move_target_inside(M,user)
+		qdel(G)
+		return TRUE
+	return ..()
 /obj/machinery/sleeper/on_update_icon()
-	overlays.Cut()
-	if(panel_open)
-		overlays += "[icon_state]_panel"
+//[INF]
+	var/list/bas_icon = splittext(icon_state, "_")
+	if(length(bas_icon)) bas_icon = bas_icon[1]
+//[/INF]
 	if(!occupant)
-		icon_state = "sleeper"
-	else if(inoperable())
-		icon_state = "sleeper_closed"
+		icon_state = "[bas_icon]_0"//inf//was: icon_state = "sleeper_0"
+	else if(stat & (BROKEN|NOPOWER))
+		icon_state = "[bas_icon]_1"//inf//was: icon_state = "sleeper_1"
 	else
-		icon_state = "sleeper_working"
+		icon_state = (("[bas_icon]_2" in icon_states(icon)) ? "[bas_icon]_2" : "[bas_icon]_1") //inf//was: icon_state = "sleeper_2"
 
 /obj/machinery/sleeper/DefaultTopicState()
 	return GLOB.outside_state
 
-/obj/machinery/sleeper/interface_interact(mob/user)
+/obj/machinery/sleeper/interface_interact(var/mob/user)
 	ui_interact(user)
 	return TRUE
 
-/obj/machinery/sleeper/ui_interact(mob/user, ui_key = "main", datum/nanoui/ui = null, force_open = 1, datum/topic_state/state = GLOB.outside_state)
+/obj/machinery/sleeper/ui_interact(var/mob/user, var/ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1, var/datum/topic_state/state = GLOB.outside_state)
 	var/data[0]
 
-	data["power"] = inoperable() ? 0 : 1
+	data["power"] = stat & (NOPOWER|BROKEN) ? 0 : 1
 
 	var/list/reagents = list()
 	for(var/T in available_chemicals)
@@ -111,7 +136,7 @@
 	data["reagents"] = reagents.Copy()
 
 	if(istype(occupant))
-		var/scan = user.skill_check(SKILL_MEDICAL, SKILL_TRAINED) ? medical_scan_results(occupant) : SPAN_CLASS("white", "<b>Contains: \the [occupant]</b>")
+		var/scan = user.skill_check(SKILL_MEDICAL, SKILL_ADEPT) ? medical_scan_results(occupant) : "<span class='white'><b>Contains: \the [occupant]</b></span>"
 		scan = replacetext(scan,"'scan_notice'","'white'")
 		scan = replacetext(scan,"'scan_warning'","'average'")
 		scan = replacetext(scan,"'scan_danger'","'bad'")
@@ -136,7 +161,7 @@
 
 /obj/machinery/sleeper/CanUseTopic(user)
 	if(user == occupant)
-		to_chat(usr, SPAN_WARNING("You can't reach the controls from the inside."))
+		to_chat(usr, "<span class='warning'>You can't reach the controls from the inside.</span>")
 		return STATUS_CLOSE
 	. = ..()
 
@@ -167,91 +192,96 @@
 			change_power_consumption(initial(active_power_usage) + stasis_power * (stasis-1), POWER_USE_ACTIVE)
 			return TOPIC_REFRESH
 
-/obj/machinery/sleeper/state_transition(singleton/machine_construction/default/new_state)
+/obj/machinery/sleeper/state_transition(var/decl/machine_construction/default/new_state)
 	. = ..()
 	if(istype(new_state))
 		updateUsrDialog()
 		go_out()
 
-/obj/machinery/sleeper/attackby(obj/item/I, mob/user)
+/obj/machinery/sleeper/attackby(var/obj/item/I, var/mob/user)
 	if(istype(I, /obj/item/reagent_containers/glass))
 		add_fingerprint(user)
 		if(!beaker)
 			if(!user.unEquip(I, src))
 				return
 			beaker = I
-			user.visible_message(SPAN_NOTICE("\The [user] adds \a [I] to \the [src]."), SPAN_NOTICE("You add \a [I] to \the [src]."))
+			user.visible_message("<span class='notice'>\The [user] adds \a [I] to \the [src].</span>", "<span class='notice'>You add \a [I] to \the [src].</span>")
 		else
-			to_chat(user, SPAN_WARNING("\The [src] has a beaker already."))
+			to_chat(user, "<span class='warning'>\The [src] has a beaker already.</span>")
 		return TRUE
 	return ..()
 
-/obj/machinery/sleeper/user_can_move_target_inside(mob/target, mob/user)
-	if (occupant)
-		to_chat(user, SPAN_WARNING("\The [src] is already occupied!"))
-		return FALSE
-	return ..()
+/obj/machinery/sleeper/dismantle()
+	if(occupant)
+		go_out()
+	..()
 
-/obj/machinery/sleeper/MouseDrop_T(mob/target, mob/user)
-	if (!CanMouseDrop(target, user) || !ismob(target))
+/obj/machinery/sleeper/MouseDrop_T(var/mob/target, var/mob/user)
+	if(..()) //anti-ghost
 		return
-	if (!user_can_move_target_inside(target, user))
+	if(!CanMouseDrop(target, user))
+		return
+	if(!istype(target))
+		return
+	if(target.buckled)
+		to_chat(user, "<span class='warning'>Unbuckle the subject before attempting to move them.</span>")
+		return
+	if(panel_open)
+		to_chat(user, "<span class='warning'>Close the maintenance panel before attempting to place the subject in the sleeper.</span>")
 		return
 	go_in(target, user)
-	return
 
-/obj/machinery/sleeper/use_grab(obj/item/grab/grab, list/click_params) //Grab is deleted at the level of go_in if all checks are passed.
-	MouseDrop_T(grab.affecting, grab.assailant)
-	return TRUE
-
-/obj/machinery/sleeper/relaymove(mob/user)
+/obj/machinery/sleeper/relaymove(var/mob/user)
 	..()
 	go_out()
 
-/obj/machinery/sleeper/emp_act(severity)
+/obj/machinery/sleeper/emp_act(var/severity)
 	if(filtering)
 		toggle_filter()
 
-	if(inoperable())
+	if(stat & (BROKEN|NOPOWER))
 		..(severity)
 		return
 
-	go_out()
+	if(occupant)
+		go_out()
 
 	..(severity)
 /obj/machinery/sleeper/proc/toggle_filter()
 	if(!occupant || !beaker)
 		filtering = 0
 		return
-	to_chat(occupant, SPAN_WARNING("You feel like your blood is being sucked away."))
+	to_chat(occupant, "<span class='warning'>You feel like your blood is being sucked away.</span>")
 	filtering = !filtering
 
 /obj/machinery/sleeper/proc/toggle_pump()
 	if(!occupant || !beaker)
 		pump = 0
 		return
-	to_chat(occupant, SPAN_WARNING("You feel a tube jammed down your throat."))
+	to_chat(occupant, "<span class='warning'>You feel a tube jammed down your throat.</span>")
 	pump = !pump
 
-/obj/machinery/sleeper/proc/go_in(mob/target, mob/user)
-	if (!target)
-		return FALSE
-	if (occupant)
-		to_chat(user, SPAN_WARNING("\The [src] is already occupied."))
-		return FALSE
-	if (target == user)
+/obj/machinery/sleeper/proc/go_in(var/mob/M, var/mob/user)
+	if(!M)
+		return
+	if(stat & (BROKEN|NOPOWER))
+		return
+	if(occupant)
+		to_chat(user, "<span class='warning'>\The [src] is already occupied.</span>")
+		return
+
+	if(M == user)
 		visible_message("\The [user] starts climbing into \the [src].")
 	else
-		visible_message("\The [user] starts putting [target] into \the [src].")
-	add_fingerprint(user) //Add fingerprints for trying to go in.
-	if (!do_after(user, 2 SECONDS, src, DO_PUBLIC_UNIQUE))
-		return FALSE
-	if (!user_can_move_target_inside(target, user))
-		return FALSE
-	set_occupant(target)
-	if (target != user)
-		add_fingerprint(target) //Add fingerprints of the person stuffed in.
-	target.remove_grabs_and_pulls()
+		visible_message("\The [user] starts putting [M] into \the [src].")
+
+	if(do_after(user, 20, src))
+		if(occupant)
+			to_chat(user, "<span class='warning'>\The [src] is already occupied.</span>")
+			return
+		if(M.loc.type == type) return //anti-double-sleepering //inf
+		set_occupant(M)
+		playsound(src, 'infinity/sound/SS2/effects/machines/medbed.wav', 50)//inf
 
 /obj/machinery/sleeper/proc/go_out()
 	if(!occupant)
@@ -259,7 +289,11 @@
 	if(occupant.client)
 		occupant.client.eye = occupant.client.mob
 		occupant.client.perspective = MOB_PERSPECTIVE
-	occupant.dropInto(loc)
+	if(occupant.loc == src)
+		if(not_turf_contains_dense_objects(get_turf(get_step(loc, dir))))
+			occupant.dropInto(get_step(loc, dir))
+		else
+			occupant.dropInto(loc)
 	set_occupant(null)
 
 	for(var/obj/O in (contents - component_parts)) // In case an object was dropped inside or something. Excludes the beaker and component parts.
@@ -268,7 +302,13 @@
 		O.dropInto(loc)
 	toggle_filter()
 
-/obj/machinery/sleeper/proc/set_occupant(mob/living/carbon/occupant)
+/obj/machinery/sleeper/AltClick(mob/user)
+	if(CanDefaultInteract(user))
+		go_out()
+	else
+		..()
+
+/obj/machinery/sleeper/proc/set_occupant(var/mob/living/carbon/occupant)
 	src.occupant = occupant
 	update_icon()
 	if(!occupant)
@@ -290,8 +330,8 @@
 		toggle_filter()
 		toggle_pump()
 
-/obj/machinery/sleeper/proc/inject_chemical(mob/living/user, chemical_name, amount)
-	if(inoperable())
+/obj/machinery/sleeper/proc/inject_chemical(var/mob/living/user, var/chemical_name, var/amount)
+	if(stat & (BROKEN|NOPOWER))
 		return
 
 	var/chemical_type = available_chemicals[chemical_name]
@@ -310,7 +350,7 @@
 
 /obj/machinery/sleeper/RefreshParts()
 	..()
-	var/T = clamp(total_component_rating_of_type(/obj/item/stock_parts/scanning_module), 1, 10)
+	var/T = Clamp(total_component_rating_of_type(/obj/item/stock_parts/scanning_module), 1, 10)
 	T = max(T,1)
 	synth_modifier = 1/T
 	pump_speed = 2 + T
@@ -323,9 +363,9 @@
 		available_chemicals |= upgrade2_chemicals
 
 
-/obj/machinery/sleeper/emag_act(remaining_charges, mob/user)
+/obj/machinery/sleeper/emag_act(var/remaining_charges, var/mob/user)
 	emagged = !emagged
-	to_chat(user, SPAN_DANGER("You [emagged ? "disable" : "enable"] \the [src]'s chemical synthesis safety checks."))
+	to_chat(user, "<span class='danger'>You [emagged ? "disable" : "enable"] \the [src]'s chemical synthesis safety checks.</span>")
 
 	if (emagged)
 		available_chemicals |= antag_chemicals
@@ -333,17 +373,35 @@
 		available_chemicals -= antag_chemicals
 	return 1
 
-/obj/machinery/sleeper/AltClick(mob/user)
-	if (CanDefaultInteract(user))
-		go_out()
-		return TRUE
-	return ..()
+/obj/machinery/sleeper/proc/user_can_move_target_inside(mob/target, mob/user)
+	if(!istype(user) || !istype(target))
+		return FALSE
+	if(user.incapacitated())
+		return FALSE
+	if(!target.simulated)
+		return FALSE
+	if(occupant)
+		to_chat(user, SPAN_WARNING("\The [src] is already occupied!"))
+		return FALSE
+	if(target.abiotic())
+		to_chat(user, SPAN_WARNING("[user == target ? "You" : "[target]"] can't enter \the [src] while wearing abiotic items."))
+		return FALSE
+	if(target.buckled)
+		to_chat(user, SPAN_WARNING("Unbuckle [user == target ? "yourself" : "\the [target]"] before attempting to [user == target ? "enter \the [src]" : "move them"]."))
+		return FALSE
+	return TRUE
 
-/obj/machinery/sleeper/verb/eject()
-	set name = "Eject Sleeper"
-	set category = "Object"
-	set src in oview(1)
-	if (CanDefaultInteract(usr))
-		go_out()
-		return TRUE
-	return FALSE
+/obj/machinery/sleeper/proc/move_target_inside(mob/target, mob/user)
+	target.forceMove(src)
+	occupant = target
+
+	update_use_power(POWER_USE_ACTIVE)
+	update_icon()
+	drop_contents()
+	SetName("[name] ([occupant])")
+
+	add_fingerprint(user)
+
+/obj/machinery/sleeper/proc/drop_contents()
+	for(var/obj/O in (contents - component_parts))
+		O.dropInto(loc)

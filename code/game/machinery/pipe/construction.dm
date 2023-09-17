@@ -9,18 +9,19 @@ Buildable meters
 	var/pipename
 	var/connect_types = CONNECT_TYPE_REGULAR
 	force = 7
-	icon = 'icons/obj/atmospherics/pipe-item.dmi'
+	icon = 'icons/obj/pipe-item.dmi'
 	icon_state = "simple"
 	randpixel = 5
 	item_state = "buildpipe"
 	w_class = ITEM_SIZE_NORMAL
-	obj_flags = OBJ_FLAG_ROTATABLE
+	level = 2
+	obj_flags = OBJ_FLAG_ROTATABLE 
 	dir = SOUTH
 	var/constructed_path = /obj/machinery/atmospherics/pipe/simple/hidden
 	var/pipe_class = PIPE_CLASS_BINARY
 	var/rotate_class = PIPE_ROTATE_STANDARD
 
-/obj/item/pipe/Initialize(mapload, obj/machinery/atmospherics/P)
+/obj/item/pipe/Initialize(var/mapload, var/obj/machinery/atmospherics/P)
 	. = ..()
 	if(!P)
 		return
@@ -69,18 +70,18 @@ Buildable meters
 /obj/item/pipe/attack_self(mob/user as mob)
 	return rotate(user)
 
-/obj/item/pipe/proc/build_unary(obj/machinery/atmospherics/unary/P, pipefailtext)
+/obj/item/pipe/proc/build_unary(var/obj/machinery/atmospherics/unary/P, var/pipefailtext)
 	P.atmos_init()
 	if (QDELETED(P))
 		to_chat(usr, pipefailtext)
 		return 1
 	P.build_network()
-	if(P.node)
+	if(P.node)		
 		P.node.atmos_init()
 		P.node.build_network()
 	return 0
 
-/obj/item/pipe/proc/build_binary(obj/machinery/atmospherics/pipe/simple/P, pipefailtext)
+/obj/item/pipe/proc/build_binary(var/obj/machinery/atmospherics/pipe/simple/P, var/pipefailtext)
 	P.atmos_init()
 	if (QDELETED(P))
 		to_chat(usr, pipefailtext)
@@ -94,12 +95,12 @@ Buildable meters
 		P.node2.build_network()
 	return 0
 
-/obj/item/pipe/proc/build_trinary(obj/machinery/atmospherics/pipe/manifold/P, pipefailtext)
+/obj/item/pipe/proc/build_trinary(var/obj/machinery/atmospherics/pipe/manifold/P, var/pipefailtext)
 	P.atmos_init()
 	if (QDELETED(P))
 		to_chat(usr, pipefailtext)
-		return 1
-	P.build_network()
+		return 1	
+	P.build_network()	
 	if(P.node1)
 		P.node1.atmos_init()
 		P.node1.build_network()
@@ -111,7 +112,7 @@ Buildable meters
 		P.node3.build_network()
 	return 0
 
-/obj/item/pipe/proc/build_quaternary(obj/machinery/atmospherics/pipe/manifold4w/P, pipefailtext)
+/obj/item/pipe/proc/build_quaternary(var/obj/machinery/atmospherics/pipe/manifold4w/P, var/pipefailtext)
 	P.atmos_init()
 	if (QDELETED(P))
 		to_chat(usr, pipefailtext)
@@ -131,7 +132,16 @@ Buildable meters
 		P.node4.build_network()
 	return 0
 
-/obj/item/pipe/attackby(obj/item/W as obj, mob/user as mob)
+/obj/item/pipe/attackby(var/obj/item/W as obj, var/mob/user as mob)
+	..()
+
+	//[INF]
+	if(istype(W, /obj/item/rpd))
+		to_chat(usr, "<span class='notice'>You put \the [W] back into \the [src].</span>")
+		qdel(src)
+		return
+	//[/INF]
+
 	if(!isWrench(W))
 		return ..()
 	if (!isturf(loc))
@@ -143,11 +153,11 @@ Buildable meters
 
 	for(var/obj/machinery/atmospherics/M in loc)
 		if((M.initialize_directions & pipe_dir) && M.check_connect_types_construction(M,src))	// matches at least one direction on either type of pipe & same connection type
-			to_chat(user, SPAN_WARNING("There is already a pipe of the same type at this location."))
+			to_chat(user, "<span class='warning'>There is already a pipe of the same type at this location.</span>")
 			return 1
 	// no conflicts found
 
-	var/pipefailtext = SPAN_WARNING("There's nothing to connect this pipe section to!") //(with how the pipe code works, at least one end needs to be connected to something, otherwise the game deletes the segment)"
+	var/pipefailtext = "<span class='warning'>There's nothing to connect this pipe section to!</span>" //(with how the pipe code works, at least one end needs to be connected to something, otherwise the game deletes the segment)"
 
 	//TODO: Move all of this stuff into the various pipe constructors.
 	var/obj/machinery/atmospherics/P = new constructed_path(get_turf(src))
@@ -181,12 +191,12 @@ Buildable meters
 	playsound(src.loc, 'sound/items/Ratchet.ogg', 50, 1)
 	user.visible_message( \
 		"[user] fastens the [src].", \
-		SPAN_NOTICE("You have fastened the [src]."), \
+		"<span class='notice'>You have fastened the [src].</span>", \
 		"You hear ratchet.")
 	qdel(src)	// remove the pipe item
 
 /obj/item/pipe/injector
-	name = "injector"
+	name = "Injector"
 	desc = "Passively injects air into its surroundings. Has a valve attached to it that can control flow rate."
 	connect_types =  CONNECT_TYPE_REGULAR|CONNECT_TYPE_FUEL
 	icon = 	'icons/atmos/injector.dmi'
@@ -212,7 +222,7 @@ Buildable meters
 /obj/item/machine_chassis
 	var/build_type
 
-/obj/item/machine_chassis/attackby(obj/item/W, mob/user)
+/obj/item/machine_chassis/attackby(var/obj/item/W, var/mob/user)
 	if(!isWrench(W))
 		return ..()
 	var/obj/machinery/machine = new build_type(get_turf(src), dir, FALSE)
@@ -221,13 +231,13 @@ Buildable meters
 	if(machine.construct_state)
 		machine.construct_state.post_construct(machine)
 	playsound(loc, 'sound/items/Ratchet.ogg', 50, 1)
-	to_chat(user, SPAN_NOTICE("You have fastened the [src]."))
+	to_chat(user, "<span class='notice'>You have fastened the [src].</span>")
 	qdel(src)
 
 /obj/item/machine_chassis/air_sensor
 	name = "gas sensor"
 	desc = "A sensor. It detects gasses."
-	icon = 'icons/obj/structures/airfilter.dmi'
+	icon = 'icons/obj/stationobjs.dmi'
 	icon_state = "gsensor1"
 	w_class = ITEM_SIZE_LARGE
 	build_type = /obj/machinery/air_sensor
@@ -235,7 +245,7 @@ Buildable meters
 /obj/item/machine_chassis/pipe_meter
 	name = "meter"
 	desc = "A meter that can measure gas inside pipes or in the general area."
-	icon = 'icons/obj/atmospherics/pipe-item.dmi'
+	icon = 'icons/obj/pipe-item.dmi'
 	icon_state = "meter"
 	item_state = "buildpipe"
 	w_class = ITEM_SIZE_LARGE

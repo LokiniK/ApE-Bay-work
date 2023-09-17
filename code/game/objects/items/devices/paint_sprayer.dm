@@ -4,7 +4,7 @@
 
 /obj/item/device/paint_sprayer
 	name = "paint sprayer"
-	icon = 'icons/obj/tools/paint_sprayer.dmi'
+	icon = 'icons/obj/device.dmi'
 	icon_state = "paint_sprayer"
 	item_state = "paint_sprayer"
 	desc = "A slender and none-too-sophisticated device capable of applying paint on floors, walls, exosuits and certain airlocks."
@@ -155,8 +155,8 @@
 		return FALSE
 	if (istype(A, /turf/simulated/floor))
 		var/turf/simulated/floor/F = A
-		if (F.decals && length(F.decals) > 0)
-			LIST_DEC(F.decals)
+		if (F.decals && F.decals.len > 0)
+			F.decals.len--
 			F.update_icon()
 			. = TRUE
 	else if (istype(A, /obj/machinery/door/airlock))
@@ -175,13 +175,13 @@
 	return .
 
 /obj/item/device/paint_sprayer/proc/pick_color_from_floor(turf/simulated/floor/F, mob/user)
-	if (!F.decals || !length(F.decals))
+	if (!F.decals || !F.decals.len)
 		return FALSE
 	var/list/available_colors = list()
 	for (var/image/I in F.decals)
 		available_colors |= isnull(I.color) ? COLOR_WHITE : I.color
 	var/picked_color = available_colors[1]
-	if (length(available_colors) > 1)
+	if (available_colors.len > 1)
 		picked_color = input(user, "Which color do you wish to pick from?") as null|anything in available_colors
 		if (user.incapacitated() || !user.Adjacent(F))
 			return FALSE
@@ -210,7 +210,7 @@
 		to_chat(user, SPAN_WARNING("\The [src] flashes an error light. You might need to reconfigure it."))
 		return FALSE
 
-	if((F.decals && length(F.decals) > 5) && !ispath(painting_decal, /obj/effect/floor_decal/reset))
+	if((F.decals && F.decals.len > 5) && !ispath(painting_decal, /obj/effect/floor_decal/reset))
 		to_chat(user, SPAN_WARNING("\The [F] has been painted too much; you need to clear it off."))
 		return FALSE
 
@@ -274,11 +274,11 @@
 /obj/item/device/paint_sprayer/proc/select_airlock_region(obj/machinery/door/airlock/D, mob/user, input_text)
 	var/choice
 	var/list/choices = list()
-	if (D.paintable & AIRLOCK_PAINTABLE_MAIN)
+	if (D.paintable & AIRLOCK_PAINTABLE)
 		choices |= AIRLOCK_REGION_PAINT
-	if (D.paintable & AIRLOCK_PAINTABLE_STRIPE)
+	if (D.paintable & AIRLOCK_STRIPABLE)
 		choices |= AIRLOCK_REGION_STRIPE
-	if (D.paintable & AIRLOCK_PAINTABLE_WINDOW)
+	if (D.paintable & AIRLOCK_WINDOW_PAINTABLE)
 		choices |= AIRLOCK_REGION_WINDOW
 	choice = input(user, input_text) as null|anything in sortList(choices)
 	if (user.incapacitated() || !D || !user.Adjacent(D))
@@ -306,14 +306,14 @@
 /obj/item/device/paint_sprayer/AltClick()
 	if (!isturf(loc))
 		choose_preset_color()
-		return TRUE
-	return ..()
+	else
+		. = ..()
 
 /obj/item/device/paint_sprayer/CtrlClick()
 	if (!isturf(loc))
 		choose_color()
-		return TRUE
-	return ..()
+	else
+		. = ..()
 
 /obj/item/device/paint_sprayer/verb/choose_color()
 	set name = "Choose color"

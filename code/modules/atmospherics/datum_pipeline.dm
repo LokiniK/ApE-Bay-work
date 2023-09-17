@@ -46,6 +46,8 @@
 		member.air_temporary.multiply(member.volume / air.volume)
 
 /datum/pipeline/proc/build_pipeline(obj/machinery/atmospherics/pipe/base)
+	air = new
+
 	var/list/possible_expansions = list(base)
 	members = list(base)
 	edges = list()
@@ -63,17 +65,17 @@
 	if(base.leaking)
 		leaks |= base
 
-	while(length(possible_expansions)>0)
+	while(possible_expansions.len>0)
 		for(var/obj/machinery/atmospherics/pipe/borderline in possible_expansions)
 
 			var/list/result = borderline.pipeline_expansion()
-			var/edge_check = length(result)
+			var/edge_check = result.len
 
-			if(length(result)>0)
+			if(result.len>0)
 				for(var/obj/machinery/atmospherics/pipe/item in result)
 					if(item.in_stasis)
 						continue
-					if(!members.Find(item))
+					if(!list_find(members, item))
 						members += item
 						possible_expansions += item
 
@@ -99,7 +101,7 @@
 
 /datum/pipeline/proc/network_expand(datum/pipe_network/new_network, obj/machinery/atmospherics/pipe/reference)
 
-	if(new_network.line_members.Find(src))
+	if(list_find(new_network.line_members, src))
 		return 0
 
 	new_network.line_members += src
@@ -228,7 +230,7 @@
 //surface - the surface area in m^2
 //exposed_surface_ratio - the proportion of the surface that is exposed to sunlight
 //thermal_conductivity - a multipler on the heat transfer rate. See OPEN_HEAT_TRANSFER_COEFFICIENT and friends
-/proc/get_thermal_radiation(surface_temperature, surface, exposed_surface_ratio, thermal_conductivity)
+/proc/get_thermal_radiation(var/surface_temperature, var/surface, var/exposed_surface_ratio, var/thermal_conductivity)
 	//*** Gain heat from sunlight, then lose heat from radiation.
 
 	// We only get heat from the star on the exposed surface area.

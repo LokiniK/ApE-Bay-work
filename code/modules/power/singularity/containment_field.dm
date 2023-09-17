@@ -1,9 +1,9 @@
 //This file was auto-corrected by findeclaration.exe on 25.5.2012 20:42:33
 
 /obj/machinery/containment_field
-	name = "containment field"
+	name = "Containment Field"
 	desc = "An energy field."
-	icon = 'icons/obj/machines/power/singularity.dmi'
+	icon = 'icons/obj/singularity.dmi'
 	icon_state = "Contain_F"
 	anchored = TRUE
 	density = FALSE
@@ -59,7 +59,7 @@
 		hasShocked = 0
 		return TRUE
 
-/obj/machinery/containment_field/proc/set_master(master1,master2)
+/obj/machinery/containment_field/proc/set_master(var/master1,var/master2)
 	if(!master1 || !master2)
 		return 0
 	FG1 = master1

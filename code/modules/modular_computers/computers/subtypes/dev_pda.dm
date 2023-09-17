@@ -7,6 +7,8 @@
 	hardware_flag = PROGRAM_PDA
 	max_hardware_size = 1
 	w_class = ITEM_SIZE_SMALL
+	base_active_power_usage = 4
+	base_idle_power_usage = 0
 	light_strength = 2
 	slot_flags = SLOT_ID | SLOT_BELT
 	stores_pen = TRUE
@@ -21,39 +23,21 @@
 /obj/item/modular_computer/pda/CtrlClick(mob/user)
 	if(!isturf(loc)) ///If we are dragging the PDA across the ground we don't want to remove the pen
 		remove_pen(user)
-		return TRUE
-	return ..()
+	else
+		. = ..()
 
-/obj/item/modular_computer/pda/AltClick(mob/user)
-	if (CanPhysicallyInteract(user) && card_slot && istype(card_slot.stored_card))
+/obj/item/modular_computer/pda/AltClick(var/mob/user)
+	if(!CanPhysicallyInteract(user))
+		return
+	if(card_slot && istype(card_slot.stored_card))
 		card_slot.eject_id(user)
-		return TRUE
-	return ..()
-
-/obj/item/modular_computer/pda/proc/receive_notification(message = null)
-	if (!enabled || bsod)
-		return
-	var/display = "pings softly[message ? " and displays a message: '[message]'" : null]"
-	var/mob/found_mob = get_container(/mob)
-	if (found_mob)
-		found_mob.visible_message(
-			SPAN_NOTICE("\The [found_mob]'s [name] [display]."),
-			SPAN_NOTICE("Your [name] [display]."),
-			SPAN_NOTICE("You hear a soft ping."),
-			1
-		)
-		return
-	visible_message(
-		SPAN_NOTICE("\The [src] [display]."),
-		SPAN_NOTICE("You hear a soft ping."),
-		1
-	)
+	else
+		..()
 
 // PDA box
 /obj/item/storage/box/PDAs
 	name = "box of spare PDAs"
 	desc = "A box of spare PDA microcomputers."
-	icon = 'icons/obj/boxes.dmi'
 	icon_state = "pda"
 
 /obj/item/storage/box/PDAs/Initialize()
@@ -91,7 +75,6 @@
 	icon_state_unpowered = "pda-nt"
 
 /obj/item/modular_computer/pda/heads
-	name = "command PDA"
 	icon_state = "pda-h"
 	icon_state_unpowered = "pda-h"
 
@@ -141,3 +124,7 @@
 /obj/item/modular_computer/pda/roboticist
 	icon_state = "pda-robot"
 	icon_state_unpowered = "pda-robot"
+
+/obj/item/modular_computer/pda/explorer
+	icon_state = "pda-exp"
+	icon_state_unpowered = "pda-exp"

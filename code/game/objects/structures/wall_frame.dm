@@ -4,7 +4,7 @@
 /obj/structure/wall_frame
 	name = "low wall"
 	desc = "A low wall section which serves as the base of windows, amongst other things."
-	icon = 'icons/obj/structures/wall_frame.dmi'
+	icon = 'icons/obj/wall_frame.dmi'
 	icon_state = "frame"
 
 	atom_flags = ATOM_FLAG_NO_TEMP_CHANGE | ATOM_FLAG_CLIMBABLE | ATOM_FLAG_CAN_BE_PAINTED | ATOM_FLAG_ADJACENT_EXCEPTION
@@ -12,28 +12,25 @@
 	density = TRUE
 	throwpass = 1
 	layer = TABLE_LAYER
-	health_max = 100
+	color = "#666666"
+//	color = COLOR_GUNMETAL //INFINITY: Because we aren't using it.
 
+	var/health = 100
 	var/paint_color
 	var/stripe_color
 	rad_resistance_modifier = 0.5
 
 	blend_objects = list(/obj/machinery/door, /turf/simulated/wall) // Objects which to blend with
-	noblend_objects = list(/obj/machinery/door/window)
+	noblend_objects = list(/obj/machinery/door/window, /obj/machinery/door/blast/regular/escape_pod, /obj/machinery/door/firedoor/border_only) //INF, WAS: /obj/machinery/door/window
 	material = DEFAULT_WALL_MATERIAL
 
-/obj/structure/wall_frame/New(new_loc, materialtype)
+/obj/structure/wall_frame/New(var/new_loc, var/materialtype)
 	..(new_loc)
 
-	if (!materialtype)
-		if (istext(material))
-			materialtype = material
-		else
-			materialtype = DEFAULT_WALL_MATERIAL
-
+	if(!materialtype)
+		materialtype = DEFAULT_WALL_MATERIAL
 	material = SSmaterials.get_material_by_name(materialtype)
-	set_max_health(material.integrity)
-	SetName("[material.use_name] [name]")
+	health = material.integrity
 
 	update_connections(1)
 	update_icon()
@@ -49,82 +46,62 @@
 /obj/structure/wall_frame/examine(mob/user)
 	. = ..()
 
+	if(health == material.integrity)
+		to_chat(user, "<span class='notice'>It seems to be in fine condition.</span>")
+	else
+		var/dam = health / material.integrity
+		if(dam <= 0.3)
+			to_chat(user, "<span class='notice'>It's got a few dents and scratches.</span>")
+		else if(dam <= 0.7)
+			to_chat(user, "<span class='warning'>A few pieces of panelling have fallen off.</span>")
+		else
+			to_chat(user, "<span class='danger'>It's nearly falling to pieces.</span>")
 	if(paint_color)
-		to_chat(user, SPAN_NOTICE("It has a smooth coat of paint applied."))
+		to_chat(user, "<span class='notice'>It has a smooth coat of paint applied.</span>")
 
+/obj/structure/wall_frame/attackby(var/obj/item/W, var/mob/user)
+	src.add_fingerprint(user)
 
-/obj/structure/wall_frame/can_use_item(obj/item/tool, mob/user, click_params)
-	. = ..()
-	if (!.)
+	//grille placing
+	if(istype(W, /obj/item/stack/material/rods))
+		for(var/obj/structure/window/WINDOW in loc)
+			if(WINDOW.dir == get_dir(src, user))
+				to_chat(user, "<span class='notice'>There is a window in the way.</span>")
+				return
+		place_grille(user, loc, W)
 		return
 
-	// Windows
-	for (var/obj/structure/window/window in loc)
-		if (window.dir == get_dir(src, user))
-			USE_FEEDBACK_FAILURE("\The [window] blocks access to \the [src].")
-			return FALSE
+	//window placing
+	else if(istype(W,/obj/item/stack/material))
+		var/obj/item/stack/material/ST = W
+		if(ST.material.opacity > 0.7)
+			return 0
+		place_window(user, loc, SOUTHWEST, ST)
 
-	// Grilles
-	var/obj/structure/grille/grille = locate() in loc
-	if (grille?.density)
-		USE_FEEDBACK_FAILURE("\The [grille] blocks access to \the [src].")
-		return FALSE
+	if(isWrench(W))
+		for(var/obj/structure/S in loc)
+			if(istype(S, /obj/structure/window))
+				to_chat(user, "<span class='notice'>There is still a window on the low wall!</span>")
+				return
+			else if(istype(S, /obj/structure/grille))
+				to_chat(user, "<span class='notice'>There is still a grille on the low wall!</span>")
+				return
+		playsound(src.loc, 'sound/items/Ratchet.ogg', 100, 1)
+		to_chat(user, "<span class='notice'>Now disassembling the low wall...</span>")
+		if(do_after(user, 40,src))
+			to_chat(user, "<span class='notice'>You dissasembled the low wall!</span>")
+			dismantle()
 
-
-/obj/structure/wall_frame/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Rods - Place Grille
-	if (istype(tool, /obj/item/stack/material/rods))
-		place_grille(user, loc, tool)
-		return TRUE
-
-	// Material Stack - Place window
-	if (istype(tool, /obj/item/stack/material))
-		var/obj/item/stack/material/stack = tool
-		if (stack.material.opacity > 0.7)
-			USE_FEEDBACK_FAILURE("\The [stack] cannot be used to make a window.")
-			return TRUE
-		place_window(user, loc, tool)
-		return TRUE
-
-	// Wrench - Dismantle
-	if (isWrench(tool))
-		playsound(src, 'sound/items/Ratchet.ogg', 50, TRUE)
-		user.visible_message(
-			SPAN_NOTICE("\The [user] starts dismantling \the [src] with \a [tool]."),
-			SPAN_NOTICE("You start dismantling \the [src] with \the [tool].")
-		)
-		if (!user.do_skilled((tool.toolspeed * 4) SECONDS, SKILL_CONSTRUCTION, src, do_flags = DO_REPAIR_CONSTRUCT) || !user.use_sanity_check(src, tool))
-			return TRUE
-		playsound(src, 'sound/items/Ratchet.ogg', 50, TRUE)
-		user.visible_message(
-			SPAN_NOTICE("\The [user] dismantles \the [src] with \a [tool]."),
-			SPAN_NOTICE("You dismantle \the [src] with \the [tool].")
-		)
-		dismantle()
-		return TRUE
-
-	// Plasmacutter - Dismantle
-	if (istype(tool, /obj/item/gun/energy/plasmacutter))
-		var/obj/item/gun/energy/plasmacutter/plasmacutter = tool
-		if (!plasmacutter.slice(user))
-			return TRUE
-		playsound(src, 'sound/items/Welder.ogg', 50, TRUE)
-		user.visible_message(
-			SPAN_NOTICE("\The [user] starts slicing \the [src] apart with \a [tool]."),
-			SPAN_NOTICE("You start slicing \the [src] apart with \the [tool].")
-		)
-		if (!user.do_skilled((tool.toolspeed * 2) SECONDS, SKILL_CONSTRUCTION, src, do_flags = DO_REPAIR_CONSTRUCT) || !user.use_sanity_check(src, tool))
-			return TRUE
-		playsound(src, 'sound/items/Welder.ogg', 50, TRUE)
-		user.visible_message(
-			SPAN_NOTICE("\The [user] slices \the [src] apart with \a [tool]."),
-			SPAN_NOTICE("You slice \the [src] apart with \the [tool].")
-		)
-		dismantle()
-		return TRUE
-
+	else if(istype(W, /obj/item/gun/energy/plasmacutter))
+		var/obj/item/gun/energy/plasmacutter/cutter = W
+		if(!cutter.slice(user))
+			return
+		playsound(src.loc, 'sound/items/Welder.ogg', 100, 1)
+		to_chat(user, "<span class='notice'>Now slicing through the low wall...</span>")
+		if(do_after(user, 20,src))
+			to_chat(user, "<span class='warning'>You have sliced through the low wall!</span>")
+			dismantle()
 	return ..()
-
 
 /obj/structure/wall_frame/CanPass(atom/movable/mover, turf/target, height=0, air_group=0)
 	if(air_group || (height==0)) return 1
@@ -144,19 +121,34 @@
 
 	for(var/i = 1 to 4)
 		if(other_connections[i] != "0")
-			I = image('icons/obj/structures/wall_frame.dmi', "frame_other[connections[i]]", dir = SHIFTL(1, i - 1))
+			I = image('icons/obj/wall_frame.dmi', "frame_other[connections[i]]", dir = 1<<(i-1))
 		else
-			I = image('icons/obj/structures/wall_frame.dmi', "frame[connections[i]]", dir = SHIFTL(1, i - 1))
+			I = image('icons/obj/wall_frame.dmi', "frame[connections[i]]", dir = 1<<(i-1))
 		overlays += I
 
 	if(stripe_color)
 		for(var/i = 1 to 4)
 			if(other_connections[i] != "0")
-				I = image('icons/obj/structures/wall_frame.dmi', "stripe_other[connections[i]]", dir = SHIFTL(1, i - 1))
+				I = image('icons/obj/wall_frame.dmi', "stripe_other[connections[i]]", dir = 1<<(i-1))
 			else
-				I = image('icons/obj/structures/wall_frame.dmi', "stripe[connections[i]]", dir = SHIFTL(1, i - 1))
+				I = image('icons/obj/wall_frame.dmi', "stripe[connections[i]]", dir = 1<<(i-1))
 			I.color = stripe_color
 			overlays += I
+
+/obj/structure/wall_frame/osmium
+	paint_color = "#9bc6f2"
+
+/obj/structure/wall_frame/voxalloy
+	paint_color = "#6c7364"
+
+/obj/structure/wall_frame/prepainted
+	paint_color = COLOR_WALL_GUNMETAL
+
+/obj/structure/wall_frame/wood
+	paint_color = "#78523b"
+
+/obj/structure/wall_frame/crystal
+	paint_color = COLOR_PALE_BLUE_GRAY
 
 /obj/structure/wall_frame/hull/Initialize()
 	. = ..()
@@ -173,17 +165,38 @@
 			paint_color = adjust_brightness(paint_color, bleach_factor)
 		update_icon()
 
-/obj/structure/wall_frame/on_death()
-	dismantle()
+/obj/structure/wall_frame/bullet_act(var/obj/item/projectile/Proj)
+	var/proj_damage = Proj.get_structure_damage()
+	var/damage = min(proj_damage, 100)
+	take_damage(damage)
+	return
+
+/obj/structure/wall_frame/hitby(AM as mob|obj, var/datum/thrownthing/TT)
+	..()
+	var/tforce = 0
+	if(ismob(AM)) // All mobs have a multiplier and a size according to mob_defines.dm
+		var/mob/I = AM
+		tforce = I.mob_size * (TT.speed/THROWFORCE_SPEED_DIVISOR)
+	else
+		var/obj/O = AM
+		tforce = O.throwforce * (TT.speed/THROWFORCE_SPEED_DIVISOR)
+	if (tforce < 15)
+		return
+	take_damage(tforce)
+
+/obj/structure/wall_frame/take_damage(damage)
+	health -= damage
+	if(health <= 0)
+		dismantle()
 
 /obj/structure/wall_frame/proc/dismantle()
-	material.place_sheet(get_turf(src), 3)
+	new /obj/item/stack/material/steel(get_turf(src), 2)
 	qdel(src)
 
 /obj/structure/wall_frame/get_color()
 	return paint_color
 
-/obj/structure/wall_frame/set_color(color)
+/obj/structure/wall_frame/set_color(var/color)
 	paint_color = color
 	update_icon()
 
@@ -199,6 +212,9 @@
 
 /obj/structure/wall_frame/hull/vox
 	paint_color = COLOR_GREEN_GRAY
+
+/obj/structure/wall_frame/hull/ascent
+	paint_color = COLOR_PURPLE
 
 /obj/structure/wall_frame/hull/verne
 	paint_color = COLOR_GUNMETAL

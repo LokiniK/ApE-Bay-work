@@ -16,6 +16,9 @@ stopserver
 reboot_called
 atupdate
 
+# sometimes something create backups of maps
+maps/*/backup/*.dmm
+
 # ignore config, but not subdirs
 !config/*/
 config/*
@@ -43,6 +46,11 @@ Session.vim
 # auto-generated tag files
 tags
 
+# updater
+updater.bat
+updater.sh
+update_log.out
+
 # ignore built libs
 lib/*.dll
 lib/*.so
@@ -51,8 +59,10 @@ lib/*.so
 *.pyc
 __pycache__
 
-node_modules/
-package-lock.json
+# flyway config
+flyway.conf
 
-# ignore local selected map
-/maps/using.dm
+#inf
+# linux
+nohup.out
+#/inf

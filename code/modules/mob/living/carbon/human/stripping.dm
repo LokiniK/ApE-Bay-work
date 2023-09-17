@@ -1,9 +1,9 @@
-/mob/living/carbon/human/proc/handle_strip(slot_to_strip_text,mob/living/user,obj/item/clothing/holder)
+/mob/living/carbon/human/proc/handle_strip(var/slot_to_strip_text,var/mob/living/user,var/obj/item/clothing/holder)
 	if(!slot_to_strip_text || !istype(user))
 		return
 
 	if(user.incapacitated()  || !user.Adjacent(src))
-		show_browser(user, null, "window=mob[src.name]")
+		close_browser(user, "window=mob[src.name]")
 		return TRUE
 
 	var/strip_delay = HUMAN_STRIP_DELAY
@@ -20,20 +20,32 @@
 		stripping = TRUE
 
 	switch (slot_to_strip_text)
-		if ("pockets")
+
+		if ("left_pocket")
 			if (stripping)
-				visible_message(SPAN_DANGER("\The [user] is trying to empty [src]'s pockets!"))
-				if (do_after(user, strip_delay, src, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
-					empty_pockets(user)
+				visible_message(SPAN_DANGER("\The [user] is trying to empty [src]'s left pocket!"))
+				if (do_after(user, strip_delay, src, do_flags = DO_DEFAULT | DO_PUBLIC_PROGRESS))
+					empty_pockets(user, slot_l_store)
 			else
-				visible_message(SPAN_DANGER("\The [user] is trying to stuff \a [held] into \the [src]'s pocket!"))
-				if (do_after(user, strip_delay, src, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
-					place_in_pockets(held, user)
+				visible_message(SPAN_DANGER("\The [user] is trying to stuff \a [held] into \the [src]'s left pocket!"))
+				if (do_after(user, strip_delay, src, do_flags = DO_DEFAULT | DO_PUBLIC_PROGRESS))
+					place_in_pockets(held, user, slot_l_store)
+			return
+
+		if ("right_pocket")
+			if (stripping)
+				visible_message(SPAN_DANGER("\The [user] is trying to empty [src]'s right pocket!"))
+				if (do_after(user, strip_delay, src, do_flags = DO_DEFAULT | DO_PUBLIC_PROGRESS))
+					empty_pockets(user, slot_r_store)
+			else
+				visible_message(SPAN_DANGER("\The [user] is trying to stuff \a [held] into \the [src]'s right pocket!"))
+				if (do_after(user, strip_delay, src, do_flags = DO_DEFAULT | DO_PUBLIC_PROGRESS))
+					place_in_pockets(held, user, slot_r_store)
 			return
 
 		if ("sensors")
 			visible_message(SPAN_DANGER("\The [user] is trying to set \the [src]'s sensors!"))
-			if (do_after(user, strip_delay, src, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
+			if (do_after(user, strip_delay, src, do_flags = DO_DEFAULT | DO_PUBLIC_PROGRESS))
 				toggle_sensors(user)
 			return
 
@@ -42,7 +54,7 @@
 				return
 			var/obj/item/clothing/under/subject_uniform = w_uniform
 			visible_message(SPAN_DANGER("\The [user] is trying to [subject_uniform.has_sensor == SUIT_LOCKED_SENSORS ? "un" : ""]lock \the [src]'s sensors!"), range = 3)
-			if (do_after(user, strip_delay, src, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
+			if (do_after(user, strip_delay, src, do_flags = DO_DEFAULT | DO_PUBLIC_PROGRESS))
 				if (subject_uniform != w_uniform)
 					to_chat(user, SPAN_WARNING("\The [src] is not wearing \the [subject_uniform] anymore."))
 					return
@@ -59,7 +71,7 @@
 
 		if ("internals")
 			visible_message(SPAN_DANGER("\The [usr] is trying to set \the [src]'s internals!"))
-			if (do_after(user, strip_delay, src, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
+			if (do_after(user, strip_delay, src, do_flags = DO_DEFAULT | DO_PUBLIC_PROGRESS))
 				toggle_internals(user)
 			return
 
@@ -75,26 +87,13 @@
 			if (isnull(A))
 				return
 			visible_message(SPAN_DANGER("\The [user] starts trying to remove \the [src]'s [A.name]!"))
-			if (!do_after(user, strip_delay, src, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
+			if (!do_after(user, strip_delay, src, do_flags = DO_DEFAULT | DO_PUBLIC_PROGRESS))
 				return
 			if (!A || holder.loc != src || !(A in holder.accessories))
 				return
 			admin_attack_log(user, src, "Stripped \an [A] from \the [holder].", "Was stripped of \an [A] from \the [holder].", "stripped \an [A] from \the [holder] of")
 			holder.remove_accessory(user, A)
 			return
-
-		else
-			var/obj/item/located_item = locate(slot_to_strip_text) in src
-			if (isunderwear(located_item))
-				var/obj/item/underwear/UW = located_item
-				visible_message(
-					SPAN_DANGER("\The [user] starts trying to remove \the [src]'s [UW.name]!"),
-					SPAN_WARNING("You start trying to remove \the [src]'s [UW.name]!")
-				)
-				if (UW.DelayedRemoveUnderwear(user, src))
-					admin_attack_log(user, src, "Stripped \an [UW] from \the [holder].", "Was stripped of \an [UW] from \the [holder].", "stripped \an [UW] from \the [holder] of")
-					user.put_in_active_hand(UW)
-				return
 
 	var/obj/item/target_slot = get_equipped_item(text2num(slot_to_strip_text))
 	if (stripping)
@@ -107,7 +106,7 @@
 	else
 		visible_message(SPAN_DANGER("\The [user] is trying to put \a [held] on \the [src]!"))
 
-	if (!do_after(user, strip_delay, src, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
+	if (!do_after(user, strip_delay, src))
 		return
 
 	if (stripping)
@@ -120,48 +119,45 @@
 		var/obj/item/clothing/C = get_equipped_item(text2num(slot_to_strip_text))
 		if (istype(C) && C.can_attach_accessory(held, user))
 			C.attach_accessory(user, held)
-		else if (!equip_to_slot_if_possible(held, text2num(slot_to_strip_text), TRYEQUIP_REDRAW | TRYEQUIP_INSTANT))
+		else if (!equip_to_slot_if_possible(held, text2num(slot_to_strip_text), del_on_fail = FALSE, disable_warning = FALSE, redraw_mob = TRUE))
 			user.put_in_active_hand(held)
 
-/mob/living/carbon/human/proc/empty_pockets(mob/living/user)
-	if (!r_store && !l_store)
+/mob/living/carbon/human/proc/empty_pockets(mob/living/user, var/slot)
+	var/slot_item = get_equipped_item(slot)
+	if (!slot_item)
 		to_chat(user, SPAN_WARNING("\The [src] has nothing in their pockets."))
 		return
-	if (r_store)
-		unEquip(r_store)
-	if (l_store)
-		unEquip(l_store)
-	visible_message(SPAN_DANGER("\The [user] empties [src]'s pockets!"))
+	if (slot_item)
+		unEquip(slot_item)
+	visible_message(SPAN_DANGER("\The [user] empties [src]'s pocket!"))
 
-/mob/living/carbon/human/proc/place_in_pockets(obj/item/I, mob/living/user)
+/mob/living/carbon/human/proc/place_in_pockets(obj/item/I, var/mob/living/user, var/slot)
+	var/slot_item = get_equipped_item(slot)
 	if(!user.unEquip(I))
 		return
-	if(!r_store)
-		if(equip_to_slot_if_possible(I, slot_r_store, TRYEQUIP_REDRAW | TRYEQUIP_SILENT))
+	if(!slot_item)
+		if(equip_to_slot_if_possible(I, slot, del_on_fail=0, disable_warning=1, redraw_mob=1))
 			return
-	if(!l_store)
-		if(equip_to_slot_if_possible(I, slot_l_store, TRYEQUIP_REDRAW | TRYEQUIP_SILENT))
-			return
-	to_chat(user, SPAN_WARNING("You are unable to place [I] in [src]'s pockets."))
+	to_chat(user, "<span class='warning'>You are unable to place [I] in [src]'s pockets.</span>")
 	user.put_in_active_hand(I)
 
 // Modify the current target sensor level.
-/mob/living/carbon/human/proc/toggle_sensors(mob/living/user)
+/mob/living/carbon/human/proc/toggle_sensors(var/mob/living/user)
 	var/obj/item/clothing/under/suit = w_uniform
 	if(!suit)
-		to_chat(user, SPAN_WARNING("\The [src] is not wearing a suit with sensors."))
+		to_chat(user, "<span class='warning'>\The [src] is not wearing a suit with sensors.</span>")
 		return
 	if (suit.has_sensor >= 2)
-		to_chat(user, SPAN_WARNING("\The [src]'s suit sensor controls are locked."))
+		to_chat(user, "<span class='warning'>\The [src]'s suit sensor controls are locked.</span>")
 		return
 
 	admin_attack_log(user, src, "Toggled their suit sensors.", "Toggled their suit sensors.", "toggled the suit sensors of")
 	suit.set_sensors(user)
 
 // Set internals on or off.
-/mob/living/carbon/human/proc/toggle_internals(mob/living/user)
+/mob/living/carbon/human/proc/toggle_internals(var/mob/living/user)
 	if(internal)
-		visible_message(SPAN_DANGER("\The [user] disables \the [src]'s internals!"))
+		visible_message("<span class='danger'>\The [user] disables \the [src]'s internals!</span>")
 		internal.add_fingerprint(user)
 		set_internals(null)
 		return
@@ -169,7 +165,7 @@
 		// Check for airtight mask/helmet.
 		if(!(wear_mask && wear_mask.item_flags & ITEM_FLAG_AIRTIGHT))
 			if(!(head && head.item_flags & ITEM_FLAG_AIRTIGHT))
-				to_chat(user, SPAN_WARNING("\The [src] does not have a suitable mask or helmet."))
+				to_chat(user, "<span class='warning'>\The [src] does not have a suitable mask or helmet.</span>")
 				return
 
 		// Find an internal source.
@@ -180,7 +176,7 @@
 		else if(istype(belt, /obj/item/tank))
 			set_internals(belt)
 		else
-			to_chat(user, SPAN_WARNING("You could not find a suitable tank!"))
+			to_chat(user, "<span class='warning'>You could not find a suitable tank!</span>")
 			return
-		visible_message(SPAN_WARNING("\The [src] is now running on internals!"))
+		visible_message("<span class='warning'>\The [src] is now running on internals!</span>")
 		internal.add_fingerprint(user)

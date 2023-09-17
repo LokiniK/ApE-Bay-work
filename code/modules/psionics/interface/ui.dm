@@ -3,10 +3,9 @@
 	var/mob/living/owner
 	var/hidden = TRUE
 
-/obj/screen/psi/Initialize(mapload)
-	. = ..()
-	owner = loc
+/obj/screen/psi/New(var/mob/living/_owner)
 	loc = null
+	owner = _owner
 	update_icon()
 
 /obj/screen/psi/Destroy()
@@ -16,6 +15,6 @@
 
 /obj/screen/psi/on_update_icon()
 	if(hidden)
-		invisibility = INVISIBILITY_ABSTRACT
+		invisibility = 101
 	else
 		invisibility = 0

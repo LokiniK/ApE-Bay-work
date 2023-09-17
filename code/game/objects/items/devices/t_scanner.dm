@@ -3,7 +3,6 @@
 /obj/item/device/t_scanner
 	name = "\improper T-ray scanner"
 	desc = "A terahertz-ray emitter and scanner, capable of penetrating conventional hull materials."
-	icon = 'icons/obj/tools/t_ray_scanner.dmi'
 	icon_state = "t-ray0"
 	slot_flags = SLOT_BELT
 	w_class = ITEM_SIZE_SMALL
@@ -18,20 +17,19 @@
 	var/list/active_scanned = list() //assoc list of objects being scanned, mapped to their overlay
 	var/client/user_client //since making sure overlays are properly added and removed is pretty important, so we track the current user explicitly
 
-	var/static/list/overlay_cache = list() //cache recent overlays
+	var/global/list/overlay_cache = list() //cache recent overlays
 
 /obj/item/device/t_scanner/Destroy()
-	if (on)
+	. = ..()
+	if(on)
 		set_active(FALSE)
-	return ..()
 
 /obj/item/device/t_scanner/on_update_icon()
 	icon_state = "t-ray[on]"
 
 /obj/item/device/t_scanner/emp_act()
-	audible_message(SPAN_NOTICE(" \The [src] buzzes oddly."))
+	audible_message("<span class = 'notice'> \The [src] buzzes oddly.</span>")
 	set_active(FALSE)
-	..()
 
 /obj/item/device/t_scanner/attack_self(mob/user)
 	set_active(!on)
@@ -40,9 +38,9 @@
 /obj/item/device/t_scanner/afterattack(atom/target, mob/user, proximity_flag, click_parameters)
 	var/obj/structure/disposalpipe/D = target
 	if(D && istype(D))
-		to_chat(user, SPAN_INFO("Pipe segment integrity: [100 - D.get_damage_percentage()]%"))
+		to_chat(user, "<span class='info'>Pipe segment integrity: [(D.health / 10) * 100]%</span>")
 
-/obj/item/device/t_scanner/proc/set_active(active)
+/obj/item/device/t_scanner/proc/set_active(var/active)
 	on = active
 	if(on)
 		START_PROCESSING(SSfastprocess, src)
@@ -82,7 +80,7 @@
 		active_scanned -= O
 
 //creates a new overlay for a scanned object
-/obj/item/device/t_scanner/proc/get_overlay(atom/movable/scanned)
+/obj/item/device/t_scanner/proc/get_overlay(var/atom/movable/scanned)
 	//Use a cache so we don't create a whole bunch of new images just because someone's walking back and forth in a room.
 	//Also means that images are reused if multiple people are using t-rays to look at the same objects.
 	if(scanned in overlay_cache)
@@ -91,7 +89,7 @@
 		var/image/I = image(loc = scanned, icon = scanned.icon, icon_state = scanned.icon_state)
 		I.plane = HUD_PLANE
 		I.layer = UNDER_HUD_LAYER
-		I.appearance_flags = DEFAULT_APPEARANCE_FLAGS | RESET_ALPHA
+		I.appearance_flags = RESET_ALPHA
 
 		//Pipes are special
 		if(istype(scanned, /obj/machinery/atmospherics/pipe))
@@ -100,11 +98,17 @@
 			I.overlays += P.overlays
 			I.underlays += P.underlays
 
+//[INF]
+		//Chameleon projector's malfuctioning
+		if(istype(scanned, /obj/effect/dummy/chameleon))
+			var/obj/effect/dummy/chameleon/C = scanned
+			C.master.disrupt()
+//[/INF]
 		if(ismob(scanned))
 			if(ishuman(scanned))
 				var/mob/living/carbon/human/H = scanned
-				if(H.species.appearance_flags & SPECIES_APPEARANCE_HAS_SKIN_COLOR)
-					I.color = H.skin_color
+				if(H.species.appearance_flags & HAS_SKIN_COLOR)
+					I.color = rgb(H.r_skin, H.g_skin, H.b_skin)
 					I.icon = 'icons/mob/mob.dmi'
 					I.icon_state = "phaseout"
 			var/mob/M = scanned
@@ -118,10 +122,10 @@
 
 	// Add it to cache, cutting old entries if the list is too long
 	overlay_cache[scanned] = .
-	if(length(overlay_cache) > OVERLAY_CACHE_LEN)
-		overlay_cache.Cut(1, length(overlay_cache)-OVERLAY_CACHE_LEN-1)
+	if(overlay_cache.len > OVERLAY_CACHE_LEN)
+		overlay_cache.Cut(1, overlay_cache.len-OVERLAY_CACHE_LEN-1)
 
-/obj/item/device/t_scanner/proc/get_scanned_objects(scan_dist)
+/obj/item/device/t_scanner/proc/get_scanned_objects(var/scan_dist)
 	. = list()
 
 	var/turf/center = get_turf(src.loc)
@@ -137,12 +141,16 @@
 				. += M
 			else if(round_is_spooky() && isobserver(M))
 				. += M
+//[INF]
+		for(var/obj/effect/dummy/chameleon/C in T.contents)
+			. += C
+//[/INF]
 
 		if(!!T.is_plating())
 			continue
 
 		for(var/obj/O in T.contents)
-			if(O.level != ATOM_LEVEL_UNDER_TILE)
+			if(O.level != 1)
 				continue
 			if(!O.invisibility)
 				continue //if it's already visible don't need an overlay for it
@@ -150,7 +158,7 @@
 
 
 
-/obj/item/device/t_scanner/proc/set_user_client(client/new_client)
+/obj/item/device/t_scanner/proc/set_user_client(var/client/new_client)
 	if(new_client == user_client)
 		return
 	if(user_client)

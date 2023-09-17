@@ -1,16 +1,10 @@
 //Since it didn't really belong in any other category, I'm putting this here
 //This is for procs to replace all the goddamn 'in world's that are chilling around the code
 
-/// All /obj/structure/cable, managed by instances
-GLOBAL_LIST_EMPTY(cable_list)
-
-/// All medical side effects
-GLOBAL_LIST_EMPTY(side_effects)
-
-/// All character setup mannequins
-GLOBAL_LIST_EMPTY(mannequins)
-
+var/global/list/cable_list = list()					//Index for all cables, so that powernets don't have to look through the entire world all the time
 var/global/list/landmarks_list = list()				//list of all landmarks created
+var/global/list/side_effects = list()				//list of all medical sideeffects types by thier names |BS12
+var/global/list/mechas_list = list()				//list of all mechs. Used by hostile mobs target tracking.
 
 #define all_genders_define_list list(MALE,FEMALE,PLURAL,NEUTER)
 #define all_genders_text_list list("Male","Female","Plural","Neuter")
@@ -21,14 +15,14 @@ var/global/list/datum/language/all_languages = list()
 var/global/list/language_keys[0]					// Table of say codes for all languages
 var/global/list/playable_species = list(SPECIES_HUMAN)    // A list of ALL playable species, whitelisted, latejoin or otherwise.
 
-
+var/list/mannequins_
 
 // Grabs
 var/global/list/all_grabstates[0]
 var/global/list/all_grabobjects[0]
 
 // Uplinks
-var/global/list/obj/item/device/uplink/world_uplinks = list()
+var/list/obj/item/device/uplink/world_uplinks = list()
 
 //Preferences stuff
 //Hairstyles
@@ -41,8 +35,8 @@ GLOBAL_LIST_EMPTY(body_marking_styles_list)		//stores /datum/sprite_accessory/ma
 GLOBAL_DATUM_INIT(underwear, /datum/category_collection/underwear, new())
 
 // Visual nets
-var/global/list/datum/visualnet/visual_nets = list()
-var/global/datum/visualnet/camera/cameranet = new()
+var/list/datum/visualnet/visual_nets = list()
+var/datum/visualnet/camera/cameranet = new()
 
 // Runes
 var/global/list/rune_list = new()
@@ -85,12 +79,13 @@ var/global/list/string_slot_flags = list(
 /////Initial Building/////
 //////////////////////////
 
-/proc/get_mannequin(ckey)
-	RETURN_TYPE(/mob/living/carbon/human/dummy/mannequin)
-	if (!GLOB.mannequins[ckey])
-		GLOB.mannequins[ckey] = new /mob/living/carbon/human/dummy/mannequin
-	return GLOB.mannequins[ckey]
-
+/proc/get_mannequin(var/ckey)
+	if(!mannequins_)
+		mannequins_ = new()
+	. = mannequins_[ckey]
+	if(!.)
+		. = new/mob/living/carbon/human/dummy/mannequin()
+		mannequins_[ckey] = .
 
 /hook/global_init/proc/makeDatumRefLists()
 	var/list/paths
@@ -165,6 +160,13 @@ var/global/list/string_slot_flags = list(
 		var/datum/grab/G = all_grabstates[grabstate_name]
 		G.refresh_updown()
 
+//[INF]
+	//medical side effects
+	paths = subtypesof(/datum/medical_effect)
+	for(var/T in paths)
+		var/datum/medical_effect/M = new T
+		GLOB.all_medical_side_effects += M.name
+//[/INF]
 	return 1
 
 //*** params cache
@@ -173,22 +175,24 @@ var/global/list/paramslist_cache = list()
 #define cached_key_number_decode(key_number_data) cached_params_decode(key_number_data, /proc/key_number_decode)
 #define cached_number_list_decode(number_list_data) cached_params_decode(number_list_data, /proc/number_list_decode)
 
-/proc/cached_params_decode(params_data, decode_proc)
+/proc/cached_params_decode(var/params_data, var/decode_proc)
 	. = paramslist_cache[params_data]
 	if(!.)
 		. = call(decode_proc)(params_data)
 		paramslist_cache[params_data] = .
 
-/proc/key_number_decode(key_number_data)
-	RETURN_TYPE(/list)
+/proc/key_number_decode(var/key_number_data)
 	var/list/L = params2list(key_number_data)
 	for(var/key in L)
 		L[key] = text2num(L[key])
 	return L
 
-/proc/number_list_decode(number_list_data)
-	RETURN_TYPE(/list)
+/proc/number_list_decode(var/number_list_data)
 	var/list/L = params2list(number_list_data)
-	for(var/i in 1 to length(L))
+	for(var/i in 1 to L.len)
 		L[i] = text2num(L[i])
 	return L
+
+var/list/cardinal    = list(NORTH, SOUTH, EAST, WEST)
+var/list/cornerdirs  = list(NORTHWEST, SOUTHEAST, NORTHEAST, SOUTHWEST)
+var/list/alldirs     = list(NORTH, SOUTH, EAST, WEST, NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST)

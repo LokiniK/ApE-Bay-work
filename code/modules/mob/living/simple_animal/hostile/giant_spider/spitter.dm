@@ -4,8 +4,8 @@
 	icon_state = "spitter"
 	icon_living = "spitter"
 	icon_dead = "spitter_dead"
-	maxHealth = 55
-	health = 55
+	maxHealth = 90
+	health = 90
 	poison_per_bite = 15
 	ranged = TRUE
 	move_to_delay = 2

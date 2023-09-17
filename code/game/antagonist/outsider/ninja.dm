@@ -5,7 +5,17 @@ GLOBAL_DATUM_INIT(ninjas, /datum/antagonist/ninja, new)
 	role_text = "Ninja"
 	role_text_plural = "Ninja"
 	landmark_id = "ninjastart"
-	welcome_text = "<span class='info'>You are an elite mercenary assassin of the Spider Clan. You have a variety of abilities at your disposal, thanks to your nano-enhanced cyber armor.</span>"
+	welcome_text = "\
+	<hr>Итак, Вы - наёмник. Нет, не верзила с пулеметом в штурмовом РИГе, а профессионал. Вы выполняете частные \
+	заказы, для которых шпионы или обычные убийцы плохо экипированы и недостаточно подготовлены. \
+	Вы снаряжены для скрытного проникновения и такого же скрытного выполнения своих задач на самых \
+	различных объектах. Оптический камуфляж вашего РИГа, телепортационная система и встроенный клинок \
+	для разрезания стен и скафандров слишком любознательных охранников - вот ваши лучшие друзья. \
+	Ваши цели достаточно специфичны. <u>Вы должны скачать максимально возможное количество технологических уровней \
+	из РНД, украсть максимально большое количичество ценных вещей, таких как чертежи и секретные документы, и \
+	возможно, даже опорочить чужую репутацию.</u> <i>Ваш заказчик, помимо всего прочего, накладывает на вас \
+	дополнительные условия - постарайтесь следовать им безукоснительно.</i> В конце-концов, преимущество в \
+	экипировке и навыках здесь у вас, а не у кого-то ещё."
 	flags = ANTAG_OVERRIDE_JOB | ANTAG_OVERRIDE_MOB | ANTAG_CLEAR_EQUIPMENT | ANTAG_CHOOSE_NAME | ANTAG_RANDSPAWN | ANTAG_VOTABLE | ANTAG_SET_APPEARANCE
 	antaghud_indicator = "hudninja"
 
@@ -18,41 +28,32 @@ GLOBAL_DATUM_INIT(ninjas, /datum/antagonist/ninja, new)
 	id_type = /obj/item/card/id/syndicate
 
 	faction = "ninja"
-	no_prior_faction = TRUE
-
 	base_to_load = /datum/map_template/ruin/antag_spawn/ninja
 
-/datum/antagonist/ninja/create_objectives(datum/mind/ninja)
+/datum/antagonist/ninja/create_objectives(var/datum/mind/ninja)
 
 	if(!..())
 		return
 
+	var/objectives_count = round(count_living()/config.traitor_objectives_scaling) + 1
 	var/objective_list = list(1,2,3,4,5)
-	for(var/i=rand(2,4),i>0,i--)
+	for(var/i in 1 to objectives_count)
 		switch(pick(objective_list))
 			if(1)//Kill
 				var/datum/objective/assassinate/ninja_objective = new
 				ninja_objective.owner = ninja
 				ninja_objective.target = ninja_objective.find_target()
-				if(ninja_objective.target != "Free Objective")
-					ninja.objectives += ninja_objective
-				else
-					i++
 				objective_list -= 1 // No more than one kill objective
 			if(2)//Steal
 				var/datum/objective/steal/ninja_objective = new
 				ninja_objective.owner = ninja
-				ninja_objective.target = ninja_objective.find_target()
+				ninja_objective.target = ninja_objective.find_target(ninja.objectives)
 				ninja.objectives += ninja_objective
 			if(3)//Protect
 				var/datum/objective/protect/ninja_objective = new
 				ninja_objective.owner = ninja
 				ninja_objective.target = ninja_objective.find_target()
-				if(ninja_objective.target != "Free Objective")
-					ninja.objectives += ninja_objective
-				else
-					i++
-					objective_list -= 3
+				objective_list -= 3
 			if(4)//Download
 				var/datum/objective/download/ninja_objective = new
 				ninja_objective.owner = ninja
@@ -63,25 +64,20 @@ GLOBAL_DATUM_INIT(ninjas, /datum/antagonist/ninja, new)
 				var/datum/objective/harm/ninja_objective = new
 				ninja_objective.owner = ninja
 				ninja_objective.target = ninja_objective.find_target()
-				if(ninja_objective.target != "Free Objective")
-					ninja.objectives += ninja_objective
-				else
-					i++
-					objective_list -= 5
 
 	var/datum/objective/survive/ninja_objective = new
 	ninja_objective.owner = ninja
 	ninja.objectives += ninja_objective
 
-/datum/antagonist/ninja/greet(datum/mind/player)
+/datum/antagonist/ninja/greet(var/datum/mind/player)
 
 	if(!..())
 		return 0
 	var/directive = generate_ninja_directive("heel")
-	player.StoreMemory("<B>Directive:</B> [SPAN_DANGER("[directive]")]<br>", /singleton/memory_options/system)
-	to_chat(player, "<b>Remember your directive:</b> [directive].")
+	player.StoreMemory("<B>Специальное указание:</B> <span class='danger'>[directive]</span><br>", /decl/memory_options/system)
+	to_chat(player, "<b>Помните о специальных указаниях:</b> [directive].")
 
-/datum/antagonist/ninja/update_antag_mob(datum/mind/player)
+/datum/antagonist/ninja/update_antag_mob(var/datum/mind/player)
 	..()
 	var/ninja_title = pick(GLOB.ninja_titles)
 	var/ninja_name = pick(GLOB.ninja_names)
@@ -91,7 +87,7 @@ GLOBAL_DATUM_INIT(ninjas, /datum/antagonist/ninja, new)
 		H.SetName(H.real_name)
 	player.name = H.name
 
-/datum/antagonist/ninja/equip(mob/living/carbon/human/player)
+/datum/antagonist/ninja/equip(var/mob/living/carbon/human/player)
 	. = ..()
 	if(.)
 		var/obj/item/device/radio/R = new /obj/item/device/radio/headset(player)
@@ -102,49 +98,39 @@ GLOBAL_DATUM_INIT(ninjas, /datum/antagonist/ninja, new)
 		equip_rig(/obj/item/rig/light/ninja, player)
 		var/obj/item/modular_computer/pda/syndicate/U = new
 		player.put_in_hands(U)
-		var/singleton/uplink_source/pda/uplink_source = new
+		var/decl/uplink_source/pda/uplink_source = new
 		uplink_source.setup_uplink_source(player, 0)
 
 /datum/antagonist/ninja/proc/generate_ninja_directive(side)
 	var/directive = "[side=="face"?"[GLOB.using_map.company_name]":"A criminal syndicate"] is your employer. "//Let them know which side they're on.
-	switch(rand(1,19))
+	switch(rand(1,14))
 		if(1)
-			directive += "The Spider Clan must not be linked to this operation. Remain hidden and covert when possible."
+			directive += "Клан Паука официально не причастен к этой операции. Действуйте скрытно и оставайтесь в тени."
 		if(2)
-			directive += "[GLOB.using_map.station_name] is financed by an enemy of the Spider Clan. Cause as much structural damage as desired."
+			directive += "[GLOB.using_map.company_name] финансировало врагов Клана Паука. Учините столько разрушений, насколько это возможно."
 		if(3)
-			directive += "A wealthy animal rights activist has made a request we cannot refuse. Prioritize saving animal lives whenever possible."
+			directive += "Богатые борцы за права животных сделали нам предложение, от которого нельзя отказаться. Спасайте животных тогда, когда это потребуется."
 		if(4)
-			directive += "The Spider Clan absolutely cannot be linked to this operation. Eliminate witnesses at your discretion."
+			directive += "Клан Паука официально не причастен к этой операции. Уничтожьте всех, кто узнает о вас."
 		if(5)
-			directive += "We are currently negotiating with [GLOB.using_map.company_name] [GLOB.using_map.boss_name]. Prioritize saving human lives over ending them."
+			directive += "На данный момент, мы сотрудничаем с [GLOB.using_map.company_name]. Убийства допускаются лишь в крайнем случае."
 		if(6)
-			directive += "We are engaged in a legal dispute over [GLOB.using_map.station_name]. If a laywer is present on board, force their cooperation in the matter."
+			directive += "Пусть никто не сомневается в милости Клана Паука. Обеспечьте безопасность всего второстепенного персонала, с которым вы столкнетесь."
 		if(7)
-			directive += "A financial backer has made an offer we cannot refuse. Implicate criminal involvement in the operation."
+			directive += "Наша репутация находится под угрозой. Нанесите как можно меньше вреда гражданским и невинным."
 		if(8)
-			directive += "Let no one question the mercy of the Spider Clan. Ensure the safety of all non-essential personnel you encounter."
+			directive += "Наша честь на кону. Используйте только благородную тактику, когда имеете дело с противниками."
 		if(9)
-			directive += "A free agent has proposed a lucrative business deal. Implicate [GLOB.using_map.company_name] involvement in the operation."
+			directive += "В настоящее время, мы ведем переговоры с лидером группы наемников. Маскируйте убийства под несчастные случаи, самоубийства или другие естественные причины."
 		if(10)
-			directive += "Our reputation is on the line. Harm as few civilians and innocents as possible."
+			var/xenorace = pick(SPECIES_UNATHI,SPECIES_TAJARA, SPECIES_SKRELL, SPECIES_RESOMI)
+			directive += "Группа радикальных [xenorace] была верными сторонниками клана паука. Проявляйте милосердие к [xenorace], когда это возможно."
 		if(11)
-			directive += "Our honor is on the line. Utilize only honorable tactics when dealing with opponents."
+			directive += "Клан Паука недавно был обвинен в религиозной бесчувственности. Попытайтесь поговорить с капелланом и доказать неправоту данных обвинений."
 		if(12)
-			directive += "We are currently negotiating with a mercenary leader. Disguise assassinations as suicide or other natural causes."
+			directive += "Клан Паука заключил сделку с конкурирующим производителем протезов. Постарайтесь показать протезы [GLOB.using_map.company_name] в плохом свете."
 		if(13)
-			directive += "Some disgruntled [GLOB.using_map.company_name] employees have been supportive of our operations. Be wary of any mistreatment by command staff."
+			directive += "Клан Паука недавно начал вербовать новых агентов. Найдите подходящих кандидатов и оцените их поведение среди экипажа судна."
 		if(14)
-			var/xenorace = pick(SPECIES_UNATHI, SPECIES_SKRELL)
-			directive += "A group of [xenorace] radicals have been loyal supporters of the Spider Clan. Favor [xenorace] crew whenever possible."
-		if(15)
-			directive += "The Spider Clan has recently been accused of religious insensitivity. Attempt to speak with the Chaplain and prove these accusations false."
-		if(16)
-			directive += "The Spider Clan has been bargaining with a competing prosthetics manufacturer. Try to shine [GLOB.using_map.company_name] prosthetics in a bad light."
-		if(17)
-			directive += "The Spider Clan has recently begun recruiting outsiders. Consider suitable candidates and assess their behavior amongst the crew."
-		if(18)
-			directive += "A cyborg liberation group has expressed interest in our serves. Prove the Spider Clan merciful towards law-bound synthetics."
-		else
-			directive += "There are no special supplemental instructions at this time."
+			directive += "Группа освобождения киборгов выразила интерес к нашей службе. Докажите, что клан Паука милостив к синтетике."
 	return directive

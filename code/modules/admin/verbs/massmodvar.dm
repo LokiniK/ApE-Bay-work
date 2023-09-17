@@ -1,4 +1,4 @@
-/client/proc/cmd_mass_modify_object_variables(atom/A, var_name)
+/client/proc/cmd_mass_modify_object_variables(atom/A, var/var_name)
 	set category = "Debug"
 	set name = "Mass Edit Variables"
 	set desc="(target) Edit all instances of a target item's variables"
@@ -20,16 +20,17 @@
 					return
 
 	src.massmodify_variables(A, var_name, method)
+	SSstatistics.add_field_details("admin_verb","MEV") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 
 
-/client/proc/massmodify_variables(atom/O, var_name = "", method = 0)
+/client/proc/massmodify_variables(var/atom/O, var/var_name = "", var/method = 0)
 	if(!check_rights(R_VAREDIT))	return
 
 	var/list/locked = list("vars", "key", "ckey", "client")
 
 	for(var/p in forbidden_varedit_object_types())
 		if( istype(O,p) )
-			to_chat(usr, SPAN_WARNING("It is forbidden to edit this object's variables."))
+			to_chat(usr, "<span class='warning'>It is forbidden to edit this object's variables.</span>")
 			return
 
 	var/list/names = list()
@@ -114,8 +115,8 @@
 		if(dir)
 			to_chat(usr, "If a direction, direction is: [dir]")
 
-	var/class = input("What kind of variable?","Variable Type",default) as null|anything in list("text",
-		"num","type","icon","file","view variables","restore to default")
+	var/class = input("What kind of variable?","Variable Type",default) as null|anything in list("text", "path",
+		"num","type","icon","file","edit referenced object","restore to default")
 
 	if(!class)
 		return
@@ -163,9 +164,8 @@
 						if (A.type == O.type)
 							A.vars[variable] = O.vars[variable]
 
-		if("view variables")
-			debug_variables(O)
-			return
+		if("edit referenced object")
+			return .(O.vars[variable])
 
 		if("text")
 			var/new_value = input("Enter new text:","Text",O.vars[variable]) as text|null//todo: sanitize ???
@@ -202,6 +202,43 @@
 					for(var/turf/A in world)
 						if (A.type == O.type)
 							A.vars[variable] = O.vars[variable]
+
+		if("path")
+			var/new_value = input("Enter new path:","Path",O.vars[variable]) as text|null
+			if(new_value == null) return
+			O.vars[variable] = text2path(new_value)
+
+			if(method)
+				if(istype(O, /mob))
+					for(var/mob/M in SSmobs.mob_list)
+						if ( istype(M , O.type) )
+							M.vars[variable] = O.vars[variable]
+
+				else if(istype(O, /obj))
+					for(var/obj/A in world)
+						if ( istype(A , O.type) )
+							A.vars[variable] = O.vars[variable]
+
+				else if(istype(O, /turf))
+					for(var/turf/A in world)
+						if ( istype(A , O.type) )
+							A.vars[variable] = O.vars[variable]
+			else
+				if(istype(O, /mob))
+					for(var/mob/M in SSmobs.mob_list)
+						if (M.type == O.type)
+							M.vars[variable] = O.vars[variable]
+
+				else if(istype(O, /obj))
+					for(var/obj/A in world)
+						if (A.type == O.type)
+							A.vars[variable] = O.vars[variable]
+
+				else if(istype(O, /turf))
+					for(var/turf/A in world)
+						if (A.type == O.type)
+							A.vars[variable] = O.vars[variable]
+
 
 		if("num")
 			var/new_value = input("Enter new number:","Num",\
@@ -243,7 +280,7 @@
 
 		if("type")
 			var/new_value
-			new_value = select_subpath(within_scope = /datum)
+			new_value = input("Enter type:","Type",O.vars[variable]) as null|anything in typesof(/obj,/mob,/area,/turf)
 			if(new_value == null) return
 			O.vars[variable] = new_value
 			if(method)

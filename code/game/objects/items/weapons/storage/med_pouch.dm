@@ -5,7 +5,7 @@ Single Use Emergency Pouches
 /obj/item/storage/med_pouch
 	name = "emergency medical pouch"
 	desc = "For use in emergency situations only."
-	icon = 'icons/obj/medical.dmi'
+	icon = 'icons/obj/med_pouch.dmi'
 	storage_slots = 7
 	w_class = ITEM_SIZE_SMALL
 	max_w_class = ITEM_SIZE_SMALL
@@ -13,7 +13,7 @@ Single Use Emergency Pouches
 	opened = FALSE
 	open_sound = 'sound/effects/rip1.ogg'
 	var/injury_type = "generic"
-	var/static/image/cross_overlay
+	var/global/image/cross_overlay
 
 	var/instructions = {"
 	1) Tear open the emergency medical pack using the easy open tab at the top.\n\
@@ -40,7 +40,7 @@ Single Use Emergency Pouches
 	overlays.Cut()
 	if(!cross_overlay)
 		cross_overlay = image(icon, "cross")
-		cross_overlay.appearance_flags = DEFAULT_APPEARANCE_FLAGS | RESET_COLOR
+		cross_overlay.appearance_flags = RESET_COLOR
 	overlays += cross_overlay
 	icon_state = "pack[opened]"
 
@@ -51,7 +51,7 @@ Single Use Emergency Pouches
 /obj/item/storage/med_pouch/CanUseTopic()
 	return STATUS_INTERACTIVE
 
-/obj/item/storage/med_pouch/OnTopic(user, list/href_list)
+/obj/item/storage/med_pouch/OnTopic(var/user, var/list/href_list)
 	if(href_list["show_info"])
 		to_chat(user, instructions)
 		return TOPIC_HANDLED
@@ -61,8 +61,14 @@ Single Use Emergency Pouches
 
 /obj/item/storage/med_pouch/open(mob/user)
 	if(!opened)
-		user.visible_message(SPAN_NOTICE("\The [user] tears open [src], breaking the vacuum seal!"), SPAN_NOTICE("You tear open [src], breaking the vacuum seal!"))
+		user.visible_message("<span class='notice'>\The [user] tears open [src], breaking the vacuum seal!</span>", "<span class='notice'>You tear open [src], breaking the vacuum seal!</span>")
 	. = ..()
+
+/obj/item/storage/med_pouch/handle_item_insertion(mob/user as mob)
+	if(opened)
+		. = ..()
+	to_chat(user, "<span class='notice'>[src] needs to be opened before you can put something in it.</span>")
+	return
 
 /obj/item/storage/med_pouch/trauma
 	name = "trauma pouch"
@@ -199,19 +205,25 @@ Single Use Emergency Pouches
 /obj/item/reagent_containers/hypospray/autoinjector/pouch_auto/inaprovaline
 	name = "emergency inaprovaline autoinjector"
 	starts_with = list(/datum/reagent/inaprovaline = 5)
+	band_color = COLOR_CYAN //inf
 
 /obj/item/reagent_containers/hypospray/autoinjector/pouch_auto/deletrathol
 	name = "emergency deletrathol autoinjector"
 	starts_with = list(/datum/reagent/deletrathol = 5)
+	band_color = COLOR_PURPLE //inf
 
 /obj/item/reagent_containers/hypospray/autoinjector/pouch_auto/dylovene
 	name = "emergency dylovene autoinjector"
 	starts_with = list(/datum/reagent/dylovene = 5)
+	band_color = COLOR_LIME //inf
 
 /obj/item/reagent_containers/hypospray/autoinjector/pouch_auto/dexalin
 	name = "emergency dexalin autoinjector"
 	starts_with = list(/datum/reagent/dexalin = 5)
+	band_color = COLOR_CYAN_BLUE //inf
 
 /obj/item/reagent_containers/hypospray/autoinjector/pouch_auto/adrenaline
 	name = "emergency adrenaline autoinjector"
-	starts_with = list(/datum/reagent/adrenaline = 5)
+	amount_per_transfer_from_this = 8
+	starts_with = list(/datum/reagent/adrenaline = 8)
+	band_color = COLOR_PURPLE_GRAY //inf

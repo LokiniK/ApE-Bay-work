@@ -2,6 +2,7 @@
 	var/unique_name
 	var/datum/detective_gun_skin/unique_reskin
 	var/static/list/gun_options
+	bulk = GUN_BULK_REVOLVER //inf
 
 /obj/item/gun/projectile/pistol/sec/detective/Initialize()
 	. = ..()
@@ -9,7 +10,7 @@
 		gun_options = init_subtypes(/datum/detective_gun_skin)
 
 /obj/item/gun/projectile/pistol/sec/detective/on_update_icon()
-	if(ammo_magazine && length(ammo_magazine.stored_ammo))
+	if(ammo_magazine && ammo_magazine.stored_ammo.len)
 		if(unique_reskin)
 			icon_state = unique_reskin.icon_state
 		else
@@ -29,7 +30,7 @@
 	if(!M.mind)	return 0
 	if(M.incapacitated()) return 0
 	if(!M.mind.assigned_role == "Detective")
-		to_chat(M, SPAN_NOTICE("You don't feel cool enough to name this gun, chump."))
+		to_chat(M, "<span class='notice'>You don't feel cool enough to name this gun, chump.</span>")
 		return 0
 
 	var/input = sanitizeSafe(input("What do you want to name the gun?","Rename gun"), MAX_NAME_LEN)
@@ -62,7 +63,7 @@
 
 
 //apart of reskins that have two sprites, touching may result in frustration and breaks
-/obj/item/gun/projectile/pistol/sec/detective/attack_hand(mob/living/user)
+/obj/item/gun/projectile/pistol/sec/detective/attack_hand(var/mob/living/user)
 	if(!unique_reskin && loc == user)
 		reskin_gun(user)
 		return
@@ -79,8 +80,54 @@
 	name = initial(d.name)
 	icon_state = initial(d.icon)
 	icon_state = initial(d.icon_state)
+/* [INF]
+/datum/detective_gun_skin/colt
+	name = "\improper Colt M1911"
+	icon_state = "colt"
+
+/datum/detective_gun_skin/luger
+	name = "\improper P08 Luger"
+	icon_state = "p08"
+
+/datum/detective_gun_skin/luger_brown
+	name = "\improper P08 Luger, brown"
+	icon_state = "p08b"
 
 /datum/detective_gun_skin/mk_standard
 	name = "\improper NT Mk. 58"
 	icon_state = "secguncomp"
+
+/datum/detective_gun_skin/mk_custom
+	name = "\improper NT Mk. 58 Custom"
+	icon_state = "secgundark"
+
+/datum/detective_gun_skin/usp
+	name = "\improper USP"
+	icon_state = "usp"
+
+/datum/detective_gun_skin/vp
+	name = "\improper H&K VP"
+	icon_state = "VP78"
 	icon = 'icons/obj/guns/pistol.dmi'
+[/INF] */
+
+//[INF]
+/datum/detective_gun_skin/mk_standard
+	name = "\improper NT MK 58"
+	icon_state = "secguncomp"
+
+/datum/detective_gun_skin/colt
+	name = "\improper Colt M1911"
+	icon_state = "pistol4"
+	icon = 'icons/obj/guns/pistol_throwback.dmi'
+
+/datum/detective_gun_skin/usp
+	name = "\improper USP"
+	icon_state = "pistol2"
+	icon = 'icons/obj/guns/pistol_throwback.dmi'
+
+/datum/detective_gun_skin/vp
+	name = "\improper H&K VP"
+	icon_state = "pistol3"
+	icon = 'icons/obj/guns/pistol_throwback.dmi'
+//[/INF]

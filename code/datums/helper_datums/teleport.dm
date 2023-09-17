@@ -1,14 +1,14 @@
-/singleton/teleport
+/decl/teleport
 	var/static/list/teleport_blacklist = list(/obj/item/disk/nuclear, /obj/item/storage/backpack/holding, /obj/effect/sparks) //Items that cannot be teleported, or be in the contents of someone who is teleporting.
 
-/singleton/teleport/proc/teleport(atom/target, atom/destination, precision = 0)
+/decl/teleport/proc/teleport(var/atom/target, var/atom/destination, var/precision = 0)
 	if(!can_teleport(target,destination))
-		target.visible_message(SPAN_WARNING("\The [target] bounces off the teleporter!"))
+		target.visible_message("<span class='warning'>\The [target] bounces off the teleporter!</span>")
 		return
 
 	teleport_target(target, destination, precision)
 
-/singleton/teleport/proc/teleport_target(atom/movable/target, atom/destination, precision)
+/decl/teleport/proc/teleport_target(var/atom/movable/target, var/atom/destination, var/precision)
 	var/list/possible_turfs = circlerangeturfs(destination, precision)
 	destination = DEFAULTPICK(possible_turfs, null)
 	if (!destination)
@@ -22,7 +22,7 @@
 			buckled.forceMove(destination)
 
 
-/singleton/teleport/proc/can_teleport(atom/movable/target, atom/destination)
+/decl/teleport/proc/can_teleport(var/atom/movable/target, var/atom/destination)
 	if(!destination || !target || !target.loc || destination.z > max_default_z_level())
 		return 0
 
@@ -34,10 +34,10 @@
 			return 0
 	return 1
 
-/singleton/teleport/sparks
+/decl/teleport/sparks
 	var/datum/effect/effect/system/spark_spread/spark = new
 
-/singleton/teleport/sparks/proc/do_spark(atom/target)
+/decl/teleport/sparks/proc/do_spark(var/atom/target)
 	if(!target.simulated)
 		return
 	var/turf/T = get_turf(target)
@@ -45,20 +45,11 @@
 	spark.attach(T)
 	spark.start()
 
-/singleton/teleport/sparks/teleport_target(atom/target, atom/destination, precision)
+/decl/teleport/sparks/teleport_target(var/atom/target, var/atom/destination, var/precision)
 	do_spark(target)
 	..()
 	do_spark(target)
 
-/proc/do_teleport(atom/movable/target, atom/destination, precision = 0, type = /singleton/teleport/sparks)
-	var/singleton/teleport/tele = GET_SINGLETON(type)
+/proc/do_teleport(var/atom/movable/target, var/atom/destination, var/precision = 0, var/type = /decl/teleport/sparks)
+	var/decl/teleport/tele = decls_repository.get_decl(type)
 	tele.teleport(target, destination, precision)
-
-
-/// Teleport an object randomly within a set of connected zlevels
-/proc/do_unstable_teleport_safe(atom/movable/target, list/zlevels = GLOB.using_map.station_levels)
-	var/turf/T = pick_area_turf_in_connected_z_levels(
-		list(/proc/is_not_space_area),
-		list(/proc/not_turf_contains_dense_objects, /proc/IsTurfAtmosSafe),
-		zlevels[1])
-	do_teleport(target, T)

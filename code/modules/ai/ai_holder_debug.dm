@@ -41,7 +41,7 @@
 		if (AI_LOG_TRACE)
 			span_type = "debug_trace"
 	if (ver <= debug_ai)
-		log_debug(SPAN_CLASS("[span_type]", "AI: ([holder]:\ref[holder] | [holder.x],[holder.y],[holder.z])(@[world.time]): [msg] "))
+		log_debug("<span class='[span_type]'>AI: ([holder]:\ref[holder] | [holder.x],[holder.y],[holder.z])(@[world.time]): [msg] </span>")
 
 // Colors the mob based on stance, to visually tell what stance it is for debugging.
 // Probably not something you want for regular use.
@@ -94,3 +94,4 @@
 	path_display = TRUE
 	last_turf_display = TRUE
 	debug_ai = AI_LOG_INFO
+

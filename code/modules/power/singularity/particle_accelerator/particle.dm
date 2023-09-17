@@ -1,7 +1,7 @@
 /obj/effect/accelerated_particle
-	name = "accelerated particles"
+	name = "Accelerated Particles"
 	desc = "Small things moving very fast."
-	icon = 'icons/obj/machines/power/particle_accelerator2.dmi'
+	icon = 'icons/obj/machines/particle_accelerator2.dmi'
 	icon_state = "particle"
 	anchored = TRUE
 	density = TRUE
@@ -29,7 +29,7 @@
 	if (A)
 		if(ismob(A))
 			toxmob(A)
-		if((istype(A,/obj/machinery/the_singularitygen))||(istype(A,/obj/singularity)))
+		if((istype(A,/obj/machinery/the_singularitygen))||(istype(A,/obj/singularity/)))
 			A:energy += energy
 		else if(istype(A,/obj/machinery/power/fusion_core))
 			var/obj/machinery/power/fusion_core/collided_core = A
@@ -57,14 +57,14 @@
 		return
 	qdel(src)
 
-/obj/effect/accelerated_particle/proc/toxmob(mob/living/M)
+/obj/effect/accelerated_particle/proc/toxmob(var/mob/living/M)
 	if (!active)
 		return
 	var/radiation = (energy*2)
-	M.apply_damage((radiation*3), DAMAGE_RADIATION, damage_flags = DAMAGE_FLAG_DISPERSED)
+	M.apply_damage((radiation*3),IRRADIATE, damage_flags = DAM_DISPERSED)
 	M.updatehealth()
 
-/obj/effect/accelerated_particle/proc/move(lag)
+/obj/effect/accelerated_particle/proc/move(var/lag)
 	set waitfor = FALSE
 	if(QDELETED(src))
 		return

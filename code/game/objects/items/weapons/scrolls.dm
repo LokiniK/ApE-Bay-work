@@ -1,7 +1,7 @@
 /obj/item/teleportation_scroll
 	name = "scroll of teleportation"
 	desc = "A scroll for moving around."
-	icon = 'icons/obj/cult.dmi'
+	icon = 'icons/obj/wizard.dmi'
 	icon_state = "scroll"
 	var/uses = 4.0
 	w_class = ITEM_SIZE_TINY
@@ -12,7 +12,7 @@
 
 /obj/item/teleportation_scroll/attack_self(mob/user as mob)
 	if((user.mind && !GLOB.wizards.is_antagonist(user.mind)))
-		to_chat(usr, SPAN_WARNING("You stare at the scroll but cannot make sense of the markings!"))
+		to_chat(usr, "<span class='warning'>You stare at the scroll but cannot make sense of the markings!</span>")
 		return
 
 	user.set_machine(src)
@@ -40,7 +40,7 @@
 	attack_self(H)
 	return
 
-/obj/item/teleportation_scroll/proc/teleportscroll(mob/user)
+/obj/item/teleportation_scroll/proc/teleportscroll(var/mob/user)
 	var/area/thearea = input(user, "Area to jump to", "BOOYEA") as null|anything in wizteleportlocs
 	thearea = thearea ? wizteleportlocs[thearea] : thearea
 
@@ -56,5 +56,8 @@
 	if(!end)
 		to_chat(user, "The spell matrix was unable to locate a suitable teleport destination for an unknown reason. Sorry.")
 		return
+	if(!is_station_area(get_area(user)))
+		log_and_message_admins("has teleported to [get_area(user)].")
+
 	smoke.start()
 	src.uses -= 1

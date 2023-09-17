@@ -2,7 +2,7 @@
 	name = "explosive particles"
 	icon = 'icons/effects/effects.dmi'
 	icon_state = "explosion_particle"
-	opacity = 1
+	opacity = TRUE
 	anchored = TRUE
 	mouse_opacity = 0
 
@@ -17,7 +17,7 @@
 
 /datum/effect/system/expl_particles/proc/set_up(n = 10, loca)
 	number = n
-	if(isturf(loca)) location = loca
+	if(istype(loca, /turf/)) location = loca
 	else location = get_turf(loca)
 
 /datum/effect/system/expl_particles/proc/start()
@@ -34,7 +34,7 @@
 	name = "explosive particles"
 	icon = 'icons/effects/96x96.dmi'
 	icon_state = "explosion"
-	opacity = 1
+	opacity = TRUE
 	anchored = TRUE
 	mouse_opacity = 0
 	pixel_x = -32
@@ -48,7 +48,7 @@
 	var/turf/location
 
 /datum/effect/system/explosion/proc/set_up(loca)
-	if(isturf(loca)) location = loca
+	if(istype(loca, /turf/)) location = loca
 	else location = get_turf(loca)
 
 /datum/effect/system/explosion/proc/start()
@@ -56,7 +56,7 @@
 	var/datum/effect/system/expl_particles/P = new/datum/effect/system/expl_particles()
 	P.set_up(10,location)
 	P.start()
-	addtimer(new Callback(src, .proc/make_smoke), 5)
+	addtimer(CALLBACK(src, .proc/make_smoke), 5)
 
 /datum/effect/system/explosion/proc/make_smoke()
 	var/datum/effect/effect/system/smoke_spread/S = new/datum/effect/effect/system/smoke_spread()

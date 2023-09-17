@@ -2,7 +2,7 @@
 	name = "grenade"
 	desc = "A hand held grenade, with an adjustable timer."
 	w_class = ITEM_SIZE_SMALL
-	icon = 'icons/obj/weapons/grenade.dmi'
+	icon = 'icons/obj/grenade.dmi'
 	icon_state = "grenade"
 	item_state = "grenade"
 	throw_speed = 4
@@ -14,16 +14,14 @@
 	var/fail_det_time = 5 // If you are clumsy and fail, you get this time.
 	var/arm_sound = 'sound/weapons/armbomb.ogg'
 
-
-/obj/item/grenade/proc/clown_check(mob/living/user)
+/obj/item/grenade/proc/clown_check(var/mob/living/user)
 	if((MUTATION_CLUMSY in user.mutations) && prob(50))
-		to_chat(user, SPAN_WARNING("Huh? How does this thing work?"))
+		to_chat(user, "<span class='warning'>Huh? How does this thing work?</span>")
 		det_time = fail_det_time
 		activate(user)
 		add_fingerprint(user)
 		return 0
 	return 1
-
 
 /obj/item/grenade/examine(mob/user, distance)
 	. = ..()
@@ -35,30 +33,29 @@
 			return
 		to_chat(user, "\The [src] is set for instant detonation.")
 
-
-/obj/item/grenade/attack_self(mob/living/user)
+/obj/item/grenade/attack_self(mob/user as mob)
 	if(!active)
 		if(clown_check(user))
-			to_chat(user, SPAN_WARNING("You prime \the [name]! [det_time/10] seconds!"))
+			to_chat(user, "<span class='warning'>You prime \the [name]! [det_time/10] seconds!</span>")
 			activate(user)
 			add_fingerprint(user)
 			if(iscarbon(user))
 				var/mob/living/carbon/C = user
 				C.throw_mode_on()
 
-
-/obj/item/grenade/proc/activate(mob/living/user)
-	if (active)
+/obj/item/grenade/proc/activate(mob/user)
+	if(active)
 		return
-	if (user)
+
+	if(user)
 		msg_admin_attack("[user.name] ([user.ckey]) primed \a [src] (<A HREF='?_src_=holder;adminplayerobservecoodjump=1;X=[user.x];Y=[user.y];Z=[user.z]'>JMP</a>)")
+
 	icon_state = initial(icon_state) + "_active"
-	active = TRUE
+	active = 1
 	playsound(loc, arm_sound, 75, 0, -3)
-	addtimer(new Callback(src, .proc/detonate, user), det_time)
+	addtimer(CALLBACK(src, .proc/detonate), det_time)
 
-
-/obj/item/grenade/proc/detonate(mob/living/user)
+/obj/item/grenade/proc/detonate()
 	var/turf/T = get_turf(src)
 	if(T)
 		T.hotspot_expose(700,125)
@@ -68,16 +65,16 @@
 		switch(det_time)
 			if (1)
 				det_time = 10
-				to_chat(user, SPAN_NOTICE("You set the [name] for 1 second detonation time."))
+				to_chat(user, "<span class='notice'>You set the [name] for 1 second detonation time.</span>")
 			if (10)
 				det_time = 30
-				to_chat(user, SPAN_NOTICE("You set the [name] for 3 second detonation time."))
+				to_chat(user, "<span class='notice'>You set the [name] for 3 second detonation time.</span>")
 			if (30)
 				det_time = 50
-				to_chat(user, SPAN_NOTICE("You set the [name] for 5 second detonation time."))
+				to_chat(user, "<span class='notice'>You set the [name] for 5 second detonation time.</span>")
 			if (50)
 				det_time = 1
-				to_chat(user, SPAN_NOTICE("You set the [name] for instant detonation."))
+				to_chat(user, "<span class='notice'>You set the [name] for instant detonation.</span>")
 		add_fingerprint(user)
 	..()
 

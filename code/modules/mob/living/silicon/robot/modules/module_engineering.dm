@@ -18,7 +18,9 @@
 		"Basic" = "Engineering",
 		"Antique" = "engineerrobot",
 		"Landmate" = "landmate",
-		"Landmate - Treaded" = "engiborg+tread"
+		"Landmate - Treaded" = "engiborg+tread",
+		"Motile" = "motile-eng",//inf
+		"Default" = "robotEngi"
 	)
 	no_slip = 1
 	equipment = list(
@@ -55,7 +57,8 @@
 		/obj/item/stack/material/cyborg/glass,
 		/obj/item/stack/material/cyborg/glass/reinforced,
 		/obj/item/stack/cable_coil/cyborg,
-		/obj/item/stack/material/cyborg/plasteel
+		/obj/item/stack/material/cyborg/plasteel,
+		/obj/item/rpd //INF
 	)
 	synths = list(
 		/datum/matter_synth/metal =    60000,
@@ -66,11 +69,12 @@
 	)
 	emag = /obj/item/melee/baton/robot/electrified_arm
 	skills = list(
-		SKILL_ATMOS        = SKILL_MASTER,
-		SKILL_ENGINES      = SKILL_MASTER,
-		SKILL_CONSTRUCTION = SKILL_MASTER,
-		SKILL_ELECTRICAL   = SKILL_MASTER,
-		SKILL_COMPUTER     = SKILL_EXPERIENCED
+		SKILL_ATMOS        = SKILL_PROF,
+		SKILL_ENGINES      = SKILL_PROF,
+		SKILL_CONSTRUCTION = SKILL_PROF,
+		SKILL_ELECTRICAL   = SKILL_PROF,
+		SKILL_COMPUTER     = SKILL_EXPERT,
+		SKILL_PILOT        = SKILL_ADEPT //INF
 	)
 
 /obj/item/robot_module/engineering/finalize_synths()
@@ -116,7 +120,7 @@
 	var/obj/item/stack/material/cyborg/plasteel/PL = locate() in equipment
 	PL.synths = list(plasteel)
 
-/obj/item/robot_module/engineering/respawn_consumable(mob/living/silicon/robot/R, amount)
+/obj/item/robot_module/engineering/respawn_consumable(var/mob/living/silicon/robot/R, var/amount)
 	var/obj/item/device/lightreplacer/LR = locate() in equipment
 	LR.Charge(R, amount)
 	..()

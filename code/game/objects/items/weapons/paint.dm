@@ -6,7 +6,7 @@ var/global/list/cached_icons = list()
 /obj/item/reagent_containers/glass/paint
 	desc = "It's a paint bucket."
 	name = "paint bucket"
-	icon = 'icons/obj/tools/paint_bucket.dmi'
+	icon = 'icons/obj/items.dmi'
 	icon_state = "paintbucket"
 	item_state = "paintcan"
 	matter = list(MATERIAL_ALUMINIUM = 200)
@@ -27,7 +27,7 @@ var/global/list/cached_icons = list()
 				admin_attack_log(user, target, "Used \the [name] containing [contained] to splash the victim.", "Was splashed by \the [name] containing [contained].", "used \the [name] containing [contained] to splash")
 			else
 				admin_attacker_log(user, "Used \the [name] containing [contained] to splash \the [target]")
-		user.visible_message(SPAN_WARNING("\The [target] has been splashed with something by [user]!"))
+		user.visible_message("<span class='warning'>\The [target] has been splashed with something by [user]!</span>")
 		reagents.trans_to_turf(target, 5)
 	else
 		return ..()

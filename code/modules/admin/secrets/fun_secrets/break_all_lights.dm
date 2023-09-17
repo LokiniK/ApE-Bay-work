@@ -1,34 +1,29 @@
 /datum/admin_secret_item/fun_secret/break_all_lights
-	name = "Break Lights"
+	name = "Break All Lights"
 
-/datum/admin_secret_item/fun_secret/break_all_lights/execute(mob/user)
+/datum/admin_secret_item/fun_secret/break_all_lights/execute(var/mob/user)
 	. = ..()
-	if (!.)
+	if(!.)
 		return
-	var/choice = input("Break Lights in:") as null | anything in list("Current Area", "Current Level", "Connected Levels", "All Lights")
-	if (!choice)
-		return
-	switch (choice)
-		if ("Current Area")
+
+	var/choise = input("Which lights to break?") in list("My area", "My Z-Level", "Station", "All lights")
+	switch(choise)
+		if ("My area")
 			var/area/usr_area = get_area(user)
-			if (!usr_area)
-				return to_chat(user, SPAN_DANGER("Invalid area!"))
+			if (!usr_area) return to_chat(user, SPAN_DANGER("Invalid area!"))
 			for (var/obj/machinery/power/apc/apc in usr_area)
 				apc.overload_lighting()
-		if ("Current Level")
+
+		if ("My Z-Level")
 			var/user_z = get_z(user)
-			if (!user_z)
-				return to_chat(user, SPAN_DANGER("Invalid Z-Level!"))
+			if (!user_z) return to_chat(user, SPAN_DANGER("Invalid Z-Level!"))
 			for (var/obj/machinery/power/apc/apc in SSmachines.machinery)
-				if (apc.z == user_z)
-					apc.overload_lighting()
-		if ("Connected Levels")
-			var/list/user_levels = get_z(user)
-			if (!user_levels)
-				return to_chat(user, SPAN_DANGER("Invalid Z-Level!"))
-			user_levels = GetConnectedZlevels(user_levels)
+				if (apc.z == user_z) apc.overload_lighting()
+
+		if ("Station")
 			for (var/obj/machinery/power/apc/apc in SSmachines.machinery)
-				if (apc.z in user_levels)
+				if (apc.z in GLOB.using_map.station_levels)
 					apc.overload_lighting()
-		if ("All Lights")
+
+		if ("All lights")
 			lightsout(0, 0)

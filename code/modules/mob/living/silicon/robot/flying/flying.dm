@@ -1,9 +1,10 @@
 /mob/living/silicon/robot/flying
 	desc = "A utility robot with an anti-gravity hover unit and a lightweight frame."
-	icon = 'icons/mob/robots_flying.dmi'
+	icon = 'infinity/icons/mob/robots_flying.dmi' //INF, WAS 'icons/mob/robots_flying.dmi'
 	icon_state = "drone-standard"
 	module_category = ROBOT_MODULE_TYPE_FLYING
 	dismantle_type = /obj/item/robot_parts/robot_suit/flyer
+	speed = -0.5 // nyoom //INF, WAS -1
 	power_efficiency = 0.75
 
 	// They are not very heavy or strong.
@@ -12,11 +13,22 @@
 	mob_swap_flags = MONKEY|SLIME|SIMPLE_ANIMAL
 	mob_push_flags = MONKEY|SLIME|SIMPLE_ANIMAL
 
+	//[inf]
+	speech_sounds = list(
+		'infinity/sound/voice/robot_talk_light_1.ogg',
+		'infinity/sound/voice/robot_talk_light_2.ogg',
+		'infinity/sound/voice/robot_talk_light_3.ogg',
+		'infinity/sound/voice/robot_talk_light_4.ogg',
+		'infinity/sound/voice/robot_talk_light_5.ogg'
+	)
+	//[/inf]
+
 /mob/living/silicon/robot/flying/initialize_components()
 	components["actuator"] =       new/datum/robot_component/actuator(src)
 	components["radio"] =          new/datum/robot_component/radio(src)
 	components["power cell"] =     new/datum/robot_component/cell(src)
 	components["diagnosis unit"] = new/datum/robot_component/diagnosis_unit(src)
+	components["camera"] =         new/datum/robot_component/camera(src)
 	components["comms"] =          new/datum/robot_component/binary_communication(src)
 	components["armour"] =         new/datum/robot_component/armour/light(src)
 
@@ -42,11 +54,11 @@
 	if(!QDELETED(src) && stat == DEAD)
 		stop_flying()
 
-/mob/living/silicon/robot/flying/Process_Spacemove()
+/mob/living/silicon/robot/flying/Allow_Spacemove()
 	return (pass_flags & PASS_FLAG_TABLE) || ..()
 
-/mob/living/silicon/robot/flying/can_fall(anchor_bypass = FALSE, turf/location_override = loc)
-	return !Process_Spacemove()
+/mob/living/silicon/robot/flying/can_fall(var/anchor_bypass = FALSE, var/turf/location_override = loc)
+	return !Allow_Spacemove()
 
 /mob/living/silicon/robot/flying/can_overcome_gravity()
-	return Process_Spacemove()
+	return Allow_Spacemove()

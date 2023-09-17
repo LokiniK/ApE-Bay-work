@@ -11,7 +11,7 @@ below 100 is not dizzy
 /mob/var/dizziness = 0//Carbon
 /mob/var/is_dizzy = 0
 
-/mob/proc/make_dizzy(amount)
+/mob/proc/make_dizzy(var/amount)
 	if(!istype(src, /mob/living/carbon/human)) // for the moment, only humans get dizzy
 		return
 
@@ -46,10 +46,10 @@ note dizziness decrements automatically in the mob's Life() proc.
 /mob/var/is_jittery = 0
 /mob/var/jitteriness = 0//Carbon
 
-/mob/proc/make_jittery(amount)
-	return //Only for living/carbon/human
+/mob/proc/make_jittery(var/amount)
+	return //Only for living/carbon/human/
 
-/mob/living/carbon/human/make_jittery(amount)
+/mob/living/carbon/human/make_jittery(var/amount)
 	if(!istype(src, /mob/living/carbon/human)) // for the moment, only humans get jittery
 		return
 	if(!jittery_damage())
@@ -81,18 +81,18 @@ note dizziness decrements automatically in the mob's Life() proc.
 
 /mob/proc/update_floating()
 
-	if(anchored || buckled || has_gravity())
+	if(anchored || buckled || check_solid_ground())
 		make_floating(0)
 		return
 
-	if(check_space_footing())
+	if(Check_Shoegrip() && Check_Dense_Object())
 		make_floating(0)
 		return
 
 	make_floating(1)
 	return
 
-/mob/proc/make_floating(n)
+/mob/proc/make_floating(var/n)
 	floatiness = n
 
 	if(floatiness && !is_floating)
@@ -192,15 +192,7 @@ note dizziness decrements automatically in the mob's Life() proc.
 		flick_overlay(I, GLOB.clients, 10)
 
 		// And animate the attack!
-		animate(
-			I,
-			alpha = 175,
-			transform = matrix().Update(scale_x = 0.75, scale_y = 0.75),
-			pixel_x = 0,
-			pixel_y = 0,
-			pixel_z = 0,
-			time = 3
-		)
+		animate(I, alpha = 175, transform = matrix() * 0.75, pixel_x = 0, pixel_y = 0, pixel_z = 0, time = 3)
 		animate(time = 1)
 		animate(alpha = 0, time = 3, easing = CIRCULAR_EASING|EASE_OUT)
 
@@ -210,9 +202,10 @@ note dizziness decrements automatically in the mob's Life() proc.
 
 	// What icon do we use for the attack?
 	var/image/I
-	var/obj/item/active_hand = get_active_hand()
-	if (active_hand)
-		I = image(active_hand.icon, A, active_hand.icon_state, A.layer + 1)
+	if(hand && l_hand) // Attacked with item in left hand.
+		I = image(l_hand.icon, A, l_hand.icon_state, A.layer + 1)
+	else if (!hand && r_hand) // Attacked with item in right hand.
+		I = image(r_hand.icon, A, r_hand.icon_state, A.layer + 1)
 	else // Attacked with a fist?
 		return
 
@@ -224,7 +217,7 @@ note dizziness decrements automatically in the mob's Life() proc.
 	flick_overlay(I, viewing, 5) // 5 ticks/half a second
 
 	// Scale the icon.
-	I.SetTransform(scale = 0.75)
+	I.transform *= 0.75
 	// Set the direction of the icon animation.
 	var/direction = get_dir(src, A)
 	if(direction & NORTH)
@@ -244,27 +237,26 @@ note dizziness decrements automatically in the mob's Life() proc.
 	animate(I, alpha = 175, pixel_x = 0, pixel_y = 0, pixel_z = 0, time = 3)
 
 /mob/proc/spin(spintime, speed)
-	set waitfor = FALSE
-	if (!spintime || !speed)
-		return
-	spintime = clamp(spintime, 1, 10 SECONDS)
-	speed = clamp(speed, 1, 2 SECONDS)
-	var/D = dir
-	while(spintime >= speed)
-		sleep(speed)
-		switch(D)
-			if(NORTH)
-				D = EAST
-			if(SOUTH)
-				D = WEST
-			if(EAST)
-				D = SOUTH
-			if(WEST)
-				D = NORTH
-		set_dir(D)
-		spintime -= speed
+	if(speed <= 0)
+		return //it's fucking crushes the game, causes massive lag
+	spawn()
+		var/D = dir
+		while(spintime >= speed)
+			sleep(speed)
+			switch(D)
+				if(NORTH)
+					D = EAST
+				if(SOUTH)
+					D = WEST
+				if(EAST)
+					D = SOUTH
+				if(WEST)
+					D = NORTH
+			set_dir(D)
+			spintime -= speed
+	return
 
-/mob/proc/phase_in(turf/T)
+/mob/proc/phase_in(var/turf/T)
 	if(!T)
 		return
 
@@ -272,13 +264,13 @@ note dizziness decrements automatically in the mob's Life() proc.
 	playsound(T, 'sound/effects/sparks2.ogg', 50, 1)
 	anim(src,'icons/mob/mob.dmi',,"phasein",,dir)
 
-/mob/proc/phase_out(turf/T)
+/mob/proc/phase_out(var/turf/T)
 	if(!T)
 		return
 	playsound(T, "sparks", 50, 1)
 	anim(src,'icons/mob/mob.dmi',,"phaseout",,dir)
 
-/mob/living/proc/on_structure_offset(offset = 0)
+/mob/living/proc/on_structure_offset(var/offset = 0)
 	if(offset)
 		var/check = default_pixel_z + offset
 		if(pixel_z != check)
@@ -293,27 +285,3 @@ note dizziness decrements automatically in the mob's Life() proc.
 /mob/living/Move()
 	. = ..()
 	on_structure_offset(0)
-
-/mob/var/waddling = FALSE
-
-/mob/proc/waddle()
-	var/mob/living/L = src
-
-	if (!istype(L) || L.incapacitated() || L.lying)
-		return
-
-	animate(L, pixel_z = 4, time = 0)
-	animate(
-		pixel_z = 0,
-		transform = matrix().Update(rotation = pick(-12, 0, 12)),
-		time = 2
-	)
-	animate(pixel_z = 0, transform = matrix(), time = 0)
-
-/mob/proc/make_waddle()
-	waddling = TRUE
-	GLOB.moved_event.register(src, src, .proc/waddle)
-
-/mob/proc/stop_waddle()
-	waddling = FALSE
-	GLOB.moved_event.unregister(src, src, .proc/waddle)

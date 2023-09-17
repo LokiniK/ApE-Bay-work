@@ -3,9 +3,9 @@
 *********/
 /datum/movement_handler/robot
 	expected_host_type = /mob/living/silicon/robot
-	VAR_PROTECTED/mob/living/silicon/robot/robot
+	var/mob/living/silicon/robot/robot
 
-/datum/movement_handler/robot/New(host)
+/datum/movement_handler/robot/New(var/host)
 	..()
 	src.robot = host
 

@@ -119,15 +119,15 @@
 /turf/simulated/floor/tiled/dark,
 /area/map_template/oldlab2/fixedsecurity)
 "aU" = (
-/obj/machinery/atmospherics/pipe/simple/visible{
-	dir = 4
-	},
 /obj/machinery/door/airlock/external/glass{
 	dir = 4;
 	frequency = 1379;
 	id_tag = "oldlab_interior";
 	locked = 1;
 	name = "Lab Interior Airlock"
+	},
+/obj/machinery/atmospherics/pipe/simple/visible{
+	dir = 4
 	},
 /turf/simulated/floor/tiled/techfloor/grid,
 /area/map_template/oldlab2/Airlock)
@@ -464,7 +464,7 @@
 /obj/effect/floor_decal/corner/research{
 	dir = 6
 	},
-/obj/machinery/anomaly_container,
+/obj/structure/anomaly_container,
 /turf/simulated/floor/tiled/white,
 /area/map_template/oldlab2/test1)
 "cS" = (
@@ -499,7 +499,7 @@
 /turf/simulated/floor/tiled/dark,
 /area/map_template/oldlab2/lab)
 "cX" = (
-/obj/machinery/stasis_cage,
+/obj/structure/stasis_cage,
 /obj/effect/floor_decal/industrial/outline/yellow,
 /turf/simulated/floor/tiled/white,
 /area/map_template/oldlab2/test1)
@@ -787,7 +787,8 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
 /obj/machinery/firealarm{
 	dir = 8;
-	pixel_x = -24
+	pixel_x = -24;
+	pixel_y = 0
 	},
 /turf/simulated/floor/tiled/white,
 /area/map_template/oldlab2/office)
@@ -1220,9 +1221,7 @@
 /area/map_template/oldlab2/office)
 "gC" = (
 /obj/structure/largecrate,
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced,
 /area/map_template/oldlab2/Airlock)
 "gG" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
@@ -1325,6 +1324,7 @@
 	dir = 1
 	},
 /obj/machinery/firealarm{
+	dir = 2;
 	pixel_y = 24
 	},
 /turf/simulated/floor/tiled/dark,
@@ -1431,7 +1431,7 @@
 /turf/simulated/floor/tiled/dark,
 /area/map_template/oldlab2/lab)
 "hJ" = (
-/obj/structure/iv_stand,
+/obj/structure/iv_drip,
 /obj/machinery/power/apc{
 	dir = 8;
 	name = "west bump";
@@ -1550,9 +1550,7 @@
 	dir = 4
 	},
 /obj/structure/largecrate,
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced,
 /area/map_template/oldlab2/Airlock)
 "iE" = (
 /obj/effect/floor_decal/industrial/warning{
@@ -1603,9 +1601,7 @@
 	locked = 1;
 	name = "Lab Exterior Airlock"
 	},
-/turf/simulated/floor/tiled/techfloor{
-	map_airless = 1
-	},
+/turf/simulated/floor/tiled/techfloor/grid,
 /area/map_template/oldlab2/Airlock)
 "iZ" = (
 /obj/machinery/atmospherics/unary/vent_scrubber/on{
@@ -1705,10 +1701,20 @@
 /turf/simulated/floor/tiled/techfloor,
 /area/map_template/oldlab2/engineerhall)
 "jI" = (
-/obj/random/ironing_board_structure,
-/obj/item/ironing_iron,
+/obj/structure/bed/roller/ironingboard,
+/obj/item/ironingiron,
 /turf/simulated/floor/tiled/freezer,
 /area/map_template/oldlab2/recandlockers)
+"jJ" = (
+/obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
+	dir = 4
+	},
+/obj/structure/table/standard,
+/obj/machinery/reagent_temperature/cooler{
+	pixel_y = 5
+	},
+/turf/simulated/floor/tiled/white,
+/area/map_template/oldlab2/chem)
 "jL" = (
 /obj/machinery/light{
 	dir = 8
@@ -1734,7 +1740,8 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
 /obj/machinery/firealarm{
 	dir = 8;
-	pixel_x = -24
+	pixel_x = -24;
+	pixel_y = 0
 	},
 /turf/simulated/floor/tiled/white,
 /area/map_template/oldlab2/lab)
@@ -1885,7 +1892,7 @@
 /turf/simulated/floor/tiled/techfloor/grid,
 /area/map_template/oldlab2/lab)
 "kP" = (
-/obj/machinery/stasis_cage,
+/obj/structure/stasis_cage,
 /obj/machinery/light{
 	dir = 1
 	},
@@ -1920,6 +1927,7 @@
 /obj/machinery/light,
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /turf/simulated/floor/tiled/dark,
@@ -2012,6 +2020,7 @@
 	},
 /obj/machinery/atmospherics/unary/vent_scrubber/on,
 /obj/machinery/firealarm{
+	dir = 2;
 	pixel_y = 24
 	},
 /turf/simulated/floor/wood/walnut,
@@ -2394,9 +2403,7 @@
 /area/map_template/oldlab2/office)
 "nw" = (
 /obj/machinery/floodlight,
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced,
 /area/map_template/oldlab2/Airlock)
 "nx" = (
 /turf/simulated/wall/titanium,
@@ -2800,6 +2807,7 @@
 "pD" = (
 /obj/machinery/atmospherics/unary/vent_pump/on,
 /obj/machinery/firealarm{
+	dir = 2;
 	pixel_y = 24
 	},
 /turf/simulated/floor/tiled/techfloor,
@@ -3009,14 +3017,13 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
 	dir = 10
 	},
-/obj/structure/roller_bed,
+/obj/structure/bed/roller,
 /turf/simulated/floor/tiled/white,
 /area/map_template/oldlab2/medical)
 "qJ" = (
 /obj/machinery/light/spot,
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/obj/vehicle/train/cargo/trolley,
+/turf/simulated/floor/reinforced,
 /area/map_template/oldlab2/Airlock)
 "qL" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
@@ -3049,7 +3056,7 @@
 	dir = 8;
 	pixel_x = 24
 	},
-/obj/machinery/anomaly_container,
+/obj/structure/anomaly_container,
 /turf/simulated/floor/tiled/white,
 /area/map_template/oldlab2/test1)
 "qS" = (
@@ -3114,7 +3121,7 @@
 /area/map_template/oldlab2/recandlockers)
 "rl" = (
 /obj/structure/table/steel_reinforced,
-/obj/item/flora/pottedplantsmall/leaf{
+/obj/structure/flora/pottedplant/deskleaf{
 	pixel_y = 5
 	},
 /obj/machinery/atmospherics/unary/vent_pump/on{
@@ -3171,16 +3178,15 @@
 /area/map_template/oldlab2/test1)
 "rs" = (
 /obj/machinery/access_button{
+	active_power_usage = "oldlab_airlock";
 	command = "cycle_exterior";
-	frequency = 1379;
+	frequency = 1380;
 	master_tag = "oldlab_airlock";
 	name = "interior access button";
 	pixel_x = 24;
 	pixel_y = -24
 	},
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced,
 /area/map_template/oldlab2/Airlock)
 "rt" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
@@ -3286,6 +3292,7 @@
 	},
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /turf/simulated/floor/tiled/white,
@@ -3308,6 +3315,16 @@
 	},
 /turf/simulated/floor/tiled/dark,
 /area/map_template/oldlab2/fixedsecurity)
+"rK" = (
+/obj/structure/table/marble,
+/obj/machinery/reagent_temperature/cooler{
+	pixel_y = 5
+	},
+/obj/effect/floor_decal/corner/grey/diagonal{
+	dir = 4
+	},
+/turf/simulated/floor/tiled/white,
+/area/map_template/oldlab2/mess)
 "rL" = (
 /obj/machinery/door/firedoor,
 /obj/machinery/door/blast/regular{
@@ -3401,6 +3418,7 @@
 /obj/machinery/light,
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /turf/simulated/floor/tiled/dark,
@@ -3846,6 +3864,7 @@
 /obj/machinery/light,
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /turf/simulated/floor/tiled/dark,
@@ -4060,6 +4079,7 @@
 /area/map_template/oldlab2/engineerhall)
 "vv" = (
 /obj/machinery/firealarm{
+	dir = 2;
 	pixel_y = 24
 	},
 /turf/simulated/floor/tiled/white,
@@ -4089,7 +4109,7 @@
 /turf/simulated/floor/tiled/dark,
 /area/map_template/oldlab2/fixedsecurity)
 "vA" = (
-/obj/machinery/anomaly_container,
+/obj/structure/anomaly_container,
 /obj/machinery/light,
 /obj/machinery/atmospherics/unary/vent_pump/high_volume/airlock{
 	dir = 1;
@@ -4247,7 +4267,7 @@
 /turf/simulated/floor/tiled/dark,
 /area/map_template/oldlab2/recandlockers)
 "wt" = (
-/obj/machinery/vending/generic{
+/obj/machinery/vending/assist{
 	pixel_y = 12
 	},
 /turf/simulated/floor/tiled/techfloor,
@@ -4451,9 +4471,7 @@
 /obj/machinery/light/spot{
 	dir = 4
 	},
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced,
 /area/map_template/oldlab2/Airlock)
 "xy" = (
 /obj/machinery/power/smes/buildable/outpost_substation,
@@ -4521,7 +4539,7 @@
 /turf/simulated/floor/tiled/dark,
 /area/map_template/oldlab2/living5)
 "yd" = (
-/obj/machinery/vending/generic{
+/obj/machinery/vending/assist{
 	dir = 8
 	},
 /turf/simulated/floor/tiled/white,
@@ -4895,7 +4913,8 @@
 	},
 /obj/machinery/firealarm{
 	dir = 8;
-	pixel_x = -24
+	pixel_x = -24;
+	pixel_y = 0
 	},
 /turf/simulated/floor/tiled/techfloor,
 /area/map_template/oldlab2/lab)
@@ -5014,7 +5033,7 @@
 /obj/effect/floor_decal/corner/paleblue{
 	dir = 5
 	},
-/obj/structure/roller_bed,
+/obj/structure/bed/roller,
 /obj/machinery/alarm{
 	dir = 8;
 	pixel_x = 25
@@ -5030,7 +5049,7 @@
 /turf/simulated/floor/tiled/white,
 /area/map_template/oldlab2/medical)
 "AI" = (
-/obj/machinery/stasis_cage,
+/obj/structure/stasis_cage,
 /obj/machinery/atmospherics/unary/vent_pump/high_volume/airlock{
 	dir = 1;
 	id_tag = "oldlab_pump"
@@ -5092,7 +5111,7 @@
 /turf/simulated/floor/tiled/techfloor,
 /area/map_template/oldlab2/server)
 "Bb" = (
-/obj/machinery/stasis_cage,
+/obj/structure/stasis_cage,
 /turf/simulated/floor/tiled/techfloor,
 /area/map_template/oldlab2/engineerhall)
 "Bc" = (
@@ -5108,6 +5127,10 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
 /turf/simulated/floor/tiled/techfloor,
 /area/map_template/oldlab2/test1)
+"Be" = (
+/obj/vehicle/train/cargo/engine,
+/turf/simulated/floor/reinforced,
+/area/map_template/oldlab2/Airlock)
 "Bi" = (
 /turf/simulated/wall/titanium,
 /area/map_template/oldlab2/living5)
@@ -5236,7 +5259,7 @@
 /area/map_template/oldlab2/test1)
 "BJ" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
-/obj/structure/iv_stand,
+/obj/structure/iv_drip,
 /obj/machinery/light{
 	dir = 4
 	},
@@ -5703,6 +5726,7 @@
 	},
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /turf/simulated/floor/tiled/freezer,
@@ -6111,8 +6135,10 @@
 "FJ" = (
 /obj/machinery/atmospherics/pipe/simple/visible,
 /obj/machinery/access_button{
+	active_power_usage = "oldlab_airlock";
+	active_timers = "interior access button";
 	command = "cycle_exterior";
-	frequency = 1379;
+	frequency = 1380;
 	master_tag = "oldlab_airlock";
 	name = "exterior access button";
 	pixel_x = 24;
@@ -6179,6 +6205,7 @@
 	},
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /turf/simulated/floor/tiled/white,
@@ -6212,7 +6239,7 @@
 /obj/effect/floor_decal/corner/pink{
 	dir = 9
 	},
-/obj/structure/iv_stand,
+/obj/structure/iv_drip,
 /turf/simulated/floor/tiled/white,
 /area/map_template/oldlab2/medical)
 "Gn" = (
@@ -6279,6 +6306,10 @@
 	},
 /turf/simulated/floor/tiled/techfloor,
 /area/map_template/oldlab2/server)
+"GO" = (
+/obj/vehicle/train/cargo/trolley,
+/turf/simulated/floor/reinforced,
+/area/map_template/oldlab2/Airlock)
 "GP" = (
 /obj/machinery/light{
 	dir = 1
@@ -6328,9 +6359,7 @@
 	id_tag = "oldlab_sensor_exterior";
 	pixel_y = -32
 	},
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced,
 /area/map_template/oldlab2/Airlock)
 "GX" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
@@ -6460,9 +6489,7 @@
 "HC" = (
 /obj/structure/largecrate,
 /obj/machinery/light/spot,
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced,
 /area/map_template/oldlab2/Airlock)
 "HF" = (
 /obj/structure/cable/yellow{
@@ -6507,7 +6534,9 @@
 	dir = 1
 	},
 /obj/structure/table/steel_reinforced,
-/obj/machinery/photocopier/faxmachine,
+/obj/machinery/photocopier/faxmachine{
+	department = "Brig Chief's Office"
+	},
 /turf/simulated/floor/tiled/white,
 /area/map_template/oldlab2/cso)
 "Ia" = (
@@ -6666,6 +6695,7 @@
 /obj/machinery/light,
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /turf/simulated/floor/tiled/dark,
@@ -6816,6 +6846,7 @@
 /obj/machinery/light,
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /turf/simulated/floor/tiled/dark,
@@ -7267,7 +7298,7 @@
 /turf/simulated/floor/tiled/white,
 /area/map_template/oldlab2/mess)
 "Mh" = (
-/obj/machinery/anomaly_container,
+/obj/structure/anomaly_container,
 /obj/machinery/atmospherics/unary/vent_pump/high_volume/airlock{
 	dir = 1;
 	id_tag = "oldlab_pump"
@@ -7364,8 +7395,10 @@
 	pixel_y = -6
 	},
 /obj/machinery/embedded_controller/radio/airlock/airlock_controller{
+	active_power_usage = "oldlab_sensor";
 	anchor_fall = "labport_airlock";
 	dir = 8;
+	frequency = 1380;
 	id_tag = "oldlab_airlock";
 	pixel_x = 25;
 	pixel_y = 8;
@@ -7574,9 +7607,7 @@
 /turf/simulated/floor/tiled/white,
 /area/map_template/oldlab2/mess)
 "Nz" = (
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced,
 /area/map_template/oldlab2/Airlock)
 "NC" = (
 /obj/machinery/atmospherics/pipe/manifold/hidden/supply{
@@ -7601,7 +7632,8 @@
 "NH" = (
 /obj/machinery/firealarm{
 	dir = 8;
-	pixel_x = -24
+	pixel_x = -24;
+	pixel_y = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
 /turf/simulated/floor/tiled/white,
@@ -7762,7 +7794,8 @@
 "OD" = (
 /obj/machinery/firealarm{
 	dir = 8;
-	pixel_x = -24
+	pixel_x = -24;
+	pixel_y = 0
 	},
 /turf/simulated/floor/tiled/dark,
 /area/map_template/oldlab2/lab)
@@ -8043,6 +8076,7 @@
 "Qc" = (
 /obj/machinery/atmospherics/unary/vent_scrubber/on,
 /obj/machinery/firealarm{
+	dir = 2;
 	pixel_y = 24
 	},
 /turf/simulated/floor/tiled/techfloor,
@@ -8392,6 +8426,7 @@
 "Ss" = (
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /turf/simulated/floor/tiled/dark,
@@ -8618,13 +8653,13 @@
 /area/map_template/oldlab2/test1)
 "Tv" = (
 /obj/structure/table/standard,
-/obj/item/roller_bed{
+/obj/item/roller{
 	pixel_y = 16
 	},
-/obj/item/roller_bed{
+/obj/item/roller{
 	pixel_y = 8
 	},
-/obj/item/roller_bed{
+/obj/item/roller{
 	pixel_y = 16
 	},
 /obj/machinery/atmospherics/unary/vent_scrubber/on{
@@ -9596,6 +9631,7 @@
 	},
 /obj/effect/catwalk_plated,
 /obj/machinery/firealarm{
+	dir = 2;
 	pixel_y = 24
 	},
 /turf/simulated/floor/plating,
@@ -9656,10 +9692,6 @@
 /obj/item/reagent_containers/ivbag/nanoblood,
 /obj/item/reagent_containers/ivbag/nanoblood,
 /obj/item/reagent_containers/ivbag/nanoblood,
-/obj/item/reagent_containers/ivbag/nanoblood,
-/obj/item/reagent_containers/ivbag/nanoblood,
-/obj/item/reagent_containers/ivbag/nanoblood,
-/obj/item/reagent_containers/ivbag/nanoblood,
 /turf/simulated/floor/tiled/white,
 /area/map_template/oldlab2/medical)
 "YW" = (
@@ -9669,6 +9701,7 @@
 /obj/machinery/light,
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /turf/simulated/floor/tiled/dark,
@@ -9705,7 +9738,8 @@
 	},
 /obj/machinery/firealarm{
 	dir = 8;
-	pixel_x = -24
+	pixel_x = -24;
+	pixel_y = 0
 	},
 /turf/simulated/floor/tiled/white,
 /area/map_template/oldlab2/test1)
@@ -9807,6 +9841,7 @@
 	dir = 4
 	},
 /obj/machinery/firealarm{
+	dir = 2;
 	pixel_y = 24
 	},
 /turf/simulated/floor/tiled/white,
@@ -10092,7 +10127,7 @@ ZN
 uh
 NY
 NY
-uh
+jJ
 Mk
 Jj
 Qu
@@ -11289,7 +11324,7 @@ xC
 mG
 zl
 pu
-qZ
+rK
 qZ
 qZ
 Yg
@@ -11728,7 +11763,7 @@ Nz
 Nz
 Nz
 Nz
-Nz
+GO
 gb
 uX
 DJ
@@ -11832,7 +11867,7 @@ Nz
 Nz
 Nz
 Nz
-Nz
+Be
 gb
 gb
 aU

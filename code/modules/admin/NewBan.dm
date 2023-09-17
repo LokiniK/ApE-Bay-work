@@ -1,8 +1,8 @@
-var/global/CMinutes = null
-var/global/savefile/Banlist
+var/CMinutes = null
+var/savefile/Banlist
 
 
-/proc/CheckBan(ckey, id, address)
+/proc/CheckBan(var/ckey, var/id, var/address)
 	if(!Banlist)		// if Banlist cannot be located for some reason
 		LoadBans()		// try to load the bans
 		if(!Banlist)	// uh oh, can't find bans!
@@ -68,11 +68,11 @@ var/global/savefile/Banlist
 
 	if (!length(Banlist.dir)) log_admin("Banlist is empty.")
 
-	if (!Banlist.dir.Find("base"))
+	if (!list_find(Banlist.dir, "base"))
 		log_admin("Banlist missing base dir.")
 		Banlist.dir.Add("base")
 		Banlist.cd = "/base"
-	else if (Banlist.dir.Find("base"))
+	else if (list_find(Banlist.dir, "base"))
 		Banlist.cd = "/base"
 
 	ClearTempbans()
@@ -105,11 +105,11 @@ var/global/savefile/Banlist
 		bantimestamp = CMinutes + minutes
 
 	Banlist.cd = "/base"
-	if (Banlist.dir.Find("[ckey][computerid]"))
-		to_chat(usr, SPAN_WARNING("Ban already exists."))
+	if (list_find(Banlist.dir, "[ckey][computerid]"))
+		to_chat(usr, "<span class='warning'>Ban already exists.</span>")
 		return 0
 	else if (!ckey)
-		to_chat(usr, SPAN_WARNING("Ckey does not exist."))
+		to_chat(usr, "<span class='warning'>Ckey does not exist.</span>")
 		return 0
 	else
 		Banlist.dir.Add("[ckey][computerid]")
@@ -138,11 +138,15 @@ var/global/savefile/Banlist
 	if(!usr)
 		log_admin("Ban Expired: [key]")
 		message_admins("Ban Expired: [key]")
+		send2adminirc("Ban Expired: [key]")//inf
 	else
 		ban_unban_log_save("[key_name_admin(usr)] unbanned [key]")
 		log_admin("[key_name_admin(usr)] unbanned [key]")
 		message_admins("[key_name_admin(usr)] unbanned: [key]")
+		send2adminirc("[key_name_admin(usr)] unbanned: [key]")//inf
+		SSstatistics.add_field("ban_unban",1)
 		usr.client.holder.DB_ban_unban( ckey(key), BANTYPE_ANY_FULLBAN)
+		to_world_ban("UNBAN", get_key(usr), ckey(key))	// INF
 	for (var/A in Banlist.dir)
 		Banlist.cd = "/base/[A]"
 		if (key == Banlist["key"] /*|| id == Banlist["id"]*/)
@@ -170,6 +174,7 @@ var/global/savefile/Banlist
 /datum/admins/proc/unbanpanel()
 	var/count = 0
 	var/dat
+	//var/dat = "<HR><B>Unban Player:</B> <span class='notice'>(U) = Unban , (E) = Edit Ban</span> <span class='good'>(Total<HR><table border=1 rules=all frame=void cellspacing=0 cellpadding=3 ></span>"
 	Banlist.cd = "/base"
 	for (var/A in Banlist.dir)
 		count++
@@ -189,7 +194,7 @@ var/global/savefile/Banlist
 		dat += text("<tr><td><A href='?src=[ref];unbanf=[key][id]'>(U)</A><A href='?src=[ref];unbane=[key][id]'>(E)</A> Key: <B>[key]</B></td><td>ComputerID: <B>[id]</B></td><td>IP: <B>[ip]</B></td><td> [expiry]</td><td>(By: [by])</td><td>(Reason: [reason])</td></tr>")
 
 	dat += "</table>"
-	dat = "<HR><B>Bans:</B> [SPAN_COLOR("blue", "(U) = Unban , (E) = Edit Ban")] - [SPAN_COLOR("green", "([count] Bans)")]<HR><table border=1 rules=all frame=void cellspacing=0 cellpadding=3 >[dat]"
+	dat = "<HR><B>Bans:</B> <FONT COLOR=blue>(U) = Unban , (E) = Edit Ban</FONT> - <FONT COLOR=green>([count] Bans)</FONT><HR><table border=1 rules=all frame=void cellspacing=0 cellpadding=3 >[dat]"
 	show_browser(usr, dat, "window=unbanp;size=875x400")
 
 //////////////////////////////////// DEBUG ////////////////////////////////////
@@ -227,3 +232,4 @@ var/global/savefile/Banlist
 	Banlist.cd = "/base"
 	for (var/A in Banlist.dir)
 		RemoveBan(A)
+

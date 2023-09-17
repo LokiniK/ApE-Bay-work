@@ -24,13 +24,13 @@
 	body_parts_covered = HEAD|FACE
 
 /obj/item/clothing/head/wizard/marisa
-	name = "witch hat"
+	name = "Witch Hat"
 	desc = "Strange-looking hat-wear, makes you want to cast fireballs."
 	icon_state = "marisa"
 	siemens_coefficient = 0.8
 
 /obj/item/clothing/head/wizard/magus
-	name = "magus helm"
+	name = "Magus Helm"
 	desc = "A mysterious helmet that hums with an unearthly power."
 	icon_state = "magus"
 	item_state = "magus"
@@ -39,10 +39,26 @@
 		slot_r_hand_str = "helmet",
 		)
 	siemens_coefficient = 0.8
-	body_parts_covered = HEAD|FACE|EYES
+	body_parts_covered = HEAD|FACE|EYES|BLOCKHAIR
+	flags_inv = HIDEMASK|HIDEEARS|HIDEEYES|HIDEFACE
+
+/obj/item/clothing/head/wizard/bondrewd_wiz
+	name = "Abyssal Helm"
+	desc = "A strange eyeless helmet, that radiates light from single purple vertical stripe in middle of it ."
+	icon_state = "boris_helmet"
+	item_state = "boris_helmet"
+	item_state_slots = list(
+		slot_l_hand_str = "helmet",
+		slot_r_hand_str = "helmet",
+		)
+	light_overlay = "helmet_light_boris"
+	max_pressure_protection = ENG_VOIDSUIT_MAX_PRESSURE
+	siemens_coefficient = 0.8
+	body_parts_covered = HEAD|FACE|EYES|BLOCKHAIR|BLOCKHEADHAIR
+	flags_inv = HIDEMASK|HIDEEARS|HIDEEYES|HIDEFACE
 
 /obj/item/clothing/head/wizard/cap
-	name = "gentleman's cap"
+	name = "Gentlemans Cap"
 	desc = "A checkered gray flat cap woven together with the rarest of threads."
 	icon_state = "gentcap"
 	item_state_slots = list(
@@ -55,6 +71,7 @@
 	name = "wizard robe"
 	desc = "A magnificant, gem-lined robe that seems to radiate power."
 	icon_state = "wizard"
+	item_state = "wizard"
 	gas_transfer_coefficient = 0.01 // IT'S MAGICAL OKAY JEEZ +1 TO NOT DIE
 	permeability_coefficient = 0.01
 	armor = list(
@@ -66,6 +83,8 @@
 		bio = ARMOR_BIO_MINOR,
 		rad = ARMOR_RAD_MINOR
 		)
+	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS//inf
+	flags_inv = HIDEJUMPSUIT//inf
 	allowed = list(/obj/item/teleportation_scroll)
 	siemens_coefficient = 0.8
 	wizard_garb = TRUE
@@ -74,55 +93,74 @@
 	name = "red wizard robe"
 	desc = "A magnificant, red, gem-lined robe that seems to radiate power."
 	icon_state = "redwizard"
+	item_state = "redwizard"
 
 
 /obj/item/clothing/suit/wizrobe/marisa
-	name = "witch robe"
+	name = "Witch Robe"
 	desc = "Magic is all about the spell power, ZE!"
 	icon_state = "marisa"
+	item_state = "marisa"
 
 /obj/item/clothing/suit/wizrobe/magusblue
-	name = "magus robe"
+	name = "Magus Robe"
 	desc = "A set of armoured robes that seem to radiate a dark power."
 	icon_state = "magusblue"
+	item_state = "magusblue"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|ARMS|HANDS|LEGS|FEET
+	flags_inv = HIDEGLOVES|HIDESHOES|HIDEJUMPSUIT|HIDETAIL
 
 /obj/item/clothing/suit/wizrobe/magusred
-	name = "magus robe"
+	name = "Magus Robe"
 	desc = "A set of armoured robes that seem to radiate a dark power."
 	icon_state = "magusred"
+	item_state = "magusred"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|ARMS|HANDS|LEGS|FEET
+	flags_inv = HIDEGLOVES|HIDESHOES|HIDEJUMPSUIT|HIDETAIL
+
+/obj/item/clothing/suit/wizrobe/bondrewd
+	name = "Abyssal Suit"
+	desc = "Sealed suit, black as darkest night. Has a white whistle attached to its neck."
+	icon_state = "boris_suit"
+	item_state = "boris_suit"
+	body_parts_covered = UPPER_TORSO|LOWER_TORSO|ARMS|HANDS|LEGS|FEET
+	flags_inv = HIDEGLOVES|HIDESHOES|HIDEJUMPSUIT|HIDETAIL
 
 /obj/item/clothing/suit/wizrobe/psypurple
 	name = "purple robes"
 	desc = "Heavy, royal purple robes threaded with psychic amplifiers and weird, bulbous lenses. Do not machine wash."
 	icon_state = "psyamp"
+	item_state = "psyamp"
 	gender = PLURAL
 
 /obj/item/clothing/suit/wizrobe/gentlecoat
-	name = "gentleman's coat"
+	name = "Gentlemans Coat"
 	desc = "A heavy threaded tweed gray jacket. For a different sort of Gentleman."
 	icon_state = "gentlecoat"
+	item_state = "gentlecoat"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|ARMS
+	flags_inv = null
 
 /obj/item/clothing/suit/wizrobe/fake
 	name = "wizard robe"
 	desc = "A rather dull, blue robe meant to mimick real wizard robes."
 	icon_state = "wizard-fake"
-	armor = null
+	item_state = "wizrobe"
+	armor = list(melee = 0, bullet = 0, laser = 0,energy = 0, bomb = 0, bio = 0, rad = 0)
 	siemens_coefficient = 1.0
 
 /obj/item/clothing/head/wizard/marisa/fake
-	name = "witch hat"
+	name = "Witch Hat"
 	desc = "Strange-looking hat-wear, makes you want to cast fireballs."
 	icon_state = "marisa"
-	armor = null
+	armor = list(melee = 0, bullet = 0, laser = 0,energy = 0, bomb = 0, bio = 0, rad = 0)
 	siemens_coefficient = 1.0
 
 /obj/item/clothing/suit/wizrobe/marisa/fake
-	name = "witch robe"
+	name = "Witch Robe"
 	desc = "Magic is all about the spell power, ZE!"
 	icon_state = "marisa"
+	item_state = "marisa"//inf, was item_state = "marisarobe"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|ARMS|LEGS
-	armor = null
+	armor = list(melee = 0, bullet = 0, laser = 0,energy = 0, bomb = 0, bio = 0, rad = 0)
 	siemens_coefficient = 1.0

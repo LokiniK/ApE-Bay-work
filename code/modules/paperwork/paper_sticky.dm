@@ -22,7 +22,7 @@
 	if(written_text)
 		icon_state = "[icon_state]_writing"
 
-/obj/item/sticky_pad/attackby(obj/item/thing, mob/user)
+/obj/item/sticky_pad/attackby(var/obj/item/thing, var/mob/user)
 	if(istype(thing, /obj/item/pen))
 
 		if(jobban_isbanned(user, "Graffiti"))
@@ -51,7 +51,7 @@
 	to_chat(user, SPAN_NOTICE("It has [papers] sticky note\s left."))
 	to_chat(user, SPAN_NOTICE("You can click it on grab intent to pick it up."))
 
-/obj/item/sticky_pad/attack_hand(mob/user)
+/obj/item/sticky_pad/attack_hand(var/mob/user)
 	if(user.a_intent == I_GRAB)
 		..()
 	else
@@ -78,6 +78,8 @@
 	icon = 'icons/obj/stickynotes.dmi'
 	color = COLOR_YELLOW
 	slot_flags = 0
+	layer = ABOVE_WINDOW_LAYER
+	pixel_z = 0
 
 /obj/item/paper/sticky/Initialize()
 	. = ..()
@@ -106,7 +108,7 @@
 /obj/item/paper/sticky/can_bundle()
 	return FALSE // Would otherwise lead to buggy interaction
 
-/obj/item/paper/sticky/afterattack(A, mob/user, flag, params)
+/obj/item/paper/sticky/afterattack(var/A, var/mob/user, var/flag, var/params)
 
 	if(!in_range(user, A) || istype(A, /obj/machinery/door) || istype(A, /obj/item/storage) || icon_state == "scrap")
 		return

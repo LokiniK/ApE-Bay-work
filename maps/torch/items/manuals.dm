@@ -13,7 +13,7 @@
 		</head>
 
 		<body>
-		<iframe width='100%' height='97%' src="[config.wiki_url]/index.php?title=Sol_Central_Government_Law" frameborder="0" id="main_frame"></iframe>
+		<iframe width='100%' height='97%' src="[config.wikiurl]Sol_Central_Government_Law&printable=yes&remove_links=1" frameborder="0" id="main_frame"></iframe>
 		</body>
 
 		</html>
@@ -36,7 +36,7 @@
 		</head>
 
 		<body>
-		<iframe width='100%' height='97%' src="[config.wiki_url]/index.php?title=Sol_Code_of_Uniform_Justice" frameborder="0" id="main_frame"></iframe>
+		<iframe width='100%' height='97%' src="[config.wikiurl]Sol_Gov_Military_Justice&printable=yes&remove_links=1" frameborder="0" id="main_frame"></iframe>
 		</body>
 
 		</html>
@@ -58,7 +58,7 @@
 		</head>
 
 		<body>
-		<iframe width='100%' height='97%' src="[config.wiki_url]/index.php?title=Standard_Operating_Procedure" frameborder="0" id="main_frame"></iframe>
+		<iframe width='100%' height='97%' src="[config.wikiurl]Standard_Operating_Procedure&printable=yes&remove_links=1" frameborder="0" id="main_frame"></iframe>
 		</body>
 
 		</html>
@@ -74,10 +74,11 @@
 	..()
 	return INITIALIZE_HINT_LATELOAD
 
-/obj/item/folder/envelope/captain/LateInitialize(mapload)
+/obj/item/folder/envelope/captain/LateInitialize()
+	..()
 	var/obj/effect/overmap/visitable/torch = map_sectors["[z]"]
 	var/memo = {"
-	<tt><center><b>[SPAN_COLOR("red", "SECRET - CODE WORDS: TORCH")]</b>
+	<tt><center><b><font color='red'>SECRET - CODE WORDS: TORCH</font></b>
 	<h3>SOL CENTRAL GOVERNMENT EXPEDITIONARY COMMAND</h3>
 	<img src = sollogo.png>
 	</center>
@@ -120,7 +121,7 @@
 /obj/item/paper/umbra
 	name = "UMBRA Protocol"
 	info = {"
-	<tt><center><b><span style='color: red'>TOP SECRET - CODE WORDS: TORCH UMBRA</span></b>
+	<tt><center><b><font color='red'>TOP SECRET - CODE WORDS: TORCH UMBRA</font></b>
 	<h3>OFFICE OF THE SECRETARY GENERAL OF SOL CENTRAL GOVERNMENT</h3>
 	<img src = sollogo.png>
 	</center>

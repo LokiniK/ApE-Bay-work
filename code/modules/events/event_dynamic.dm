@@ -1,4 +1,4 @@
-var/global/list/event_last_fired = list()
+var/list/event_last_fired = list()
 
 //Always triggers an event when called, dynamically chooses events based on job population
 /proc/spawn_dynamic_event()
@@ -27,21 +27,20 @@ var/global/list/event_last_fired = list()
 	possibleEvents[/datum/event/trivial_news] = 400
 	possibleEvents[/datum/event/mundane_news] = 300
 
-	possibleEvents[/datum/event/money_lotto] = max(min(5, length(GLOB.player_list)), 50)
+	possibleEvents[/datum/event/money_lotto] = max(min(5, GLOB.player_list.len), 50)
 	if(account_hack_attempted)
-		possibleEvents[/datum/event/money_hacker] = max(min(25, length(GLOB.player_list)) * 4, 200)
+		possibleEvents[/datum/event/money_hacker] = max(min(25, GLOB.player_list.len) * 4, 200)
 
 
-	possibleEvents[/datum/event/mob_spawning/carp] = 20 + 10 * active_with_role["Engineer"]
+	possibleEvents[/datum/event/carp_migration] = 20 + 10 * active_with_role["Engineer"]
 	possibleEvents[/datum/event/brand_intelligence] = 10 + 10 * active_with_role["Janitor"]
 
-	possibleEvents[/datum/event/mob_spawning/rogue_drones] = 5 + 25 * active_with_role["Engineer"] + 25 * active_with_role["Security"]
+	possibleEvents[/datum/event/rogue_drone] = 5 + 25 * active_with_role["Engineer"] + 25 * active_with_role["Security"]
 	possibleEvents[/datum/event/infestation] = 100 + 100 * active_with_role["Janitor"]
 
 	possibleEvents[/datum/event/communications_blackout] = 50 + 25 * active_with_role["AI"] + active_with_role["Scientist"] * 25
 	possibleEvents[/datum/event/ionstorm] = active_with_role["AI"] * 25 + active_with_role["Robot"] * 25 + active_with_role["Engineer"] * 10 + active_with_role["Scientist"] * 5
 	possibleEvents[/datum/event/grid_check] = 25 + 10 * active_with_role["Engineer"]
-	possibleEvents[/datum/event/power_surge] = active_with_role["Engineer"] >= 2 ? 15 + 10 * active_with_role["Engineer"] : 0
 	possibleEvents[/datum/event/electrical_storm] = 15 * active_with_role["Janitor"] + 5 * active_with_role["Engineer"]
 	possibleEvents[/datum/event/wallrot] = 30 * active_with_role["Engineer"] + 50 * active_with_role["Gardener"]
 
@@ -50,6 +49,7 @@ var/global/list/event_last_fired = list()
 	if(minutes_passed >= 30) // Give engineers time to set up engine
 		possibleEvents[/datum/event/meteor_wave] = 10 * active_with_role["Engineer"]
 		possibleEvents[/datum/event/blob] = 10 * active_with_role["Engineer"]
+		possibleEvents[/datum/event/minispasm] = 10 * active_with_role["Medical"]
 
 	if(active_with_role["Medical"] > 0)
 		possibleEvents[/datum/event/radiation_storm] = active_with_role["Medical"] * 10
@@ -93,7 +93,6 @@ var/global/list/event_last_fired = list()
 // with a specific role.
 // Note that this isn't sorted by department, because e.g. having a roboticist shouldn't make meteors spawn.
 /proc/number_active_with_role()
-	RETURN_TYPE(/list)
 	var/list/active_with_role = list()
 	active_with_role["Engineer"] = 0
 	active_with_role["Medical"] = 0

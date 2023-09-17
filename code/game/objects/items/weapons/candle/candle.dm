@@ -17,7 +17,8 @@
 	var/candle_falloff = 2
 
 /obj/item/flame/candle/Initialize()
-	wax = rand(27 MINUTES, 33 MINUTES) / SSobj.wait // Enough for 27-33 minutes. 30 minutes on average, adjusted for subsystem tickrate.
+//INF	wax = rand(27 MINUTES, 33 MINUTES) / SSobj.wait // Enough for 27-33 minutes. 30 minutes on average, adjusted for subsystem tickrate.
+	wax = 60 MINUTES / SSobj.wait //INF. For new year
 	if(available_colours)
 		color = pick(available_colours)
 	. = ..()
@@ -39,20 +40,21 @@
 
 /obj/item/flame/candle/attackby(obj/item/W as obj, mob/user as mob)
 	..()
-	if (isFlameOrHeatSource(W))
+	if(isflamesource(W) || is_hot(W))
 		light(user)
 
-/obj/item/flame/candle/resolve_attackby(atom/A, mob/user)
+/obj/item/flame/candle/resolve_attackby(var/atom/A, mob/user)
 	. = ..()
-	if (istype(A, /obj/item/flame/candle) && IsHeatSource())
+	if(istype(A, /obj/item/flame/candle/) && is_hot(src))
 		var/obj/item/flame/candle/other_candle = A
 		other_candle.light()
 
 /obj/item/flame/candle/proc/light(mob/user)
 	if(!lit)
 		lit = 1
-		visible_message(SPAN_NOTICE("\The [user] lights the [name]."))
-		set_light(candle_max_bright, candle_inner_range, candle_outer_range, candle_falloff)
+		visible_message("<span class='notice'>\The [user] lights the [name].</span>")
+		set_light(candle_max_bright, candle_inner_range, candle_outer_range, candle_falloff,\
+																								l_color = LIGHT_COLOR_FIRE)//inf
 		START_PROCESSING(SSobj, src)
 
 /obj/item/flame/candle/Process()

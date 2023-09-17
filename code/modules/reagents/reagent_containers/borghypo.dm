@@ -1,7 +1,7 @@
 /obj/item/reagent_containers/borghypo
 	name = "robot hypospray"
 	desc = "An advanced chemical synthesizer and injection system, designed for heavy-duty medical equipment."
-	icon = 'icons/obj/tools/syringe.dmi'
+	icon = 'icons/obj/syringe.dmi'
 	item_state = "hypo"
 	icon_state = "borghypo"
 	amount_per_transfer_from_this = 5
@@ -56,7 +56,7 @@
 					reagent_volumes[T] = min(reagent_volumes[T] + 5, volume)
 	return 1
 
-/obj/item/reagent_containers/borghypo/attack(mob/living/M, mob/user, target_zone)
+/obj/item/reagent_containers/borghypo/attack(var/mob/living/M, var/mob/user, var/target_zone)
 	if(!istype(M))
 		return
 
@@ -76,7 +76,7 @@
 	if (allow)
 		if (allow == INJECTION_PORT)
 			user.visible_message(SPAN_WARNING("\The [user] begins hunting for an injection port on \the [M]'s suit!"))
-			if(!user.do_skilled(INJECTION_PORT_DELAY, SKILL_MEDICAL, M, do_flags = DO_MEDICAL))
+			if(!user.do_skilled(INJECTION_PORT_DELAY, SKILL_MEDICAL, M))
 				return
 		to_chat(user, SPAN_NOTICE("You inject [M] with the injector."))
 		if(ishuman(M))
@@ -180,7 +180,7 @@
 			to_chat(user, SPAN_NOTICE("Dispensing from \the [bottle]."))
 		return TOPIC_REFRESH
 
-	var/index = reagent_names.Find(selection)
+	var/index = list_find(reagent_names, selection)
 	if (index)
 		mode = index
 		dispense = null
@@ -203,7 +203,7 @@
 /obj/item/reagent_containers/borghypo/service
 	name = "cyborg drink synthesizer"
 	desc = "A portable drink dispencer."
-	icon = 'icons/obj/food/drinks.dmi'
+	icon = 'icons/obj/drinks.dmi'
 	icon_state = "shaker"
 	charge_cost = 5
 	recharge_time = 3
@@ -245,10 +245,10 @@
 		/datum/reagent/ethanol/coffee/kahlua
 		)
 
-/obj/item/reagent_containers/borghypo/service/attack(mob/M, mob/user)
+/obj/item/reagent_containers/borghypo/service/attack(var/mob/M, var/mob/user)
 	return
 
-/obj/item/reagent_containers/borghypo/service/afterattack(obj/target, mob/user, proximity)
+/obj/item/reagent_containers/borghypo/service/afterattack(var/obj/target, var/mob/user, var/proximity)
 	if(!proximity)
 		return
 
@@ -282,7 +282,7 @@
 
 /obj/item/robot_rack/bottle
 	name = "bottle rack"
-	icon = 'icons/obj/chemical_storage.dmi'
+	icon = 'icons/obj/chemical.dmi'
 	icon_state = "bottle-1"
 	object_type = /obj/item/reagent_containers/glass/bottle
 	capacity = 4

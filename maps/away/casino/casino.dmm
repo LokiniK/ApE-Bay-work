@@ -85,6 +85,7 @@
 "aj" = (
 /obj/effect/step_trigger/thrower{
 	affect_ghosts = 1;
+	direction = 2;
 	name = "thrower_throwdownside";
 	nostop = 1;
 	stopper = 0;
@@ -187,19 +188,22 @@
 	frequency = 1380;
 	icon_state = "door_closed";
 	id_tag = "casino_dock_outer";
+	locked = 0;
 	name = "Docking Port Airlock"
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_maintenance)
 "aE" = (
 /obj/structure/bed/chair{
-	dir = 8
+	dir = 8;
+	icon_state = "chair_preview"
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_bridge)
 "aF" = (
 /obj/structure/bed/chair{
-	dir = 4
+	dir = 4;
+	icon_state = "chair_preview"
 	},
 /obj/effect/decal/cleanable/blood/splatter,
 /turf/simulated/floor/tiled,
@@ -224,6 +228,7 @@
 	dir = 5
 	},
 /obj/machinery/atmospherics/unary/vent_pump/high_volume/external_air{
+	dir = 2;
 	id_tag = "admin_shuttle_dock_pump"
 	},
 /obj/item/device/radio/intercom{
@@ -261,7 +266,8 @@
 /area/casino/casino_maintenance)
 "aO" = (
 /obj/machinery/atmospherics/pipe/manifold/hidden{
-	dir = 4
+	dir = 4;
+	icon_state = "map"
 	},
 /obj/machinery/light/small{
 	dir = 4
@@ -281,6 +287,7 @@
 	frequency = 1380;
 	icon_state = "door_closed";
 	id_tag = "casino_dock_inner";
+	locked = 0;
 	name = "Docking Port Airlock"
 	},
 /turf/simulated/floor/plating,
@@ -288,7 +295,8 @@
 "aV" = (
 /obj/machinery/light{
 	dir = 8;
-	icon_state = "tube1"
+	icon_state = "tube1";
+	pixel_y = 0
 	},
 /obj/structure/cable{
 	d2 = 4;
@@ -316,7 +324,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/unary/vent_scrubber/on{
 	dir = 4
@@ -361,11 +370,13 @@
 "bd" = (
 /obj/machinery/alarm{
 	dir = 8;
+	icon_state = "alarm0";
 	pixel_x = 24
 	},
 /obj/effect/decal/cleanable/blood/drip,
 /obj/machinery/atmospherics/pipe/manifold/hidden{
-	dir = 4
+	dir = 4;
+	icon_state = "map"
 	},
 /turf/simulated/floor/tiled/dark,
 /area/casino/casino_maintenance)
@@ -483,7 +494,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -501,7 +513,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -516,7 +529,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -533,7 +547,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -548,7 +563,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/manifold/hidden/supply,
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
@@ -562,7 +578,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -577,7 +594,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -595,7 +613,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -612,7 +631,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/manifold/hidden/supply{
 	dir = 1
@@ -866,7 +886,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_crew_bunk)
@@ -879,7 +900,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_crew_bunk)
@@ -889,7 +911,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_crew_bunk)
@@ -900,7 +923,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_crew_bunk)
@@ -913,7 +937,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_crew_bunk)
@@ -989,6 +1014,7 @@
 /obj/machinery/power/apc{
 	dir = 1;
 	name = "north bump";
+	pixel_x = 0;
 	pixel_y = 24;
 	req_access = newlist()
 	},
@@ -1002,7 +1028,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -1020,6 +1047,7 @@
 "cM" = (
 /obj/effect/decal/cleanable/blood/splatter,
 /obj/structure/cable{
+	dir = 2;
 	icon_state = "1-10"
 	},
 /turf/simulated/floor/tiled,
@@ -1045,7 +1073,8 @@
 /area/casino/casino_security)
 "cS" = (
 /obj/structure/bed/chair{
-	dir = 4
+	dir = 4;
+	icon_state = "chair_preview"
 	},
 /obj/effect/decal/cleanable/blood,
 /turf/simulated/floor/tiled,
@@ -1080,6 +1109,8 @@
 	external_pressure_bound = 140;
 	external_pressure_bound_default = 140;
 	icon_state = "map_vent_out";
+	pressure_checks = 1;
+	pressure_checks_default = 1;
 	use_power = 1
 	},
 /turf/simulated/floor/tiled,
@@ -1111,7 +1142,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -1197,7 +1229,7 @@
 	d2 = 2;
 	icon_state = "0-2"
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "dt" = (
 /obj/structure/hygiene/toilet{
@@ -1205,7 +1237,8 @@
 	},
 /obj/machinery/light{
 	dir = 8;
-	icon_state = "tube1"
+	icon_state = "tube1";
+	pixel_y = 0
 	},
 /obj/item/material/knife/folding,
 /obj/effect/decal/cleanable/blood/splatter,
@@ -1269,7 +1302,7 @@
 	d2 = 2;
 	icon_state = "1-2"
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "dM" = (
 /obj/structure/bed/chair/comfy/red{
@@ -1293,19 +1326,19 @@
 /area/casino/casino_storage)
 "dQ" = (
 /obj/structure/table/woodentable,
-/obj/item/storage/fancy/smokable/cigar{
+/obj/item/storage/fancy/cigar{
 	pixel_y = 5
 	},
-/obj/item/storage/fancy/smokable/cigar{
+/obj/item/storage/fancy/cigar{
 	pixel_y = 5
 	},
-/obj/item/storage/fancy/smokable/cigar{
+/obj/item/storage/fancy/cigar{
 	pixel_y = 5
 	},
-/obj/item/storage/fancy/smokable/cigar{
+/obj/item/storage/fancy/cigar{
 	pixel_y = 5
 	},
-/obj/item/storage/fancy/smokable/cigar{
+/obj/item/storage/fancy/cigar{
 	pixel_y = 5
 	},
 /obj/random/tool,
@@ -1344,18 +1377,22 @@
 	name = "Starboard Auxiliary Solar Array"
 	},
 /obj/effect/floor_decal/solarpanel,
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "ed" = (
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "ee" = (
 /obj/structure/hygiene/shower{
-	dir = 4
+	dir = 4;
+	icon_state = "shower";
+	pixel_x = 0;
+	pixel_y = 0
 	},
 /obj/machinery/light{
 	dir = 8;
-	icon_state = "tube1"
+	icon_state = "tube1";
+	pixel_y = 0
 	},
 /turf/simulated/floor/tiled/white,
 /area/casino/casino_crew_bathroom)
@@ -1379,7 +1416,8 @@
 /obj/structure/casino/roulette_chart,
 /obj/machinery/light{
 	dir = 8;
-	icon_state = "tube1"
+	icon_state = "tube1";
+	pixel_y = 0
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_storage)
@@ -1425,7 +1463,7 @@
 	d2 = 4;
 	icon_state = "1-4"
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "er" = (
 /obj/structure/cable/yellow{
@@ -1443,7 +1481,7 @@
 	d2 = 8;
 	icon_state = "4-8"
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "es" = (
 /obj/structure/cable/yellow{
@@ -1451,7 +1489,7 @@
 	d2 = 8;
 	icon_state = "4-8"
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "et" = (
 /obj/structure/cable/yellow{
@@ -1469,7 +1507,7 @@
 	d2 = 4;
 	icon_state = "2-4"
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "eu" = (
 /obj/structure/cable/yellow{
@@ -1487,7 +1525,7 @@
 	d2 = 8;
 	icon_state = "4-8"
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "ev" = (
 /obj/structure/cable/yellow{
@@ -1500,7 +1538,7 @@
 	d2 = 8;
 	icon_state = "1-8"
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "ew" = (
 /obj/structure/reagent_dispensers/beerkeg,
@@ -1551,7 +1589,8 @@
 "eF" = (
 /obj/machinery/light{
 	dir = 8;
-	icon_state = "tube1"
+	icon_state = "tube1";
+	pixel_y = 0
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_hangar)
@@ -1581,7 +1620,7 @@
 	name = "Starboard Auxiliary Solar Array"
 	},
 /obj/effect/floor_decal/solarpanel,
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "eJ" = (
 /obj/structure/reagent_dispensers/watertank,
@@ -1595,7 +1634,7 @@
 /turf/simulated/floor/plating,
 /area/casino/casino_maintenance)
 "eL" = (
-/obj/machinery/vending/generic,
+/obj/machinery/vending/assist,
 /turf/simulated/floor/plating,
 /area/casino/casino_maintenance)
 "eM" = (
@@ -1695,7 +1734,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_hangar)
@@ -1703,7 +1743,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/structure/cable/green{
 	d1 = 1;
@@ -1718,6 +1759,7 @@
 	icon_state = "0-8"
 	},
 /obj/machinery/power/apc{
+	dir = 2;
 	name = "south bump";
 	pixel_y = -24
 	},
@@ -1836,7 +1878,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -1852,7 +1895,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -1871,7 +1915,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -1888,7 +1933,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/door/blast/regular{
 	density = 0;
@@ -2012,7 +2058,8 @@
 "fK" = (
 /obj/machinery/light{
 	dir = 8;
-	icon_state = "tube1"
+	icon_state = "tube1";
+	pixel_y = 0
 	},
 /turf/simulated/floor/carpet,
 /area/casino/casino_mainfloor)
@@ -2029,7 +2076,7 @@
 	},
 /obj/structure/cable/yellow,
 /obj/effect/floor_decal/solarpanel,
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "fN" = (
 /obj/structure/mopbucket,
@@ -2037,7 +2084,7 @@
 /turf/simulated/floor/plating,
 /area/casino/casino_maintenance)
 "fO" = (
-/obj/item/reagent_containers/glass/bucket,
+/obj/item/reagent_containers/misc/bucket,
 /turf/simulated/floor/plating,
 /area/casino/casino_maintenance)
 "fP" = (
@@ -2276,8 +2323,8 @@
 /area/casino/casino_mainfloor)
 "gv" = (
 /obj/structure/table/woodentable,
-/obj/item/storage/fancy/smokable/cigar,
-/obj/item/storage/fancy/smokable/cigar{
+/obj/item/storage/fancy/cigar,
+/obj/item/storage/fancy/cigar{
 	pixel_y = 5
 	},
 /turf/simulated/floor/carpet,
@@ -2293,7 +2340,7 @@
 	d2 = 4;
 	icon_state = "2-4"
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "gx" = (
 /obj/structure/cable/yellow{
@@ -2310,7 +2357,7 @@
 	pixel_y = 24;
 	req_access = newlist()
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "gy" = (
 /obj/machinery/door/airlock/external{
@@ -2346,6 +2393,7 @@
 	},
 /obj/effect/floor_decal/industrial/warning/full,
 /obj/machinery/oxygen_pump{
+	pixel_x = 0;
 	pixel_y = 32
 	},
 /obj/structure/cable/yellow{
@@ -2354,6 +2402,7 @@
 	icon_state = "2-8"
 	},
 /obj/machinery/atmospherics/unary/vent_pump/high_volume{
+	dir = 2;
 	id_tag = "casino_solar_pump"
 	},
 /turf/simulated/floor/plating,
@@ -2412,7 +2461,7 @@
 	name = "Port Auxiliary Solar Array"
 	},
 /obj/effect/floor_decal/solarpanel,
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "gL" = (
 /obj/machinery/door/airlock/external{
@@ -2461,14 +2510,15 @@
 	d2 = 2;
 	icon_state = "1-2"
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "hb" = (
 /obj/effect/floor_decal/industrial/warning{
 	dir = 1
 	},
 /obj/machinery/atmospherics/pipe/manifold/hidden{
-	dir = 8
+	dir = 8;
+	icon_state = "map"
 	},
 /obj/machinery/access_button{
 	command = "cycle_interior";
@@ -2538,7 +2588,7 @@
 	name = "Port Auxiliary Solar Array"
 	},
 /obj/effect/floor_decal/solarpanel,
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "hl" = (
 /obj/structure/cable/yellow,
@@ -2559,7 +2609,8 @@
 "hm" = (
 /obj/machinery/power/solar_control{
 	id = "solar";
-	name = "Solar Control"
+	name = "Solar Control";
+	track = 0
 	},
 /obj/effect/floor_decal/industrial/warning/corner{
 	dir = 4
@@ -2702,7 +2753,8 @@
 /obj/machinery/atmospherics/pipe/simple/hidden,
 /obj/structure/cable{
 	d2 = 2;
-	icon_state = "0-2"
+	icon_state = "0-2";
+	pixel_y = 0
 	},
 /obj/machinery/power/apc{
 	dir = 8;
@@ -2740,7 +2792,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -2758,7 +2811,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -2785,7 +2839,8 @@
 "hY" = (
 /obj/machinery/light{
 	dir = 8;
-	icon_state = "tube1"
+	icon_state = "tube1";
+	pixel_y = 0
 	},
 /obj/structure/coatrack,
 /turf/simulated/floor/carpet,
@@ -2840,7 +2895,7 @@
 	d2 = 4;
 	icon_state = "1-4"
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "ih" = (
 /obj/machinery/door/firedoor,
@@ -2895,9 +2950,9 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
 	dir = 4
 	},
-/obj/item/storage/fancy/egg_box/full,
-/obj/item/storage/fancy/egg_box/full,
-/obj/item/storage/fancy/egg_box/full,
+/obj/item/storage/fancy/egg_box,
+/obj/item/storage/fancy/egg_box,
+/obj/item/storage/fancy/egg_box,
 /obj/item/reagent_containers/food/condiment/flour,
 /obj/item/reagent_containers/food/condiment/sugar,
 /turf/simulated/floor/tiled,
@@ -2926,10 +2981,10 @@
 /turf/simulated/floor/tiled,
 /area/casino/casino_kitchen)
 "ip" = (
-/obj/structure/bed/chair/comfy/red{
+/obj/item/material/knife/table,
+/obj/structure/bed/chair/rounded/red{
 	dir = 4
 	},
-/obj/item/material/knife/table,
 /turf/simulated/floor/carpet,
 /area/casino/casino_mainfloor)
 "iq" = (
@@ -2956,7 +3011,8 @@
 /area/casino/casino_mainfloor)
 "iv" = (
 /obj/machinery/atmospherics/pipe/simple/hidden{
-	dir = 5
+	dir = 5;
+	icon_state = "intact"
 	},
 /obj/structure/cable{
 	d1 = 1;
@@ -2967,12 +3023,14 @@
 /area/casino/casino_crew_atmos)
 "iw" = (
 /obj/machinery/atmospherics/pipe/simple/hidden{
-	dir = 4
+	dir = 4;
+	icon_state = "intact"
 	},
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_crew_atmos)
@@ -2980,10 +3038,12 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/universal{
-	dir = 4
+	dir = 4;
+	icon_state = "map_universal"
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_crew_atmos)
@@ -2994,7 +3054,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -3030,7 +3091,8 @@
 /area/casino/casino_kitchen)
 "iC" = (
 /obj/structure/window/basic{
-	dir = 1
+	dir = 1;
+	icon_state = "window"
 	},
 /obj/structure/window/basic{
 	dir = 8
@@ -3044,17 +3106,20 @@
 /area/casino/casino_kitchen)
 "iD" = (
 /obj/structure/window/basic{
-	dir = 1
+	dir = 1;
+	icon_state = "window"
 	},
 /obj/machinery/gibber,
 /turf/simulated/floor/tiled/freezer,
 /area/casino/casino_kitchen)
 "iE" = (
 /obj/structure/window/basic{
-	dir = 1
+	dir = 1;
+	icon_state = "window"
 	},
 /obj/structure/window/basic{
-	dir = 4
+	dir = 4;
+	icon_state = "window"
 	},
 /obj/structure/kitchenspike,
 /turf/simulated/floor/tiled/freezer,
@@ -3156,7 +3221,8 @@
 /area/casino/casino_mainfloor)
 "iU" = (
 /obj/machinery/atmospherics/pipe/simple/visible/red{
-	dir = 6
+	dir = 6;
+	icon_state = "intact"
 	},
 /turf/simulated/wall/r_wall,
 /area/casino/casino_crew_atmos)
@@ -3182,7 +3248,8 @@
 	icon_state = "warning"
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/universal{
-	dir = 4
+	dir = 4;
+	icon_state = "map_universal"
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_crew_atmos)
@@ -3201,7 +3268,8 @@
 "ja" = (
 /obj/machinery/light{
 	dir = 8;
-	icon_state = "tube1"
+	icon_state = "tube1";
+	pixel_y = 0
 	},
 /obj/structure/flora/pottedplant/unusual,
 /turf/simulated/floor/carpet,
@@ -3210,7 +3278,8 @@
 /obj/structure/synthesized_instrument/synthesizer/piano,
 /obj/machinery/light{
 	dir = 8;
-	icon_state = "tube1"
+	icon_state = "tube1";
+	pixel_y = 0
 	},
 /turf/simulated/floor/carpet,
 /area/casino/casino_mainfloor)
@@ -3230,18 +3299,20 @@
 /turf/simulated/wall/r_wall,
 /area/casino/casino_crew_atmos)
 "jf" = (
-/obj/structure/closet/firecloset,
+/obj/structure/closet/walllocker/firecloset,
 /turf/simulated/floor/plating,
 /area/casino/casino_crew_atmos)
 "jg" = (
 /obj/machinery/atmospherics/pipe/simple/visible/cyan{
-	dir = 6
+	dir = 6;
+	icon_state = "intact"
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_crew_atmos)
 "jh" = (
 /obj/machinery/atmospherics/pipe/simple/visible/cyan{
-	dir = 9
+	dir = 9;
+	icon_state = "intact"
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_crew_atmos)
@@ -3371,13 +3442,12 @@
 	icon_state = "map_injector";
 	use_power = 1
 	},
-/turf/simulated/floor{
-	map_airless = 1
-	},
-/area/casino/casino_crew_atmos)
+/turf/simulated/floor/airless,
+/area/space)
 "jv" = (
 /obj/machinery/atmospherics/pipe/simple/visible/red{
-	dir = 9
+	dir = 9;
+	icon_state = "intact"
 	},
 /turf/simulated/wall/r_wall,
 /area/casino/casino_crew_atmos)
@@ -3403,7 +3473,8 @@
 /area/casino/casino_crew_atmos)
 "jz" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/universal{
-	dir = 4
+	dir = 4;
+	icon_state = "map_universal"
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_crew_atmos)
@@ -3504,7 +3575,8 @@
 /area/casino/casino_crew_atmos)
 "jM" = (
 /obj/machinery/atmospherics/pipe/manifold/visible/cyan{
-	dir = 4
+	dir = 4;
+	icon_state = "map"
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_crew_atmos)
@@ -3648,7 +3720,7 @@
 "kf" = (
 /obj/structure/table/marble,
 /obj/item/reagent_containers/food/drinks/bottle/rum,
-/obj/item/reagent_containers/glass/rag,
+/obj/item/reagent_containers/misc/rag,
 /obj/random/drinkbottle,
 /obj/random/drinkbottle,
 /obj/random/drinkbottle,
@@ -3718,7 +3790,7 @@
 /area/casino/casino_mainfloor)
 "kp" = (
 /obj/structure/table/marble,
-/obj/item/storage/fancy/smokable/cigar{
+/obj/item/storage/fancy/cigar{
 	pixel_y = 5
 	},
 /turf/simulated/floor/tiled,
@@ -3823,7 +3895,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -3838,7 +3911,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -3853,7 +3927,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -3867,7 +3942,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -3882,7 +3958,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -3966,7 +4043,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/carpet,
 /area/casino/casino_mainfloor)
@@ -3975,7 +4053,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/carpet,
 /area/casino/casino_mainfloor)
@@ -3983,7 +4062,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/carpet,
 /area/casino/casino_mainfloor)
@@ -3993,6 +4073,13 @@
 	},
 /turf/simulated/floor/carpet,
 /area/casino/casino_mainfloor)
+"lb" = (
+/turf/simulated/floor/reinforced,
+/area/casino/casino_bow)
+"lc" = (
+/obj/machinery/portable_atmospherics/canister/nitrogen,
+/turf/simulated/floor/reinforced,
+/area/casino/casino_bow)
 "ld" = (
 /obj/effect/floor_decal/industrial/warning,
 /obj/machinery/portable_atmospherics/canister/phoron,
@@ -4025,7 +4112,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -4039,7 +4127,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -4051,7 +4140,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -4091,7 +4181,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -4105,7 +4196,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -4145,7 +4237,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -4159,7 +4252,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -4203,7 +4297,8 @@
 "lv" = (
 /obj/machinery/light{
 	dir = 8;
-	icon_state = "tube1"
+	icon_state = "tube1";
+	pixel_y = 0
 	},
 /obj/structure/cable{
 	d1 = 1;
@@ -4212,7 +4307,67 @@
 	},
 /turf/simulated/floor/carpet,
 /area/casino/casino_mainfloor)
+"lw" = (
+/obj/structure/showcase{
+	desc = "A bewilderingly complex prototype designed to split the fabric of spacetime and allow access to Bluespace.";
+	icon = 'icons/obj/power.dmi';
+	icon_state = "tracker";
+	name = "Bluespace Drive"
+	},
+/obj/machinery/shield{
+	desc = "An energy shield used to contain the exotic particles emitted by the Bluespace Drive.";
+	name = "Containment Shield"
+	},
+/obj/structure/cable/green{
+	d2 = 4;
+	icon_state = "0-4"
+	},
+/turf/simulated/floor/reinforced,
+/area/casino/casino_bow)
+"lx" = (
+/obj/structure/cable/green{
+	d1 = 4;
+	d2 = 8;
+	icon_state = "4-8"
+	},
+/turf/simulated/floor/reinforced,
+/area/casino/casino_bow)
+"ly" = (
+/obj/effect/wingrille_spawn/reinforced_phoron/full,
+/obj/structure/cable/green{
+	d1 = 4;
+	d2 = 8;
+	icon_state = "4-8"
+	},
+/turf/simulated/floor/reinforced,
+/area/casino/casino_bow)
+"lz" = (
+/obj/machinery/door/firedoor,
+/obj/machinery/door/airlock/engineering{
+	name = "Bluespace Drive";
+	secured_wires = 0
+	},
+/obj/structure/cable/green{
+	d1 = 4;
+	d2 = 8;
+	icon_state = "4-8"
+	},
+/turf/simulated/floor/plating,
+/area/casino/casino_crew_atmos)
+"lA" = (
+/obj/structure/cable/green{
+	d1 = 4;
+	d2 = 8;
+	icon_state = "4-8"
+	},
+/turf/simulated/floor/plating,
+/area/casino/casino_crew_atmos)
 "lB" = (
+/obj/structure/cable/green{
+	d1 = 4;
+	d2 = 8;
+	icon_state = "4-8"
+	},
 /obj/machinery/light/small,
 /turf/simulated/floor/plating,
 /area/casino/casino_crew_atmos)
@@ -4317,6 +4472,10 @@
 /obj/structure/bed/chair/comfy/black,
 /turf/simulated/floor/carpet,
 /area/casino/casino_mainfloor)
+"lW" = (
+/obj/machinery/portable_atmospherics/canister/phoron,
+/turf/simulated/floor/reinforced,
+/area/casino/casino_bow)
 "lX" = (
 /obj/machinery/door/firedoor,
 /obj/machinery/door/airlock{
@@ -4332,15 +4491,15 @@
 /turf/simulated/floor/plating,
 /area/casino/casino_bow)
 "lY" = (
-/obj/structure/bed/chair/comfy/red{
+/obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
+/obj/structure/bed/chair/rounded/red{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
 /turf/simulated/floor/wood,
 /area/casino/casino_private_vip)
 "lZ" = (
 /obj/structure/table/woodentable,
-/obj/item/storage/fancy/smokable/cigar{
+/obj/item/storage/fancy/cigar{
 	pixel_y = 5
 	},
 /turf/simulated/floor/wood,
@@ -4352,7 +4511,7 @@
 /turf/simulated/floor/wood,
 /area/casino/casino_private_vip)
 "mb" = (
-/obj/structure/bed/chair/comfy/red{
+/obj/structure/bed/chair/rounded/red{
 	dir = 8
 	},
 /turf/simulated/floor/wood,
@@ -4365,8 +4524,8 @@
 /turf/simulated/floor/wood,
 /area/casino/casino_private_vip)
 "md" = (
-/obj/structure/bed/chair/comfy/red,
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
+/obj/structure/bed/chair/rounded/red,
 /turf/simulated/floor/wood,
 /area/casino/casino_private1)
 "me" = (
@@ -4377,9 +4536,9 @@
 /turf/simulated/floor/wood,
 /area/casino/casino_private1)
 "mf" = (
-/obj/structure/bed/chair/comfy/red,
 /obj/item/flame/lighter/zippo/random,
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
+/obj/structure/bed/chair/rounded/red,
 /turf/simulated/floor/wood,
 /area/casino/casino_private2)
 "mg" = (
@@ -4411,13 +4570,15 @@
 /area/casino/casino_mainfloor)
 "mk" = (
 /obj/machinery/computer/ship/engines{
-	dir = 4
+	dir = 4;
+	icon_state = "computer"
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_bow)
 "ml" = (
 /obj/structure/bed/chair{
-	dir = 8
+	dir = 8;
+	icon_state = "chair_preview"
 	},
 /obj/effect/decal/cleanable/blood/splatter,
 /turf/simulated/floor/plating,
@@ -4442,11 +4603,11 @@
 /turf/simulated/floor/plating,
 /area/casino/casino_bow)
 "mp" = (
-/obj/structure/bed/chair/comfy/red{
-	dir = 4
-	},
 /obj/machinery/atmospherics/unary/vent_scrubber/on{
 	dir = 1
+	},
+/obj/structure/bed/chair/rounded/red{
+	dir = 4
 	},
 /turf/simulated/floor/wood,
 /area/casino/casino_private_vip)
@@ -4460,10 +4621,10 @@
 /turf/simulated/floor/wood,
 /area/casino/casino_private_vip)
 "ms" = (
-/obj/structure/bed/chair/comfy/red{
+/obj/item/storage/bag/cash,
+/obj/structure/bed/chair/rounded/red{
 	dir = 8
 	},
-/obj/item/storage/bag/cash,
 /turf/simulated/floor/wood,
 /area/casino/casino_private_vip)
 "mt" = (
@@ -4481,7 +4642,7 @@
 /turf/simulated/floor/wood,
 /area/casino/casino_private1)
 "mv" = (
-/obj/structure/bed/chair/comfy/red{
+/obj/structure/bed/chair/rounded/red{
 	dir = 8
 	},
 /turf/simulated/floor/wood,
@@ -4499,7 +4660,7 @@
 /turf/simulated/floor/wood,
 /area/casino/casino_private2)
 "my" = (
-/obj/structure/bed/chair/comfy/red{
+/obj/structure/bed/chair/rounded/red{
 	dir = 8
 	},
 /turf/simulated/floor/wood,
@@ -4622,7 +4783,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_bow)
@@ -4710,18 +4872,18 @@
 /obj/machinery/atmospherics/pipe/simple/visible/black{
 	dir = 6
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/casino/casino_bow)
 "nh" = (
 /obj/machinery/atmospherics/pipe/manifold4w/visible/black,
 /obj/machinery/meter,
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/casino/casino_bow)
 "ni" = (
 /obj/machinery/atmospherics/pipe/simple/visible/black{
 	dir = 10
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/casino/casino_bow)
 "nj" = (
 /obj/structure/bed/chair,
@@ -4747,33 +4909,48 @@
 "nm" = (
 /obj/structure/bed/chair,
 /obj/machinery/status_display{
-	pixel_x = -32
+	pixel_x = -32;
+	pixel_y = 0
 	},
-/obj/structure/casino/pod_controller{
+/obj/machinery/embedded_controller/radio/simple_docking_controller/escape_pod{
+	frequency = 1380;
+	id_tag = "Casino_escape_pod_3";
 	name = "Casino escape pod Three controller";
-	pixel_x = 24
+	pixel_x = 24;
+	pixel_y = 0;
+	tag_door = "Casino escape_pod_3_hatch"
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_bow)
 "nn" = (
 /obj/structure/bed/chair,
 /obj/machinery/status_display{
-	pixel_x = -32
+	pixel_x = -32;
+	pixel_y = 0
 	},
-/obj/structure/casino/pod_controller{
+/obj/machinery/embedded_controller/radio/simple_docking_controller/escape_pod{
+	frequency = 1380;
+	id_tag = "Casino_escape_pod_2";
 	name = "Casino escape pod Two controller";
-	pixel_x = 24
+	pixel_x = 24;
+	pixel_y = 0;
+	tag_door = "Casino escape_pod_2_hatch"
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_bow)
 "no" = (
 /obj/structure/bed/chair,
 /obj/machinery/status_display{
-	pixel_x = -32
+	pixel_x = -32;
+	pixel_y = 0
 	},
-/obj/structure/casino/pod_controller{
+/obj/machinery/embedded_controller/radio/simple_docking_controller/escape_pod{
+	frequency = 1380;
+	id_tag = "Casino_escape_pod_1";
 	name = "Casino escape pod One controller";
-	pixel_x = 24
+	pixel_x = 24;
+	pixel_y = 0;
+	tag_door = "escape_pod_17_hatch"
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_bow)
@@ -4785,9 +4962,7 @@
 /turf/simulated/wall/r_titanium,
 /area/casino/casino_bow)
 "ns" = (
-/turf/simulated/floor/reinforced{
-	map_airless = 1
-	},
+/turf/simulated/floor/reinforced/airless,
 /area/casino/casino_bow)
 "ob" = (
 /obj/structure/table/gamblingtable,
@@ -4799,7 +4974,8 @@
 "oc" = (
 /obj/machinery/light{
 	dir = 8;
-	icon_state = "tube1"
+	icon_state = "tube1";
+	pixel_y = 0
 	},
 /obj/machinery/atmospherics/unary/vent_pump/on{
 	dir = 1;
@@ -4853,10 +5029,6 @@
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_crew_cantina)
-"qB" = (
-/obj/machinery/radio_beacon,
-/turf/simulated/floor/tiled,
-/area/casino/casino_bridge)
 "rb" = (
 /obj/item/ammo_casing/rifle/used,
 /obj/item/ammo_casing/rifle/used,
@@ -4876,7 +5048,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_crew_cantina)
@@ -4895,7 +5068,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_crew_cantina)
@@ -4908,7 +5082,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_crew_cantina)
@@ -4930,7 +5105,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_crew_cantina)
@@ -4952,7 +5128,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_crew_cantina)
@@ -4976,7 +5153,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_crew_cantina)
@@ -4985,7 +5163,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/item/ammo_casing/rifle/used,
 /obj/item/ammo_casing/rifle/used,
@@ -5002,7 +5181,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_crew_cantina)
@@ -5028,7 +5208,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_crew_cantina)
@@ -5054,7 +5235,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/tiled,
 /area/casino/casino_mainfloor)
@@ -5159,7 +5341,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/item/ammo_casing/pistol/magnum/used,
 /obj/item/ammo_casing/pistol/magnum/used,
@@ -5181,13 +5364,15 @@
 /area/casino/casino_mainfloor)
 "Fb" = (
 /obj/structure/bed/chair{
-	dir = 4
+	dir = 4;
+	icon_state = "chair_preview"
 	},
 /obj/effect/decal/cleanable/blood,
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/item/ammo_casing/pistol/magnum/used,
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
@@ -5260,7 +5445,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_crew_atmos)
@@ -5289,7 +5475,8 @@
 /area/casino/casino_cutter)
 "Jb" = (
 /obj/machinery/power/smes/buildable{
-	RCon_tag = "Solar - Starboard"
+	RCon_tag = "Solar - Starboard";
+	charge = 0
 	},
 /obj/effect/engine_setup/smes,
 /obj/structure/cable{
@@ -5334,7 +5521,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -5357,7 +5545,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -5369,9 +5558,7 @@
 /area/casino/casino_mainfloor)
 "Mb" = (
 /obj/machinery/shipsensors,
-/turf/simulated/floor{
-	map_airless = 1
-	},
+/turf/simulated/floor/airless,
 /area/casino/casino_bridge)
 "Mc" = (
 /obj/machinery/atmospherics/pipe/manifold/hidden/supply{
@@ -5388,7 +5575,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/carpet,
 /area/casino/casino_mainfloor)
@@ -5441,13 +5629,27 @@
 /obj/structure/cable,
 /obj/structure/cable{
 	d2 = 2;
-	icon_state = "0-2"
+	icon_state = "0-2";
+	pixel_y = 0
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_crew_atmos)
+"Oq" = (
+/obj/structure/bed/chair/rounded/red{
+	dir = 8
+	},
+/turf/simulated/floor/carpet,
+/area/casino/casino_mainfloor)
+"Ou" = (
+/obj/structure/bed/chair/rounded/red{
+	dir = 4
+	},
+/turf/simulated/floor/carpet,
+/area/casino/casino_mainfloor)
 "OB" = (
 /obj/structure/window/basic{
-	dir = 4
+	dir = 4;
+	icon_state = "window"
 	},
 /obj/machinery/computer/shuttle_control/explore/casino_cutter{
 	dir = 1
@@ -5479,6 +5681,11 @@
 	d1 = 1;
 	d2 = 2;
 	icon_state = "1-2"
+	},
+/obj/structure/cable/green{
+	d1 = 1;
+	d2 = 8;
+	icon_state = "1-8"
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_crew_atmos)
@@ -5514,7 +5721,8 @@
 /area/casino/casino_cutter)
 "QB" = (
 /obj/structure/bed/chair{
-	dir = 8
+	dir = 8;
+	icon_state = "chair_preview"
 	},
 /obj/machinery/door/window,
 /obj/item/key,
@@ -5551,7 +5759,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/machinery/light/small{
 	dir = 1
@@ -5585,7 +5794,7 @@
 	dir = 4;
 	icon_state = "bulb1"
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/casino/casino_bow)
 "SP" = (
 /obj/structure/cable/green{
@@ -5595,6 +5804,7 @@
 /obj/machinery/power/apc{
 	dir = 1;
 	name = "north bump";
+	pixel_x = 0;
 	pixel_y = 24;
 	req_access = newlist()
 	},
@@ -5607,11 +5817,12 @@
 /obj/machinery/light/small{
 	dir = 8
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/casino/casino_bow)
 "Uc" = (
 /obj/structure/hygiene/sink{
 	dir = 8;
+	icon_state = "sink";
 	pixel_x = -12;
 	pixel_y = 2
 	},
@@ -5621,7 +5832,8 @@
 /obj/random/soap,
 /obj/machinery/light{
 	dir = 8;
-	icon_state = "tube1"
+	icon_state = "tube1";
+	pixel_y = 0
 	},
 /turf/simulated/floor/tiled/white,
 /area/casino/casino_crew_bathroom)
@@ -5636,13 +5848,15 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /turf/simulated/floor/plating,
 /area/casino/casino_maintenance)
 "Vc" = (
 /obj/structure/hygiene/sink{
 	dir = 8;
+	icon_state = "sink";
 	pixel_x = -12;
 	pixel_y = 2
 	},
@@ -5676,7 +5890,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/structure/cable{
 	d1 = 2;
@@ -5688,6 +5903,7 @@
 "Wc" = (
 /obj/structure/hygiene/sink{
 	dir = 8;
+	icon_state = "sink";
 	pixel_x = -12;
 	pixel_y = 2
 	},
@@ -5705,7 +5921,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/structure/cable{
 	d1 = 1;
@@ -5724,7 +5941,8 @@
 /obj/structure/cable{
 	d1 = 4;
 	d2 = 8;
-	icon_state = "4-8"
+	icon_state = "4-8";
+	pixel_x = 0
 	},
 /obj/structure/cable{
 	d1 = 1;
@@ -8882,13 +9100,13 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+kC
+kC
+kC
+kC
+kC
+kC
+kC
 aa
 aa
 aa
@@ -8984,13 +9202,13 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+kC
+kC
+kC
+kC
+kC
+kC
+kC
 aa
 aa
 aa
@@ -9086,13 +9304,13 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+kC
+kC
+lb
+lw
+lb
+kC
+kC
 aa
 aa
 aa
@@ -9188,13 +9406,13 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+kC
+kC
+lb
+lx
+lb
+kC
+kC
 aa
 aa
 aa
@@ -9290,13 +9508,13 @@ bb
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+kC
+kC
+kC
+ly
+kC
+kC
+kC
 aa
 aa
 aa
@@ -9392,13 +9610,13 @@ bb
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+kC
+kC
+lc
+lx
+lW
+kC
+kC
 aa
 aa
 aa
@@ -9497,7 +9715,7 @@ ij
 ij
 ij
 ij
-ij
+lz
 kC
 kC
 kC
@@ -9561,7 +9779,7 @@ gb
 ax
 ax
 ax
-qB
+ap
 aV
 am
 bj
@@ -9599,7 +9817,7 @@ ku
 kD
 kP
 ld
-jN
+lA
 kC
 mk
 mG
@@ -9701,7 +9919,7 @@ kv
 kv
 jN
 le
-jN
+lA
 kC
 ml
 mH
@@ -9905,7 +10123,7 @@ jN
 jN
 jN
 le
-jN
+lA
 kC
 mm
 mI
@@ -10007,7 +10225,7 @@ km
 kE
 kb
 lf
-jN
+lA
 kC
 mn
 mJ
@@ -11523,16 +11741,16 @@ gX
 gt
 ge
 ge
-hZ
+Ou
 ip
 ge
-hZ
-hZ
+Ou
+Ou
 ge
-hZ
-hZ
+Ou
+Ou
 ge
-hZ
+Ou
 ge
 kJ
 kT
@@ -11829,16 +12047,16 @@ gt
 hg
 ge
 gJ
-ic
-ic
+Oq
+Oq
 ge
-ic
-ic
+Oq
+Oq
 ge
-ic
-ic
+Oq
+Oq
 ge
-ic
+Oq
 ge
 kJ
 kV

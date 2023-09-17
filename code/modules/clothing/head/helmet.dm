@@ -6,13 +6,14 @@
 		slot_l_hand_str = "helmet",
 		slot_r_hand_str = "helmet",
 		)
-	valid_accessory_slots = list(ACCESSORY_SLOT_HELM_C, ACCESSORY_SLOT_HELM_D)
-	restricted_accessory_slots = list(ACCESSORY_SLOT_HELM_C, ACCESSORY_SLOT_HELM_D)
+	valid_accessory_slots = list(ACCESSORY_SLOT_HELM_C)
+	slot_flags = SLOT_HEAD|SLOT_BACK
+	restricted_accessory_slots = list(ACCESSORY_SLOT_HELM_C)
 	item_flags = ITEM_FLAG_THICKMATERIAL
 	body_parts_covered = HEAD
 	armor = list(
 		melee = ARMOR_MELEE_RESISTANT,
-		bullet = ARMOR_BALLISTIC_RESISTANT,
+		bullet = ARMOR_BALLISTIC_PISTOL,
 		laser = ARMOR_LASER_HANDGUNS,
 		energy = ARMOR_ENERGY_SMALL,
 		bomb = ARMOR_BOMB_PADDED
@@ -25,9 +26,16 @@
 	siemens_coefficient = 0.7
 	w_class = ITEM_SIZE_NORMAL
 	species_restricted = list("exclude", SPECIES_NABBER, SPECIES_ADHERENT)
+	sprite_sheets = list(
+		SPECIES_VOX = 'icons/mob/species/vox/onmob_head_vox.dmi',
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_head_resomi.dmi',
+		SPECIES_UNATHI = 'icons/mob/species/unathi/generated/onmob_head_unathi.dmi',
+		SPECIES_EROSAN = 'infinity/icons/mob/species/erosan/mask.dmi', //INF,
+		SPECIES_TAJARA = 'icons/mob/species/tajaran/helmet.dmi' //INF
+		)
 
 /obj/item/clothing/head/helmet/nt
-	name = "corporate security helmet"
+	name = "\improper corporate security helmet"
 	desc = "A helmet with 'CORPORATE SECURITY' printed on the back in red lettering."
 	icon_state = "helmet_nt"
 
@@ -37,7 +45,7 @@
 	icon_state = "helmet_pcrc"
 
 /obj/item/clothing/head/helmet/nt/guard
-	accessories = list(/obj/item/clothing/accessory/helmet_cover/nt)
+	starting_accessories = list(/obj/item/clothing/accessory/armor/helmcover/nt)
 
 /obj/item/clothing/head/helmet/tactical
 	name = "tactical helmet"
@@ -97,7 +105,7 @@
 		melee = ARMOR_MELEE_SMALL,
 		bullet = ARMOR_BALLISTIC_MINOR,
 		laser = ARMOR_LASER_RIFLES,
-		energy = ARMOR_ENERGY_RESISTANT
+		energy = ARMOR_ENERGY_STRONG //INF was RESISTANT
 		)
 	siemens_coefficient = 0
 
@@ -125,7 +133,6 @@
 		energy = ARMOR_ENERGY_RESISTANT,
 		bomb = ARMOR_BOMB_PADDED
 		)
-	valid_accessory_slots = null
 	cold_protection = HEAD
 	min_cold_protection_temperature = SPACE_HELMET_MIN_COLD_PROTECTION_TEMPERATURE
 	siemens_coefficient = 0.5
@@ -154,9 +161,11 @@
 	flags_inv = HIDEMASK|HIDEEARS|HIDEEYES|BLOCKHAIR
 	body_parts_covered = HEAD|FACE
 	siemens_coefficient = 1
+	tint = 1  //INF
+
 
 /obj/item/clothing/head/helmet/augment
-	name = "augment array"
+	name = "Augment Array"
 	desc = "A helmet with optical and cranial augments coupled to it."
 	icon_state = "v62"
 	valid_accessory_slots = null
@@ -187,7 +196,7 @@
 	armor = list(
 		melee = ARMOR_MELEE_MAJOR,
 		bullet = ARMOR_BALLISTIC_RIFLE,
-		laser = ARMOR_LASER_HANDGUNS,
+		laser = ARMOR_LASER_MAJOR,
 		energy = ARMOR_ENERGY_RESISTANT,
 		bomb = ARMOR_BIO_MINOR
 		)
@@ -227,7 +236,6 @@
 	desc = "Yarr."
 	icon_state = "pirate"
 	item_state = "pirate"
-	valid_accessory_slots = null
 	armor = list(
 		melee = ARMOR_MELEE_MAJOR,
 		bullet = ARMOR_BALLISTIC_PISTOL,
@@ -240,25 +248,3 @@
 	flags_inv = BLOCKHAIR
 	body_parts_covered = 0
 	siemens_coefficient = 0.9
-
-/obj/item/clothing/head/helmet/divinghelmet
-	name = "diving helmet"
-	desc = "An old-timey diving helmet, built to withstand immense pressures and provide breathable air."
-	icon_state = "divinghelmet"
-	valid_accessory_slots = null
-	flash_protection = FLASH_PROTECTION_MINOR
-	item_flags = ITEM_FLAG_AIRTIGHT
-	min_pressure_protection = 0
-	min_cold_protection_temperature = SPACE_HELMET_MIN_COLD_PROTECTION_TEMPERATURE
-	max_heat_protection_temperature = SPACE_SUIT_MAX_HEAT_PROTECTION_TEMPERATURE
-	max_pressure_protection = VOIDSUIT_MAX_PRESSURE
-	armor = list(
-		melee = ARMOR_MELEE_VERY_HIGH,
-		bullet = ARMOR_BALLISTIC_RIFLE,
-		laser = ARMOR_LASER_MAJOR,
-		energy = ARMOR_ENERGY_MINOR,
-		bomb = ARMOR_BOMB_RESISTANT,
-		bio = ARMOR_BIO_SHIELDED,
-		rad = ARMOR_RAD_SMALL
-		)
-	species_restricted = list(SPECIES_HUMAN)

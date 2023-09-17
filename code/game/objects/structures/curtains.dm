@@ -1,10 +1,11 @@
 /obj/structure/curtain
 	name = "curtain"
-	icon = 'icons/obj/structures/curtain.dmi'
+	icon = 'icons/obj/curtain.dmi'
 	icon_state = "closed"
 	layer = ABOVE_WINDOW_LAYER
-	opacity = 1
+	opacity = TRUE
 	density = FALSE
+	anchored = TRUE
 
 /obj/structure/curtain/Initialize()
 	.=..()
@@ -17,17 +18,17 @@
 
 /obj/structure/curtain/bullet_act(obj/item/projectile/P, def_zone)
 	if(!P.nodamage)
-		visible_message(SPAN_WARNING("[P] tears [src] down!"))
+		visible_message("<span class='warning'>[P] tears [src] down!</span>")
 		qdel(src)
 	else
 		..(P, def_zone)
 
 /obj/structure/curtain/attack_hand(mob/user)
-	playsound(get_turf(loc), "rustle", 15, 1, -5)
 	toggle()
 	..()
 
 /obj/structure/curtain/proc/toggle()
+	playsound(get_turf(loc), 'infinity/sound/effects/curtain.ogg', 15, 1, -5)
 	set_opacity(!opacity)
 	if(opacity)
 		icon_state = "closed"
@@ -49,9 +50,17 @@
 	name = "bed curtain"
 	color = "#854636"
 
+/obj/structure/curtain/open/bar
+	name = "bar curtain"
+	color = "#854636"
+
 /obj/structure/curtain/open/privacy
 	name = "privacy curtain"
 	color = "#b8f5e3"
+
+/obj/structure/curtain/open/canteen
+	name = "privacy curtain"
+	color = COLOR_BLUE_GRAY
 
 /obj/structure/curtain/open/shower
 	name = "shower curtain"

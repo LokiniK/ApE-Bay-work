@@ -4,7 +4,7 @@ var/global/list/stool_cache = list() //haha stool
 /obj/item/stool
 	name = "stool"
 	desc = "Apply butt."
-	icon = 'icons/obj/structures/furniture.dmi'
+	icon = 'icons/obj/furniture.dmi'
 	icon_state = "stool_preview" //set for the map
 	item_state = "stool"
 	randpixel = 0
@@ -17,6 +17,10 @@ var/global/list/stool_cache = list() //haha stool
 
 /obj/item/stool/padded
 	icon_state = "stool_padded_preview" //set for the map
+
+/obj/item/stool/padded/red/New(var/newloc,var/newmaterial)
+	..(newloc,"steel","leather")
+
 
 /obj/item/stool/New(newloc, new_material = DEFAULT_FURNITURE_MATERIAL, new_padding_material)
 	..(newloc)
@@ -42,7 +46,7 @@ var/global/list/stool_cache = list() //haha stool
 	icon_state = "bar_stool_padded_preview"
 
 /obj/item/stool/bar/padded/New(newloc, new_material = DEFAULT_FURNITURE_MATERIAL)
-	..(newloc, new_material, MATERIAL_CARPET)
+	..(newloc, new_material, MATERIAL_RED_CLOTH)
 
 /obj/item/stool/on_update_icon()
 	// Prep icon.
@@ -72,7 +76,7 @@ var/global/list/stool_cache = list() //haha stool
 		SetName("[material.display_name] [initial(name)]")
 		desc = "A stool. Apply butt with care. It's made of [material.use_name]."
 
-/obj/item/stool/proc/add_padding(padding_type)
+/obj/item/stool/proc/add_padding(var/padding_type)
 	padding_material = SSmaterials.get_material_by_name(padding_type)
 	update_icon()
 
@@ -82,30 +86,30 @@ var/global/list/stool_cache = list() //haha stool
 		padding_material = null
 	update_icon()
 
-/obj/item/stool/apply_hit_effect(mob/living/target, mob/living/user, hit_zone)
+/obj/item/stool/apply_hit_effect(mob/living/target, mob/living/user, var/hit_zone)
 	if (prob(5))
-		user.visible_message(SPAN_DANGER("[user] breaks [src] over [target]'s back!"))
+		user.visible_message("<span class='danger'>[user] breaks [src] over [target]'s back!</span>")
 		user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
 		user.do_attack_animation(target)
 		dismantle() //This deletes self.
 
-		var/blocked = target.get_blocked_ratio(hit_zone, DAMAGE_BRUTE, damage = 20)
+		var/blocked = target.get_blocked_ratio(hit_zone, BRUTE, damage = 20)
 		target.Weaken(10 * (1 - blocked))
-		target.apply_damage(20, DAMAGE_BRUTE, hit_zone, src)
+		target.apply_damage(20, BRUTE, hit_zone, src)
 		return 1
 
 	return ..()
 
 /obj/item/stool/ex_act(severity)
 	switch(severity)
-		if(EX_ACT_DEVASTATING)
+		if(1.0)
 			qdel(src)
 			return
-		if(EX_ACT_HEAVY)
+		if(2.0)
 			if (prob(50))
 				qdel(src)
 				return
-		if(EX_ACT_LIGHT)
+		if(3.0)
 			if (prob(5))
 				qdel(src)
 				return
@@ -118,8 +122,9 @@ var/global/list/stool_cache = list() //haha stool
 	qdel(src)
 
 /obj/item/stool/attackby(obj/item/W as obj, mob/user as mob)
-	if(isWrench(W))
-		playsound(src.loc, 'sound/items/Ratchet.ogg', 50, 1)
+	if(isScrewdriver(W))
+		playsound(src.loc, 'sound/items/Screwdriver.ogg', 50, 1)
+		to_chat(user, "You deconstruct \the [src]")
 		dismantle()
 		qdel(src)
 	else if(istype(W,/obj/item/stack))
@@ -144,6 +149,7 @@ var/global/list/stool_cache = list() //haha stool
 		if(!istype(src.loc, /turf))
 			user.drop_from_inventory(src)
 			src.dropInto(loc)
+		playsound(src.loc, 'sound/effects/rustle5.ogg', 50, 1)
 		to_chat(user, "You add padding to \the [src].")
 		add_padding(padding_type)
 		return
@@ -154,10 +160,20 @@ var/global/list/stool_cache = list() //haha stool
 		to_chat(user, "You remove the padding from \the [src].")
 		playsound(src, 'sound/items/Wirecutter.ogg', 100, 1)
 		remove_padding()
+
+	else if(isWrench(W))
+		playsound(src.loc, 'sound/items/Ratchet.ogg', 50, 1)
+		if(!anchored)
+			to_chat(user, "You anchored \the [src].")
+			anchored = TRUE
+		else
+			to_chat(user, "You disanchored \the [src].")
+			anchored = FALSE
+
 	else
 		..()
 
 //Generated subtypes for mapping porpoises
 
-/obj/item/stool/wood/New(newloc)
+/obj/item/stool/wood/New(var/newloc)
 	..(newloc,MATERIAL_WOOD)

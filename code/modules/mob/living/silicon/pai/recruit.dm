@@ -2,7 +2,7 @@
 
 // Recruiting observers to play as pAIs
 
-var/global/datum/paiController/paiController			// Global handler for pAI candidates
+var/datum/paiController/paiController			// Global handler for pAI candidates
 
 /datum/paiCandidate
 	var/name
@@ -34,7 +34,7 @@ var/global/datum/paiController/paiController			// Global handler for pAI candida
 		if(card.pai)
 			return
 		if(istype(card,/obj/item/device/paicard) && istype(candidate,/datum/paiCandidate))
-			var/mob/living/silicon/pai/pai = new(card, card)
+			var/mob/living/silicon/pai/pai = new(card)
 			if(!candidate.name)
 				pai.SetName(pick(GLOB.ninja_names))
 			else
@@ -44,8 +44,8 @@ var/global/datum/paiController/paiController			// Global handler for pAI candida
 			pai.chassis = pai.icon_state = GLOB.possible_chassis[candidate.chassis]
 			var/list/sayverbs = GLOB.possible_say_verbs[candidate.say_verb]
 			pai.speak_statement = sayverbs[1]
-			pai.speak_exclamation = sayverbs[(length(sayverbs)>1 ? 2 : length(sayverbs))]
-			pai.speak_query = sayverbs[(length(sayverbs)>2 ? 3 : length(sayverbs))]
+			pai.speak_exclamation = sayverbs[(sayverbs.len>1 ? 2 : sayverbs.len)]
+			pai.speak_query = sayverbs[(sayverbs.len>2 ? 3 : sayverbs.len)]
 
 			card.setPersonality(pai)
 			card.looking_for_personality = 0
@@ -116,7 +116,7 @@ var/global/datum/paiController/paiController			// Global handler for pAI candida
 
 		recruitWindow(usr, href_list["allow_submit"] != "0")
 
-/datum/paiController/proc/recruitWindow(mob/M as mob, allowSubmit = 1)
+/datum/paiController/proc/recruitWindow(var/mob/M as mob, allowSubmit = 1)
 	var/datum/paiCandidate/candidate
 	for(var/datum/paiCandidate/c in pai_candidates)
 		if(!istype(c) || !istype(M))
@@ -188,8 +188,8 @@ var/global/datum/paiController/paiController			// Global handler for pAI candida
 			"}
 
 	dat += {"
-	<body>
-		<b><span style="font-size: 3px">pAI Personality Configuration</span></b>
+	<meta charset=\"UTF-8\"><body>
+		<b><font size="3px">pAI Personality Configuration</font></b>
 		<p class="top">Please configure your pAI personality's options. Remember, what you enter here could determine whether or not the user requesting a personality chooses you!</p>
 
 		<table>
@@ -250,7 +250,7 @@ var/global/datum/paiController/paiController			// Global handler for pAI candida
 	if(allowSubmit)
 		dat += {"
 			<table>
-				<td class="button"><a href='byond://?src=\ref[src];option=submit;new=1;candidate=\ref[candidate]' class="button"><b><span style="font-size: 4px">Submit Personality</span></b></a></td>
+				<td class="button"><a href='byond://?src=\ref[src];option=submit;new=1;candidate=\ref[candidate]' class="button"><b><font size="4px">Submit Personality</font></b></a></td>
 			</table><br>
 			"}
 	dat += {"
@@ -259,7 +259,7 @@ var/global/datum/paiController/paiController			// Global handler for pAI candida
 
 	show_browser(M, dat, "window=paiRecruit;size=580x580;")
 
-/datum/paiController/proc/findPAI(obj/item/device/paicard/p, mob/user)
+/datum/paiController/proc/findPAI(var/obj/item/device/paicard/p, var/mob/user)
 	requestRecruits(user)
 	var/list/available = list()
 	for(var/datum/paiCandidate/c in paiController.pai_candidates)
@@ -276,6 +276,7 @@ var/global/datum/paiController/paiController			// Global handler for pAI candida
 		<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">
 		<html>
 			<head>
+			<meta charset=\"UTF-8\"><body>
 				<style>
 					body {
 						margin-top:5px;
@@ -337,7 +338,7 @@ var/global/datum/paiController/paiController			// Global handler for pAI candida
 				</style>
 			</head>
 			<body>
-				<b>[SPAN_SIZE("3px", "pAI Availability List")]</b><br><br>
+				<b><font size='3px'>pAI Availability List</font></b><br><br>
 	"}
 	dat += "<p>Displaying available AI personalities from central database... If there are no entries, or if a suitable entry is not listed, check again later as more personalities may be added.</p>"
 
@@ -376,14 +377,14 @@ var/global/datum/paiController/paiController			// Global handler for pAI candida
 	show_browser(user, dat, "window=findPai")
 
 
-/datum/paiController/proc/requestRecruits(mob/user)
+/datum/paiController/proc/requestRecruits(var/mob/user)
 	inquirer = user
 	for(var/mob/observer/ghost/O in GLOB.player_list)
 		if(!O.MayRespawn())
 			continue
 		if(jobban_isbanned(O, "pAI"))
 			continue
-		if(asked.Find(O.key))
+		if(list_find(asked, O.key))
 			if(world.time < asked[O.key] + askDelay)
 				continue
 			else
@@ -392,7 +393,7 @@ var/global/datum/paiController/paiController			// Global handler for pAI candida
 			if(BE_PAI in O.client.prefs.be_special_role)
 				question(O.client)
 
-/datum/paiController/proc/question(client/C)
+/datum/paiController/proc/question(var/client/C)
 	spawn(0)
 		if(!C)	return
 		asked.Add(C.key)

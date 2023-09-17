@@ -1,11 +1,11 @@
 /obj/structure/closet/secure_closet/scientist
 	name = "scientist's locker"
 	req_access = list(list(access_tox,access_tox_storage))
-	closet_appearance = /singleton/closet_appearance/secure_closet/expedition/science
+	icon_state = "science"
 
 /obj/structure/closet/secure_closet/scientist/WillContain()
 	return list(
-		new /datum/atom_creator/weighted(list(/obj/item/storage/backpack/messenger/corpsci, /obj/item/storage/backpack/satchel/corpsci)),
+		new /datum/atom_creator/weighted(list(/obj/item/storage/backpack/messenger/tox, /obj/item/storage/backpack/satchel/tox)),
 		/obj/item/clothing/under/rank/scientist,
 		/obj/item/clothing/suit/storage/toggle/labcoat,
 		/obj/item/clothing/shoes/white,
@@ -17,11 +17,11 @@
 /obj/structure/closet/secure_closet/xenobio
 	name = "xenobiologist's locker"
 	req_access = list(access_xenobiology)
-	closet_appearance = /singleton/closet_appearance/secure_closet/expedition/science
+	icon_state = "xenobot"
 
 /obj/structure/closet/secure_closet/xenobio/WillContain()
 	return list(
-		new /datum/atom_creator/weighted(list(/obj/item/storage/backpack/messenger/corpsci, /obj/item/storage/backpack/corpsci)),
+		new /datum/atom_creator/weighted(list(/obj/item/storage/backpack/messenger/tox, /obj/item/storage/backpack/satchel/tox)),
 		/obj/item/clothing/under/rank/scientist,
 		/obj/item/clothing/suit/storage/toggle/labcoat,
 		/obj/item/clothing/shoes/white,
@@ -35,7 +35,7 @@
 /obj/structure/closet/secure_closet/RD
 	name = "chief science officer's locker"
 	req_access = list(access_rd)
-	closet_appearance = /singleton/closet_appearance/secure_closet/rd
+	icon_state = "rd"
 
 /obj/structure/closet/secure_closet/RD/WillContain()
 	return list(

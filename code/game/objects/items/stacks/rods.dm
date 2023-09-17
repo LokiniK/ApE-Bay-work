@@ -4,7 +4,6 @@
 	singular_name = "rod"
 	plural_name = "rods"
 	icon_state = "rod"
-	base_state = "rod"
 	plural_icon_state = "rod-mult"
 	max_icon_state = "rod-max"
 	w_class = ITEM_SIZE_LARGE
@@ -13,7 +12,6 @@
 	throw_speed = 5
 	throw_range = 20
 	max_amount = 100
-	base_parry_chance = 15
 	attack_verb = list("hit", "bludgeoned", "whacked")
 	lock_picking_level = 3
 	matter_multiplier = 0.5
@@ -45,21 +43,15 @@
 	if(isWelder(W))
 		var/obj/item/weldingtool/WT = W
 
-		if(material.ignition_point)
-			to_chat(user, SPAN_WARNING("You can't weld this material into sheets."))
-			return
-
 		if(!can_use(2))
-			to_chat(user, SPAN_WARNING("You need at least two rods to do this."))
+			to_chat(user, "<span class='warning'>You need at least two rods to do this.</span>")
 			return
 
 		if(WT.remove_fuel(0,user))
-			var/obj/item/stack/material/new_item = material.place_sheet(usr.loc)
+			var/obj/item/stack/material/steel/new_item = new(usr.loc)
 			new_item.add_to_stacks(usr)
-			user.visible_message(
-				SPAN_NOTICE("\The [user] welds \the [src] into \a [material.sheet_singular_name]."),
-				SPAN_NOTICE("You weld \the [src] into \a [material.sheet_singular_name].")
-				)
+			for (var/mob/M in viewers(src))
+				M.show_message("<span class='notice'>[src] is shaped into metal by [user.name] with the weldingtool.</span>", 3, "<span class='notice'>You hear welding.</span>", 2)
 			var/obj/item/stack/material/rods/R = src
 			src = null
 			var/replace = (user.get_inactive_hand()==R)
@@ -67,6 +59,17 @@
 			if (!R && replace)
 				user.put_in_hands(new_item)
 		return
+
+	if (istype(W, /obj/item/tape_roll))
+		var/obj/item/stack/medical/splint/ghetto/new_splint = new(user.loc)
+		new_splint.dropInto(loc)
+		new_splint.add_fingerprint(user)
+
+		user.visible_message("<span class='notice'>\The [user] constructs \a [new_splint] out of a [singular_name].</span>", \
+				"<span class='notice'>You use make \a [new_splint] out of a [singular_name].</span>")
+		src.use(1)
+		return
+
 	..()
 
 /obj/item/stack/material/rods/attack_self(mob/user as mob)

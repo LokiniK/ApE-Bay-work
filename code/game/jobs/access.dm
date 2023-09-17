@@ -31,7 +31,7 @@
 	if(!istype(L, /list))
 		return FALSE
 
-	if(GLOB.using_map?.maint_all_access)
+	if(maint_all_access)
 		L = L.Copy()
 		L |= access_maint_tunnels
 
@@ -87,18 +87,16 @@
 		if("Supreme Commander")
 			return get_all_centcom_access()
 
-var/global/list/datum/access/priv_all_access_datums
+/var/list/datum/access/priv_all_access_datums
 /proc/get_all_access_datums()
-	RETURN_TYPE(/list)
 	if(!priv_all_access_datums)
 		priv_all_access_datums = init_subtypes(/datum/access)
 		priv_all_access_datums = dd_sortedObjectList(priv_all_access_datums)
 
 	return priv_all_access_datums.Copy()
 
-var/global/list/datum/access/priv_all_access_datums_id
+/var/list/datum/access/priv_all_access_datums_id
 /proc/get_all_access_datums_by_id()
-	RETURN_TYPE(/list)
 	if(!priv_all_access_datums_id)
 		priv_all_access_datums_id = list()
 		for(var/datum/access/A in get_all_access_datums())
@@ -106,9 +104,8 @@ var/global/list/datum/access/priv_all_access_datums_id
 
 	return priv_all_access_datums_id.Copy()
 
-var/global/list/datum/access/priv_all_access_datums_region
+/var/list/datum/access/priv_all_access_datums_region
 /proc/get_all_access_datums_by_region()
-	RETURN_TYPE(/list)
 	if(!priv_all_access_datums_region)
 		priv_all_access_datums_region = list()
 		for(var/datum/access/A in get_all_access_datums())
@@ -118,49 +115,43 @@ var/global/list/datum/access/priv_all_access_datums_region
 
 	return priv_all_access_datums_region.Copy()
 
-/proc/get_access_ids(access_types = ACCESS_TYPE_ALL)
-	RETURN_TYPE(/list)
+/proc/get_access_ids(var/access_types = ACCESS_TYPE_ALL)
 	var/list/L = new()
 	for(var/datum/access/A in get_all_access_datums())
 		if(A.access_type & access_types)
 			L += A.id
 	return L
 
-var/global/list/priv_all_access
+/var/list/priv_all_access
 /proc/get_all_accesses()
-	RETURN_TYPE(/list)
 	if(!priv_all_access)
 		priv_all_access = get_access_ids()
 
 	return priv_all_access.Copy()
 
-var/global/list/priv_station_access
+/var/list/priv_station_access
 /proc/get_all_station_access()
-	RETURN_TYPE(/list)
 	if(!priv_station_access)
 		priv_station_access = get_access_ids(ACCESS_TYPE_STATION)
 
 	return priv_station_access.Copy()
 
-var/global/list/priv_centcom_access
+/var/list/priv_centcom_access
 /proc/get_all_centcom_access()
-	RETURN_TYPE(/list)
 	if(!priv_centcom_access)
 		priv_centcom_access = get_access_ids(ACCESS_TYPE_CENTCOM)
 
 	return priv_centcom_access.Copy()
 
-var/global/list/priv_syndicate_access
+/var/list/priv_syndicate_access
 /proc/get_all_syndicate_access()
-	RETURN_TYPE(/list)
 	if(!priv_syndicate_access)
 		priv_syndicate_access = get_access_ids(ACCESS_TYPE_SYNDICATE)
 
 	return priv_syndicate_access.Copy()
 
-var/global/list/priv_region_access
-/proc/get_region_accesses(code)
-	RETURN_TYPE(/list)
+/var/list/priv_region_access
+/proc/get_region_accesses(var/code)
 	if(code == ACCESS_REGION_ALL)
 		return get_all_station_access()
 
@@ -174,7 +165,7 @@ var/global/list/priv_region_access
 	var/list/region = priv_region_access["[code]"]
 	return region.Copy()
 
-/proc/get_region_accesses_name(code)
+/proc/get_region_accesses_name(var/code)
 	switch(code)
 		if(ACCESS_REGION_ALL)
 			return "All"
@@ -209,7 +200,6 @@ var/global/list/priv_region_access
 	return AS[id]
 
 /proc/get_all_centcom_jobs()
-	RETURN_TYPE(/list)
 	return list("VIP Guest",
 		"Custodian",
 		"Thunderdome Overseer",
@@ -243,6 +233,9 @@ var/global/list/priv_region_access
 		var/obj/item/card/id = I ? I.GetIdCard() : null
 		if(id)
 			return id
+	var/obj/item/organ/internal/controller/controller = locate() in internal_organs
+	if(istype(controller))
+		return controller.GetIdCard()
 
 /mob/living/carbon/human/GetAccess()
 	. = list()
@@ -250,6 +243,9 @@ var/global/list/priv_region_access
 		var/obj/item/I = item_slot
 		if(I)
 			. |= I.GetAccess()
+	var/obj/item/organ/internal/controller/controller = locate() in internal_organs
+	if(istype(controller))
+		. |= controller.GetAccess()
 #undef HUMAN_ID_CARDS
 
 /mob/living/silicon/GetIdCard()
@@ -257,31 +253,39 @@ var/global/list/priv_region_access
 		return // Unconscious, dead or once possessed but now client-less silicons are not considered to have id access.
 	return idcard
 
-/proc/FindNameFromID(mob/M, missing_id_name = "Unknown")
+/proc/FindNameFromID(var/mob/M, var/missing_id_name = "Unknown")
 	var/obj/item/card/id/C = M.GetIdCard()
 	if(C)
 		return C.registered_name
 	return missing_id_name
 
 /proc/get_all_job_icons() //For all existing HUD icons
-	RETURN_TYPE(/list)
 	return SSjobs.titles_to_datums + list("Prisoner")
 
 /obj/proc/GetJobName() //Used in secHUD icon generation
 	var/obj/item/card/id/I = GetIdCard()
 
 	if(I)
+//[INF]		Please can we locate CentCom first, not null icon_state in ALL ICONS? Thank you
+		var/centcom = get_all_centcom_jobs()
+		if(I.assignment	in centcom) //Return with the NT logo if it is a Centcom job
+			return "Centcom"
+		if(I.rank in centcom)
+			return "Centcom"
+//[/INF]
 		var/job_icons = get_all_job_icons()
 		if(I.assignment	in job_icons) //Check if the job has a hud icon
 			return I.assignment
 		if(I.rank in job_icons)
 			return I.rank
 
+/*[ORIG]
 		var/centcom = get_all_centcom_jobs()
 		if(I.assignment	in centcom) //Return with the NT logo if it is a Centcom job
 			return "Centcom"
 		if(I.rank in centcom)
 			return "Centcom"
+[/ORIG]*/
 	else
 		return
 

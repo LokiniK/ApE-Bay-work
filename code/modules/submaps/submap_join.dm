@@ -12,7 +12,7 @@
 			join_as(locate(href_list["joining"]), jobs[join_as])
 			return TRUE
 
-/datum/submap/proc/check_general_join_blockers(mob/new_player/joining, datum/job/submap/job)
+/datum/submap/proc/check_general_join_blockers(var/mob/new_player/joining, var/datum/job/submap/job)
 
 	if(!istype(job)) // This proc uses a specific type that check_latejoin_blockers() does not.
 		log_debug("Job assignment error for [name] - job does not exist or is of the incorrect type.")
@@ -38,13 +38,13 @@
 
 	return TRUE
 
-/datum/submap/proc/join_as(mob/new_player/joining, datum/job/submap/job)
+/datum/submap/proc/join_as(var/mob/new_player/joining, var/datum/job/submap/job)
 
 	if(!check_general_join_blockers(joining, job))
 		return
 
 	if(!LAZYLEN(job.spawnpoints))
-		to_chat(joining, SPAN_WARNING("There are no available spawn points for that job."))
+		to_chat(joining, "<span class='warning'>There are no available spawn points for that job.</span>")
 
 	var/turf/spawn_turf = get_turf(pick(job.spawnpoints))
 	if(!SSjobs.check_unsafe_spawn(joining, spawn_turf))
@@ -57,6 +57,7 @@
 	if(joining.mind)
 		joining.mind.assigned_job = job
 		joining.mind.assigned_role = job.title
+		joining.mind.role_alt_title = job.get_alt_title_for(joining.client) //INF
 	joining.faction = name
 	job.current_positions++
 
@@ -70,13 +71,16 @@
 		var/mob/living/carbon/human/user_human
 		if(ishuman(character))
 			user_human = character
-			if(job.branch && GLOB.mil_branches)
-				user_human.char_branch = GLOB.mil_branches.get_branch(job.branch)
-				user_human.char_rank =   GLOB.mil_branches.get_rank(job.branch, job.rank)
+			if(user_human.client.prefs.branches[job.title])
+				user_human.char_branch = mil_branches.get_branch(user_human.client.prefs.branches[job.title])
+				user_human.char_rank = mil_branches.get_rank(user_human.client.prefs.branches[job.title], user_human.client.prefs.ranks[job.title])
+			else if (job.branch && mil_branches)
+				user_human.char_branch = mil_branches.get_branch(job.branch)
+				user_human.char_rank =   mil_branches.get_rank(job.branch, job.rank)
 
 			// We need to make sure to use the abstract instance here; it's not the same as the one we were passed.
 			character.skillset.obtain_from_client(SSjobs.get_by_path(job.type), character.client)
-			job.equip(character, "")
+			job.equip(character, joining.mind ? joining.mind.role_alt_title : "") //INF was job.equip(character, "")
 			job.apply_fingerprints(character)
 			var/list/spawn_in_storage = SSjobs.equip_custom_loadout(character, job)
 			if(spawn_in_storage)
@@ -85,7 +89,6 @@
 			SScustomitems.equip_custom_items(user_human)
 
 		character.job = job.title
-		character.faction = name
 		if(character.mind)
 			character.mind.assigned_job = job
 			character.mind.assigned_role = character.job
@@ -98,12 +101,15 @@
 		if(istype(ojob) && ojob.info)
 			to_chat(character, ojob.info)
 
-		if (user_human?.disabilities & NEARSIGHTED) //Try to give glasses to the vision impaired
-			user_human.equip_to_slot_or_del(new /obj/item/clothing/glasses/prescription(user_human), slot_glasses)
+		if(user_human && user_human.disabilities & NEARSIGHTED)
+			var/equipped = user_human.equip_to_slot_or_del(new /obj/item/clothing/glasses/prescription(user_human), slot_glasses)
+			if(equipped)
+				var/obj/item/clothing/glasses/G = user_human.glasses
+				G.prescription = 7
 
-		SET_BIT(character.hud_updateflag, ID_HUD)
-		SET_BIT(character.hud_updateflag, IMPLOYAL_HUD)
-		SET_BIT(character.hud_updateflag, SPECIALROLE_HUD)
+		BITSET(character.hud_updateflag, ID_HUD)
+		BITSET(character.hud_updateflag, IMPLOYAL_HUD)
+		BITSET(character.hud_updateflag, SPECIALROLE_HUD)
 
 		SSticker.mode.handle_offsite_latejoin(character)
 		GLOB.universe.OnPlayerLatejoin(character)

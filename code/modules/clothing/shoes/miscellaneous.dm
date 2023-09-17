@@ -28,7 +28,7 @@
 		bomb = ARMOR_BOMB_RESISTANT,
 		bio = ARMOR_BIO_MINOR
 		)
-	item_flags = ITEM_FLAG_NOSLIP | ITEM_FLAG_WASHER_ALLOWED
+	item_flags = ITEM_FLAG_NOSLIP
 	siemens_coefficient = 0.6
 
 /obj/item/clothing/shoes/combat //Basically SWAT shoes combined with galoshes.
@@ -44,7 +44,7 @@
 		bomb = ARMOR_BOMB_RESISTANT,
 		bio = ARMOR_BIO_MINOR
 		)
-	item_flags = ITEM_FLAG_NOSLIP | ITEM_FLAG_WASHER_ALLOWED
+	item_flags = ITEM_FLAG_NOSLIP
 	siemens_coefficient = 0.6
 
 	cold_protection = FEET
@@ -52,6 +52,35 @@
 	heat_protection = FEET
 	max_heat_protection_temperature = SHOE_MAX_HEAT_PROTECTION_TEMPERATURE
 
+/obj/item/clothing/shoes/jungleboots
+	name = "jungle boots"
+	desc = "A pair of durable brown boots. Waterproofed for use planetside."
+	icon_state = "jungle"
+	force = 3
+	armor = list(
+		melee = ARMOR_MELEE_RESISTANT,
+		bullet = ARMOR_BALLISTIC_MINOR,
+		laser = ARMOR_LASER_MINOR,
+		energy = ARMOR_ENERGY_MINOR,
+		bomb = ARMOR_BOMB_PADDED,
+		bio = ARMOR_BIO_MINOR
+		)
+	siemens_coefficient = 0.7
+
+/obj/item/clothing/shoes/desertboots
+	name = "desert boots"
+	desc = "A pair of durable tan boots. Designed for use in hot climates."
+	icon_state = "desert"
+	force = 3
+	armor = list(
+		melee = ARMOR_MELEE_RESISTANT,
+		bullet = ARMOR_BALLISTIC_MINOR,
+		laser = ARMOR_LASER_MINOR,
+		energy = ARMOR_ENERGY_MINOR,
+		bomb = ARMOR_BOMB_PADDED,
+		bio = ARMOR_BIO_MINOR
+		)
+	siemens_coefficient = 0.7
 
 /obj/item/clothing/shoes/dutyboots
 	name = "duty boots"
@@ -91,6 +120,24 @@
 	can_add_hidden_item = FALSE
 	can_add_cuffs = FALSE
 
+/obj/item/clothing/shoes/unathi/footwraps
+	name = "big footwraps"
+	desc = "A large roll of treated canvas used to protect paws."
+	icon_state = "unathi_footwraps"
+	item_state = "unathi_footwraps"
+	force = 0
+	w_class = ITEM_SIZE_SMALL
+	species_restricted = list(SPECIES_UNATHI)
+
+/obj/item/clothing/shoes/unathi/sandals
+	name = "unathi sandals"
+	desc = "A pair of unathi sandals built exclusively for their paws."
+	icon_state = "unathi_sandals"
+	item_state = "unathi_sandals"
+	force = 0
+	w_class = ITEM_SIZE_SMALL
+	species_restricted = list(SPECIES_UNATHI)
+
 /obj/item/clothing/shoes/dress/white
 	name = "white dress shoes"
 	desc = "Brilliantly white shoes, not a spot on them."
@@ -112,6 +159,12 @@
 	icon_state = "black"
 	body_parts_covered = FEET
 
+/obj/item/clothing/shoes/bondrewd
+	desc = "A pair of durable shoes. Them must belongs to a dedicated scientist."
+	name = "abyssal boots"
+	icon_state = "boris_boots"
+	body_parts_covered = FEET
+
 /obj/item/clothing/shoes/clown_shoes
 	desc = "The prankster's standard-issue clowning shoes. Damn they're huge!"
 	name = "clown shoes"
@@ -122,11 +175,11 @@
 	species_restricted = null
 	can_add_hidden_item = FALSE
 
-/obj/item/clothing/shoes/clown_shoes/Initialize()
-	. = ..()
+/obj/item/clothing/shoes/clown_shoes/New()
+	..()
 	slowdown_per_slot[slot_shoes]  = 1
 
-/obj/item/clothing/shoes/clown_shoes/handle_movement(turf/walking, running)
+/obj/item/clothing/shoes/clown_shoes/handle_movement(var/turf/walking, var/running)
 	if(running)
 		if(footstep >= 2)
 			footstep = 0
@@ -154,7 +207,6 @@
 	name = "cyborg boots"
 	desc = "Shoes for a cyborg costume."
 	icon_state = "boots"
-	item_flags = null
 
 /obj/item/clothing/shoes/slippers
 	name = "bunny slippers"
@@ -189,8 +241,8 @@
 	can_add_hidden_item = FALSE
 	can_add_cuffs = FALSE
 
-/obj/item/clothing/shoes/swimmingfins/Initialize()
-	. = ..()
+/obj/item/clothing/shoes/swimmingfins/New()
+	..()
 	slowdown_per_slot[slot_shoes] = 1
 
 /obj/item/clothing/shoes/athletic
@@ -215,57 +267,63 @@
 	desc = "A pair of black high heels."
 	color = COLOR_GRAY15
 
-/obj/item/clothing/shoes/heels/red
+obj/item/clothing/shoes/heels/red
 	name = "red high heels"
 	desc = "A pair of red high heels."
 	color = COLOR_RED
 
-/obj/item/clothing/shoes/foamclog
-	name = "foam clogs"
-	desc = "Made from durable foam resin that retains its spongy feel."
-	icon_state = "foamclog"
-	can_add_hidden_item = FALSE
-	can_add_cuffs = FALSE
-	var/clipped = FALSE
-	var/icon_state_modified = "foamclog-toeless"
+/obj/item/clothing/shoes/brand_shoes
+	name = "brand shoes"
+	desc = "Some sneakers with pretty much distinctive fashion."
+	icon = 'infinity/icons/obj/clothing/obj_feet.dmi'
+	item_icons = list(slot_shoes_str = 'infinity/icons/mob/onmob/onmob_feet.dmi')
+	icon_state = "brand_shoes1"
+	item_state = "brand_shoes1"
 
-/obj/item/clothing/shoes/foamclog/use_tool(obj/item/W, mob/user)
-	if(istype(W, /obj/item/wirecutters) || istype(W, /obj/item/scalpel))
-		if (clipped)
-			to_chat(user, SPAN_NOTICE("\The [src] have already been modified!"))
-			update_icon()
-			return ..()
-		playsound(src.loc, 'sound/items/Wirecutter.ogg', 100, 1)
-		user.visible_message(SPAN_WARNING("\The [user] modifies \the [src] with \the [W]."),SPAN_WARNING("You modify \the [src] with \the [W]."))
-		cut_clogs()
-		return ..()
+/obj/item/clothing/shoes/brand_shoes/two
+	name = "brand shoes"
+	desc = "Some sneakers with pretty much distinctive fashion."
+	icon_state = "brand_shoes2"
+	item_state = "brand_shoes2"
 
-/obj/item/clothing/shoes/foamclog/proc/cut_clogs()
-	clipped = TRUE
-	name = "toe-less [name]"
-	desc = "[desc]<br>They have been modified to accommodate a different shape."
-	icon_state = icon_state_modified
-	if("exclude" in species_restricted)
-		species_restricted -= SPECIES_UNATHI
-	update_icon()
-	return
+/obj/item/clothing/shoes/brand_shoes/three
+	name = "brand shoes"
+	desc = "Some sneakers with pretty much distinctive fashion."
+	icon_state = "brand_shoes3"
+	item_state = "brand_shoes3"
 
-/obj/item/clothing/shoes/foamclog/toeless/Initialize()
-	. = ..()
-	cut_clogs()
+/obj/item/clothing/shoes/brand_shoes/antiquated
+	name = "antiquated shoes"
+	desc = "Some sneakers with pretty much distinctive fashion."
+	icon_state = "antiquated_shoes"
+	item_state = "antiquated_shoes"
 
-/obj/item/clothing/shoes/foamclog/random/New()
-	..()
-	color = get_random_colour()
+/obj/item/clothing/shoes/brand_shoes/faln
+	name = "faln shoes"
+	desc = "The trekking sneakers that provide nigh-perfect ankle support and traction on any type of terrain."
+	icon_state = "papaleroy_faln_sneakers"
+	item_state = "papaleroy_faln_sneakers"
 
-/obj/item/clothing/shoes/foamclog/flipflobster
-	name = "flip flobsters"
-	desc = "Made from durable foam resin that retains its spongy feel. These are shaped as lobsters."
-	icon_state = "flipflobster"
-	can_add_hidden_item = FALSE
-	can_add_cuffs = FALSE
-	icon_state_modified = "flipflobster-toeless"
+/obj/item/clothing/shoes/red_geta
+	name = "red geta"
+	desc = "These sandals originate from culture of Japan and are meant to be an accompaniment for kimonos."
+	icon = 'infinity/icons/obj/clothing/obj_feet.dmi'
+	item_icons = list(slot_shoes_str = 'infinity/icons/mob/onmob/onmob_feet.dmi')
+	icon_state = "red_geta"
+	item_state = "red_geta"
 
-/obj/item/clothing/shoes/foamclog/flipflobster/toeless/Initialize()
-	. = ..()
-	cut_clogs()
+/obj/item/clothing/shoes/black_geta
+	name = "black geta"
+	desc = "These sandals originate from culture of Japan and are meant to be an accompaniment for kimonos."
+	icon = 'infinity/icons/obj/clothing/obj_feet.dmi'
+	item_icons = list(slot_shoes_str = 'infinity/icons/mob/onmob/onmob_feet.dmi')
+	icon_state = "black_geta"
+	item_state = "black_geta"
+
+/obj/item/clothing/shoes/noble_boots
+	name = "noble boots"
+	desc = "Polished leather boots that would rather fit some Avalonian nobleman."
+	icon = 'infinity/icons/obj/clothing/obj_feet.dmi'
+	item_icons = list(slot_shoes_str = 'infinity/icons/mob/onmob/onmob_feet.dmi')
+	icon_state = "noble_boots"
+	item_state = "noble_boots"

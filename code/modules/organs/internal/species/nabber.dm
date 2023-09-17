@@ -1,6 +1,10 @@
 /obj/item/organ/internal/voicebox/nabber
 	name = "vocal synthesiser"
-	assists_languages = list(LANGUAGE_HUMAN_RUSSIAN, LANGUAGE_GUTTER, LANGUAGE_HUMAN_EURO, LANGUAGE_EAL)
+	assists_languages = list(LANGUAGE_HUMAN_RUSSIAN, LANGUAGE_GUTTER, LANGUAGE_HUMAN_EURO, LANGUAGE_EAL, LANGUAGE_CHANGELING_GLOBAL, LANGUAGE_SPACER)
+
+/obj/item/organ/internal/voicebox/nabber/ascent
+	name = "mantid vocal synthesiser"
+	assists_languages = list(LANGUAGE_SKRELLIAN, LANGUAGE_HUMAN_RUSSIAN, LANGUAGE_GUTTER, LANGUAGE_HUMAN_EURO, LANGUAGE_EAL)
 
 /obj/item/organ/internal/voicebox/nabber/Initialize()
 	. = ..()
@@ -28,7 +32,7 @@
 			eye_overlay.color = "#aaaaaa"
 		return eye_overlay
 
-/obj/item/organ/internal/eyes/insectoid/nabber/additional_flash_effects(intensity)
+/obj/item/organ/internal/eyes/insectoid/nabber/additional_flash_effects(var/intensity)
 	if(!eyes_shielded)
 		take_internal_damage(max(0, 4 * (intensity)))
 		return 1
@@ -41,31 +45,31 @@
 		action.button_icon_state = "nabber-shield-[eyes_shielded ? 1 : 0]"
 		if(action.button) action.button.UpdateIcon()
 
-/obj/item/organ/internal/eyes/insectoid/nabber/attack_self(mob/user)
+/obj/item/organ/internal/eyes/insectoid/nabber/attack_self(var/mob/user)
 	. = ..()
 	if(.)
 		eyes_shielded = !eyes_shielded
 		if(eyes_shielded)
-			to_chat(owner, SPAN_NOTICE("Nearly opaque lenses slide down to shield your eyes."))
+			to_chat(owner, "<span class='notice'>Nearly opaque lenses slide down to shield your eyes.</span>")
 			innate_flash_protection = FLASH_PROTECTION_MAJOR
 			owner.overlay_fullscreen("eyeshield", /obj/screen/fullscreen/blind)
 			owner.update_icons()
 		else
-			to_chat(owner, SPAN_NOTICE("Your protective lenses retract out of the way."))
+			to_chat(owner, "<span class='notice'>Your protective lenses retract out of the way.</span>")
 			innate_flash_protection = FLASH_PROTECTION_VULNERABLE
-			addtimer(new Callback(src, .proc/remove_shield), 1 SECONDS)
+			addtimer(CALLBACK(src, .proc/remove_shield), 1 SECONDS)
 			owner.update_icons()
 		refresh_action_button()
 
 /obj/item/organ/internal/eyes/insectoid/nabber/proc/remove_shield()
 	owner.clear_fullscreen("eyeshield")
 
-/obj/item/organ/internal/eyes/nabber/New(mob/living/carbon/holder)
+/obj/item/organ/internal/eyes/nabber/New(var/mob/living/carbon/holder)
 	. = ..()
 	if(dna)
 		color = rgb(dna.GetUIValue(DNA_UI_EYES_R), dna.GetUIValue(DNA_UI_EYES_G), dna.GetUIValue(DNA_UI_EYES_B))
 
-/obj/item/organ/internal/eyes/insectoid/nabber/set_dna(datum/dna/new_dna)
+/obj/item/organ/internal/eyes/insectoid/nabber/set_dna(var/datum/dna/new_dna)
 	. = ..()
 	color = rgb(new_dna.GetUIValue(DNA_UI_EYES_R), new_dna.GetUIValue(DNA_UI_EYES_G), new_dna.GetUIValue(DNA_UI_EYES_B))
 
@@ -148,7 +152,7 @@
 	safe_toxins_max = 10
 
 /obj/item/organ/internal/lungs/insectoid/nabber/rupture()
-	to_chat(owner, SPAN_DANGER("You feel air rushing through your trachea!"))
+	to_chat(owner, "<span class='danger'>You feel air rushing through your trachea!</span>")
 
 /obj/item/organ/internal/lungs/insectoid/nabber/handle_failed_breath()
 	var/mob/living/carbon/human/H = owner
@@ -169,6 +173,11 @@
 	name = "distributed nervous system"
 	parent_organ = BP_CHEST
 
+//inf-def start
+/obj/item/organ/internal/brain/insectoid/nabber/take_internal_damage(var/damage, var/silent)
+	..(damage / 2, silent)
+//inf-def end
+
 /obj/item/organ/internal/brain/insectoid/nabber/Process()
 	if(!owner || !owner.should_have_organ(BP_HEART))
 		return
@@ -182,15 +191,15 @@
 		if(BLOOD_VOLUME_OKAY to BLOOD_VOLUME_SAFE)
 			lowblood_tally = 2
 			if(prob(1))
-				to_chat(owner, SPAN_WARNING("You're finding it difficult to move."))
+				to_chat(owner, "<span class='warning'>You're finding it difficult to move.</span>")
 		if(BLOOD_VOLUME_BAD to BLOOD_VOLUME_OKAY)
 			lowblood_tally = 4
 			if(prob(1))
-				to_chat(owner, SPAN_WARNING("Moving has become very difficult."))
+				to_chat(owner, "<span class='warning'>Moving has become very difficult.</span>")
 		if(BLOOD_VOLUME_SURVIVE to BLOOD_VOLUME_BAD)
 			lowblood_tally = 6
 			if(prob(15))
-				to_chat(owner, SPAN_WARNING("You're almost unable to move!"))
+				to_chat(owner, "<span class='warning'>You're almost unable to move!</span>")
 				if(!owner.pulling_punches)
 					var/datum/species/nabber/nab = species
 					nab.arm_swap(owner, TRUE)
@@ -200,7 +209,7 @@
 				var/datum/species/nabber/nab = species
 				nab.arm_swap(owner, TRUE)
 			if(prob(10))
-				to_chat(owner, SPAN_WARNING("Your body is barely functioning and is starting to shut down."))
+				to_chat(owner, "<span class='warning'>Your body is barely functioning and is starting to shut down.</span>")
 				owner.Paralyse(1)
 				var/obj/item/organ/internal/I = pick(owner.internal_organs)
 				I.take_internal_damage(5)

@@ -1,35 +1,30 @@
 /datum/admin_secret_item/fun_secret/fix_all_lights
-	name = "Fix Lights"
+	name = "Fix All Lights"
 
-/datum/admin_secret_item/fun_secret/fix_all_lights/execute(mob/user)
+/datum/admin_secret_item/fun_secret/fix_all_lights/execute(var/mob/user)
 	. = ..()
-	if (!.)
+	if(!.)
 		return
-	var/choice = input("Fix Lights in:") as null | anything in list("Current Area", "Current Level", "Connected Levels", "All Lights")
-	if (!choice)
-		return
-	switch (choice)
-		if ("Current Area")
+
+	var/choise = input("Which lights to fix?") in list("My area", "My Z-Level", "Station", "All lights")
+	switch(choise)
+		if ("My area")
 			var/area/usr_area = get_area(user)
-			if (!usr_area)
-				return to_chat(user, SPAN_DANGER("Invalid area!"))
+			if (!usr_area) return to_chat(user, SPAN_DANGER("Invalid area!"))
 			for (var/obj/machinery/light/light in usr_area)
 				light.fix()
-		if ("Current Level")
+
+		if ("My Z-Level")
 			var/user_z = get_z(user)
-			if (!user_z)
-				return to_chat(user, SPAN_DANGER("Invalid Z-Level!"))
+			if (!user_z) return to_chat(user, SPAN_DANGER("Invalid Z-Level!"))
 			for (var/obj/machinery/light/light in SSmachines.machinery)
-				if (light.z == user_z)
-					light.fix()
-		if ("Connected Levels")
-			var/list/user_levels = get_z(user)
-			if (!user_levels)
-				return to_chat(user, SPAN_DANGER("Invalid Z-Level!"))
-			user_levels = GetConnectedZlevels(user_levels)
+				if (light.z == user_z) light.fix()
+
+		if ("Station")
 			for (var/obj/machinery/light/light in SSmachines.machinery)
-				if (light.z in user_levels)
+				if (light.z in GLOB.using_map.station_levels)
 					light.fix()
-		if ("All Lights")
+
+		if ("All lights")
 			for (var/obj/machinery/light/light in SSmachines.machinery)
 				light.fix()

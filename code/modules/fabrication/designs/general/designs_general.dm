@@ -1,5 +1,5 @@
 /datum/fabricator_recipe/bucket
-	path = /obj/item/reagent_containers/glass/bucket
+	path = /obj/item/reagent_containers/misc/bucket
 
 /datum/fabricator_recipe/flashlight
 	path = /obj/item/device/flashlight
@@ -25,6 +25,9 @@
 /datum/fabricator_recipe/suit_cooler
 	path = /obj/item/device/suit_cooling_unit
 
+/datum/fabricator_recipe/mini_suit_cooler
+	path = /obj/item/device/suit_cooling_unit/miniature/empty
+
 /datum/fabricator_recipe/weldermask
 	path = /obj/item/clothing/head/welding
 
@@ -37,32 +40,14 @@
 /datum/fabricator_recipe/tape
 	path = /obj/item/device/tape
 
-/datum/fabricator_recipe/tube/large/warm
-	path = /obj/item/light/tube/large/warm
+/datum/fabricator_recipe/tube/large
+	path = /obj/item/light/tube/large
 
-/datum/fabricator_recipe/tube/large/cool
-	path = /obj/item/light/tube/large/cool
+/datum/fabricator_recipe/tube
+	path = /obj/item/light/tube
 
-/datum/fabricator_recipe/tube/large/white
-	path = /obj/item/light/tube/large/white
-
-/datum/fabricator_recipe/tube/warm
-	path = /obj/item/light/tube/warm
-
-/datum/fabricator_recipe/tube/cool
-	path = /obj/item/light/tube/cool
-
-/datum/fabricator_recipe/tube/white
-	path = /obj/item/light/tube/white
-
-/datum/fabricator_recipe/bulb/warm
-	path = /obj/item/light/bulb/warm
-
-/datum/fabricator_recipe/bulb/cool
-	path = /obj/item/light/bulb/cool
-
-/datum/fabricator_recipe/bulb/white
-	path = /obj/item/light/bulb/white
+/datum/fabricator_recipe/bulb
+	path = /obj/item/light/bulb
 
 /datum/fabricator_recipe/ashtray_glass
 	path = /obj/item/material/ashtray/glass

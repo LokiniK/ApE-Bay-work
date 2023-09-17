@@ -30,24 +30,14 @@
 	multiple_sprites = 1
 
 /obj/item/ammo_magazine/speedloader/pclip
-	name = "magnum pistol stripper clip"
-	desc = "A stripper clip for pistol magnum caliber weapons."
+	name = "pistol stripper clip"
+	desc = "A stripper clip for pistol caliber weapons."
 	icon_state = "pclip"
 	caliber = CALIBER_PISTOL_MAGNUM
 	ammo_type = /obj/item/ammo_casing/pistol/magnum
 	matter = list(MATERIAL_STEEL = 1300)
 	max_ammo = 5
 	multiple_sprites = 1
-
-/obj/item/ammo_magazine/speedloader/hpclip
-	name = "holdout pistol stripper clip"
-	desc = "A stripper clip for pistol holdout caliber weapons."
-	icon_state = "hpclip"
-	caliber = CALIBER_PISTOL_SMALL
-	ammo_type = /obj/item/ammo_casing/pistol/small
-	matter = list(MATERIAL_STEEL = 1800)
-	max_ammo = 10
-	multiple_sprites = TRUE
 
 /obj/item/ammo_magazine/speedloader/clip
 	name = "rifle stripper clip"
@@ -79,11 +69,11 @@
 		overlays += I
 
 /obj/item/ammo_magazine/shotholder/attack_hand(mob/user)
-	if((user.a_intent == I_HURT) && (length(stored_ammo)))
-		var/obj/item/ammo_casing/C = stored_ammo[length(stored_ammo)]
+	if((user.a_intent == I_HURT) && (stored_ammo.len))
+		var/obj/item/ammo_casing/C = stored_ammo[stored_ammo.len]
 		stored_ammo-=C
 		user.put_in_hands(C)
-		user.visible_message("\The [user] removes \a [C] from [src].", SPAN_NOTICE("You remove \a [C] from [src]."))
+		user.visible_message("\The [user] removes \a [C] from [src].", "<span class='notice'>You remove \a [C] from [src].</span>")
 		update_icon()
 	else
 		..()
@@ -169,6 +159,14 @@
 /obj/item/ammo_magazine/smg/empty
 	initial_ammo = 0
 
+/obj/item/ammo_magazine/smg/rubber
+	labels = list("rubber")
+	ammo_type = /obj/item/ammo_casing/pistol/rubber
+
+/obj/item/ammo_magazine/smg/practice
+	labels = list("practice")
+	ammo_type = /obj/item/ammo_casing/pistol/practice
+
 /obj/item/ammo_magazine/pistol
 	name = "pistol magazine"
 	icon_state = "pistol_mag"
@@ -177,7 +175,7 @@
 	caliber = CALIBER_PISTOL
 	matter = list(MATERIAL_STEEL = 750)
 	ammo_type = /obj/item/ammo_casing/pistol
-	max_ammo = 8
+	max_ammo = 10
 	multiple_sprites = 1
 
 /obj/item/ammo_magazine/pistol/empty
@@ -248,7 +246,7 @@
 
 /obj/item/ammo_magazine/pistol/throwback
 	name = "pistol magazine"
-	caliber = CALIBER_PISTOL_ANTIQUE
+	caliber = CALIBER_PISTOL_BIG
 	ammo_type = /obj/item/ammo_casing/pistol/throwback
 
 /obj/item/ammo_magazine/box/emp/pistol
@@ -314,38 +312,32 @@
 	max_ammo = 20
 	multiple_sprites = 1
 
+/obj/item/ammo_magazine/rifle/ak
+	name = "SkM magazine"
+	icon_state = "7.62x39mm"
+	mag_type = MAGAZINE
+	caliber = CALIBER_RIFLE
+	matter = list(MATERIAL_STEEL = 1800)
+	ammo_type = /obj/item/ammo_casing/rifle/ak
+	max_ammo = 25
+	multiple_sprites = 1
+
 /obj/item/ammo_magazine/mil_rifle
 	name = "assault rifle magazine"
-	icon_state = "bullpup"
+	icon_state = "bullup"
 	origin_tech = list(TECH_COMBAT = 2)
 	mag_type = MAGAZINE
 	caliber = CALIBER_RIFLE_MILITARY
 	matter = list(MATERIAL_STEEL = 1800)
 	ammo_type = /obj/item/ammo_casing/rifle/military
-	max_ammo = 18
+	max_ammo = 15 //if we lived in a world where normal mags had 30 rounds, this would be a 20 round mag
 	multiple_sprites = 1
 
-/obj/item/ammo_magazine/mil_rifle/heavy
-	labels = list("heavy")
-
-/obj/item/ammo_magazine/mil_rifle/heavy/empty
+/obj/item/ammo_magazine/mil_rifle/empty
 	initial_ammo = 0
 
-/obj/item/ammo_magazine/mil_rifle/heavy/practice
-	labels = list("heavy, practice")
-	ammo_type = /obj/item/ammo_casing/rifle/military/practice
-
-/obj/item/ammo_magazine/mil_rifle/light
-	icon_state = "bullpup_light"
-	labels = list("light")
-	ammo_type = /obj/item/ammo_casing/rifle/military/light
-	max_ammo = 14
-
-/obj/item/ammo_magazine/mil_rifle/light/empty
-	initial_ammo = 0
-
-/obj/item/ammo_magazine/mil_rifle/light/practice
-	labels = list("light, practice")
+/obj/item/ammo_magazine/mil_rifle/practice
+	labels = list("practice")
 	ammo_type = /obj/item/ammo_casing/rifle/military/practice
 
 /obj/item/ammo_magazine/caps
@@ -357,37 +349,3 @@
 	matter = list(MATERIAL_STEEL = 600)
 	max_ammo = 7
 	multiple_sprites = 1
-
-/obj/item/ammo_magazine/iclipr
-	name = "en-bloc clip"
-	desc = "An en-bloc clip for the garand rifle."
-	icon_state = "iclipr"
-	caliber = CALIBER_RIFLE
-	mag_type = MAGAZINE
-	ammo_type = /obj/item/ammo_casing/rifle
-	matter = list(MATERIAL_STEEL = 1500)
-	max_ammo = 8
-	multiple_sprites = TRUE
-
-/obj/item/ammo_magazine/shotgunmag
-	name = "shotgun magazine"
-	desc = "A magazine for semi-automatic shotguns."
-	icon_state = "drum"
-	caliber = CALIBER_SHOTGUN
-	mag_type = MAGAZINE
-	ammo_type = /obj/item/ammo_casing/shotgun
-	matter = list(MATERIAL_STEEL = 2400)
-	max_ammo = 15
-	multiple_sprites = TRUE
-
-/obj/item/ammo_magazine/shotgunmag/shot
-	labels = list("shot")
-	ammo_type = /obj/item/ammo_casing/shotgun/pellet
-
-/obj/item/ammo_magazine/shotgunmag/flechette
-	labels = list("flechette")
-	ammo_type = /obj/item/ammo_casing/shotgun/flechette
-
-/obj/item/ammo_magazine/shotgunmag/beanbag
-	labels = list("beanbag")
-	ammo_type = /obj/item/ammo_casing/shotgun/beanbag

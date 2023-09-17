@@ -1,4 +1,4 @@
-var/global/list/obj/effect/bump_teleporter/BUMP_TELEPORTERS = list()
+var/list/obj/effect/bump_teleporter/BUMP_TELEPORTERS = list()
 
 /obj/effect/bump_teleporter
 	name = "bump-teleporter"
@@ -6,7 +6,7 @@ var/global/list/obj/effect/bump_teleporter/BUMP_TELEPORTERS = list()
 	icon_state = "x2"
 	var/id = null			//id of this bump_teleporter.
 	var/id_target = null	//id of bump_teleporter which this moves you to.
-	invisibility = INVISIBILITY_ABSTRACT //nope, can't see this
+	invisibility = 101 		//nope, can't see this
 	anchored = TRUE
 	density = TRUE
 	opacity = 0

@@ -10,10 +10,10 @@
 	var/transfer_blood = 0
 	var/mob/living/carbon/human/bloody_hands_mob
 
-/obj/item/clothing/shoes
+/obj/item/clothing/shoes/
 	var/track_blood = 0
 
-/obj/item/reagent_containers/glass/rag
+/obj/item/reagent_containers/misc/rag
 	name = "rag"
 	desc = "For cleaning up messes, you suppose."
 	w_class = ITEM_SIZE_TINY
@@ -22,7 +22,6 @@
 	amount_per_transfer_from_this = 5
 	possible_transfer_amounts = "5"
 	volume = 10
-	can_be_placed_into = null
 	item_flags = ITEM_FLAG_NO_BLUDGEON
 	atom_flags = ATOM_FLAG_OPEN_CONTAINER
 	unacidable = FALSE
@@ -30,23 +29,32 @@
 	var/on_fire = 0
 	var/burn_time = 20 //if the rag burns for too long it turns to ashes
 
-/obj/item/reagent_containers/glass/rag/New()
+/obj/item/reagent_containers/misc/rag/New()
 	..()
 	update_name()
 
-/obj/item/reagent_containers/glass/rag/Destroy()
+/obj/item/reagent_containers/misc/rag/Destroy()
 	STOP_PROCESSING(SSobj, src) //so we don't continue turning to ash while gc'd
 	. = ..()
 
-/obj/item/reagent_containers/glass/rag/attack_self(mob/user as mob)
+/obj/item/reagent_containers/misc/rag/display_reagent_volume(mob/user)
+	if(!reagents || reagents.total_volume == 0)
+		to_chat(user, "<span class='notice'>It is dry.</span>")
+	else if(reagents.total_volume <= volume * 0.5)
+		to_chat(user, "<span class='notice'>It is moist.</span>")
+	else
+		to_chat(user, "<span class='notice'>It is wet.</span>")
+
+
+/obj/item/reagent_containers/misc/rag/attack_self(mob/user as mob)
 	if(on_fire && user.unEquip(src))
-		user.visible_message(SPAN_WARNING("\The [user] stamps out [src]."), SPAN_WARNING("You stamp out [src]."))
+		user.visible_message("<span class='warning'>\The [user] stamps out [src].</span>", "<span class='warning'>You stamp out [src].</span>")
 		extinguish()
 	else
 		remove_contents(user)
 
-/obj/item/reagent_containers/glass/rag/attackby(obj/item/W, mob/user)
-	if (!on_fire && W.IsFlameSource())
+/obj/item/reagent_containers/misc/rag/attackby(obj/item/W, mob/user)
+	if(!on_fire && isflamesource(W))
 		ignite()
 		if(on_fire)
 			user.visible_message(
@@ -59,7 +67,7 @@
 	. = ..()
 	update_name()
 
-/obj/item/reagent_containers/glass/rag/proc/update_name()
+/obj/item/reagent_containers/misc/rag/proc/update_name()
 	if(on_fire)
 		SetName("burning [initial(name)]")
 	else if(reagents.total_volume)
@@ -67,7 +75,7 @@
 	else
 		SetName("dry [initial(name)]")
 
-/obj/item/reagent_containers/glass/rag/on_update_icon()
+/obj/item/reagent_containers/misc/rag/on_update_icon()
 	if(on_fire)
 		icon_state = "raglit"
 	else
@@ -77,36 +85,30 @@
 	if(istype(B))
 		B.update_icon()
 
-/obj/item/reagent_containers/glass/rag/proc/remove_contents(mob/user, atom/trans_dest = null)
+/obj/item/reagent_containers/misc/rag/proc/remove_contents(mob/user, atom/trans_dest = null)
 	if(!trans_dest && !user.loc)
 		return
 
 	if(reagents.total_volume)
-		var/atom/target = trans_dest ? trans_dest : user.loc
-		user.visible_message(
-			SPAN_DANGER("\The [user] begins to wring out \the [src] over \the [target]."),
-			SPAN_NOTICE("You begin to wring out \the [src] over \the [target].")
-		)
+		var/target_text = trans_dest? "\the [trans_dest]" : "\the [user.loc]"
+		user.visible_message("<span class='danger'>\The [user] begins to wring out [src] over [target_text].</span>", "<span class='notice'>You begin to wring out [src] over [target_text].</span>")
 
-		if (do_after(user, reagents.total_volume * 5, target, DO_PUBLIC_UNIQUE)) //50 for a fully soaked rag
+		if(do_after(user, reagents.total_volume*5, do_flags = DO_DEFAULT & ~DO_SHOW_PROGRESS)) //50 for a fully soaked rag
 			if(trans_dest)
 				reagents.trans_to(trans_dest, reagents.total_volume)
 			else
 				reagents.splash(user.loc, reagents.total_volume)
-			user.visible_message(
-				SPAN_DANGER("\The [user] wrings out \the [src] over [target]."),
-				SPAN_NOTICE("You finish to wringing out \the [src].")
-			)
+			user.visible_message("<span class='danger'>\The [user] wrings out [src] over [target_text].</span>", "<span class='notice'>You finish to wringing out [src].</span>")
 			update_name()
 
-/obj/item/reagent_containers/glass/rag/proc/wipe_down(atom/A, mob/user)
+/obj/item/reagent_containers/misc/rag/proc/wipe_down(atom/A, mob/user)
 	if(!reagents.total_volume)
-		to_chat(user, SPAN_WARNING("The [initial(name)] is dry!"))
+		to_chat(user, "<span class='warning'>The [initial(name)] is dry!</span>")
 	else
 		user.visible_message("\The [user] starts to wipe down [A] with [src]!")
 		reagents.splash(A, 1) //get a small amount of liquid on the thing we're wiping.
 		update_name()
-		if (do_after(user, 3 SECONDS, A, DO_PUBLIC_UNIQUE))
+		if(do_after(user,30))
 			user.visible_message("\The [user] finishes wiping off the [A]!")
 			if(isturf(A))
 				var/turf/T = A
@@ -114,7 +116,7 @@
 			else
 				A.clean_blood()
 
-/obj/item/reagent_containers/glass/rag/attack(atom/target as obj|turf|area, mob/user as mob , flag)
+/obj/item/reagent_containers/misc/rag/attack(atom/target as obj|turf|area, mob/user as mob , flag)
 	if(isliving(target))
 		var/mob/living/M = target
 		if(on_fire)
@@ -127,25 +129,7 @@
 			user.do_attack_animation(src)
 			admin_attack_log(user, M, "used \the [src] (ignited) to attack", "was attacked using \the [src] (ignited)", "attacked with \the [src] (ignited)")
 			M.IgniteMob()
-		else if (reagents.total_volume)
-			if (iscarbon(target) && user.a_intent == I_HELP && flag == BP_HEAD)
-				var/mob/living/carbon/C = target
-				var/obj/item/organ/external/head/H = C.organs_by_name[BP_HEAD]
-				if (istype(H) && H.forehead_graffiti)
-					var/datum/reagent/R = /datum/reagent/acetone
-					var/wash_amount = 5
-					if (reagents.has_reagent(R, wash_amount))
-						H.forehead_graffiti = null
-						reagents.remove_reagent(R, wash_amount)
-						if (user == target)
-							var/datum/pronouns/P = M.choose_from_pronouns()
-							user.visible_message(SPAN_NOTICE("\The [user] scrubs the ink off [P.his] forehead."), SPAN_NOTICE("You scrub the ink off your forehead."))
-						else
-							user.visible_message(SPAN_NOTICE("\The [user] scrubs the ink off \the [M]'s forehead."), SPAN_NOTICE("You scrub the ink off \the [M]'s forehead."))
-					else
-						to_chat(user, SPAN_WARNING("You need to wet the rag with [wash_amount] units of [initial(R.name)] to get the ink off!"))
-					return
-
+		else if(reagents.total_volume)
 			if(user.zone_sel.selecting == BP_MOUTH)
 				if (!M.has_danger_grab(user))
 					to_chat(user, SPAN_WARNING("You need to have a firm grip on \the [target] before you can use \the [src] on them!"))
@@ -159,10 +143,10 @@
 				)
 
 				var/grab_time = 6 SECONDS
-				if (user.skill_check(SKILL_COMBAT, SKILL_TRAINED))
+				if (user.skill_check(SKILL_COMBAT, SKILL_ADEPT))
 					grab_time = 3 SECONDS
 
-				if (do_after(user, grab_time, target, DO_PUBLIC_UNIQUE))
+				if (do_after(user, grab_time, target, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
 					user.visible_message(
 						SPAN_DANGER("\The [user] smothers \the [target] with \the [src]!"),
 						SPAN_DANGER("You smother \the [target] with \the [src]!")
@@ -182,17 +166,17 @@
 
 	return ..()
 
-/obj/item/reagent_containers/glass/rag/afterattack(atom/A as obj|turf|area, mob/user as mob, proximity)
+/obj/item/reagent_containers/misc/rag/afterattack(atom/A as obj|turf|area, mob/user as mob, proximity)
 	if(!proximity)
 		return
 
 	if(istype(A, /obj/structure/reagent_dispensers))
 		if(!reagents.get_free_space())
-			to_chat(user, SPAN_WARNING("\The [src] is already soaked."))
+			to_chat(user, "<span class='warning'>\The [src] is already soaked.</span>")
 			return
 
 		if(A.reagents && A.reagents.trans_to_obj(src, reagents.maximum_volume))
-			user.visible_message(SPAN_NOTICE("\The [user] soaks [src] using [A]."), SPAN_NOTICE("You soak [src] using [A]."))
+			user.visible_message("<span class='notice'>\The [user] soaks [src] using [A].</span>", "<span class='notice'>You soak [src] using [A].</span>")
 			update_name()
 		return
 
@@ -203,24 +187,20 @@
 			wipe_down(A, user)
 		return
 
-/obj/item/reagent_containers/glass/rag/fire_act(datum/gas_mixture/air, exposed_temperature, exposed_volume)
+/obj/item/reagent_containers/misc/rag/fire_act(datum/gas_mixture/air, exposed_temperature, exposed_volume)
 	if(exposed_temperature >= 50 + T0C)
 		ignite()
 	if(exposed_temperature >= 900 + T0C)
 		new /obj/effect/decal/cleanable/ash(get_turf(src))
 		qdel(src)
 
+//rag must have a minimum of 2 units welder fuel and at least 80% of the reagents must be welder fuel.
+//maybe generalize flammable reagents someday
+/obj/item/reagent_containers/misc/rag/proc/can_ignite()
+	var/fuel = reagents.get_reagent_amount(/datum/reagent/fuel)
+	return (fuel >= 2 && fuel >= reagents.total_volume*0.8)
 
-/obj/item/reagent_containers/glass/rag/proc/can_ignite()
-	var/fuel = 0
-	for (var/datum/reagent/R as anything in reagents?.reagent_list)
-		if (R.gas_flags & XGM_GAS_FUEL)
-			fuel += R.volume
-		fuel += R.accelerant_quality * R.volume
-	return (fuel >= 2 && fuel >= reagents?.total_volume * 0.8)
-
-
-/obj/item/reagent_containers/glass/rag/proc/ignite()
+/obj/item/reagent_containers/misc/rag/proc/ignite()
 	if(on_fire)
 		return
 	if(!can_ignite())
@@ -228,7 +208,7 @@
 
 	//also copied from matches
 	if(reagents.get_reagent_amount(/datum/reagent/toxin/phoron)) // the phoron explodes when exposed to fire
-		visible_message(SPAN_DANGER("\The [src] conflagrates violently!"))
+		visible_message("<span class='danger'>\The [src] conflagrates violently!</span>")
 		var/datum/effect/effect/system/reagents_explosion/e = new()
 		e.set_up(round(reagents.get_reagent_amount(/datum/reagent/toxin/phoron) / 2.5, 1), get_turf(src), 0, 0)
 		e.start()
@@ -241,7 +221,7 @@
 	update_name()
 	update_icon()
 
-/obj/item/reagent_containers/glass/rag/proc/extinguish()
+/obj/item/reagent_containers/misc/rag/proc/extinguish()
 	STOP_PROCESSING(SSobj, src)
 	set_light(0)
 	on_fire = 0
@@ -249,15 +229,15 @@
 	//rags sitting around with 1 second of burn time left is dumb.
 	//ensures players always have a few seconds of burn time left when they light their rag
 	if(burn_time <= 5)
-		visible_message(SPAN_WARNING("\The [src] falls apart!"))
+		visible_message("<span class='warning'>\The [src] falls apart!</span>")
 		new /obj/effect/decal/cleanable/ash(get_turf(src))
 		qdel(src)
 	update_name()
 	update_icon()
 
-/obj/item/reagent_containers/glass/rag/Process()
+/obj/item/reagent_containers/misc/rag/Process()
 	if(!can_ignite())
-		visible_message(SPAN_WARNING("\The [src] burns out."))
+		visible_message("<span class='warning'>\The [src] burns out.</span>")
 		extinguish()
 
 	//copied from matches

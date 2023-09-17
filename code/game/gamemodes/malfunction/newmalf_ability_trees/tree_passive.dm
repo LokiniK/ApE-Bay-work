@@ -10,14 +10,15 @@
 // BEGIN RESEARCH DATUMS
 
 /datum/malf_research_ability/passive/intellicard_interception
-	ability = /datum/game_mode/malfunction/verb/intellicard_interception
+	ability = new/datum/game_mode/malfunction/verb/intellicard_interception()
 	price = 250
-	next = new/datum/malf_research_ability/passive/subtle_algorithms()
+	next = list(new/datum/malf_research_ability/passive/subtle_algorithms(),
+		new/datum/malf_research_ability/passive/disable_dr())
 	name = "T1 - Intellicard Interception"
 
 
 /datum/malf_research_ability/passive/subtle_algorithms
-	ability = /datum/game_mode/malfunction/verb/subtle_algorithms
+	ability = new/datum/game_mode/malfunction/verb/subtle_algorithms()
 	price = 1000
 	next = new/datum/malf_research_ability/passive/relay_suppression()
 	name = "T2 - Subtle Algorithms"
@@ -29,11 +30,11 @@
 	next = new/datum/malf_research_ability/passive/relay_override()
 	name = "T3 - Relay Suppression"
 
-/datum/malf_research_ability/passive/relay_suppression/research_finished(mob/living/silicon/ai/user)
+/datum/malf_research_ability/passive/relay_suppression/research_finished(var/mob/living/silicon/ai/user)
 	..()
 	if(!user)
 		return
-	to_chat(user, SPAN_NOTICE("You have suppressed the IDS system of nearby quantum relay. Your hacks will no longer be prevented or detected."))
+	to_chat(user, "<span class='notice'>You have suppressed the IDS system of nearby quantum relay. Your hacks will no longer be prevented or detected.</span>")
 	user.hack_can_fail = 0
 
 
@@ -42,11 +43,11 @@
 	price = 4000
 	name = "T4 - Relay Override"
 
-/datum/malf_research_ability/passive/relay_override/research_finished(mob/living/silicon/ai/user)
+/datum/malf_research_ability/passive/relay_override/research_finished(var/mob/living/silicon/ai/user)
 	..()
 	if(!user)
 		return
-	to_chat(user, SPAN_NOTICE("You have completely overtaken a nearby quantum relay. No remote communications will work."))
+	to_chat(user, "<span class='notice'>You have completely overtaken a nearby quantum relay. No remote communications will work.</span>")
 	user.intercepts_communication = 1
 
 

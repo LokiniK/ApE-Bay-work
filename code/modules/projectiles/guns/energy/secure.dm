@@ -1,5 +1,5 @@
 /obj/item/gun/energy/gun/small/secure
-	name = "compact smartgun"
+	name = "LAEP90-CS smartgun"
 	desc = "Combining the two LAEP90 variants, the secure and compact LAEP90-CS is the next best thing to keeping your security forces on a literal leash."
 	icon = 'icons/obj/guns/small_egun_secure.dmi'
 	item_icons = list(
@@ -7,10 +7,11 @@
 		slot_r_hand_str = 'icons/mob/onmob/items/righthand_guns_secure.dmi',
 		)
 	req_access = list(list(access_brig, access_bridge))
-	authorized_modes = list(ALWAYS_AUTHORIZED, AUTHORIZED)
+	authorized_modes = list(AUTHORIZED, AUTHORIZED, UNAUTHORIZED) //inf, was: list(ALWAYS_AUTHORIZED, AUTHORIZED, UNAUTHORIZED)
+	s_gun = "LP90-CS"
 
 /obj/item/gun/energy/stunrevolver/secure
-	name = "smart stun revolver"
+	name = "A&M X6 stun revolver"
 	desc = "This A&M X6 is fitted with an NT1019 chip which allows remote authorization of weapon functionality. It has an SCG emblem on the grip."
 	icon = 'icons/obj/guns/stunrevolver_secure.dmi'
 	icon_state = "revolverstun100"
@@ -21,9 +22,11 @@
 		)
 	item_state = null
 	req_access = list(list(access_brig, access_bridge))
+	projectile_type = /obj/item/projectile/energy/electrode/green
+	s_gun = "X6-S"
 
 /obj/item/gun/energy/gun/secure
-	name = "smartgun"
+	name = "LAEP90 smartgun"
 	desc = "A more secure LAEP90, the LAEP90-S is designed to please paranoid constituents. Body cam not included."
 	icon = 'icons/obj/guns/energy_gun_secure.dmi'
 	item_icons = list(
@@ -32,7 +35,8 @@
 		)
 	item_state = null	//so the human update icon uses the icon_state instead.
 	req_access = list(list(access_brig, access_bridge))
-	authorized_modes = list(ALWAYS_AUTHORIZED, AUTHORIZED)
+	authorized_modes = list(AUTHORIZED, AUTHORIZED, UNAUTHORIZED) //inf, was: list(ALWAYS_AUTHORIZED, AUTHORIZED, UNAUTHORIZED)
+	s_gun = "LP90-S"
 
 /obj/item/gun/energy/gun/secure/preauthorized
 	authorized_modes = list(ALWAYS_AUTHORIZED, AUTHORIZED, AUTHORIZED)
@@ -48,17 +52,15 @@
 		)
 	modifystate = "energyrevolverstun"
 	item_state = null
-	projectile_type = /obj/item/projectile/beam/stun
 	firemodes = list(
 		list(mode_name="stun", projectile_type=/obj/item/projectile/beam/stun, modifystate="energyrevolverstun"),
 		list(mode_name="shock", projectile_type=/obj/item/projectile/beam/stun/shock, modifystate="energyrevolvershock"),
 		list(mode_name="kill", projectile_type=/obj/item/projectile/beam, modifystate="energyrevolverkill"),
 		)
 	req_access = list(list(access_brig, access_heads))
-	authorized_modes = list(ALWAYS_AUTHORIZED, AUTHORIZED)
-
-/obj/item/gun/energy/revolver/secure/preauthorized
-	authorized_modes = list(ALWAYS_AUTHORIZED, AUTHORIZED, AUTHORIZED)
+	authorized_modes = list(AUTHORIZED, AUTHORIZED, UNAUTHORIZED) //inf, was: list(ALWAYS_AUTHORIZED, AUTHORIZED, UNAUTHORIZED)
+	is_serial = 1
+	s_gun = "LR680-S"
 
 /obj/item/gun/energy/gun/secure/mounted
 	name = "robot energy gun"
@@ -78,7 +80,9 @@
 	. = ..()
 
 /obj/item/gun/energy/laser/secure
-	name = "laser carbine"
+	name = "G40E laser carbine"
 	desc = "A Hephaestus Industries G40E carbine, designed to kill with concentrated energy blasts. Fitted with an NT1019 chip to make sure killcount is tracked appropriately."
 	icon_state = "lasersec"
 	req_access = list(list(access_brig, access_bridge))
+	is_serial = 1
+	s_gun = "G40E-S"

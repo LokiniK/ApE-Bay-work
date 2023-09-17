@@ -1,6 +1,9 @@
 /obj/effect/overmap/visitable/sector/exoplanet/grass
-	name = "lush exoplanet"
-	desc = "Planet with abundant flora and fauna."
+	scanner_name = "lush exoplanet"
+	scanner_desc = @{"[i]Stellar Body[/i]>: UNKNOWN
+[i]Class[/i]>: M-Class Planetoid
+[i]Habitability[/i]>: IDEAL
+[b]Notice[/b]>: Planet with abundant flora and fauna"}
 	color = "#407c40"
 	planetary_area = /area/exoplanet/grass
 	rock_colors = list(COLOR_ASTEROID_ROCK, COLOR_GRAY80, COLOR_BROWN)
@@ -26,7 +29,7 @@
 /obj/effect/overmap/visitable/sector/exoplanet/grass/get_surface_color()
 	return grass_color
 
-/obj/effect/overmap/visitable/sector/exoplanet/grass/adapt_seed(datum/seed/S)
+/obj/effect/overmap/visitable/sector/exoplanet/grass/adapt_seed(var/datum/seed/S)
 	..()
 	var/carnivore_prob = rand(100)
 	if(carnivore_prob < 30)
@@ -53,10 +56,12 @@
 /area/exoplanet/grass
 	base_turf = /turf/simulated/floor/exoplanet/grass
 	ambience = list('sound/effects/wind/wind_2_1.ogg','sound/effects/wind/wind_2_2.ogg','sound/effects/wind/wind_3_1.ogg','sound/effects/wind/wind_4_1.ogg','sound/ambience/eeriejungle2.ogg','sound/ambience/eeriejungle1.ogg')
-	forced_ambience = list(
-		'sound/ambience/jungle.ogg'
-	)
 
+/area/exoplanet/grass/play_ambience(var/mob/living/L)
+	..()
+	if(!L.ear_deaf && L.client && !L.client.ambience_playing)
+		L.client.ambience_playing = TRUE
+		L.playsound_local(get_turf(L),sound('sound/ambience/jungle.ogg', repeat = 1, wait = 0, volume = 25, channel = GLOB.ambience_sound_channel))
 
 /datum/random_map/noise/exoplanet/grass
 	descriptor = "grass exoplanet"
@@ -79,17 +84,17 @@
 	lightlevel = 0.5
 	has_trees = TRUE
 	flora_diversity = 8
-	fauna_types = list(/mob/living/simple_animal/passive/cat, /mob/living/simple_animal/passive/chicken, /mob/living/simple_animal/passive/mouse, /mob/living/simple_animal/passive/opossum, /mob/living/simple_animal/hostile/retaliate/goat, /mob/living/simple_animal/hostile/retaliate/goose, /mob/living/simple_animal/passive/cow)
+	fauna_types = list(/mob/living/simple_animal/friendly/cat, /mob/living/simple_animal/friendly/chicken, /mob/living/simple_animal/friendly/mouse, /mob/living/simple_animal/friendly/opossum, /mob/living/simple_animal/hostile/retaliate/goat, /mob/living/simple_animal/hostile/retaliate/goose, /mob/living/simple_animal/friendly/cow)
 	megafauna_types = list(/mob/living/simple_animal/hostile/retaliate/parrot/space/megafauna, /mob/living/simple_animal/hostile/retaliate/goose/dire)
 
 	//Animals being named alien creature is a bit odd as these would just be earth transplants
-	species = list( /mob/living/simple_animal/passive/cat 					  = "wild cat",
-					/mob/living/simple_animal/passive/chicken 				  = "wild chicken",
-					/mob/living/simple_animal/passive/mouse 				  = "mouse",
-					/mob/living/simple_animal/passive/opossum 				  =	"opossum",
+	species = list( /mob/living/simple_animal/friendly/cat 					  = "wild cat",
+					/mob/living/simple_animal/friendly/chicken 				  = "wild chicken",
+					/mob/living/simple_animal/friendly/mouse 				  = "mouse",
+					/mob/living/simple_animal/friendly/opossum 				  =	"opossum",
 					/mob/living/simple_animal/hostile/retaliate/goat  = "wild goat",
 					/mob/living/simple_animal/hostile/retaliate/goose = "goose",
-					/mob/living/simple_animal/passive/cow 					  = "wild cow")
+					/mob/living/simple_animal/friendly/cow 					  = "wild cow")
 
 /obj/effect/overmap/visitable/sector/exoplanet/grass/terraformed/generate_habitability()
 	habitability_class = HABITABILITY_IDEAL

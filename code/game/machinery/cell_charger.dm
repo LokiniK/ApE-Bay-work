@@ -1,29 +1,41 @@
 /obj/machinery/cell_charger
 	name = "heavy-duty cell charger"
 	desc = "A much more powerful version of the standard recharger that is specially designed for charging power cells."
-	icon = 'icons/obj/machines/power/cell_charger.dmi'
+	icon = 'icons/obj/power.dmi'
 	icon_state = "ccharger0"
 	anchored = TRUE
-	obj_flags = OBJ_FLAG_CAN_TABLE
 	idle_power_usage = 5
 	active_power_usage = 60 KILOWATTS	//This is the power drawn when charging
 	power_channel = EQUIP
 	var/obj/item/cell/charging = null
 	var/chargelevel = -1
+	construct_state = /decl/machine_construction/default/panel_closed //inf
+	uncreated_component_parts = null  //inf
+
+/obj/machinery/cell_charger/Initialize()
+	. = ..()
+/*inf	component_parts = list(
+		new /obj/item/stock_parts/circuitboard/cell_charger(src),
+		new /obj/item/stock_parts/capacitor(src)) inf*/
+	RefreshParts()
+
+/obj/machinery/cell_charger/RefreshParts()
+	for(var/obj/item/stock_parts/SP in component_parts)
+		if(istype(SP, /obj/item/stock_parts/capacitor))
+			active_power_usage *= SP.rating
 
 /obj/machinery/cell_charger/on_update_icon()
 	icon_state = "ccharger[charging ? 1 : 0]"
-	if(charging && operable())
+	if(charging && !(stat & (BROKEN|NOPOWER)) )
 		var/newlevel = 	round(charging.percent() * 4.0 / 99)
 		if(chargelevel != newlevel)
 			overlays.Cut()
-			overlays += emissive_appearance(icon, "ccharger-o[newlevel]")
 			overlays += "ccharger-o[newlevel]"
 			chargelevel = newlevel
 	else
 		overlays.Cut()
 
-/obj/machinery/cell_charger/examine(mob/user, distance)
+/obj/machinery/cell_charger/examine(var/mob/user, var/distance)
 	. = ..()
 	if(distance <= 5)
 		to_chat(user, "There's [charging ? "a" : "no"] cell in the charger.")
@@ -31,17 +43,17 @@
 			to_chat(user, "Current charge: [charging.charge]")
 
 /obj/machinery/cell_charger/attackby(obj/item/W, mob/user)
-	if(MACHINE_IS_BROKEN(src))
+	if(stat & BROKEN)
 		return
 
 	if(istype(W, /obj/item/cell) && anchored)
 		if(charging)
-			to_chat(user, SPAN_WARNING("There is already a cell in the charger."))
+			to_chat(user, "<span class='warning'>There is already a cell in the charger.</span>")
 			return
 		else
 			var/area/a = get_area(loc)
 			if(a.power_equip == 0) // There's no APC in this area, don't try to cheat power!
-				to_chat(user, SPAN_WARNING("The [name] blinks red as you try to insert the cell!"))
+				to_chat(user, "<span class='warning'>The [name] blinks red as you try to insert the cell!</span>")
 				return
 			if(!user.unEquip(W, src))
 				return
@@ -51,15 +63,16 @@
 			user.visible_message("[user] inserts a cell into the charger.", "You insert a cell into the charger.")
 			chargelevel = -1
 		queue_icon_update()
-	else if(isWrench(W))
+	if(isWrench(W))
 		if(charging)
 			to_chat(user, SPAN_WARNING("Remove the cell first!"))
 			return
-
 		anchored = !anchored
 		set_power()
 		to_chat(user, "You [anchored ? "attach" : "detach"] the cell charger [anchored ? "to" : "from"] the ground")
 		playsound(src.loc, 'sound/items/Ratchet.ogg', 75, 1)
+		return
+	return ..()
 
 /obj/machinery/cell_charger/physical_attack_hand(mob/user)
 	if(charging)
@@ -74,8 +87,13 @@
 		STOP_PROCESSING_MACHINE(src, MACHINERY_PROCESS_SELF)
 		return TRUE
 
+obj/machinery/cell_charger/MouseDrop(var/obj/structure/table/T)
+	if(!anchored && istype(T) && CanMouseDrop(T, usr))
+		forceMove(T.loc)
+		usr.stop_pulling()
+
 /obj/machinery/cell_charger/emp_act(severity)
-	if(inoperable())
+	if(stat & (BROKEN|NOPOWER))
 		return
 	if(charging)
 		charging.emp_act(severity)
@@ -83,7 +101,7 @@
 
 /obj/machinery/cell_charger/proc/set_power()
 	queue_icon_update()
-	if(inoperable() || !anchored)
+	if((stat & (BROKEN|NOPOWER)) || !anchored)
 		update_use_power(POWER_USE_OFF)
 		return
 	if (charging && !charging.fully_charged())

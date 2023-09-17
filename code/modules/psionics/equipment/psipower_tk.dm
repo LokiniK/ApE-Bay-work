@@ -1,6 +1,6 @@
 /obj/item/psychic_power/telekinesis
 	name = "telekinetic grip"
-	maintain_cost = 6
+	maintain_cost = 2
 	icon_state = "telekinesis"
 	var/atom/movable/focus
 
@@ -14,7 +14,7 @@
 		return
 	. = ..()
 
-/obj/item/psychic_power/telekinesis/proc/set_focus(atom/movable/_focus)
+/obj/item/psychic_power/telekinesis/proc/set_focus(var/atom/movable/_focus)
 
 	if(!_focus.simulated || !istype(_focus.loc, /turf))
 		return FALSE
@@ -34,6 +34,7 @@
 		. = attack_self(owner)
 		if(!.)
 			to_chat(owner, SPAN_WARNING("\The [_focus] is too hefty for you to get a mind-grip on."))
+		qdel(src)
 		return FALSE
 
 	focus = _focus
@@ -44,18 +45,18 @@
 	overlays += I
 	return TRUE
 
-/obj/item/psychic_power/telekinesis/attack_self(mob/user)
+/obj/item/psychic_power/telekinesis/attack_self(var/mob/user)
 	user.visible_message(SPAN_NOTICE("\The [user] makes a strange gesture."))
 	sparkle()
 	return focus.do_simple_ranged_interaction(user)
 
-/obj/item/psychic_power/telekinesis/afterattack(atom/target, mob/living/user, proximity)
+/obj/item/psychic_power/telekinesis/afterattack(var/atom/target, var/mob/living/user, var/proximity)
 
 	if(!target || !user || (isobj(target) && !isturf(target.loc)) || !user.psi || !user.psi.can_use() || !user.psi.spend_power(8))
 		return
 
-	user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN * 2)
-	user.psi.set_cooldown(8)
+	user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN * 4)
+	user.psi.set_cooldown(16)
 
 	var/user_psi_leech = user.do_psionics_check(5, user)
 	if(user_psi_leech)
@@ -84,10 +85,13 @@
 		else
 			if(!focus.anchored)
 				var/user_rank = owner.psi.get_rank(PSI_PSYCHOKINESIS)
-				focus.throw_at(target, user_rank*2, user_rank*3, owner)
+				focus.throw_at(target, user_rank*1.2, user_rank*1.6, owner)
 			sleep(1)
 			sparkle()
 		owner.drop_from_inventory(src)
+
+	if(!user.psi.spend_power(2)) // So you can't spam-click kill everything that moves
+		return FALSE
 
 /obj/item/psychic_power/telekinesis/proc/sparkle()
 	set waitfor = 0

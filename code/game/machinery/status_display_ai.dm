@@ -2,11 +2,11 @@
 	var/overlay
 	var/ckey
 
-/datum/ai_emotion/New(over, key)
+/datum/ai_emotion/New(var/over, var/key)
 	overlay = over
 	ckey = key
 
-var/global/list/ai_status_emotions = list(
+var/list/ai_status_emotions = list(
 	"Very Happy" 				= new /datum/ai_emotion("ai_veryhappy"),
 	"Happy" 					= new /datum/ai_emotion("ai_happy"),
 	"Neutral" 					= new /datum/ai_emotion("ai_neutral"),
@@ -23,13 +23,20 @@ var/global/list/ai_status_emotions = list(
 	"Dorfy" 					= new /datum/ai_emotion("ai_urist"),
 	"Facepalm" 					= new /datum/ai_emotion("ai_facepalm"),
 	"Friend Computer" 			= new /datum/ai_emotion("ai_friend"),
-	"Tribunal" 					= new /datum/ai_emotion("ai_tribunal", "serithi"),
-	"Tribunal Malfunctioning"	= new /datum/ai_emotion("ai_tribunal_malf", "serithi"),
-	"Ship Scan" 				= new /datum/ai_emotion("ai_shipscan")
+	"Tribunal" 					= new /datum/ai_emotion("ai_tribunal",),
+	"Tribunal Malfunctioning"	= new /datum/ai_emotion("ai_tribunal_malf",),
+	"Ship Scan" 				= new /datum/ai_emotion("ai_shipscan"),
+	"Fish Tank" 				= new /datum/ai_emotion("ai_fishtank"),
+	"Plump" 					= new /datum/ai_emotion("ai_plump"),
+	//[INF],
+	//[_Elar_],
+	"Citadel"					= new /datum/ai_emotion("ai_citadel"),
+	"Vega"						= new /datum/ai_emotion("ai_vega")
+	//[/_Elar_],
+	//[/INF],
 	)
 
-/proc/get_ai_emotions(ckey)
-	RETURN_TYPE(/list)
+/proc/get_ai_emotions(var/ckey)
 	var/list/emotions = new
 	for(var/emotion_name in ai_status_emotions)
 		var/datum/ai_emotion/emotion = ai_status_emotions[emotion_name]
@@ -56,9 +63,9 @@ var/global/list/ai_status_emotions = list(
 				SD.friendc = 0
 
 /obj/machinery/ai_status_display
-	icon = 'icons/obj/machines/status_display.dmi'
+	icon = 'infinity/icons/obj/status_display.dmi'
 	icon_state = "frame"
-	name = "\improper AI display"
+	name = "AI display"
 	anchored = TRUE
 	density = FALSE
 
@@ -76,7 +83,7 @@ var/global/list/ai_status_emotions = list(
 	src.emotion = emote
 
 /obj/machinery/ai_status_display/on_update_icon()
-	if(inoperable())
+	if(stat & (NOPOWER|BROKEN))
 		overlays.Cut()
 		return
 
@@ -89,9 +96,8 @@ var/global/list/ai_status_emotions = list(
 		if(2) // BSOD
 			set_picture("ai_bsod")
 
-/obj/machinery/ai_status_display/proc/set_picture(state)
+/obj/machinery/ai_status_display/proc/set_picture(var/state)
 	picture_state = state
-	if(length(overlays))
+	if(overlays.len)
 		overlays.Cut()
-	overlays += overlay_image('icons/obj/machines/status_display.dmi', icon_state=picture_state, plane = EFFECTS_ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
-	set_light(0.8, 0.1, 1, l_color = "#0093ff")
+	overlays += image('infinity/icons/obj/status_display.dmi', icon_state=picture_state)

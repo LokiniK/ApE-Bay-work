@@ -105,9 +105,9 @@
 	singular_name = "steel floor tile"
 	desc = "Those could work as a pretty decent throwing weapon." //why?
 	icon_state = "tile"
-	force = 6
+	force = 2
 	matter = list(MATERIAL_STEEL = 450)
-	throwforce = 15
+	throwforce = 3
 	obj_flags = OBJ_FLAG_CONDUCTIBLE
 
 /obj/item/stack/tile/mono
@@ -170,7 +170,6 @@
 	singular_name = "white floor tile"
 	icon_state = "tile_white"
 	matter = list(MATERIAL_PLASTIC = 450)
-	build_type = /obj/item/stack/tile/floor_white
 
 /obj/item/stack/tile/floor_white/fifty
 	amount = 50
@@ -181,7 +180,6 @@
 	icon_state = "fr_tile"
 	matter = list(MATERIAL_STEEL = 450)
 	obj_flags = OBJ_FLAG_CONDUCTIBLE
-	build_type = /obj/item/stack/tile/floor_dark
 
 /obj/item/stack/tile/floor_dark/fifty
 	amount = 50
@@ -191,7 +189,6 @@
 	singular_name = "freezer floor tile"
 	icon_state = "tile_freezer"
 	matter = list(MATERIAL_PLASTIC = 450)
-	build_type = /obj/item/stack/tile/floor_freezer
 
 /obj/item/stack/tile/floor_freezer/fifty
 	amount = 50
@@ -211,14 +208,13 @@
 	singular_name = "linoleum"
 	desc = "A piece of linoleum. It is the same size as a normal floor tile!"
 	icon_state = "tile_linoleum"
-	build_type = /obj/item/stack/tile/linoleum
 
 /obj/item/stack/tile/linoleum/fifty
 	amount = 50
 
 /obj/item/stack/tile/stone
 	name = "stone slabs"
-	singular_name = "stone slab"
+	singular name = "stone slab"
 	desc = "A smooth, flat slab of some kind of stone."
 	icon_state = "tile_stone"
 
@@ -230,37 +226,42 @@
 	singular_name = "brown carpet"
 	desc = "A piece of brown carpet."
 	icon_state = "tile_carpetbrown"
-	build_type = /obj/item/stack/tile/carpet
 
 /obj/item/stack/tile/carpet/fifty
 	amount = 50
+
+/obj/item/stack/tile/carpet/ten
+	amount = 10
 
 /obj/item/stack/tile/carpetblue
 	name = "blue carpet"
 	desc = "A piece of blue and gold carpet."
 	singular_name = "blue carpet"
 	icon_state = "tile_carpetblue"
-	build_type = /obj/item/stack/tile/carpetblue
 
 /obj/item/stack/tile/carpetblue/fifty
 	amount = 50
+
+/obj/item/stack/tile/carpetblue/ten
+	amount = 10
 
 /obj/item/stack/tile/carpetblue2
 	name = "pale blue carpet"
 	desc = "A piece of blue and pale blue carpet."
 	singular_name = "pale blue carpet"
 	icon_state = "tile_carpetblue2"
-	build_type = /obj/item/stack/tile/carpetblue2
 
 /obj/item/stack/tile/carpetblue2/fifty
 	amount = 50
-
+//[inf]
+/obj/item/stack/tile/carpetblue2/ten
+	amount = 10
+//[/inf]
 /obj/item/stack/tile/carpetblue3
 	name = "sea blue carpet"
 	desc = "A piece of blue and green carpet."
 	singular_name = "sea blue carpet"
 	icon_state = "tile_carpetblue3"
-	build_type = /obj/item/stack/tile/carpetblue3
 
 /obj/item/stack/tile/carpetblue3/fifty
 	amount = 50
@@ -270,7 +271,6 @@
 	desc = "A piece of magenta carpet."
 	singular_name = "magenta carpet"
 	icon_state = "tile_carpetmagenta"
-	build_type = /obj/item/stack/tile/carpetmagenta
 
 /obj/item/stack/tile/carpetmagenta/fifty
 	amount = 50
@@ -280,40 +280,48 @@
 	desc = "A piece of purple carpet."
 	singular_name = "purple carpet"
 	icon_state = "tile_carpetpurple"
-	build_type = /obj/item/stack/tile/carpetpurple
 
 /obj/item/stack/tile/carpetpurple/fifty
 	amount = 50
+
+/obj/item/stack/tile/carpetpurple/ten
+	amount = 10
 
 /obj/item/stack/tile/carpetorange
 	name = "orange carpet"
 	desc = "A piece of orange carpet."
 	singular_name = "orange carpet"
 	icon_state = "tile_carpetorange"
-	build_type = /obj/item/stack/tile/carpetorange
 
 /obj/item/stack/tile/carpetorange/fifty
 	amount = 50
+
+/obj/item/stack/tile/carpetorange/ten
+	amount = 10
 
 /obj/item/stack/tile/carpetgreen
 	name = "green carpet"
 	desc = "A piece of green carpet."
 	singular_name = "green carpet"
 	icon_state = "tile_carpetgreen"
-	build_type = /obj/item/stack/tile/carpetgreen
 
 /obj/item/stack/tile/carpetgreen/fifty
 	amount = 50
+
+/obj/item/stack/tile/carpetgreen/ten
+	amount = 10
 
 /obj/item/stack/tile/carpetred
 	name = "red carpet"
 	desc = "A piece of red carpet."
 	singular_name = "red carpet"
 	icon_state = "tile_carpetred"
-	build_type = /obj/item/stack/tile/carpetred
 
 /obj/item/stack/tile/carpetred/fifty
 	amount = 50
+
+/obj/item/stack/tile/carpetred/ten
+	amount = 10
 
 /obj/item/stack/tile/pool
 	name = "pool tiling"

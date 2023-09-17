@@ -1,14 +1,34 @@
-#define RECOMMENDED_VERSION 514
-#define FAILED_DB_CONNECTION_CUTOFF 5
+/var/server_name = "SS220 WL Prime"
+
+//inf #define RECOMMENDED_VERSION 513 // Определено в code/_macros_inf.dm и используется там же
+#define FAILED_DB_CONNECTION_CUTOFF 25
 #define THROTTLE_MAX_BURST 15 SECONDS
 #define SET_THROTTLE(TIME, REASON) throttle[1] = base_throttle + (TIME); throttle[2] = (REASON);
 
-
-
-var/global/game_id = randhex(8)
+/var/game_id = null
 
 GLOBAL_VAR(href_logfile)
 
+
+
+/hook/global_init/proc/generate_gameid()
+	if(game_id != null)
+		return
+	game_id = ""
+
+	var/list/c = list("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0")
+	var/l = c.len
+
+	var/t = world.timeofday
+	for(var/_ = 1 to 4)
+		game_id = "[c[(t % l) + 1]][game_id]"
+		t = round(t / l)
+	game_id = "-[game_id]"
+	t = round(world.realtime / (10 * 60 * 60 * 24))
+	for(var/_ = 1 to 3)
+		game_id = "[c[(t % l) + 1]][game_id]"
+		t = round(t / l)
+	return 1
 
 // Find mobs matching a given string
 //
@@ -58,6 +78,13 @@ GLOBAL_VAR(href_logfile)
 /proc/stack_trace(msg)
 	CRASH(msg)
 
+GLOBAL_REAL_VAR(list/stack_trace_storage)
+/proc/gib_stack_trace()
+	stack_trace_storage = list()
+	stack_trace()
+	stack_trace_storage.Cut(1, min(3,stack_trace_storage.len))
+	. = stack_trace_storage
+	stack_trace_storage = null
 
 /proc/enable_debugging(mode, port)
 	CRASH("auxtools not loaded")
@@ -67,36 +94,46 @@ GLOBAL_VAR(href_logfile)
 	return
 
 
-#ifndef UNIT_TEST
-/hook/startup/proc/set_visibility()
-	world.update_hub_visibility(config.hub_visible)
-#endif
-
 /world/New()
 	var/debug_server = world.GetConfig("env", "AUXTOOLS_DEBUG_DLL")
 	if (debug_server)
-		call_ext(debug_server, "auxtools_init")()
+		call(debug_server, "auxtools_init")()
 		enable_debugging()
 
+	if(config)
+		name = "[config.server_name] - [GLOB.using_map.full_name]"
+
+	//logs
 	SetupLogs()
 	var/date_string = time2text(world.realtime, "YYYY/MM/DD")
-	to_file(global.diary, "[log_end]\n[log_end]\nStarting up. (ID: [game_id]) [time2text(world.timeofday, "hh:mm.ss")][log_end]\n---------------------[log_end]")
+	diary = file("data/logs/[date_string].log")
 
-	if (config)
-		if (config.server_name)
-			name = "[config.server_name]"
-		if (config.log_runtime)
-			var/runtime_log = file("data/logs/runtime/[date_string]_[time2text(world.timeofday, "hh:mm")]_[game_id].log")
-			to_file(runtime_log, "Game [game_id] starting up at [time2text(world.timeofday, "hh:mm.ss")]")
-			log = runtime_log
-		if (config.log_hrefs)
-			GLOB.href_logfile = file("data/logs/[date_string] hrefs.htm")
 
-	if (byond_version < RECOMMENDED_VERSION)
+	GLOB.changelog_hash_infinity = md5('html/changelog_infinity.html')
+	GLOB.world_game_log = "[GLOB.log_directory]/game.log"
+	start_log(GLOB.world_game_log)
+
+	if(config && config.server_name != null && config.server_suffix && world.port > 0)
+		config.server_name += " #[(world.port % 1000) / 100]"
+
+	if(config && config.log_runtime)
+		world.log = file("[GLOB.log_directory]/runtime.log")
+		world.log << "Game [game_id] starting up at [time2text(world.timeofday, "hh:mm.ss")]"
+
+
+
+	if (config && config.log_hrefs)
+		GLOB.href_logfile = file("data/logs/[date_string] hrefs.htm")
+
+	if(byond_version < RECOMMENDED_VERSION)
 		to_world_log("Your server's byond version does not meet the recommended requirements for this server. Please update BYOND")
+
 	callHook("startup")
-	QDEL_NULL(__global_init)
-	..()
+	//Emergency Fix
+	load_mods()
+	//end-emergency fix
+
+	. = ..()
 
 #ifdef UNIT_TEST
 	log_unit_test("Unit Tests Enabled. This will destroy the world when testing is complete.")
@@ -108,7 +145,7 @@ GLOBAL_VAR(href_logfile)
 /world/Del()
 	var/debug_server = world.GetConfig("env", "AUXTOOLS_DEBUG_DLL")
 	if (debug_server)
-		call_ext(debug_server, "auxtools_shutdown")()
+		call(debug_server, "auxtools_shutdown")()
 	callHook("shutdown")
 	return ..()
 
@@ -118,7 +155,7 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 
 
 /world/Topic(T, addr, master, key)
-	to_file(global.diary, "TOPIC: \"[T]\", from:[addr], master:[master], key:[key][log_end]")
+	to_file(diary, "TOPIC: \"[T]\", from:[addr], master:[master], key:[key][GLOB.log_end]")
 
 	if (GLOB.world_topic_last > world.timeofday)
 		GLOB.world_topic_throttle = list() //probably passed midnight
@@ -166,7 +203,20 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 		s["players"] = 0
 		s["stationtime"] = stationtime2text()
 		s["roundduration"] = roundduration2text()
+		s["roundtime"] = roundduration2text()
 		s["map"] = replacetext(GLOB.using_map.full_name, "\improper", "") //Done to remove the non-UTF-8 text macros
+
+		switch(GAME_STATE)
+			if(RUNLEVEL_INIT)
+				s["ticker_state"] = 0
+			if(RUNLEVEL_LOBBY)
+				s["ticker_state"] = 1
+			if(RUNLEVEL_SETUP)
+				s["ticker_state"] = 2
+			if(RUNLEVEL_GAME)
+				s["ticker_state"] = 3
+			if(RUNLEVEL_POSTGAME)
+				s["ticker_state"] = 4
 
 		var/active = 0
 		var/list/players = list()
@@ -178,18 +228,20 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 					continue	//so stealthmins aren't revealed by the hub
 				admins[C.key] = C.holder.rank
 			if(legacy)
-				s["player[length(players)]"] = C.key
+				s["player[players.len]"] = C.key
 			players += C.key
 			if(istype(C.mob, /mob/living))
 				active++
 
-		s["players"] = length(players)
-		s["admins"] = length(admins)
+		s["players"] = players.len
+		s["admins"] = admins.len
 		if(!legacy)
 			s["playerlist"] = list2params(players)
 			s["adminlist"] = list2params(admins)
 			s["active_players"] = active
 
+		if(input["format"] == "json")
+			return json_encode(s)
 		return list2params(s)
 
 	else if(T == "manifest")
@@ -198,7 +250,7 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 		// We rebuild the list in the format external tools expect
 		for(var/dept in nano_crew_manifest)
 			var/list/dept_list = nano_crew_manifest[dept]
-			if(length(dept_list) > 0)
+			if(dept_list.len > 0)
 				positions[dept] = list()
 				for(var/list/person in dept_list)
 					positions[dept][person["name"]] = person["rank"]
@@ -266,7 +318,48 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 		SET_THROTTLE(10 SECONDS, "Comms Not Enabled")
 		return "Not enabled"
 
+	else if(copytext(T,1,15) == "playerlist_ext")
+		if(!config.comms_password)
+			return "Not enabled"
+		var/input[] = params2list(T)
+		if(input["key"] != config.comms_password)
+			SET_THROTTLE(30 SECONDS, "Bad Comms Key")
+			return "Bad Key"
+
+		var/list/players = list()
+		var/list/just_keys = list()
+
+		var/list/disconnected_observers = list()
+
+		for(var/mob/M in GLOB.dead_mob_list_)
+			if(!M.last_ckey)
+				continue
+			if(M.client)
+				continue
+			var/ckey = ckey(M.last_ckey)
+			disconnected_observers[ckey] = ckey
+
+		for(var/client/C as anything in GLOB.clients)
+			var/ckey = C.ckey
+			players[ckey] = ckey
+			just_keys += ckey
+
+		for(var/mob/M in GLOB.living_mob_list_)
+			if(!M.last_ckey)
+				continue
+			var/ckey = ckey(M.last_ckey)
+			if(players[ckey])
+				continue
+			if(disconnected_observers[ckey])
+				continue
+			players[ckey] = ckey
+			just_keys += ckey
+
+		return json_encode(just_keys)
+
 	else if(copytext(T,1,5) == "laws")
+		if(!config.comms_password)
+			return "Not enabled"
 		var/input[] = params2list(T)
 		if(input["key"] != config.comms_password)
 			SET_THROTTLE(30 SECONDS, "Bad Comms Key")
@@ -274,9 +367,9 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 
 		var/list/match = text_find_mobs(input["laws"], /mob/living/silicon)
 
-		if(!length(match))
+		if(!match.len)
 			return "No matches"
-		else if(length(match) == 1)
+		else if(match.len == 1)
 			var/mob/living/silicon/S = match[1]
 			var/info = list()
 			info["name"] = S.name
@@ -314,6 +407,8 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 			return list2params(ret)
 
 	else if(copytext(T,1,5) == "info")
+		if(!config.comms_password)
+			return "Not enabled"
 		var/input[] = params2list(T)
 		if(input["key"] != config.comms_password)
 			SET_THROTTLE(30 SECONDS, "Bad Comms Key")
@@ -321,9 +416,9 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 
 		var/list/match = text_find_mobs(input["info"])
 
-		if(!length(match))
+		if(!match.len)
 			return "No matches"
-		else if(length(match) == 1)
+		else if(match.len == 1)
 			var/mob/M = match[1]
 			var/info = list()
 			info["key"] = M.key
@@ -373,7 +468,8 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 				4. sender = the ircnick that send the message.
 		*/
 
-
+		if(!config.comms_password)
+			return "Not enabled"
 		var/input[] = params2list(T)
 		if(input["key"] != config.comms_password)
 			SET_THROTTLE(30 SECONDS, "Bad Comms Key")
@@ -395,16 +491,16 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 		if(rank == "Unknown")
 			rank = "Staff"
 
-		var/message =	SPAN_CLASS("pm", "[rank] PM from <b><a href='?irc_msg=[input["sender"]]'>[input["sender"]]</a></b>: [input["msg"]]")
-		var/amessage =  SPAN_CLASS("staff_pm", "[rank] PM from <a href='?irc_msg=[input["sender"]]'>[input["sender"]]</a> to <b>[key_name(C)]</b> : [input["msg"]]")
+		var/message =	"<font color='red'>[rank] PM from <b><a href='?irc_msg=[input["sender"]]'>[input["sender"]]</a></b>: [input["msg"]]</font>"
+		var/amessage =  "<font color='blue'>[rank] PM from <a href='?irc_msg=[input["sender"]]'>[input["sender"]]</a> to <b>[key_name(C)]</b> : [input["msg"]]</font>"
 
 		C.received_irc_pm = world.time
 		C.irc_admin = input["sender"]
 
-		sound_to(C, sound('sound/ui/pm-notify.ogg', volume = 40))
+		sound_to(C, 'sound/effects/adminhelp.ogg')
 		to_chat(C, message)
 
-		for(var/client/A as anything in GLOB.admins)
+		for(var/client/A in GLOB.admins)
 			if(A != C)
 				to_chat(A, amessage)
 		return "Message Successful"
@@ -416,6 +512,8 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 				1. notes = ckey of person the notes lookup is for
 				2. validationkey = the key the bot has, it should match the gameservers commspassword in it's configuration.
 		*/
+		if(!config.comms_password)
+			return "Not enabled"
 		var/input[] = params2list(T)
 		if(input["key"] != config.comms_password)
 			SET_THROTTLE(30 SECONDS, "Bad Comms Key")
@@ -423,6 +521,8 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 		return show_player_info_irc(ckey(input["notes"]))
 
 	else if(copytext(T,1,4) == "age")
+		if(!config.comms_password)
+			return "Not enabled"
 		var/input[] = params2list(T)
 		if(input["key"] != config.comms_password)
 			SET_THROTTLE(30 SECONDS, "Bad Comms Key")
@@ -436,12 +536,21 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 		else
 			return "Database connection failed or not set up"
 
+	else if(copytext(T,1,19) == "prometheus_metrics")
+		if(!config.comms_password)
+			return "Not enabled"
+		var/input[] = params2list(T)
+		if(input["key"] != config.comms_password)
+			SET_THROTTLE(30 SECONDS, "Bad Comms Key")
+			return "Bad Key"
+		if(!GLOB || !GLOB.prometheus_metrics)
+			return "Metrics not ready"
+		return GLOB.prometheus_metrics.collect()
 
-/world/Reboot(reason)
-	/*spawn(0)
+
+/world/Reboot(var/reason)
+	spawn(0)
 		sound_to(world, sound(pick('sound/AI/newroundsexy.ogg','sound/misc/apcdestroyed.ogg','sound/misc/bangindonk.ogg')))// random end sounds!! - LastyBatsy
-
-		*/
 
 	Master.Shutdown()
 
@@ -456,7 +565,7 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 
 	if(config.wait_for_sigusr1_reboot && reason != 3)
 		text2file("foo", "reboot_called")
-		to_world(SPAN_DANGER("World reboot waiting for external scripts. Please be patient."))
+		to_world("<span class=danger>World reboot waiting for external scripts. Please be patient.</span>")
 		return
 
 	..(reason)
@@ -471,22 +580,123 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 		return
 
 	var/list/Lines = file2list("data/mode.txt")
-	if(length(Lines))
+	if(Lines.len)
 		if(Lines[1])
 			SSticker.master_mode = Lines[1]
 			log_misc("Saved mode is '[SSticker.master_mode]'")
 
-/world/proc/save_mode(the_mode)
+/world/proc/save_mode(var/the_mode)
 	var/F = file("data/mode.txt")
 	fdel(F)
 	to_file(F, the_mode)
 
+/proc/load_configuration()
+	config = new /datum/configuration()
+	config.load("config/config.txt")
+	config.load("config/game_options.txt","game_options")
+	config.load("config/twitch_censor.txt", "twitch_censor")
+	if (GLOB.using_map?.config_path)
+		config.load(GLOB.using_map.config_path, "using_map")
+	config.load_text("config/motd.txt", "motd")
+	config.load_text("config/event.txt", "event")
+	config.loadsql("config/dbconfig.txt")
+
+/hook/startup/proc/loadMods()
+	world.load_mods()
+	return 1
+
+/world/proc/load_mods()
+	if(config.admin_legacy_system)
+		var/text = file2text("config/moderators.txt")
+		if (!text)
+			error("Failed to load config/mods.txt")
+		else
+			var/list/lines = splittext(text, "\n")
+			for(var/line in lines)
+				if (!line)
+					continue
+
+				if (copytext(line, 1, 2) == ";")
+					continue
+
+				var/title = "Moderator"
+				var/rights = admin_ranks[title]
+
+				var/ckey = copytext(line, 1, length(line)+1)
+				var/datum/admins/D = new /datum/admins(title, rights, ckey)
+				D.associate(GLOB.ckey_directory[ckey])
 
 /world/proc/update_status()
-	if (!config?.hub_visible || !config.hub_entry)
-		return
-	status = config.generate_hub_entry()
+	var/s = ""
 
+	if (config && config.server_name)
+		s += "<b>[config.server_name]</b>"
+
+//	s += "<b>[station_name()]</b>"
+	s += " ("
+//	s += "<a href=\"https://infinity-ss13.info\">" //Change this to wherever you want the hub to link to.
+//	s += "[game_version]"
+//	s += "Forum"  //Replace this with something else. Or ever better, delete it and uncomment the game version.
+//	s += "</a>|"
+	s += "<a href=\"http://discord.ss220.space\">"
+	s += "Discord"
+	s += "</a>"
+	s += ")"
+	s += " MedRP, modified Bay12 code, русский язык"
+//	s += "<br><b>Map:</b> [station_name()]"
+	var/n = 0
+	for (var/mob/M in GLOB.player_list)
+		if (M.client)
+			n++
+	s += "<br><b>Players:</b> [n] | "
+	if(SSticker.runlevels == RUNLEVEL_POSTGAME)
+		s += "<b>Mode:</b> ENDING"
+	else if(config.event_status)
+		s += "<b>Mode:</b> <u>EVENT!</u>"
+	else if(SSticker.master_mode)
+		s +="<b>Mode:</b> [SSticker.master_mode]"
+	else
+		s += "<b>Mode:</b> STARTING"
+//	s += "<br><b>Round Duration:</b> [roundduration2text()]"
+	if(!config.enter_allowed)
+		s += "<br><b>Status:</b> closed"
+
+/*inf, original bs12 ahead
+	var/list/features = list()
+
+	if(SSticker.master_mode)
+		features += SSticker.master_mode
+	else
+		features += "<b>STARTING</b>"
+
+	if (!config.enter_allowed)
+		features += "closed"
+
+	features += config.abandon_allowed ? "respawn" : "no respawn"
+
+	if (config && config.allow_vote_mode)
+		features += "vote"
+
+	var/n = 0
+	for (var/mob/M in GLOB.player_list)
+		if (M.client)
+			n++
+
+	if (n > 1)
+		features += "~[n] players"
+	else if (n > 0)
+		features += "~[n] player"
+
+
+	if (config && config.hostedby)
+		features += "hosted by <b>[config.hostedby]</b>"
+
+	if (features)
+		s += ": [jointext(features, ", ")]"
+*/
+	/* does this help? I do not know */
+	if (src.status != s)
+		src.status = s
 
 /world/proc/SetupLogs()
 	GLOB.log_directory = "data/logs/[time2text(world.realtime, "YYYY/MM/DD")]/round-"
@@ -495,32 +705,46 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 	else
 		GLOB.log_directory += "[replacetext(time_stamp(), ":", ".")]"
 
+	GLOB.world_qdel_log = file("[GLOB.log_directory]/qdel.log")
+	to_file(GLOB.world_qdel_log, "\n\nStarting up round ID [game_id]. [time_stamp()]\n---------------------")
 
-var/global/failed_db_connections = 0
-var/global/failed_old_db_connections = 0
+var/failed_db_connections = 0
+var/failed_old_db_connections = 0
 
 /hook/startup/proc/connectDB()
+
+	// This check includes connection to DB. Works with brand new rust_g SQL.
+	SSdbcore.CheckSchemaVersion()
+
+	// TODO: Remove legacy DB interaction
 	if(!setup_database_connection())
 		to_world_log("Your server failed to establish a connection with the feedback database.")
 	else
 		to_world_log("Feedback database connection established.")
 	return 1
 
-/proc/setup_database_connection()
-	if (!sqlenabled)
-		return 0
+proc/setup_database_connection()
+
 	if(failed_db_connections > FAILED_DB_CONNECTION_CUTOFF)	//If it failed to establish a connection more than 5 times in a row, don't bother attempting to conenct anymore.
 		return 0
+
 	if(!dbcon)
 		dbcon = new()
+
 	var/user = sqlfdbklogin
 	var/pass = sqlfdbkpass
 	var/db = sqlfdbkdb
 	var/address = sqladdress
 	var/port = sqlport
+
 	dbcon.Connect("dbi:mysql:[db]:[address]:[port]","[user]","[pass]")
 	. = dbcon.IsConnected()
 	if ( . )
+		var/DBQuery/unicode_query = dbcon.NewQuery("SET NAMES utf8mb4 COLLATE utf8mb4_general_ci")	// Установка кодировки и сравнения (4-байтный UTF-8) для сервера БД ~bear1ake
+		if(!unicode_query.Execute())					// Не понимаю, каким образом это может произойти, но...
+			failed_db_connections++						// ... постараемся запомнить этот факт ...
+			to_world_log(unicode_query.ErrorMsg())		// ... оповестим сервер об этом ...
+			return										// ... и прекратим подключение ~bear1ake
 		failed_db_connections = 0	//If this connection succeeded, reset the failed connections counter.
 	else
 		failed_db_connections++		//If it failed, increase the failed connections counter.
@@ -528,32 +752,32 @@ var/global/failed_old_db_connections = 0
 	return .
 
 //This proc ensures that the connection to the feedback database (global variable dbcon) is established
-/proc/establish_db_connection()
-	if (!sqlenabled)
-		return 0
+proc/establish_db_connection()
 	if(failed_db_connections > FAILED_DB_CONNECTION_CUTOFF)
 		return 0
+
 	if(!dbcon || !dbcon.IsConnected())
 		return setup_database_connection()
 	else
 		return 1
 
-
+/* [original] Два подключения к одному серверу и одной базе? Пожалуй нет. ~bear1ake
 /hook/startup/proc/connectOldDB()
 	if(!setup_old_database_connection())
 		to_world_log("Your server failed to establish a connection with the SQL database.")
 	else
 		to_world_log("SQL database connection established.")
 	return 1
-
+[/original] */
 //These two procs are for the old database, while it's being phased out. See the tgstation.sql file in the SQL folder for more information.
-/proc/setup_old_database_connection()
-	if (!sqlenabled)
-		return 0
+proc/setup_old_database_connection()
+
 	if(failed_old_db_connections > FAILED_DB_CONNECTION_CUTOFF)	//If it failed to establish a connection more than 5 times in a row, don't bother attempting to conenct anymore.
 		return 0
+
 	if(!dbcon_old)
 		dbcon_old = new()
+
 	var/user = sqllogin
 	var/pass = sqlpass
 	var/db = sqldb
@@ -563,16 +787,20 @@ var/global/failed_old_db_connections = 0
 	dbcon_old.Connect("dbi:mysql:[db]:[address]:[port]","[user]","[pass]")
 	. = dbcon_old.IsConnected()
 	if ( . )
+		var/DBQuery/unicode_query = dbcon_old.NewQuery("SET NAMES utf8mb4 COLLATE utf8mb4_general_ci")	// Установка кодировки и сравнения (4-байтный UTF-8) для сервера БД ~bear1ake
+		if(!unicode_query.Execute())					// Не понимаю, каким образом это может произойти, но...
+			failed_db_connections++						// ... постараемся запомнить этот факт ...
+			to_world_log(unicode_query.ErrorMsg())		// ... оповестим сервер об этом ...
+			return										// ... и прекратим подключение ~bear1ake
 		failed_old_db_connections = 0	//If this connection succeeded, reset the failed connections counter.
 	else
 		failed_old_db_connections++		//If it failed, increase the failed connections counter.
 		to_world_log(dbcon.ErrorMsg())
+
 	return .
 
 //This proc ensures that the connection to the feedback database (global variable dbcon) is established
-/proc/establish_old_db_connection()
-	if (!sqlenabled)
-		return 0
+proc/establish_old_db_connection()
 	if(failed_old_db_connections > FAILED_DB_CONNECTION_CUTOFF)
 		return 0
 
@@ -581,7 +809,7 @@ var/global/failed_old_db_connections = 0
 	else
 		return 1
 
-#undef RECOMMENDED_VERSION
+//inf #undef RECOMMENDED_VERSION // Определено в code/_macros_inf.dm и используется там же
 #undef FAILED_DB_CONNECTION_CUTOFF
 #undef THROTTLE_MAX_BURST
 #undef SET_THROTTLE

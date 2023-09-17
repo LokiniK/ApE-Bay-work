@@ -1,7 +1,7 @@
-/singleton/hierarchy/supply_pack/security
+/decl/hierarchy/supply_pack/security
 	name = "Security"
 
-/singleton/hierarchy/supply_pack/security/lightarmorsol
+/decl/hierarchy/supply_pack/security/lightarmorsol
 	name = "Armor - SCG light"
 	contains = list(/obj/item/clothing/suit/armor/pcarrier/light/sol = 4,
 					/obj/item/clothing/head/helmet/solgov =4)
@@ -10,7 +10,7 @@
 	containername = "\improper SolGov light armor crate"
 	access = access_security
 
-/singleton/hierarchy/supply_pack/security/secarmor
+/decl/hierarchy/supply_pack/security/secarmor
 	name = "Armor - Security"
 	contains = list(/obj/item/clothing/suit/armor/pcarrier/medium/security = 2,
 					/obj/item/clothing/head/helmet/solgov/security =2)
@@ -19,7 +19,7 @@
 	containername = "security armor crate"
 	access = access_security
 
-/singleton/hierarchy/supply_pack/security/solarmor
+/decl/hierarchy/supply_pack/security/solarmor
 	name = "Armor - Peacekeeper"
 	contains = list(/obj/item/clothing/suit/armor/pcarrier/blue/sol = 2,
 					/obj/item/clothing/head/helmet/solgov =2)
@@ -28,7 +28,7 @@
 	containername = "peacekeeper armor crate"
 	access = access_emergency_armory
 
-/singleton/hierarchy/supply_pack/security/comarmor
+/decl/hierarchy/supply_pack/security/comarmor
 	name = "Armor - Command"
 	contains = list(/obj/item/clothing/suit/armor/pcarrier/medium/command = 2,
 					/obj/item/clothing/head/helmet/solgov/command =2)
@@ -37,7 +37,7 @@
 	containername = "command armor crate"
 	access = access_heads
 
-/singleton/hierarchy/supply_pack/security/nanoarmor
+/decl/hierarchy/supply_pack/security/nanoarmor
 	name = "Armor - Corporate"
 	contains = list(/obj/item/clothing/suit/armor/pcarrier/medium/nt = 2,
 					/obj/item/clothing/head/helmet/nt/guard =2)
@@ -46,7 +46,7 @@
 	containername = "corporate armor crate"
 	access = access_nanotrasen
 
-/singleton/hierarchy/supply_pack/security/lightnanoarmor
+/decl/hierarchy/supply_pack/security/lightnanoarmor
 	name = "Armor - Corporate light"
 	contains = list(/obj/item/clothing/suit/armor/pcarrier/light/nt = 2,
 					/obj/item/clothing/head/helmet/nt/guard =2)
@@ -55,21 +55,16 @@
 	containername = "corporate light armor crate"
 	access = access_nanotrasen
 
-/singleton/hierarchy/supply_pack/security/pistol
+/decl/hierarchy/supply_pack/security/pistol
 	name = "Weapons - Ballistic sidearms"
-	contains = list(
-		/obj/item/gun/projectile/pistol/m22f/empty = 2,
-		/obj/item/gun/projectile/pistol/m19/empty = 2,
-		/obj/item/storage/box/ammo/doublestack,
-		/obj/item/storage/box/ammo/pistol
-	)
-	cost = 50
+	contains = list(/obj/item/gun/projectile/pistol/military = 4)
+	cost = 40
 	containertype = /obj/structure/closet/crate/secure/weapon
 	containername = "ballistic sidearms crate"
 	access = access_armory
 	security_level = SUPPLY_SECURITY_ELEVATED
 
-/singleton/hierarchy/supply_pack/security/laser
+/decl/hierarchy/supply_pack/security/laser
 	name = "Weapons - Laser carbines"
 	contains = list(/obj/item/gun/energy/laser/secure = 4)
 	cost = 60
@@ -78,14 +73,14 @@
 	access = access_emergency_armory
 	security_level = SUPPLY_SECURITY_ELEVATED
 
-/singleton/hierarchy/supply_pack/security/laser/shady
+/decl/hierarchy/supply_pack/security/laser/shady
 	name = "Weapons - Laser carbines (For disposal)"
 	contains = list(/obj/item/gun/energy/laser = 4)
 	cost = 80
 	contraband = 1
 	security_level = null
 
-/singleton/hierarchy/supply_pack/security/advancedlaser
+/decl/hierarchy/supply_pack/security/advancedlaser
 	name = "Weapons - Advanced Laser Weapons"
 	contains = list(/obj/item/gun/energy/xray = 2,
 					/obj/item/gun/energy/xray/pistol = 2,
@@ -96,7 +91,7 @@
 	access = access_emergency_armory
 	security_level = SUPPLY_SECURITY_HIGH
 
-/singleton/hierarchy/supply_pack/security/sniperlaser
+/decl/hierarchy/supply_pack/security/sniperlaser
 	name = "Weapons - Energy marksman"
 	contains = list(/obj/item/gun/energy/sniperrifle = 2)
 	cost = 70
@@ -105,57 +100,42 @@
 	access = access_emergency_armory
 	security_level = SUPPLY_SECURITY_HIGH
 
-/singleton/hierarchy/supply_pack/security/pdw
+/decl/hierarchy/supply_pack/security/pdw
 	name = "Weapons - Ballistic PDWs"
-	contains = list(/obj/item/gun/projectile/automatic/sec_smg/empty = 2)
+	contains = list(/obj/item/gun/projectile/automatic/sec_smg = 2)
 	cost = 40
 	containertype = /obj/structure/closet/crate/secure/weapon
 	containername = "\improper Ballistic PDW crate"
 	access = access_emergency_armory
-	security_level = SUPPLY_SECURITY_ELEVATED
+	security_level = SUPPLY_SECURITY_HIGH
 
-/singleton/hierarchy/supply_pack/security/bullpup
-	name = "Weapons - Heavy ballistic rifles"
+/decl/hierarchy/supply_pack/security/bullpup
+	name = "Weapons - Ballistic rifles"
 	contains = list(/obj/item/gun/projectile/automatic/bullpup_rifle = 2)
-	cost = 100 //A little more expensive than the 5mmR variant. Hits harder!
+	cost = 80 //Because 5.56 is OP as fuck right now.
 	containertype = /obj/structure/closet/crate/secure/weapon
-	containername = "bullpup heavy automatic rifle crate"
+	containername = "bullpup automatic rifle crate"
 	access = access_emergency_armory
 	security_level = SUPPLY_SECURITY_HIGH
 
-/singleton/hierarchy/supply_pack/security/light_bullpup
-	name = "Weapons - Light ballistic rifles"
-	contains = list(/obj/item/gun/projectile/automatic/bullpup_rifle/light = 2)
-	cost = 80
-	containertype = /obj/structure/closet/crate/secure/weapon
-	containername = "bullpup light automatic rifle crate"
-	access = access_emergency_armory
-	security_level = SUPPLY_SECURITY_HIGH
-
-/singleton/hierarchy/supply_pack/security/pistolammo
+/decl/hierarchy/supply_pack/security/pistolammo
 	name = "Ammunition - pistol magazines"
-	contains = list(
-		/obj/item/storage/box/ammo/pistol = 3,
-		/obj/item/storage/box/ammo/doublestack = 3
-	)
+	contains = list(/obj/item/ammo_magazine/pistol/double = 4)
 	cost = 30
 	containertype = /obj/structure/closet/crate/secure/weapon
 	containername = "pistol ammunition crate"
-	access = access_hos
+	access = access_security
 	security_level = SUPPLY_SECURITY_ELEVATED
 
-/singleton/hierarchy/supply_pack/security/pistolammorubber
+/decl/hierarchy/supply_pack/security/pistolammorubber
 	name = "Ammunition - pistol rubber"
-	contains = list(
-		/obj/item/storage/box/ammo/pistol/rubber = 4,
-		/obj/item/storage/box/ammo/doublestack/rubber = 2
-	)
+	contains = list(/obj/item/ammo_magazine/pistol/double/rubber = 4)
 	cost = 20
 	containertype = /obj/structure/closet/crate/secure/weapon
 	containername = "pistol rubber ammunition crate"
 	access = access_security
 
-/singleton/hierarchy/supply_pack/security/pistolammopractice
+/decl/hierarchy/supply_pack/security/pistolammopractice
 	name = "Ammunition - pistol practice ammo"
 	contains = list(/obj/item/ammo_magazine/pistol/double/practice = 8)
 	cost = 20
@@ -163,7 +143,7 @@
 	containername = "pistol practice ammunition crate"
 	access = access_security
 
-/singleton/hierarchy/supply_pack/security/holster
+/decl/hierarchy/supply_pack/security/holster
 	name = "Gear - Holster crate"
 	contains = list(/obj/item/clothing/accessory/storage/holster/hip = 4)
 	cost = 20
@@ -171,7 +151,7 @@
 	containername = "holster crate"
 	access = access_solgov_crew
 
-/singleton/hierarchy/supply_pack/security/securityextragear
+/decl/hierarchy/supply_pack/security/securityextragear
 	name = "Gear - Master at Arms equipment"
 	contains = list(/obj/item/device/radio/headset/headset_sec,
 					/obj/item/device/radio/headset/headset_sec/alt,
@@ -180,7 +160,7 @@
 					/obj/item/reagent_containers/spray/pepper,
 					/obj/item/grenade/chem_grenade/teargas,
 					/obj/item/melee/baton/loaded,
-					/obj/item/clothing/glasses/hud/security/prot,
+					/obj/item/clothing/glasses/sunglasses/sechud/goggles,
 					/obj/item/taperoll/police,
 					/obj/item/device/hailer,
 					/obj/item/clothing/accessory/storage/black_vest,
@@ -195,10 +175,10 @@
 	containername = "\improper Master at Arms equipment crate"
 	access = access_security
 
-/singleton/hierarchy/supply_pack/security/cosextragear
+/decl/hierarchy/supply_pack/security/cosextragear
 	name = "Gear - Chief of Security equipment"
 	contains = list(/obj/item/device/radio/headset/heads/cos,
-					/obj/item/clothing/glasses/hud/security/prot,
+					/obj/item/clothing/glasses/sunglasses/sechud/goggles,
 					/obj/item/taperoll/police,
 					/obj/item/storage/belt/holster/security,
 					/obj/item/device/hailer,
@@ -210,7 +190,7 @@
 	containername = "\improper Chief of Security equipment crate"
 	access = access_hos
 
-/singleton/hierarchy/supply_pack/security/practicelasers
+/decl/hierarchy/supply_pack/security/practicelasers
 	name = "Misc - Practice Laser Carbines"
 	contains = list(/obj/item/gun/energy/laser/practice = 4)
 	cost = 20

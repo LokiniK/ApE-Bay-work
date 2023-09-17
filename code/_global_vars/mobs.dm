@@ -4,23 +4,10 @@ GLOBAL_PROTECT(admins)
 GLOBAL_LIST_EMPTY(ckey_directory) //all ckeys with associated client
 
 
-/// List of all mobs with clients currently attached
-GLOBAL_LIST_EMPTY(player_list)
-
-/// List of all living mobs with clients currently attached
-GLOBAL_LIST_EMPTY(living_players)
-
-/// List of all carbon/human* mobs
-GLOBAL_LIST_EMPTY(human_mobs)
-
-/// List of all silicon* mobs
-GLOBAL_LIST_EMPTY(silicon_mobs)
-
-/// List of all observer/ghost mobs
-GLOBAL_LIST_EMPTY(ghost_mobs)
-
-/// List of all mob/living currently alive
-GLOBAL_LIST_EMPTY(alive_mobs)
-
-/// List of all mob/living currently dead
-GLOBAL_LIST_EMPTY(dead_mobs)
+GLOBAL_LIST_EMPTY(player_list)      //List of all mobs **with clients attached**. Excludes /mob/new_player
+GLOBAL_LIST_EMPTY(human_mob_list)   //List of all human mobs and sub-types, including clientless
+GLOBAL_LIST_EMPTY(silicon_mob_list) //List of all silicon mobs, including clientless
+GLOBAL_LIST_EMPTY(living_mob_list_) //List of all alive mobs, including clientless. Excludes /mob/new_player
+GLOBAL_LIST_EMPTY(dead_mob_list_)   //List of all dead mobs, including clientless. Excludes /mob/new_player
+GLOBAL_LIST_EMPTY(ghost_mob_list)   //List of all ghosts, including clientless. Excludes /mob/new_player
+GLOBAL_LIST_EMPTY(antag_list)   	//List of all antagonist minds

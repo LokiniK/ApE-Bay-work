@@ -13,7 +13,7 @@
 /obj/structure/morgue
 	name = "morgue"
 	desc = "Used to keep bodies in until someone fetches them."
-	icon = 'icons/obj/structures/morgue_tray.dmi'
+	icon = 'icons/obj/stationobjs.dmi'
 	icon_state = "morgue1"
 	dir = EAST
 	density = TRUE
@@ -30,7 +30,7 @@
 	if (src.connected)
 		src.icon_state = "morgue0"
 	else
-		if (length(src.contents))
+		if (src.contents.len)
 			src.icon_state = "morgue2"
 		else
 			src.icon_state = "morgue1"
@@ -38,20 +38,20 @@
 
 /obj/structure/morgue/ex_act(severity)
 	switch(severity)
-		if(EX_ACT_DEVASTATING)
+		if(1.0)
 			for(var/atom/movable/A as mob|obj in src)
 				A.forceMove(src.loc)
 				ex_act(severity)
 			qdel(src)
 			return
-		if(EX_ACT_HEAVY)
+		if(2.0)
 			if (prob(50))
 				for(var/atom/movable/A as mob|obj in src)
 					A.forceMove(src.loc)
 					ex_act(severity)
 				qdel(src)
 				return
-		if(EX_ACT_LIGHT)
+		if(3.0)
 			if (prob(5))
 				for(var/atom/movable/A as mob|obj in src)
 					A.forceMove(src.loc)
@@ -73,7 +73,7 @@
 		src.connected = new /obj/structure/m_tray( src.loc )
 		step(src.connected, src.dir)
 		var/turf/T = get_step(src, src.dir)
-		if (T.contents.Find(src.connected))
+		if (list_find(T.contents, src.connected))
 			src.connected.connected = src
 			src.icon_state = "morgue0"
 			for(var/atom/movable/A as mob|obj in src)
@@ -87,35 +87,25 @@
 	update()
 	return
 
-/obj/structure/morgue/attack_robot(mob/user)
+/obj/structure/morgue/attack_robot(var/mob/user)
 	if(Adjacent(user))
 		return attack_hand(user)
 	else return ..()
 
-
-/obj/structure/morgue/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Pen - Add label
-	if (istype(tool, /obj/item/pen))
-		var/input = input(user, "What would you like the label to be? Leave null to clear label.", "\The [initial(name)] - Label") as null|text
-		input = sanitizeSafe(input, MAX_NAME_LEN)
-		if (!user.use_sanity_check(src, tool))
-			return TRUE
-		if (!input)
-			SetName(initial(name))
-			user.visible_message(
-				SPAN_NOTICE("\The [user] clears \the [src]'s label with \a [tool]."),
-				SPAN_NOTICE("You clear \the [src]'s label with \the [tool].")
-			)
+/obj/structure/morgue/attackby(P as obj, mob/user as mob)
+	if (istype(P, /obj/item/pen))
+		var/t = input(user, "What would you like the label to be?", text("[]", src.name), null)  as text
+		if (user.get_active_hand() != P)
+			return
+		if ((!in_range(src, usr) && src.loc != user))
+			return
+		t = sanitizeSafe(t, MAX_NAME_LEN)
+		if (t)
+			src.SetName(text("Morgue- '[]'", t))
 		else
-			SetName("[initial(name)] - '[input]'")
-			user.visible_message(
-				SPAN_NOTICE("\The [user] labels \the [src] with \a [tool]."),
-				SPAN_NOTICE("You label \the [src] with \the [tool].")
-			)
-		return TRUE
-
-	return ..()
-
+			src.SetName("Morgue")
+	src.add_fingerprint(user)
+	return
 
 /obj/structure/morgue/relaymove(mob/user as mob)
 	if (user.stat)
@@ -123,7 +113,7 @@
 	src.connected = new /obj/structure/m_tray( src.loc )
 	step(src.connected, EAST)
 	var/turf/T = get_step(src, EAST)
-	if (T.contents.Find(src.connected))
+	if (list_find(T.contents, src.connected))
 		src.connected.connected = src
 		src.icon_state = "morgue0"
 		for(var/atom/movable/A as mob|obj in src)
@@ -141,10 +131,10 @@
 /obj/structure/m_tray
 	name = "morgue tray"
 	desc = "Apply corpse before closing."
-	icon = 'icons/obj/structures/morgue_tray.dmi'
+	icon = 'icons/obj/stationobjs.dmi'
 	icon_state = "morguet"
 	density = TRUE
-	layer = BELOW_OBJ_LAYER
+	layer = BELOW_OBJ_LAYER - 0.1
 	var/obj/structure/morgue/connected = null
 	anchored = TRUE
 	throwpass = 1
@@ -169,7 +159,7 @@
 	return
 
 /obj/structure/m_tray/MouseDrop_T(atom/movable/O as mob|obj, mob/user as mob)
-	if ((!( istype(O, /atom/movable) ) || O.anchored || get_dist(user, src) > 1 || get_dist(user, O) > 1 || user.contents.Find(src) || user.contents.Find(O)))
+	if ((!( istype(O, /atom/movable) ) || O.anchored || get_dist(user, src) > 1 || get_dist(user, O) > 1 || list_find(user.contents, src) || list_find(user.contents, O)))
 		return
 	if (!ismob(O) && !istype(O, /obj/structure/closet/body_bag))
 		return
@@ -179,7 +169,7 @@
 	if (user != O)
 		for(var/mob/B in viewers(user, 3))
 			if ((B.client && !( B.blinded )))
-				to_chat(B, SPAN_WARNING("\The [user] stuffs [O] into [src]!"))
+				to_chat(B, "<span class='warning'>\The [user] stuffs [O] into [src]!</span>")
 	return
 
 
@@ -190,7 +180,7 @@
 /obj/structure/crematorium
 	name = "crematorium"
 	desc = "A human incinerator. Works well on barbeque nights."
-	icon = 'icons/obj/structures/crematorium.dmi'
+	icon = 'icons/obj/stationobjs.dmi'
 	icon_state = "crema1"
 	density = TRUE
 	var/obj/structure/c_tray/connected = null
@@ -210,7 +200,7 @@
 		icon_state = "crema_active"
 	else if (src.connected)
 		src.icon_state = "crema0"
-	else if (length(src.contents))
+	else if (src.contents.len)
 		src.icon_state = "crema2"
 	else
 		src.icon_state = "crema1"
@@ -218,20 +208,20 @@
 
 /obj/structure/crematorium/ex_act(severity)
 	switch(severity)
-		if(EX_ACT_DEVASTATING)
+		if(1)
 			for(var/atom/movable/A as mob|obj in src)
 				A.forceMove(src.loc)
 				ex_act(severity)
 			qdel(src)
 			return
-		if(EX_ACT_HEAVY)
+		if(2)
 			if (prob(50))
 				for(var/atom/movable/A as mob|obj in src)
 					A.forceMove(src.loc)
 					ex_act(severity)
 				qdel(src)
 				return
-		if(EX_ACT_LIGHT)
+		if(3)
 			if (prob(5))
 				for(var/atom/movable/A as mob|obj in src)
 					A.forceMove(src.loc)
@@ -242,7 +232,7 @@
 
 /obj/structure/crematorium/attack_hand(mob/user)
 	if(cremating)
-		to_chat(usr, SPAN_WARNING("It's locked."))
+		to_chat(usr, "<span class='warning'>It's locked.</span>")
 		return
 	if(src.connected && (src.locked == FALSE))
 		for(var/atom/movable/A as mob|obj in src.connected.loc)
@@ -256,7 +246,7 @@
 		src.connected = new /obj/structure/c_tray(src.loc)
 		step(src.connected, dir)
 		var/turf/T = get_step(src, dir)
-		if (T.contents.Find(src.connected))
+		if (list_find(T.contents, src.connected))
 			src.connected.connected = src
 			src.icon_state = "crema0"
 			for(var/atom/movable/A as mob|obj in src)
@@ -268,30 +258,20 @@
 	src.add_fingerprint(user)
 	update()
 
-
-/obj/structure/crematorium/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Pen - Add label
-	if (istype(tool, /obj/item/pen))
-		var/input = input(user, "What would you like the label to be? Leave null to clear label.", "\The [initial(name)] - Label") as null|text
-		input = sanitizeSafe(input, MAX_NAME_LEN)
-		if (!user.use_sanity_check(src, tool))
-			return TRUE
-		if (!input)
-			SetName(initial(name))
-			user.visible_message(
-				SPAN_NOTICE("\The [user] clears \the [src]'s label with \a [tool]."),
-				SPAN_NOTICE("You clear \the [src]'s label with \the [tool].")
-			)
+/obj/structure/crematorium/attackby(P as obj, mob/user as mob)
+	if(istype(P, /obj/item/pen))
+		var/t = input(user, "What would you like the label to be?", text("[]", src.name), null)  as text
+		if(user.get_active_hand() != P)
+			return
+		if((!in_range(src, usr) > 1 && src.loc != user))
+			return
+		t = sanitizeSafe(t, MAX_NAME_LEN)
+		if(t)
+			src.SetName(text("Crematorium- '[]'", t))
 		else
-			SetName("[initial(name)] - '[input]'")
-			user.visible_message(
-				SPAN_NOTICE("\The [user] labels \the [src] with \a [tool]."),
-				SPAN_NOTICE("You label \the [src] with \the [tool].")
-			)
-		return TRUE
-
-	return ..()
-
+			src.SetName("Crematorium")
+	src.add_fingerprint(user)
+	return
 
 /obj/structure/crematorium/relaymove(mob/user as mob)
 	if (user.stat || locked)
@@ -299,7 +279,7 @@
 	src.connected = new /obj/structure/c_tray( src.loc )
 	step(src.connected, SOUTH)
 	var/turf/T = get_step(src, SOUTH)
-	if (T.contents.Find(src.connected))
+	if (list_find(T.contents, src.connected))
 		src.connected.connected = src
 		src.icon_state = "crema0"
 		for(var/atom/movable/A as mob|obj in src)
@@ -313,15 +293,15 @@
 	if(cremating)
 		return //don't let you cremate something twice or w/e
 
-	if(length(contents) <= 0)
-		src.audible_message(SPAN_WARNING("You hear a hollow crackle."), 1)
+	if(contents.len <= 0)
+		src.audible_message("<span class='warning'>You hear a hollow crackle.</span>", 1)
 		return
 
 	else
 		if(length(search_contents_for(/obj/item/disk/nuclear)))
 			to_chat(loc, "The button's status indicator flashes yellow, indicating that something important is inside the crematorium, and must be removed.")
 			return
-		src.audible_message(SPAN_WARNING("You hear a roar as the [src] activates."), 1)
+		src.audible_message("<span class='warning'>You hear a roar as the [src] activates.</span>", 1)
 
 		cremating = 1
 		locked = 1
@@ -372,14 +352,14 @@
 									shake_animation()
 
 
-			if(M.stat == DEAD)
+//INF				if(M.stat >= DEAD)
 				if(round_is_spooky())
 					if(prob(50))
 						playsound(src, 'sound/effects/ghost.ogg', 10, 5)
 					else
 						playsound(src, 'sound/effects/ghost2.ogg', 10, 5)
 
-				admin_attack_log(A, M, "Cremated their victim.", "Was cremated.", "cremated alive")
+				admin_attack_log(M, A, "Cremated their victim.", "Was cremated.", "cremated alive")
 				M.audible_message("[M]'s screams cease, as does any movement within the [src]. All that remains is a dull, empty silence.")
 				M.dust()
 
@@ -400,7 +380,7 @@
 /obj/structure/c_tray
 	name = "crematorium tray"
 	desc = "Apply body before burning."
-	icon = 'icons/obj/structures/crematorium.dmi'
+	icon = 'icons/obj/stationobjs.dmi'
 	icon_state = "cremat"
 	density = TRUE
 	layer = BELOW_OBJ_LAYER
@@ -428,7 +408,7 @@
 	return
 
 /obj/structure/c_tray/MouseDrop_T(atom/movable/O as mob|obj, mob/user as mob)
-	if ((!( istype(O, /atom/movable) ) || O.anchored || get_dist(user, src) > 1 || get_dist(user, O) > 1 || user.contents.Find(src) || user.contents.Find(O)))
+	if ((!( istype(O, /atom/movable) ) || O.anchored || get_dist(user, src) > 1 || get_dist(user, O) > 1 || list_find(user.contents, src) || list_find(user.contents, O)))
 		return
 	if (!ismob(O) && !istype(O, /obj/structure/closet/body_bag))
 		return
@@ -436,15 +416,20 @@
 		return
 	O.forceMove(src.loc)
 	if (user != O)
-		user.visible_message(SPAN_WARNING("\The [user] stuffs \the [O] into \the [src]!"))
+		for(var/mob/B in viewers(user, 3))
+			if ((B.client && !( B.blinded )))
+				to_chat(B, text("<span class='warning'>[] stuffs [] into []!</span>", user, O, src))
 
 /obj/machinery/button/crematorium
 	name = "crematorium igniter"
 	desc = "Burn baby burn!"
-	icon = 'icons/obj/structures/buttons.dmi'
-	icon_state = "blast_ctrl"
+	icon = 'icons/obj/power.dmi'
+	icon_state = "crema_switch"
 	req_access = list(access_crematorium)
 	id_tag = 1
+
+/obj/machinery/button/crematorium/on_update_icon()
+	return
 
 /obj/machinery/button/crematorium/activate(mob/user)
 	if(operating)

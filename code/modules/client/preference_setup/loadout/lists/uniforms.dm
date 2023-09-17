@@ -45,11 +45,13 @@
 	suits += /obj/item/clothing/under/lawyer/black
 	suits += /obj/item/clothing/under/suit_jacket/tan
 	suits += /obj/item/clothing/under/scratch
+	suits += /obj/item/clothing/under/bluetunic_regular
 	suits += /obj/item/clothing/under/lawyer/bluesuit
 	suits += /obj/item/clothing/under/rank/internalaffairs/plain
 	suits += /obj/item/clothing/under/blazer
 	suits += /obj/item/clothing/under/blackjumpskirt
 	suits += /obj/item/clothing/under/kilt
+	suits += /obj/item/clothing/under/manager
 	suits += /obj/item/clothing/under/dress/dress_hr
 	suits += /obj/item/clothing/under/det
 	suits += /obj/item/clothing/under/det/black
@@ -80,6 +82,7 @@
 	dresses += /obj/item/clothing/under/dress/dress_purple
 	dresses += /obj/item/clothing/under/sundress
 	gear_tweaks += new/datum/gear_tweak/path/specified_types_list(dresses)
+//  dresses += /obj/item/clothing/under/dress/dress_red //warfoxy's custom item
 
 /datum/gear/uniform/cheongsam
 	display_name = "cheongsam, colour select"
@@ -133,7 +136,7 @@
 
 /datum/gear/uniform/shorts/custom
 	display_name = "athletic shorts, colour select"
-	path = /obj/item/clothing/under/shorts
+	path = /obj/item/clothing/under/shorts/
 	flags = GEAR_HAS_COLOR_SELECTION
 
 /datum/gear/uniform/turtleneck
@@ -153,9 +156,9 @@
 /datum/gear/uniform/corporate/New()
 	..()
 	var/corps = list()
-	corps += /obj/item/clothing/under/rank/scientist/nanotrasen
-	corps += /obj/item/clothing/under/rank/scientist/heph
-	corps += /obj/item/clothing/under/rank/scientist/zeng
+	corps += /obj/item/clothing/under/rank/scientist/corporate/nanotrasen
+	corps += /obj/item/clothing/under/rank/scientist/corporate/heph
+	corps += /obj/item/clothing/under/rank/scientist/corporate/zeng
 	corps += /obj/item/clothing/under/mbill
 	corps += /obj/item/clothing/under/saare
 	corps += /obj/item/clothing/under/aether
@@ -169,8 +172,13 @@
 	corps += /obj/item/clothing/under/morpheus
 	corps += /obj/item/clothing/under/skinner
 	corps += /obj/item/clothing/under/dais
-	corps += /obj/item/clothing/under/rank/roboticist/bishop
+//	corps += /obj/item/clothing/under/scp_uniform
 	gear_tweaks += new/datum/gear_tweak/path/specified_types_list(corps)
+
+/datum/gear/uniform/corp_guard
+	display_name = "corporate colours, guard"
+	path = /obj/item/clothing/under/rank/guard
+	flags = GEAR_HAS_TYPE_SELECTION
 
 /datum/gear/uniform/corp_exec
 	display_name = "corporate colours, senior researcher"
@@ -204,11 +212,3 @@
 /datum/gear/uniform/frontier
 	display_name = "frontier clothes"
 	path = /obj/item/clothing/under/frontier
-
-/datum/gear/uniform/pj_red
-	display_name = "red pajamas"
-	path = /obj/item/clothing/under/redpyjamas
-
-/datum/gear/uniform/pj_blue
-	display_name = "blue pajamas"
-	path = /obj/item/clothing/under/bluepyjamas

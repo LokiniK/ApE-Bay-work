@@ -22,7 +22,7 @@
 	// Create the origin cell to start us off.
 	openlist += new /datum/maze_cell(start_x,start_y)
 
-	while(length(openlist))
+	while(openlist.len)
 		// Grab a maze point to use and remove it from the open list.
 		var/datum/maze_cell/next = pick(openlist)
 		openlist -= next
@@ -56,7 +56,7 @@
 	openlist.Cut()
 	closedlist.Cut()
 
-/datum/random_map/maze/proc/add_to_openlist(tx, ty, nx, ny)
+/datum/random_map/maze/proc/add_to_openlist(var/tx, var/ty, var/nx, var/ny)
 	if(tx < 1 || ty < 1 || tx > limit_x || ty > limit_y || !isnull(checked_coord_cache["[tx]-[ty]"]))
 		return 0
 	checked_coord_cache["[tx]-[ty]"] = 1

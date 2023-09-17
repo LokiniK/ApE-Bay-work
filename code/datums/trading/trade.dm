@@ -35,7 +35,7 @@
 	var/margin = 1.2											//Multiplier to price when selling to player
 	var/price_rng = 10                                          //Percentage max variance in sell prices.
 	var/insult_drop = 5                                         //How far disposition drops on insult
-	var/compliment_increase = 5                                 //How far compliments increase disposition
+	var/compliment_increase = 2                                 //How far compliments increase disposition
 	var/refuse_comms = 0                                        //Whether they refuse further communication
 
 	var/mob_transfer_message = "You are transported to ORIGIN." //What message gets sent to mobs that get sold.
@@ -49,7 +49,7 @@
 			var/datum/language/L = all_languages[name_language]
 			if(L)
 				name = L.get_random_name(pick(MALE,FEMALE))
-	if(possible_origins && length(possible_origins))
+	if(possible_origins && possible_origins.len)
 		origin = pick(possible_origins)
 
 	//Generate the
@@ -62,37 +62,18 @@
 		add_to_pool(trading_items, possible_trading_items, force = 1)
 		add_to_pool(wanted_items, possible_wanted_items, force = 1)
 
-/datum/trader/proc/generate_pool(list/trading_pool)
+/datum/trader/proc/generate_pool(var/list/trading_pool)
 	. = list()
-	// Add types
 	for(var/type in trading_pool)
 		var/status = trading_pool[type]
 		if(status & TRADER_THIS_TYPE)
 			. += type
 		if(status & TRADER_SUBTYPES_ONLY)
 			. += subtypesof(type)
-
-	// Remove blacklisted
-	for (var/type in .)
-		var/status = trading_pool[type]
-		if (HAS_FLAGS(status, TRADER_BLACKLIST) || !validate_type_for_trade(type))
+		if(status & TRADER_BLACKLIST)
 			. -= type
-		if (HAS_FLAGS(status, TRADER_BLACKLIST_SUB))
+		if(status & TRADER_BLACKLIST_SUB)
 			. -= subtypesof(type)
-
-
-/**
- * Validates a given type can be used for trading. Intended to prevent certain items from being attainable via merchants.
- *
- * Returns boolean.
- */
-/datum/trader/proc/validate_type_for_trade(type)
-	if (isatom(type))
-		var/atom/atom = type
-		// Block abstracts
-		if (type == initial(atom.abstract_type))
-			return FALSE
-	return TRUE
 
 
 //If this hits 0 then they decide to up and leave.
@@ -102,31 +83,33 @@
 	remove_from_pool(possible_trading_items, 9) //We want the stock to change every so often, so we make it so that they have roughly 10~11 ish items max
 	return 1
 
-/datum/trader/proc/remove_from_pool(list/pool, chance_per_item)
-	if(pool && prob(chance_per_item * length(pool)))
-		var/i = rand(1,length(pool))
+/datum/trader/proc/remove_from_pool(var/list/pool, var/chance_per_item)
+	if(pool && prob(chance_per_item * pool.len))
+		var/i = rand(1,pool.len)
 		pool[pool[i]] = null
 		pool -= pool[i]
 
-/datum/trader/proc/add_to_pool(list/pool, list/possible, base_chance = 100, force = 0)
+/datum/trader/proc/add_to_pool(var/list/pool, var/list/possible, var/base_chance = 100, var/force = 0)
 	var/divisor = 1
-	if(pool && length(pool))
-		divisor = length(pool)
+	if(pool && pool.len)
+		divisor = pool.len
 	if(force || prob(base_chance/divisor))
 		var/new_item = get_possible_item(possible)
 		if(new_item)
 			pool |= new_item
 
-/datum/trader/proc/get_possible_item(list/trading_pool)
-	if(!trading_pool || !length(trading_pool))
+/datum/trader/proc/get_possible_item(var/list/trading_pool)
+	if(!trading_pool || !trading_pool.len)
 		return
 	var/picked = pick(trading_pool)
 	var/atom/A = picked
 	if(initial(A.name) in list("object", "item","weapon", "structure", "machinery", "exosuit", "organ", "snack")) //weed out a few of the common bad types. Reason we don't check types specifically is that (hopefully) further bad subtypes don't set their name up and are similar.
 		return null
+	if(initial(A.trade_blacklisted) == TRUE)	// INF Pervent custom coded items be traded by merchants
+		return null								// INF
 	return picked
 
-/datum/trader/proc/get_response(key, default)
+/datum/trader/proc/get_response(var/key, var/default)
 	if(speech && speech[key])
 		. = speech[key]
 	else
@@ -136,24 +119,24 @@
 	. = replacetext(.,"CURRENCY_SINGULAR", GLOB.using_map.local_currency_name_singular)
 	. = replacetext(.,"CURRENCY", GLOB.using_map.local_currency_name)
 
-/datum/trader/proc/print_trading_items(num)
-	num = clamp(num,1,length(trading_items))
+/datum/trader/proc/print_trading_items(var/num)
+	num = Clamp(num,1,trading_items.len)
 	if(trading_items[num])
 		var/atom/movable/M = trading_items[num]
 		return "<b>[initial(M.name)]</b>"
 
 /datum/trader/proc/skill_curve(skill)
 	switch(skill)
-		if(SKILL_EXPERIENCED)
+		if(SKILL_EXPERT)
 			. = 1
-		if(SKILL_EXPERIENCED to SKILL_MAX)
-			. = 1 + (SKILL_EXPERIENCED - skill) * 0.2
+		if(SKILL_EXPERT to SKILL_MAX)
+			. = 1 + (SKILL_EXPERT - skill) * 0.1
 		else
-			. = 1 + (SKILL_EXPERIENCED - skill) ** 2
+			. = 1 + (SKILL_EXPERT - skill) ** 3
 	//This condition ensures that the buy price is higher than the sell price on generic goods, i.e. the merchant can't be exploited
 	. = max(., price_rng/((margin - 1)*(200 - price_rng)))
 
-/datum/trader/proc/get_item_value(trading_num, skill = SKILL_MAX)
+/datum/trader/proc/get_item_value(var/trading_num, skill = SKILL_MAX)
 	if(!trading_items[trading_items[trading_num]])
 		var/type = trading_items[trading_num]
 		var/value = get_value(type)
@@ -168,7 +151,7 @@
 		. *= want_multiplier
 	. *= max(1 - (margin - 1) * skill_curve(skill), 0.1) //Trader will underpay at lower skill.
 
-/datum/trader/proc/make_response(response_type, response_default, delta = 0, success = TRUE)
+/datum/trader/proc/make_response(var/response_type, var/response_default, var/delta = 0, var/success = TRUE)
 	. = new /datum/trade_response(get_response(response_type, response_default), delta, success)
 
 /datum/trader/proc/offer_money_for_bulk(quantity, trade_num, money_amount, turf/location, skill = SKILL_MAX)
@@ -181,9 +164,9 @@
 	return make_response(TRADER_TRADE_COMPLETE, "Thank you for your patronage!", -value, TRUE)
 
 /datum/trader/proc/offer_items_for_bulk(quantity, list/offers, num, turf/location, skill = SKILL_MAX)
-	if(!length(offers))
+	if(!offers?.len)
 		return make_response(TRADER_NOT_ENOUGH, "That's not enough.", 0, FALSE)
-	num = clamp(num, 1, length(trading_items))
+	num = Clamp(num, 1, trading_items.len)
 	var/offer_worth = 0
 	for(var/item in offers)
 		var/atom/movable/offer = item
@@ -192,7 +175,7 @@
 			is_wanted = 2
 		if((trade_flags & TRADER_WANTED_ALL) && is_type_in_list(offer, possible_wanted_items))
 			is_wanted = 1
-		if(length(blacklisted_trade_items) && is_type_in_list(offer ,blacklisted_trade_items))
+		if(blacklisted_trade_items?.len && is_type_in_list(offer ,blacklisted_trade_items))
 			return make_response(TRADER_NO_BLACKLISTED, "I refuse to take one of those items.", 0, FALSE)
 
 		if(istype(offer, /obj/item/spacecash))
@@ -216,7 +199,7 @@
 		return make_response(TRADER_TRADE_COMPLETE, "Thank you for your patronage!", 0, TRUE)
 	return make_response(TRADER_NOT_ENOUGH, "That's not enough.", 0, FALSE)
 
-/datum/trader/proc/hail(mob/user)
+/datum/trader/proc/hail(var/mob/user)
 	if(!can_hail())
 		return make_response(TRADER_HAIL_DENY, "No, go away.", 0, FALSE)
 	var/specific
@@ -260,7 +243,7 @@
 			to_chat(offer, replacetext(text, "ORIGIN", origin))
 		qdel(offer)
 
-	num = clamp(num, 1, length(trading_items))
+	num = Clamp(num, 1, trading_items.len)
 	var/type = trading_items[num]
 
 	var/list/M = list()
@@ -272,8 +255,8 @@
 
 	return M
 
-/datum/trader/proc/how_much_do_you_want(num, skill = SKILL_MAX)
-	num = clamp(num, 1, length(trading_items))
+/datum/trader/proc/how_much_do_you_want(var/num, skill = SKILL_MAX)
+	num = Clamp(num, 1, trading_items.len)
 	var/atom/movable/M = trading_items[num]
 	var/datum/trade_response/tr = make_response(TRADER_HOW_MUCH, "Hmm.... how about VALUE CURRENCY?", 0, FALSE)
 	tr.text = replacetext(replacetext(tr.text, "ITEM", initial(M.name)), "VALUE", get_item_value(num, skill))
@@ -291,10 +274,10 @@
 	tr.text += " [english_list(want_english)]"
 	return tr
 
-/datum/trader/proc/sell_items(list/offers, skill = SKILL_MAX)
+/datum/trader/proc/sell_items(var/list/offers, skill = SKILL_MAX)
 	if(!(trade_flags & TRADER_GOODS))
 		return make_response(TRADER_GOODS, "I'm not buying.", 0, FALSE)
-	if(!offers || !length(offers))
+	if(!offers || !offers.len)
 		return make_response(TRADER_NOT_ENOUGH, "I'm not buying that.", 0, FALSE)
 
 	var/wanted
@@ -313,5 +296,5 @@
 		qdel(offer)
 	return make_response(TRADER_TRADE_COMPLETE, "Thanks for the goods!", total, TRUE)
 
-/datum/trader/proc/bribe_to_stay_longer(amt)
+/datum/trader/proc/bribe_to_stay_longer(var/amt)
 	return make_response(TRADER_BRIBE_FAILURE, "How about no?", 0, FALSE)

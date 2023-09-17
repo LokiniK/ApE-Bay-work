@@ -4,18 +4,18 @@
 	descriptions = list(
 		new /datum/wire_description(SMARTFRIDGE_WIRE_ELECTRIFY, "This wire seems to be carrying a heavy current."),
 		new /datum/wire_description(SMARTFRIDGE_WIRE_THROW, "This wire leads to the item dispensor force controls."),
-		new /datum/wire_description(SMARTFRIDGE_WIRE_IDSCAN, "This wire is connected to the ID scanning panel.", SKILL_EXPERIENCED)
+		new /datum/wire_description(SMARTFRIDGE_WIRE_IDSCAN, "This wire is connected to the ID scanning panel.", SKILL_EXPERT)
 	)
 
 /datum/wires/smartfridge/secure
 	random = 1
 	wire_count = 4
 
-var/global/const/SMARTFRIDGE_WIRE_ELECTRIFY	= 1
-var/global/const/SMARTFRIDGE_WIRE_THROW		= 2
-var/global/const/SMARTFRIDGE_WIRE_IDSCAN		= 4
+var/const/SMARTFRIDGE_WIRE_ELECTRIFY	= 1
+var/const/SMARTFRIDGE_WIRE_THROW		= 2
+var/const/SMARTFRIDGE_WIRE_IDSCAN		= 4
 
-/datum/wires/smartfridge/CanUse(mob/living/L)
+/datum/wires/smartfridge/CanUse(var/mob/living/L)
 	var/obj/machinery/smartfridge/S = holder
 	if(!istype(L, /mob/living/silicon))
 		if(S.seconds_electrified)
@@ -32,7 +32,7 @@ var/global/const/SMARTFRIDGE_WIRE_IDSCAN		= 4
 	. += "The red light is [S.shoot_inventory ? "off" : "blinking"].<BR>"
 	. += "A [S.scan_id ? "purple" : "yellow"] light is on.<BR>"
 
-/datum/wires/smartfridge/UpdatePulsed(index)
+/datum/wires/smartfridge/UpdatePulsed(var/index)
 	var/obj/machinery/smartfridge/S = holder
 	switch(index)
 		if(SMARTFRIDGE_WIRE_THROW)
@@ -42,7 +42,7 @@ var/global/const/SMARTFRIDGE_WIRE_IDSCAN		= 4
 		if(SMARTFRIDGE_WIRE_IDSCAN)
 			S.scan_id = !S.scan_id
 
-/datum/wires/smartfridge/UpdateCut(index, mended)
+/datum/wires/smartfridge/UpdateCut(var/index, var/mended)
 	var/obj/machinery/smartfridge/S = holder
 	switch(index)
 		if(SMARTFRIDGE_WIRE_THROW)
@@ -54,3 +54,14 @@ var/global/const/SMARTFRIDGE_WIRE_IDSCAN		= 4
 				S.seconds_electrified = -1
 		if(SMARTFRIDGE_WIRE_IDSCAN)
 			S.scan_id = 1
+
+/datum/wires/smartfridge/SolveWireFunction(var/function)
+	var/sf = ""
+	switch(function)
+		if(SMARTFRIDGE_WIRE_ELECTRIFY)
+			sf = "Port A"
+		if(SMARTFRIDGE_WIRE_THROW)
+			sf = "Port B"
+		if(SMARTFRIDGE_WIRE_IDSCAN)
+			sf = "Port C"
+	return sf

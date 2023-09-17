@@ -7,9 +7,11 @@ var/global/list/additional_antag_types = list()
 	var/extended_round_description = "This roundtype should not be spawned, let alone votable. Someone contact a developer and tell them the game's broken again."
 	var/config_tag = null
 	var/votable = TRUE
+	var/probability = 0
 
 	var/required_players = 0                 // Minimum players for round to start if voted in.
 	var/required_enemies = 0                 // Minimum antagonists for round to start.
+	var/list/newscaster_announcements = list() //INF, WAS var/newscaster_announcements = null
 	var/end_on_antag_death = FALSE           // Round will end when all antagonists are dead.
 	var/ert_disabled = FALSE                 // ERT cannot be called.
 	var/deny_respawn = FALSE	             // Disable respawn during this round.
@@ -50,9 +52,9 @@ var/global/list/additional_antag_types = list()
 	name = capitalize(lowertext(name))
 	config_tag = lowertext(config_tag)
 
-	if(round_autoantag && !length(latejoin_antag_tags))
+	if(round_autoantag && !latejoin_antag_tags.len)
 		latejoin_antag_tags = antag_tags.Copy()
-	else if(!round_autoantag && length(latejoin_antag_tags))
+	else if(!round_autoantag && latejoin_antag_tags.len)
 		round_autoantag = TRUE
 
 /datum/game_mode/Topic(href, href_list[])
@@ -109,7 +111,7 @@ var/global/list/additional_antag_types = list()
 			to_chat(usr, "Cannot remove core mode antag type.")
 			return
 		var/datum/antagonist/antag = GLOB.all_antag_types_[href_list["remove_antag_type"]]
-		if(antag_templates && length(antag_templates) && antag && (antag in antag_templates) && (antag.id in additional_antag_types))
+		if(antag_templates && antag_templates.len && antag && (antag in antag_templates) && (antag.id in additional_antag_types))
 			antag_templates -= antag
 			additional_antag_types -= antag.id
 			message_admins("Admin [key_name_admin(usr)] removed [antag.role_text] template from game mode.")
@@ -128,48 +130,47 @@ var/global/list/additional_antag_types = list()
 		usr.client.holder.show_game_mode(usr)
 
 /datum/game_mode/proc/announce() //to be called when round starts
-	to_world("<B>The current game mode is [capitalize(name)]!</B>")
+	to_world("<B>Текущий игровой режим [capitalize(name)]!</B>")
 	if(round_description) to_world("[round_description]")
 	if(round_autoantag) to_world("Antagonists will be added to the round automagically as needed.")
-	if(antag_templates && length(antag_templates))
+	if(antag_templates && antag_templates.len)
 		var/antag_summary = "<b>Possible antagonist types:</b> "
 		var/i = 1
 		for(var/datum/antagonist/antag in antag_templates)
 			if(i > 1)
-				if(i == length(antag_templates))
+				if(i == antag_templates.len)
 					antag_summary += " and "
 				else
 					antag_summary += ", "
 			antag_summary += "[antag.role_text_plural]"
 			i++
 		antag_summary += "."
-		if(length(antag_templates) > 1 && SSticker.master_mode != "secret")
+		if(antag_templates.len > 1 && SSticker.master_mode != "secret")
 			to_world("[antag_summary]")
 		else
 			message_admins("[antag_summary]")
 
+// startRequirements()
+// Checks to see if the game can be setup and ran with the current number of players or whatnot.
+// Returns 0 if the mode can start and a message explaining the reason why it can't otherwise.
+/datum/game_mode/proc/startRequirements()
+	var/playerC = 0
+	for(var/mob/new_player/player in GLOB.player_list)
+		if(player.client && player.ready)
+			playerC++
 
-/// Run prior to a mode vote to determine if the mode should be included. Falsy if yes, otherwise a status message.
-/datum/game_mode/proc/check_votable(list/lobby_players)
-	if (length(lobby_players) < required_players)
-		return "[length(lobby_players)]/[required_players] lobby players"
-
-
-/// Check to see if the currently selected mode can be started. Falsy if yes, otherwise a status message.
-/datum/game_mode/proc/check_startable(list/lobby_players)
-	var/list/ready_players = SSticker.ready_players(lobby_players)
-	if (length(ready_players) < required_players)
-		return "[length(ready_players)]/[required_players] ready players"
+	if(playerC < required_players)
+		return "Not enough players, [src.required_players] players needed."
 
 	var/enemy_count = 0
 	var/list/all_antag_types = GLOB.all_antag_types_
-	if(antag_tags && length(antag_tags))
+	if(antag_tags && antag_tags.len)
 		for(var/antag_tag in antag_tags)
 			var/datum/antagonist/antag = all_antag_types[antag_tag]
 			if(!antag)
 				continue
 			var/list/potential = list()
-			if(antag_templates && length(antag_templates))
+			if(antag_templates && antag_templates.len)
 				if(antag.flags & ANTAG_OVERRIDE_JOB)
 					potential = antag.pending_antagonists
 				else
@@ -177,12 +178,12 @@ var/global/list/additional_antag_types = list()
 			else
 				potential = antag.get_potential_candidates(src)
 			if(islist(potential))
-				if(require_all_templates && length(potential) < antag.initial_spawn_req)
-					return "[length(potential)]/[antag.initial_spawn_req] [antag.role_text] players"
-				enemy_count += length(potential)
+				if(require_all_templates && potential.len < antag.initial_spawn_req)
+					return "Not enough antagonists ([antag.role_text]), [antag.initial_spawn_req] required and [potential.len] available."
+				enemy_count += potential.len
 				if(enemy_count >= required_enemies)
 					return 0
-		return "[enemy_count]/[required_enemies] total antag players"
+		return "Not enough antagonists, [required_enemies] required and [enemy_count] available."
 	else
 		return 0
 
@@ -212,11 +213,11 @@ var/global/list/additional_antag_types = list()
 
 	refresh_event_modifiers()
 
-	addtimer(new Callback(null, /proc/display_roundstart_logout_report), ROUNDSTART_LOGOUT_REPORT_TIME)
+	addtimer(CALLBACK(null, /proc/display_roundstart_logout_report), ROUNDSTART_LOGOUT_REPORT_TIME)
 
 	var/welcome_delay = rand(waittime_l, waittime_h)
-	addtimer(new Callback(GLOB.using_map, /datum/map/proc/send_welcome), welcome_delay)
-	addtimer(new Callback(src, .proc/announce_ert_disabled), welcome_delay + 10 SECONDS)
+	addtimer(CALLBACK(GLOB.using_map, /datum/map/proc/send_welcome), welcome_delay)
+	addtimer(CALLBACK(src, .proc/announce_ert_disabled), welcome_delay + 10 SECONDS)
 
 	//Assign all antag types for this game mode. Any players spawned as antags earlier should have been removed from the pending list, so no need to worry about those.
 	for(var/datum/antagonist/antag in antag_templates)
@@ -236,6 +237,11 @@ var/global/list/additional_antag_types = list()
 
 	if(evacuation_controller && auto_recall_shuttle)
 		evacuation_controller.recall = 1
+
+	SSstatistics.set_field_details("round_start","[time2text(world.realtime)]")
+	if(SSticker.mode)
+		SSstatistics.set_field_details("game_mode","[SSticker.mode]")
+	SSstatistics.set_field_details("server_ip","[world.internet_address]:[world.port]")
 	return 1
 
 /datum/game_mode/proc/fail_setup()
@@ -274,6 +280,7 @@ var/global/list/additional_antag_types = list()
 		"killer bugs that lay eggs in the husks of the living",
 		"a deserted transport carrying xenofauna specimens",
 		"an emissary for the gestalt requesting a security detail",
+		"a Tajaran slave rebellion",//inf
 		"radical Skrellian transevolutionaries",
 		"classified security operations",
 		"a gargantuan glowing goat"
@@ -283,7 +290,7 @@ var/global/list/additional_antag_types = list()
 /datum/game_mode/proc/check_finished()
 	if(evacuation_controller.round_over() || station_was_nuked)
 		return 1
-	if(end_on_antag_death && antag_templates && length(antag_templates))
+	if(end_on_antag_death && antag_templates && antag_templates.len)
 		var/has_antags = 0
 		for(var/datum/antagonist/antag in antag_templates)
 			if(!antag.antags_are_dead())
@@ -308,7 +315,7 @@ var/global/list/additional_antag_types = list()
 		sleep(2)
 	for(var/antag_type in all_antag_types)
 		var/datum/antagonist/antag = all_antag_types[antag_type]
-		if(!length(antag.current_antagonists) || (antag in antag_templates))
+		if(!antag.current_antagonists.len || (antag in antag_templates))
 			continue
 		sleep(2)
 		antag.print_player_summary()
@@ -329,17 +336,39 @@ var/global/list/additional_antag_types = list()
 		if(client.mob && client.mob.mind)
 			client.mob.mind.show_roundend_summary(departmental_goal_summary)
 
+	for(var/thing in GLOB.clients)
+		var/client/client = thing
+		if(client.mob && client.mob.mind)
+			log_antag_objectives(client.mob.mind)
+			log_goals(client.mob.mind)
+			log_memories(client.mob.mind)
+
 	to_world(text)
 
-	send2mainirc("A round of [src.name] has ended - [data["surviving_total"]] survivor\s, [data["ghosts"]] ghost\s.")
-	SSwebhooks.send(WEBHOOK_ROUNDEND, data)
+
+/*	if(GLOB.clients.len > 0) // INF, нужна дополнительная статистика? ~bear1ake
+		SSstatistics.set_field("round_end_clients",GLOB.clients.len)
+	if(ghosts > 0)
+		SSstatistics.set_field("round_end_ghosts",ghosts)
+	if(surviving_humans > 0)
+		SSstatistics.set_field("survived_human",surviving_humans)
+	if(surviving_total > 0)
+		SSstatistics.set_field("survived_total",surviving_total)
+	if(escaped_humans > 0)
+		SSstatistics.set_field("escaped_human",escaped_humans)
+	if(escaped_total > 0)
+		SSstatistics.set_field("escaped_total",escaped_total) */
+
+//INF	send2mainirc("A round of [src.name] has ended - [surviving_total] survivor\s, [ghosts] ghost\s.")
+	send2mainirc("Раунд с режимом [src.name] завершен. Выживших: [data["surviving_total"]]; призраков: [data["ghosts"]]; игроков: [GLOB.clients.len]; продолжительность: [roundduration2text()].") //INF
+	SSwebhooks.send(WEBHOOK_ROUNDEND, data) // INF TODO: передача о количестве клиентов ~bear1ake
 
 	return 0
 
 /datum/game_mode/proc/check_win() //universal trigger to be called at mob death, nuke explosion, etc. To be called from everywhere.
 	return 0
 
-/datum/game_mode/proc/get_players_for_role(antag_id)
+/datum/game_mode/proc/get_players_for_role(var/antag_id)
 	var/list/players = list()
 	var/list/candidates = list()
 
@@ -372,15 +401,14 @@ var/global/list/additional_antag_types = list()
 				players -= player
 
 		// If we don't have enough antags, draft people who voted for the round.
-		if(length(candidates) < required_enemies)
+		if(candidates.len < required_enemies)
 			for(var/mob/new_player/player in players)
-				if(!antag_id || ((antag_id in player.client.prefs.be_special_role) || (antag_id in player.client.prefs.may_be_special_role)))
+				if(!antag_id || ((antag_id in player.client.prefs.be_special_role)))//inf, was: if(!antag_id || ((antag_id in player.client.prefs.be_special_role) || (antag_id in player.client.prefs.may_be_special_role)))
 					log_debug("[player.key] has not selected never for this role, so we are drafting them.")
 					candidates += player.mind
 					players -= player
-					if(length(candidates) == required_enemies || length(players) == 0)
+					if(candidates.len == required_enemies || players.len == 0)
 						break
-
 	return candidates		// Returns: The number of people who had the antagonist role set to yes, regardless of recomended_enemies, if that number is greater than required_enemies
 							//			required_enemies if the number of people with that role set to yes is less than recomended_enemies,
 							//			Less if there are not enough valid players in the game entirely to make required_enemies.
@@ -400,14 +428,14 @@ var/global/list/additional_antag_types = list()
 		antag_scaling_coeff = 0
 
 	var/list/all_antag_types = GLOB.all_antag_types_
-	if(antag_tags && length(antag_tags))
+	if(antag_tags && antag_tags.len)
 		antag_templates = list()
 		for(var/antag_tag in antag_tags)
 			var/datum/antagonist/antag = all_antag_types[antag_tag]
 			if(antag)
 				antag_templates |= antag
 
-	if(additional_antag_types && length(additional_antag_types))
+	if(additional_antag_types && additional_antag_types.len)
 		if(!antag_templates)
 			antag_templates = list()
 		for(var/antag_type in additional_antag_types)
@@ -416,7 +444,15 @@ var/global/list/additional_antag_types = list()
 				antag_templates |= antag
 
 	shuffle(antag_templates) //In the case of multiple antag types
-
+//INF	newscaster_announcements = pick(newscaster_standard_feeds)
+//[INF]
+	if(!newscaster_announcements.len)
+		var/daily_news = newscaster_standard_feeds
+		for(var/i = 1, i <= 2, i++)
+			var/news = pick(daily_news)
+			daily_news -= news
+			newscaster_announcements += news
+//[/INF]
 // Manipulates the end-game cinematic in conjunction with GLOB.cinematic
 /datum/game_mode/proc/nuke_act(obj/screen/cinematic_screen, station_missed = 0)
 	if(!cinematic_icon_states)
@@ -431,7 +467,7 @@ var/global/list/additional_antag_types = list()
 		if(!station_missed)
 			end = cinematic_icon_states[2]
 			to_flick = "station_explode_fade_red"
-			for(var/mob/living/M in GLOB.alive_mobs)
+			for(var/mob/living/M in GLOB.living_mob_list_)
 				if(is_station_turf(get_turf(M)))
 					M.death()//No mercy
 		if(end)
@@ -445,8 +481,8 @@ var/global/list/additional_antag_types = list()
 //////////////////////////
 //Reports player logouts//
 //////////////////////////
-/proc/display_roundstart_logout_report()
-	var/msg = "<b>Roundstart logout report</b>\n\n"
+proc/display_roundstart_logout_report()
+	var/msg = "<span class='notice'><b>Roundstart logout report</b>\n\n"
 	for(var/mob/living/L in SSmobs.mob_list)
 
 		if(L.ckey)
@@ -456,11 +492,11 @@ var/global/list/additional_antag_types = list()
 					found = 1
 					break
 			if(!found)
-				msg += "<b>[L.name]</b> ([L.ckey]), the [L.job] ([SPAN_COLOR("#ffcc00", "<b>Disconnected</b>")])\n"
+				msg += "<b>[L.name]</b> ([L.ckey]), the [L.job] (<font color='#ffcc00'><b>Disconnected</b></font>)\n"
 
 		if(L.ckey && L.client)
 			if(L.client.inactivity >= (ROUNDSTART_LOGOUT_REPORT_TIME / 2))	//Connected, but inactive (alt+tabbed or something)
-				msg += "<b>[L.name]</b> ([L.ckey]), the [L.job] ([SPAN_COLOR("#ffcc00", "<b>Connected, Inactive</b>")])\n"
+				msg += "<b>[L.name]</b> ([L.ckey]), the [L.job] (<font color='#ffcc00'><b>Connected, Inactive</b></font>)\n"
 				continue //AFK client
 			if(L.admin_paralyzed)
 				msg += "<b>[L.name]</b> ([L.ckey]), the [L.job] (Admin paralyzed)\n"
@@ -481,29 +517,29 @@ var/global/list/additional_antag_types = list()
 					continue //Dead mob, ghost abandoned
 				else
 					if(D.can_reenter_corpse)
-						msg += "<b>[L.name]</b> ([ckey(D.mind.key)]), the [L.job] ([SPAN_COLOR("red", "<b>Adminghosted</b>")])\n"
+						msg += "<b>[L.name]</b> ([ckey(D.mind.key)]), the [L.job] (<font color='red'><b>Adminghosted</b></font>)\n"
 						continue //Lolwhat
 					else
-						msg += "<b>[L.name]</b> ([ckey(D.mind.key)]), the [L.job] ([SPAN_COLOR("red", "<b>Ghosted</b>")])\n"
+						msg += "<b>[L.name]</b> ([ckey(D.mind.key)]), the [L.job] (<font color='red'><b>Ghosted</b></font>)\n"
 						continue //Ghosted while alive
 
-	msg = SPAN_NOTICE(msg)
+	msg += "</span>" // close the span from right at the top
 
 	for(var/mob/M in SSmobs.mob_list)
 		if(M.client && M.client.holder)
 			to_chat(M, msg)
 
-/proc/show_objectives(datum/mind/player)
+/proc/show_objectives(var/datum/mind/player)
 
 	if(!player || !player.current) return
 
-	if(config.objectives_disabled == CONFIG_OBJECTIVE_NONE || !length(player.objectives))
+	if(config.objectives_disabled == CONFIG_OBJECTIVE_NONE || !player.objectives.len)
 		return
 
 	var/obj_count = 1
-	to_chat(player.current, SPAN_NOTICE("Your current objectives:"))
+	to_chat(player.current, "<span class='notice'>Текущие цели:</span>")
 	for(var/datum/objective/objective in player.objectives)
-		to_chat(player.current, "<B>Objective #[obj_count]</B>: [objective.explanation_text]")
+		to_chat(player.current, "<B>Цель #[obj_count]</B>: [objective.explanation_text]")
 		obj_count++
 
 /mob/verb/check_round_info()

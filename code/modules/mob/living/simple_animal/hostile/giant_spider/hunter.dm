@@ -9,14 +9,16 @@
 	icon_living = "hunter"
 	icon_dead = "hunter_dead"
 
-	maxHealth = 100
-	health = 100
 
-	poison_per_bite = 5
+
+	maxHealth = 120
+	health = 120
+
+	// poison_per_bite = 5
 
 	movement_cooldown = 0 // Hunters are FAST.
 
-	ai_holder = /datum/ai_holder/simple_animal/melee/evasive/hunter_spider
+	ai_holder = /datum/ai_holder/simple_animal/melee
 
 	// Leaping is a special attack, so these values determine when leap can happen.
 	// Leaping won't occur if its on cooldown.
@@ -77,10 +79,7 @@
 	if(victim)
 		victim.Weaken(2)
 		victim.visible_message(SPAN_DANGER("\The [src] knocks down \the [victim]!"))
-		to_chat(victim, SPAN_CLASS("critical", "\The [src] jumps on you!"))
+		to_chat(victim, "<span class='critical'>\The [src] jumps on you!</span>")
 		. = TRUE
 
 	set_AI_busy(FALSE)
-
-/datum/ai_holder/simple_animal/melee/evasive/hunter_spider
-	can_flee = TRUE

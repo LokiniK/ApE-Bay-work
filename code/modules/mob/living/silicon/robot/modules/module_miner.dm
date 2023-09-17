@@ -14,7 +14,8 @@
 	sprites = list(
 		"Basic" = "Miner_old",
 		"Advanced Droid" = "droid-miner",
-		"Treadhead" = "Miner"
+		"Treadhead" = "Miner",
+		"Default" = "robotMine"
 	)
 	supported_upgrades = list(
 		/obj/item/borg/upgrade/jetpack
@@ -33,9 +34,9 @@
 	)
 	emag = /obj/item/gun/energy/plasmacutter
 	skills = list(
-		SKILL_PILOT        = SKILL_EXPERIENCED,
-		SKILL_EVA          = SKILL_MASTER,
-		SKILL_CONSTRUCTION = SKILL_EXPERIENCED
+		SKILL_PILOT        = SKILL_EXPERT,
+		SKILL_EVA          = SKILL_PROF,
+		SKILL_CONSTRUCTION = SKILL_EXPERT
 	)
 	no_slip = 1
 

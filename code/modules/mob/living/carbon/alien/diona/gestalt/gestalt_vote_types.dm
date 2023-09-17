@@ -7,15 +7,15 @@
 	var/obj/structure/diona_gestalt/owner
 	var/minimum_nymphs = 3
 
-/datum/gestalt_vote/New(obj/structure/diona_gestalt/_owner, mob/_caller)
+/datum/gestalt_vote/New(var/obj/structure/diona_gestalt/_owner, var/mob/_caller)
 	owner = _owner
 	caller =_caller
-	addtimer(new Callback(src, .proc/timed_out), vote_time)
+	addtimer(CALLBACK(src, .proc/timed_out), vote_time)
 
 /datum/gestalt_vote/proc/timed_out()
 	if(owner && !passed)
 		for(var/thing in owner.nymphs)
-			to_chat(thing, SPAN_NOTICE("\The vote to <i>[descriptor]</i> has run out of time and has failed."))
+			to_chat(thing, "<span class='notice'>\The vote to <i>[descriptor]</i> has run out of time and has failed.</span>")
 	qdel(src)
 
 /datum/gestalt_vote/Topic(href, href_list)
@@ -30,11 +30,11 @@
 				if(chirp.client)
 					target_value++
 			target_value = ceil(target_value/2)
-			passed = (length(voted) >= target_value)
+			passed = (voted.len >= target_value)
 			for(var/thing in owner.nymphs)
-				to_chat(thing, SPAN_NOTICE("\The [voter] voted yes to <i>[descriptor]</i> ([length(voted)]/[target_value])."))
+				to_chat(thing, "<span class='notice'>\The [voter] voted yes to <i>[descriptor]</i> ([voted.len]/[target_value]).</span>")
 				if(passed)
-					to_chat(thing, SPAN_NOTICE("<b>Motion passed!</b>"))
+					to_chat(thing, "<span class='notice'><b>Motion passed!</b></span>")
 			if(passed) succeeded()
 			return TRUE
 
@@ -61,11 +61,11 @@
 		caller.mind.transfer_to(humanoid_gestalt)
 	else
 		humanoid_gestalt.key = caller.key
-	owner.visible_message(SPAN_NOTICE("\The [owner] curls in on itself and bunches up, forming a humanoid shape."))
+	owner.visible_message("<span class='notice'>\The [owner] curls in on itself and bunches up, forming a humanoid shape.</span>")
 	for(var/thing in owner.nymphs)
 		var/mob/living/carbon/alien/diona/D = thing
 		D.forceMove(humanoid_gestalt)
-		to_chat(D, SPAN_NOTICE("\The [caller] has shaped the gestalt into a humanoid form."))
+		to_chat(D, "<span class='notice'>\The [caller] has shaped the gestalt into a humanoid form.</span>")
 	owner.nymphs.Cut()
 	var/caller_instance_num = caller.instance_num
 	spawn

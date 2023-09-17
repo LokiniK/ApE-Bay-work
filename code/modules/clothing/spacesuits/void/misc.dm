@@ -17,9 +17,13 @@
 	flags_inv = HIDESHOES|HIDEJUMPSUIT
 	siemens_coefficient = 0.6
 
+/obj/item/clothing/suit/space/void/swat/New()
+	..()
+	slowdown_per_slot[slot_wear_suit] = 1
+
 //Skrell space gear. Sleek like a wetsuit.
 /obj/item/clothing/head/helmet/space/void/skrell
-	name = "skrellian helmet"
+	name = "Skrellian helmet"
 	desc = "Smoothly contoured and polished to a shine. Still looks like a fishbowl."
 	armor = list(
 		melee = ARMOR_MELEE_KNIVES,
@@ -32,16 +36,22 @@
 		)
 	max_heat_protection_temperature = SPACE_SUIT_MAX_HEAT_PROTECTION_TEMPERATURE
 	species_restricted = list(SPECIES_SKRELL,SPECIES_HUMAN)
+	tint = 1 //INF, WAS NOTHING (0) //skrellian tek
 
 /obj/item/clothing/head/helmet/space/void/skrell/white
+	icon = 'infinity/icons/obj/clothing/species/skrell/obj_head_skrell.dmi'//inf
+	item_icons = list(slot_head_str = 'infinity/icons/mob/species/skrell/onmob_head_skrell.dmi')//inf
 	icon_state = "skrell_helmet_white"
 
 /obj/item/clothing/head/helmet/space/void/skrell/black
+	icon = 'infinity/icons/obj/clothing/species/skrell/obj_head_skrell.dmi'//inf
+	item_icons = list(slot_head_str = 'infinity/icons/mob/species/skrell/onmob_head_skrell.dmi')//inf
 	icon_state = "skrell_helmet_black"
 
 /obj/item/clothing/suit/space/void/skrell
-	name = "skrellian voidsuit"
+	name = "Skrellian voidsuit"
 	desc = "Seems like a wetsuit with reinforced plating seamlessly attached to it. Very chic."
+	icon = 'infinity/icons/obj/clothing/species/skrell/obj_suit_skrell.dmi' //INF
 	armor = list(
 		melee = ARMOR_MELEE_KNIVES,
 		bullet = ARMOR_BALLISTIC_PISTOL,
@@ -55,6 +65,14 @@
 	heat_protection = UPPER_TORSO|LOWER_TORSO|LEGS|FEET|ARMS|HANDS
 	max_heat_protection_temperature = SPACE_SUIT_MAX_HEAT_PROTECTION_TEMPERATURE
 	species_restricted = list(SPECIES_SKRELL,SPECIES_HUMAN)
+//[INF]
+	item_icons = list(
+		slot_wear_suit_str = 'infinity/icons/mob/species/skrell/onmob_suit_skrell.dmi',
+		slot_l_hand_str = 'icons/mob/onmob/items/lefthand_spacesuits.dmi',
+		slot_r_hand_str = 'icons/mob/onmob/items/righthand_spacesuits.dmi'
+		)
+	sprite_sheets_obj = null //the same sprite for humans and skrells
+//[/INF]
 
 /obj/item/clothing/suit/space/void/skrell/white
 	icon_state = "skrell_suit_white"

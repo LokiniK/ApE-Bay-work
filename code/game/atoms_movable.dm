@@ -1,9 +1,8 @@
 /atom/movable
 	layer = OBJ_LAYER
 
-	glide_size = 4
-
-	animate_movement = SLIDE_STEPS
+	appearance_flags = TILE_BOUND | LONG_GLIDE
+	glide_size = 8
 
 	var/waterproof = TRUE
 	var/movable_flags
@@ -22,156 +21,42 @@
 	var/item_state = null // Used to specify the item state for the on-mob overlays.
 	var/does_spin = TRUE // Does the atom spin when thrown (of course it does :P)
 
-	/// The icon width this movable expects to have by default.
-	var/icon_width = 32
-
-	/// The icon height this movable expects to have by default.
-	var/icon_height = 32
-
-	/// Either [EMISSIVE_BLOCK_NONE], [EMISSIVE_BLOCK_GENERIC], or [EMISSIVE_BLOCK_UNIQUE]
-	var/blocks_emissive = EMISSIVE_BLOCK_NONE
-	///Internal holder for emissive blocker object, DO NOT USE DIRECTLY. Use blocks_emissive
-	var/mutable_appearance/em_block
-
-	var/inertia_dir = 0
-	var/atom/inertia_last_loc
-	var/inertia_moving = 0
-	var/inertia_next_move = 0
-	var/inertia_move_delay = 5
-	var/atom/movable/inertia_ignore
-
-//call this proc to start space drifting
-/atom/movable/proc/space_drift(direction)//move this down
-	if(!loc || direction & (UP|DOWN) || Process_Spacemove(0))
-		inertia_dir = 0
-		inertia_ignore = null
-		return 0
-
-	inertia_dir = direction
-	if(!direction)
-		return 1
-	inertia_last_loc = loc
-	SSspacedrift.processing[src] = src
-	return 1
-
-//return 0 to space drift, 1 to stop, -1 for mobs to handle space slips
-/atom/movable/proc/Process_Spacemove(allow_movement)
-	if(!simulated)
-		return 1
-
-	if(has_gravity())
-		return 1
-
-	if(pulledby)
-		return 1
-
-	if(throwing)
-		return 1
-
-	if(anchored)
-		return 1
-
-	if(!isturf(loc))
-		return 1
-
-	if(locate(/obj/structure/lattice) in range(1, get_turf(src))) //Not realistic but makes pushing things in space easier
-		return -1
-
-	return 0
-
-/atom/movable/hitby(atom/movable/AM, datum/thrownthing/TT)
-	. = ..()
-	process_momentum(AM,TT)
-
-/atom/movable/proc/process_momentum(atom/movable/AM, datum/thrownthing/TT)//physic isn't an exact science
-	. = momentum_power(AM,TT)
-
-	if(.)
-		momentum_do(.,TT,AM)
-
-/atom/movable/proc/momentum_power(atom/movable/AM, datum/thrownthing/TT)
-	if(anchored)
-		return 0
-
-	. = (AM.get_mass()*TT.speed)/(get_mass()*min(AM.throw_speed,2))
-	if(has_gravity())
-		. *= 0.5
-
-/atom/movable/proc/momentum_do(power, datum/thrownthing/TT)
-	var/direction = TT.init_dir
-	switch(power)
-		if(0.75 to INFINITY)		//blown backward, also calls being pinned to walls
-			throw_at(get_edge_target_turf(src, direction), min((TT.maxrange - TT.dist_travelled) * power, 10), throw_speed * min(power, 1.5))
-
-		if(0.5 to 0.75)	//knocks them back and changes their direction
-			step(src, direction)
-
-		if(0.25 to 0.5)	//glancing change in direction
-			var/drift_dir
-			if(direction & (NORTH|SOUTH))
-				if(inertia_dir & (NORTH|SOUTH))
-					drift_dir |= (direction & (NORTH|SOUTH)) & (inertia_dir & (NORTH|SOUTH))
-				else
-					drift_dir |= direction & (NORTH|SOUTH)
-			else
-				drift_dir |= inertia_dir & (NORTH|SOUTH)
-			if(direction & (EAST|WEST))
-				if(inertia_dir & (EAST|WEST))
-					drift_dir |= (direction & (EAST|WEST)) & (inertia_dir & (EAST|WEST))
-				else
-					drift_dir |= direction & (EAST|WEST)
-			else
-				drift_dir |= inertia_dir & (EAST|WEST)
-			space_drift(drift_dir)
-
-/atom/movable/proc/get_mass()
-	return 1.5
-
-
-/atom/movable/Initialize()
-	. = ..()
-	var/emissive_block = update_emissive_blocker()
-	if(emissive_block)
-		overlays += emissive_block
-		// Since this overlay is managed by the update_overlays proc
-		LAZYADD(managed_overlays, emissive_block)
-
 /atom/movable/Destroy()
 	if(!(atom_flags & ATOM_FLAG_INITIALIZED))
-		crash_with("\A [src] was deleted before initalization")
-	walk(src, 0)
+		crash_with("Was deleted before initalization")
+
 	for(var/A in src)
 		qdel(A)
+
 	forceMove(null)
 	if (pulledby)
 		if (pulledby.pulling == src)
 			pulledby.pulling = null
 		pulledby = null
-	if (LAZYLEN(movement_handlers) && !ispath(movement_handlers[1]))
+
+	if(LAZYLEN(movement_handlers) && !ispath(movement_handlers[1]))
 		QDEL_NULL_LIST(movement_handlers)
+
 	if (bound_overlay)
 		QDEL_NULL(bound_overlay)
-	if (virtual_mob && !ispath(virtual_mob))
+
+	if(virtual_mob && !ispath(virtual_mob))
 		qdel(virtual_mob)
 		virtual_mob = null
-	if (em_block)
-		QDEL_NULL(em_block)
-	return ..()
 
-/atom/movable/Bump(atom/A, yes)
+	. = ..()
+
+/atom/movable/Bump(var/atom/A, yes)
 	if(!QDELETED(throwing))
 		throwing.hit_atom(A)
 
-	if(inertia_dir)
-		inertia_dir = 0
-
 	if (A && yes)
 		A.last_bumped = world.time
-		invoke_async(A, /atom/proc/Bumped, src) // Avoids bad actors sleeping or unexpected side effects, as the legacy behavior was to spawn here
+		INVOKE_ASYNC(A, /atom/proc/Bumped, src) // Avoids bad actors sleeping or unexpected side effects, as the legacy behavior was to spawn here
 	..()
 
 /atom/movable/proc/forceMove(atom/destination)
-	if((gc_destroyed && gc_destroyed != GC_CURRENTLY_BEING_QDELETED) && !isnull(destination))
+	if(QDELETED(src) && !QDESTROYING(src) && !isnull(destination))
 		CRASH("Attempted to forceMove a QDELETED [src] out of nullspace!!!")
 	if(loc == destination)
 		return 0
@@ -237,7 +122,7 @@
 				L.source_atom.update_light()
 
 //called when src is thrown into hit_atom
-/atom/movable/proc/throw_impact(atom/hit_atom, datum/thrownthing/TT)
+/atom/movable/proc/throw_impact(atom/hit_atom, var/datum/thrownthing/TT)
 	if(istype(hit_atom,/mob/living))
 		var/mob/living/M = hit_atom
 		M.hitby(src,TT)
@@ -268,29 +153,8 @@
 		SpinAnimation(4,1)
 
 	SSthrowing.processing[src] = TT
-
-/atom/movable/proc/update_emissive_blocker()
-	if (!blocks_emissive)
-		return
-	if (blocks_emissive == EMISSIVE_BLOCK_GENERIC)
-		return fast_emissive_blocker(src)
-	if (blocks_emissive == EMISSIVE_BLOCK_UNIQUE)
-		if (!em_block && !QDELETED(src))
-			appearance_flags |= KEEP_TOGETHER
-			render_target = ref(src)
-			var/mutable_appearance/gen_emissive_blocker = emissive_blocker(
-				icon = icon,
-				appearance_flags = appearance_flags,
-				source = render_target
-			)
-			em_block = gen_emissive_blocker
-		return em_block
-
-/atom/movable/update_overlays()
-	. = ..()
-	var/emissive_blocker = update_emissive_blocker()
-	if (emissive_blocker)
-		. += emissive_blocker
+	if (SSthrowing.state == SS_PAUSED && length(SSthrowing.currentrun))
+		SSthrowing.currentrun[src] = TT
 
 //Overlays
 /atom/movable/overlay
@@ -326,23 +190,6 @@
 	GLOB.dir_set_event.unregister(master, src)
 	master = null
 	. = ..()
-
-/atom/movable/overlay/use_grab(obj/item/grab/grab, list/click_params)
-	if (master)
-		return master.use_grab(grab, click_params)
-	return FALSE
-
-/atom/movable/overlay/use_weapon(obj/item/weapon, mob/user, list/click_params)
-	SHOULD_CALL_PARENT(FALSE)
-	if (master)
-		return master.use_weapon(weapon, user, click_params)
-	return FALSE
-
-/atom/movable/overlay/use_tool(obj/item/tool, mob/user, list/click_params)
-	SHOULD_CALL_PARENT(FALSE)
-	if (master)
-		return master.use_tool(tool, user, click_params)
-	return FALSE
 
 /atom/movable/overlay/attackby(obj/item/I, mob/user)
 	if (master)
@@ -392,7 +239,3 @@
 
 /atom/movable/proc/get_bullet_impact_effect_type()
 	return BULLET_IMPACT_NONE
-
-
-/atom/movable/proc/CheckDexterity(mob/living/user)
-	return TRUE

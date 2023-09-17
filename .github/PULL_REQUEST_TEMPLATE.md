@@ -1,16 +1,50 @@
-<!-- 
-Do not forget to add a changelog when you have made admin/player facing changes that can alter gameplay.
-Examples which require a changelog entry include:
-* Adding/removing objects that players may interact with, or the way they function.
-* Adding/removing/altering admin tools.
-* Changing the map.
+# Описание
 
-Examples were changelog entries are optional/not typically required:
-* Cosmetic changes such as descriptions, sound effects, etc.
-* Optimizations and other changes to underlying systems which do not affect gameplay.
-* Minor bug fixes.
+* Дайте описание пулл-реквесту
+* Опишите цель создания этого пулл-реквеста
+* Если пулл-реквест исправляет какую-нибудь ошибку или репорт на гитхабер - опишите его и оставьте ссылку на сам репорт
+* Убедитесь, что Ваш пулл-реквест соблюдает [наш кодстайл](CODE_GUIDELINES.md).
+* Вы сделали изменения по карте? Убедитесь, что сделан [mapmerge](tools/../../tools/mapmerge2/README.md).
 
-You'll find a README and example file in .\html\changelogs\ for further instructions.
+## Основные изменения
 
-You can also find a template for adding your changelog directly to the PR description here: https://github.com/Baystation12/Baystation12/wiki/Automatic-changelog-generation
--->
+* Изменение 1
+* Изменение 2
+* Изменение 3
+
+## Скриншоты
+
+* Добавьте сюда скриншоты
+* Это опционально, но помогает оценить результат работы
+* Не забывайте добавлять скриншотам примечания, если их много
+* Если Вы хотите сделать сравнение между двумя скриншотами - можете воспользоваться таблицей
+* В ином случае можете её убрать и просто оставлять скриншоты
+
+| Было                   | Стало                  |
+| ---------------------- | ---------------------- |
+| Вставить сюда скриншот | Вставить сюда скриншот |
+| Вставить сюда скриншот | Вставить сюда скриншот |
+
+## Changelog
+
+<!-- С помощью этого раздела можно подготовить список изменений, которые попадут в игровой чейндж-лог. --->
+<!-- Вам нужно указать префикс изменения (Он идёт до двоеточия) и дать описание, как на примере. --->
+<!-- Префиксы можно использовать несколько раз. --->
+<!-- Если Вы не планируете добавлять записи в чейндж-лог - просто удалите из пулл-реквеста этот раздел. --->
+
+:cl:
+bugfix: fixed a few things
+wip: implemented wip things
+tweak: tweaked a few things
+soundadd: added a new sound thingy
+sounddel: removed an old sound thingy
+rscdel: removed old things
+rscadd: added new things
+imageadd: added some icons and images
+imagedel: deleted some icons and images
+maptweak: edited some maps
+spellcheck: fixed a few typos
+experiment: implemented experiment things
+balance: rebalanced something
+admin: messed with admin stuff
+/:cl:

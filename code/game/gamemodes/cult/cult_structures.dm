@@ -17,37 +17,60 @@
 /obj/structure/cult/pylon
 	name = "pylon"
 	desc = "A floating crystal that hums with an unearthly energy."
-	icon = 'icons/obj/structures/pylon.dmi'
+	icon = 'icons/obj/pylon.dmi'
 	icon_state = "pylon"
 	light_max_bright = 0.5
 	light_inner_range = 1
 	light_outer_range = 13
 	light_color = "#3e0000"
-	health_max = 20
-	health_min_damage = 4
-	damage_hitsound = 'sound/effects/Glasshit.ogg'
+	var/health = 20
+	var/maxhealth = 20
 
-
-/obj/structure/cult/pylon/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Cult Builder - Repair pylon
-	if (istype(tool, /obj/item/natural_weapon/cult_builder))
-		if (!health_damaged())
-			USE_FEEDBACK_FAILURE("\The [src] does not need repairs.")
-			return TRUE
+/obj/structure/cult/pylon/attackby(obj/item/W, mob/user)
+	user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
+	if (istype(W, /obj/item/natural_weapon/cult_builder))
+		if (health >= maxhealth)
+			to_chat(user, SPAN_WARNING("\The [src] is fully repaired."))
+		else
+			user.visible_message(
+				SPAN_NOTICE("\The [user] mends some of the cracks on \the [src]."),
+				SPAN_NOTICE("You repair some of \the [src]'s damage.")
+			)
+			health = min(maxhealth, health + 5)
+		return
+	user.do_attack_animation(src)
+	if (W.force < 4)
 		user.visible_message(
-			SPAN_NOTICE("\The [user] mends some of the cracks on \the [src]."),
-			SPAN_NOTICE("You repair some of \the [src]'s damage.")
+			SPAN_DANGER("\The [user] hits \the [src], but they bounce off!"),
+			SPAN_DANGER("You hit \the [src], but bounce off!"),
+			SPAN_WARNING("You hear thick glass being struck with something.")
 		)
-		restore_health(5)
-		return TRUE
-
-	return ..()
-
+		playsound(get_turf(src), 'sound/effects/Glasshit.ogg', 50, TRUE)
+		return
+	health = max(0, health - W.force)
+	if(!health)
+		user.visible_message(
+			SPAN_DANGER("\The [user] smashes \the [src]!"),
+			SPAN_DANGER("You smash \the [src] into pieces!"),
+			SPAN_WARNING("You hear glass shattering, and a tinkle of shards.")
+		)
+		playsound(get_turf(src), 'sound/effects/Glassbr3.ogg', 75, TRUE)
+		qdel(src)
+	else
+		user.visible_message(
+			SPAN_DANGER("\The [user] hits \the [src]!"),
+			SPAN_DANGER("You hit \the [src]!"),
+			SPAN_WARNING("You hear thick glass being struck with something.")
+		)
+		playsound(get_turf(src), 'sound/effects/Glasshit.ogg', 75, TRUE)
 
 /obj/structure/cult/tome
 	name = "Desk"
 	desc = "A desk covered in arcane manuscripts and tomes in unknown languages. Looking at the text makes your skin crawl."
 	icon_state = "tomealtar"
+	light_color = "#ed9200"
+	light_outer_range = 3
+	light_color= "ed9200"
 
 //sprites for this no longer exist	-Pete
 //(they were stolen from another game anyway)
@@ -62,11 +85,8 @@
 /obj/effect/gateway
 	name = "gateway"
 	desc = "You're pretty sure that abyss is staring back."
-	icon = 'icons/effects/64x64.dmi'
-	icon_state = "portal"
-	pixel_x = -16
-	pixel_y = -16
-	plane = EFFECTS_ABOVE_LIGHTING_PLANE
+	icon = 'icons/obj/cult.dmi'
+	icon_state = "hole"
 	density = TRUE
 	unacidable = TRUE
 	anchored = TRUE
@@ -82,8 +102,10 @@
 	)
 
 /obj/effect/gateway/active/cult
-	light_outer_range=5
-	light_color="#ff0000"
+	light_max_bright	= 0.5
+	light_inner_range	= 2
+	light_outer_range	= 5
+	light_color			= "#ff0000"
 	spawnable=list(
 		/mob/living/simple_animal/hostile/scarybat/cult,
 		/mob/living/simple_animal/hostile/creature/cult,
@@ -92,7 +114,7 @@
 
 /obj/effect/gateway/active/New()
 	..()
-	addtimer(new Callback(src, .proc/create_and_delete), rand(30,60) SECONDS)
+	addtimer(CALLBACK(src, .proc/create_and_delete), rand(30,60) SECONDS)
 
 
 /obj/effect/gateway/active/proc/create_and_delete()
@@ -100,7 +122,7 @@
 	new t(src.loc)
 	qdel(src)
 
-/obj/effect/gateway/active/Crossed(atom/A)
+/obj/effect/gateway/active/Crossed(var/atom/A)
 	if(!istype(A, /mob/living))
 		return
 
@@ -117,8 +139,8 @@
 
 		M.AddMovementHandler(/datum/movement_handler/mob/transformation)
 		M.icon = null
-		M.overlays.Cut()
-		M.set_invisibility(INVISIBILITY_ABSTRACT)
+		M.overlays.len = 0
+		M.set_invisibility(101)
 
 		if(istype(M, /mob/living/silicon/robot))
 			var/mob/living/silicon/robot/Robot = M
@@ -130,7 +152,7 @@
 				if(istype(W, /obj/item/implant))
 					qdel(W)
 
-		var/mob/living/new_mob = new /mob/living/simple_animal/passive/corgi(A.loc)
+		var/mob/living/new_mob = new /mob/living/simple_animal/friendly/corgi(A.loc)
 		new_mob.a_intent = I_HURT
 		if(M.mind)
 			M.mind.transfer_to(new_mob)
@@ -138,3 +160,4 @@
 			new_mob.key = M.key
 
 		to_chat(new_mob, "<B>Your form morphs into that of a corgi.</B>")//Because we don't have cluwnes
+

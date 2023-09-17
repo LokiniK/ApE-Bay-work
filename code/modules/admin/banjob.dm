@@ -1,7 +1,7 @@
 //This file was auto-corrected by findeclaration.exe on 25.5.2012 20:42:32
 
-var/global/jobban_runonce			// Updates legacy bans with new info
-var/global/jobban_keylist[0]		//to store the keys & ranks
+var/jobban_runonce			// Updates legacy bans with new info
+var/jobban_keylist[0]		//to store the keys & ranks
 
 /proc/jobban_fullban(mob/M, rank, reason)
 	if(!M)
@@ -23,12 +23,12 @@ var/global/jobban_keylist[0]		//to store the keys & ranks
 		if (SSjobs.guest_jobbans(rank))
 			if(config.guest_jobban && IsGuestKey(M.key))
 				return "Guest Job-ban"
-			if(!GLOB.skip_allow_lists && config.usewhitelist && !check_whitelist(M))
+			if(config.usewhitelist && !check_whitelist(M))
 				return "Whitelisted Job"
 		return ckey_is_jobbanned(M.ckey, rank)
 	return 0
 
-/proc/ckey_is_jobbanned(check_key, rank)
+/proc/ckey_is_jobbanned(var/check_key, var/rank)
 	for(var/s in jobban_keylist)
 		if(findtext(s,"[check_key] - [rank]") == 1 )
 			var/startpos = findtext(s, "## ")+3
@@ -62,7 +62,7 @@ var/global/jobban_keylist[0]		//to store the keys & ranks
 			return
 
 		//Job permabans
-		var/DBQuery/query = dbcon.NewQuery("SELECT ckey, job FROM erro_ban WHERE bantype = 'JOB_PERMABAN' AND isnull(unbanned)")
+		var/DBQuery/query = dbcon.NewQuery("SELECT ckey, job FROM [sqlfdbkdbutil].ban WHERE bantype = 'JOB_PERMABAN' AND isnull(unbanned)")
 		query.Execute()
 
 		while(query.NextRow())
@@ -72,7 +72,7 @@ var/global/jobban_keylist[0]		//to store the keys & ranks
 			jobban_keylist.Add("[ckey] - [job]")
 
 		//Job tempbans
-		var/DBQuery/query1 = dbcon.NewQuery("SELECT ckey, job FROM erro_ban WHERE bantype = 'JOB_TEMPBAN' AND isnull(unbanned) AND expiration_time > Now()")
+		var/DBQuery/query1 = dbcon.NewQuery("SELECT ckey, job FROM [sqlfdbkdbutil].ban WHERE bantype = 'JOB_TEMPBAN' AND isnull(unbanned) AND expiration_time > Now()")
 		query1.Execute()
 
 		while(query1.NextRow())
@@ -90,7 +90,7 @@ var/global/jobban_keylist[0]		//to store the keys & ranks
 	jobban_savebanfile()
 
 
-/proc/ban_unban_log_save(formatted_log)
+/proc/ban_unban_log_save(var/formatted_log)
 	text2file(formatted_log,"data/ban_unban_log.txt")
 
 

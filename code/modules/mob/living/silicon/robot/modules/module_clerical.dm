@@ -3,11 +3,12 @@
 		"Service" = TRUE
 	)
 	skills = list(
-		SKILL_BUREAUCRACY         = SKILL_MASTER,
-		SKILL_FINANCE             = SKILL_MASTER,
-		SKILL_COMPUTER            = SKILL_EXPERIENCED,
-		SKILL_SCIENCE             = SKILL_EXPERIENCED,
-		SKILL_DEVICES             = SKILL_EXPERIENCED
+		SKILL_BUREAUCRACY         = SKILL_PROF,
+		SKILL_FINANCE             = SKILL_PROF,
+		SKILL_COMPUTER            = SKILL_EXPERT,
+		SKILL_SCIENCE             = SKILL_EXPERT,
+		SKILL_DEVICES             = SKILL_EXPERT,
+		SKILL_PILOT               = SKILL_ADEPT //INF
 	)
 
 /obj/item/robot_module/clerical/butler
@@ -18,12 +19,13 @@
 		"Kent" = "toiletbot",
 		"Bro" = "Brobot",
 		"Rich" = "maximillion",
-		"Default" = "Service2"
+		"Basic" = "Service2",
+		"Default" = "robotServ"
 	)
 	equipment = list(
 		/obj/item/device/flash,
 		/obj/item/gripper/service,
-		/obj/item/reagent_containers/glass/bucket,
+		/obj/item/reagent_containers/misc/bucket,
 		/obj/item/material/minihoe,
 		/obj/item/material/hatchet,
 		/obj/item/device/scanner/plant,
@@ -38,14 +40,14 @@
 		/obj/item/tray/robotray,
 		/obj/item/reagent_containers/borghypo/service
 	)
-	emag = /obj/item/reagent_containers/food/drinks/bottle/small/beer/fake
+	emag = /obj/item/reagent_containers/food/drinks/bottle/small/beer
 	skills = list(
-		SKILL_BUREAUCRACY         = SKILL_MASTER,
-		SKILL_COMPUTER            = SKILL_EXPERIENCED,
-		SKILL_COOKING             = SKILL_MASTER,
-		SKILL_BOTANY              = SKILL_MASTER,
+		SKILL_BUREAUCRACY         = SKILL_PROF,
+		SKILL_COMPUTER            = SKILL_EXPERT,
+		SKILL_COOKING             = SKILL_PROF,
+		SKILL_BOTANY              = SKILL_PROF,
 		SKILL_MEDICAL             = SKILL_BASIC,
-		SKILL_CHEMISTRY           = SKILL_TRAINED
+		SKILL_CHEMISTRY           = SKILL_ADEPT
 	)
 
 /obj/item/robot_module/clerical/butler/finalize_equipment()
@@ -57,12 +59,17 @@
 
 /obj/item/robot_module/clerical/butler/finalize_emag()
 	. = ..()
-	emag.SetName("Mickey Finn's Special Brew")
-
-/obj/item/robot_module/clerical/butler/respawn_consumable(mob/living/silicon/robot/R, amount)
-	..()
 	if(emag)
-		var/obj/item/reagent_containers/food/drinks/bottle/small/beer/fake/B = emag
+		var/datum/reagents/R = emag.create_reagents(50)
+		R.add_reagent(/datum/reagent/chloralhydrate/beer2, 50)
+		emag.SetName("Mickey Finn's Special Brew")
+
+/obj/item/robot_module/clerical/butler/respawn_consumable(var/mob/living/silicon/robot/R, var/amount)
+	..()
+	var/obj/item/reagent_containers/food/condiment/enzyme/E = locate() in equipment
+	E.reagents.add_reagent(/datum/reagent/enzyme, 2 * amount)
+	if(emag)
+		var/obj/item/reagent_containers/food/drinks/bottle/small/beer/B = emag
 		B.reagents.add_reagent(/datum/reagent/chloralhydrate/beer2, 2 * amount)
 
 /obj/item/robot_module/clerical/general
@@ -77,7 +84,8 @@
 		"Kent" =     "toiletbot",
 		"Bro" =      "Brobot",
 		"Rich" =     "maximillion",
-		"Default" =  "Service2"
+		"Basic" =  "Service2",
+		"Default" = "robotCler"
 	)
 	equipment = list(
 		/obj/item/device/flash,

@@ -1,34 +1,25 @@
-/*MEGALEECH
-Tiny, weak, and mostly harmless alone. dangerous in groups.
-*/
-
 /mob/living/simple_animal/hostile/leech
 	name = "megaleech"
-	desc = "A giant leech the size of a common snake."
+	desc = "A green leech the size of a common snake."
 	icon = 'icons/mob/simple_animal/megaleech.dmi'
 	icon_state = "leech"
 	icon_living = "leech"
 	icon_dead = "leech_dead"
 	health = 15
 	maxHealth = 15
-	harm_intent_damage = 8
+	harm_intent_damage = 5
 	natural_weapon = /obj/item/natural_weapon/bite/weak
 	pass_flags = PASS_FLAG_TABLE
 	faction = "leeches"
 	can_pry = FALSE
 	break_stuff_probability = 5
-	flash_vulnerability = 0 // We dont have eyes, why should we care about light?
+	flash_vulnerability = 0
 	bleed_colour = COLOR_VIOLET
-	color = COLOR_GRAY
 
 	ai_holder = /datum/ai_holder/simple_animal/melee/leech
 
 	var/suck_potency = 8
 	var/belly = 100
-
-/mob/living/simple_animal/hostile/leech/Initialize()
-	color = get_random_colour(0,75,190) // Our icon is greyscale, and can be painted just fine.  Uses same coloring range as flora.
-	. = ..()
 
 /datum/ai_holder/simple_animal/melee/leech/engage_target()
 	. = ..()
@@ -42,7 +33,7 @@ Tiny, weak, and mostly harmless alone. dangerous in groups.
 		H.remove_blood_simple(L.suck_potency)
 		if(L.health < L.maxHealth)
 			L.health += L.suck_potency / 1.5
-		L.belly += clamp(L.suck_potency, 0, 100)
+		L.belly += Clamp(L.suck_potency, 0, 100)
 
 
 /mob/living/simple_animal/hostile/leech/Life()
@@ -56,18 +47,15 @@ Tiny, weak, and mostly harmless alone. dangerous in groups.
 		belly -= 1
 
 /obj/structure/leech_spawner
-	name = "rigus regzorfra" // Similar naming to exoplanet flora, but not quite.
-	desc = "Wait... Something is wrong about this one." // Someone is actually checking for pests, let's reward them.
-	icon = 'icons/obj/flora/hydroponics_growing.dmi'
-	icon_state = "alien1-1" // Placeholder until initalize. If seen like this, something went wrong.
-	color = COLOR_GRAY
+	name = "reeds"
+	desc = "Some reeds with a few funnel-like structures growing alongside."
+	icon = 'icons/mob/simple_animal/megaleech.dmi'
+	icon_state = "reeds"
 	anchored = TRUE
 	var/number_to_spawn = 12
 	var/spent = FALSE
 
 /obj/structure/leech_spawner/Initialize()
-	icon_state = pick("alien[rand(1,4)]-dead") // Picks from the same pool of icons as xenoflora, but dead already.
-	color = get_random_colour(0,75,190) // Colors them as such, too.
 	. = ..()
 	START_PROCESSING(SSobj, src)
 
@@ -79,8 +67,7 @@ Tiny, weak, and mostly harmless alone. dangerous in groups.
 	for(var/i in 1 to number_to_spawn)
 		new /mob/living/simple_animal/hostile/leech(get_turf(src))
 	visible_message(SPAN_MFAUNA("A swarm of leeches burst out from \the [src]!"))
-	playsound(src, 'sound/voice/BugHiss.ogg', 50, 5)
-	icon_state = "alien4-1" // looks close enough to an exploded plant.
-	desc = "A pile of strewn together, half-dissolved plant matter pieces, covered in a thin, transparent liquid."
+	icon_state = "reeds_empty"
+	desc = "Some alien reeds."
 	spent = TRUE
 	STOP_PROCESSING(SSobj, src)

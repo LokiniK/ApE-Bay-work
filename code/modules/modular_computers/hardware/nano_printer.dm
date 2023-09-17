@@ -3,7 +3,7 @@
 	desc = "Small integrated printer with paper recycling module."
 	power_usage = 50
 	origin_tech = list(TECH_DATA = 2, TECH_ENGINEERING = 2)
-	critical = FALSE
+	critical = 0
 	icon_state = "printer"
 	hardware_size = 1
 	var/stored_paper = 50
@@ -16,30 +16,29 @@
 	. += "Paper buffer level: [stored_paper]/[max_paper]"
 	. += "Printer language: [print_language]"
 
-/obj/item/stock_parts/computer/nano_printer/proc/print_text(text_to_print, paper_title = null, paper_type = /obj/item/paper, list/md = null)
-	. = FALSE
+/obj/item/stock_parts/computer/nano_printer/proc/print_text(var/text_to_print, var/paper_title = null, var/paper_type = /obj/item/paper, var/list/md = null)
 	if(printer_ready())
 		last_print = world.time
 		// Damaged printer causes the resulting paper to be somewhat harder to read.
-		if(is_malfunctioning())
+		if(damage > damage_malfunction)
 			text_to_print = stars(text_to_print, 100-malfunction_probability)
 		var/turf/T = get_turf(src)
 		new paper_type(T, text_to_print, paper_title, md, print_language)
 		stored_paper--
 		playsound(T, "sound/machines/dotprinter.ogg", 30)
-		T.visible_message(SPAN_NOTICE("\The [src] prints out a paper."))
-		return TRUE
+		T.visible_message("<span class='notice'>\The [src] prints out a paper.</span>")
+		return 1
 
 /obj/item/stock_parts/computer/nano_printer/proc/printer_ready()
 	if(!stored_paper)
-		return FALSE
+		return 0
 	if(!enabled)
-		return FALSE
+		return 0
 	if(!check_functionality())
-		return FALSE
+		return 0
 	if(world.time < last_print + 1 SECOND)
-		return FALSE
-	return TRUE
+		return 0
+	return 1
 
 /obj/item/stock_parts/computer/nano_printer/attackby(obj/item/W as obj, mob/user as mob)
 	if(istype(W, /obj/item/paper))
@@ -65,9 +64,9 @@
 			if(stored_paper >= max_paper) //check if the printer is full yet
 				to_chat(user, "The printer has been filled to full capacity.")
 				break
-		if(length(B.pages) == 0) //if all its papers have been put into the printer, delete bundle
+		if(B.pages.len == 0) //if all its papers have been put into the printer, delete bundle
 			qdel(W)
-		else if(length(B.pages) == 1) //if only one item left, extract item and delete the one-item bundle
+		else if(B.pages.len == 1) //if only one item left, extract item and delete the one-item bundle
 			user.drop_from_inventory(B)
 			user.put_in_hands(B[1])
 			qdel(B)

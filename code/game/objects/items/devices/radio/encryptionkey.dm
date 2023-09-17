@@ -1,8 +1,8 @@
 
-/obj/item/device/encryptionkey
+/obj/item/device/encryptionkey/
 	name = "standard encryption key"
 	desc = "An encryption key for a radio headset. Contains cypherkeys."
-	icon = 'icons/obj/cypherkeys.dmi'
+	icon = 'icons/obj/radio.dmi'
 	icon_state = "cypherkey"
 	item_state = ""
 	w_class = ITEM_SIZE_TINY
@@ -11,6 +11,8 @@
 	var/translate_hive = 0
 	var/syndie = 0
 	var/list/channels = list()
+
+/obj/item/device/encryptionkey/attackby(obj/item/W as obj, mob/user as mob)
 
 /obj/item/device/encryptionkey/map_preset
 	var/preset_name
@@ -39,12 +41,6 @@
 	channels = list("Raider" = 1, "Hailing" = 1)
 	origin_tech = list(TECH_ESOTERIC = 2)
 	syndie = 1
-
-/obj/item/device/encryptionkey/vox_raider
-	icon_state = "cypherkey"
-	channels = list("Vox Raider" = TRUE, "Hailing" = TRUE)
-	origin_tech = list(TECH_ESOTERIC = 2)
-	syndie = TRUE
 
 /obj/item/device/encryptionkey/binary
 	icon_state = "cypherkey"
@@ -104,7 +100,7 @@
 /obj/item/device/encryptionkey/heads/rd
 	name = "chief science officer's encryption key"
 	icon_state = "rd_cypherkey"
-	channels = list("Science" = 1, "Command" = 1, "Hailing" = 1)
+	channels = list("Science" = 1, "Command" = 1, "Hailing" = 1, "Exploration" = 1) //inf, was: channels = list("Science" = 1, "Command" = 1, "Hailing" = 1)
 
 /obj/item/device/encryptionkey/heads/hos
 	name = "head of security's encryption key"
@@ -154,3 +150,10 @@
 	name = "prospector radio encryption key"
 	icon_state = "srv_cypherkey"
 	channels = list("Supply" = 1)
+
+//[INF]
+/obj/item/device/encryptionkey/away_scg_patrol
+	name = "SCG Patrol radio encryption key"
+	icon_state = "nt_cypherkey"
+	channels = list("SCG Patrol" = 1)
+//[/INF]

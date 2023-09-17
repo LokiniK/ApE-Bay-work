@@ -22,9 +22,9 @@
 	if(istype(SNM))
 		SNM.emagged = computer.emagged()
 		if(SNM.notifications_enabled)
-			if(length(SSsupply.requestlist))
+			if(SSsupply.requestlist.len)
 				ui_header = "supply_new_order.gif"
-			else if(length(SSsupply.shoppinglist))
+			else if(SSsupply.shoppinglist.len)
 				ui_header = "supply_awaiting_delivery.gif"
 			else
 				ui_header = "supply_idle.gif"
@@ -47,8 +47,8 @@
 
 /datum/nano_module/supply/ui_interact(mob/user, ui_key = "main", datum/nanoui/ui = null, force_open = 1, state = GLOB.default_state)
 	var/list/data = host.initial_data()
-	var/is_admin = emagged || check_access(user, admin_access)
-	var/singleton/security_state/security_state = GET_SINGLETON(GLOB.using_map.security_state)
+	var/is_admin = check_access(user, admin_access)
+	var/decl/security_state/security_state = decls_repository.get_decl(GLOB.using_map.security_state)
 	if(!LAZYLEN(category_names) || !LAZYLEN(category_contents) || current_security_level != security_state.current_security_level || emagged_memory != emagged )
 		generate_categories()
 		current_security_level = security_state.current_security_level
@@ -56,8 +56,8 @@
 
 	data["is_admin"] = is_admin
 	if(is_admin)
-		data["shopping_cart_length"] = length(SSsupply.shoppinglist)
-		data["request_length"] = length(SSsupply.requestlist)
+		data["shopping_cart_length"] = SSsupply.shoppinglist.len
+		data["request_length"] = SSsupply.requestlist.len
 	data["screen"] = screen
 	data["credits"] = "[SSsupply.points]"
 	data["currency"] = GLOB.using_map.supply_currency_name
@@ -119,7 +119,7 @@
 		ui.open()
 
 // Supply the order ID and where to look. This is just to reduce copypaste code.
-/datum/nano_module/supply/proc/find_order_by_id(order_id, list/find_in)
+/datum/nano_module/supply/proc/find_order_by_id(var/order_id, var/list/find_in)
 	for(var/datum/supply_order/SO in find_in)
 		if(SO.ordernum == order_id)
 			return SO
@@ -147,7 +147,7 @@
 
 	if(href_list["order"])
 		clear_order_contents()
-		var/singleton/hierarchy/supply_pack/P = locate(href_list["order"]) in SSsupply.master_supply_list
+		var/decl/hierarchy/supply_pack/P = locate(href_list["order"]) in SSsupply.master_supply_list
 		if(!istype(P))
 			return 1
 
@@ -194,11 +194,11 @@
 	if(href_list["launch_shuttle"])
 		var/datum/shuttle/autodock/ferry/supply/shuttle = SSsupply.shuttle
 		if(!shuttle)
-			to_chat(user, SPAN_WARNING("Error connecting to the shuttle."))
+			to_chat(user, "<span class='warning'>Error connecting to the shuttle.</span>")
 			return
 		if(shuttle.at_station())
 			if (shuttle.forbidden_atoms_check())
-				to_chat(usr, SPAN_WARNING("For safety reasons the automated supply shuttle cannot transport live organisms, classified nuclear weaponry or homing beacons."))
+				to_chat(usr, "<span class='warning'>For safety reasons the automated supply shuttle cannot transport live organisms, classified nuclear weaponry or homing beacons.</span>")
 			else
 				shuttle.launch(user)
 		else
@@ -218,15 +218,15 @@
 		var/id = text2num(href_list["approve_order"])
 		var/datum/supply_order/SO = find_order_by_id(id, SSsupply.requestlist)
 		if(SO)
-			if(SO.object.cost >= SSsupply.points)
-				to_chat(usr, SPAN_WARNING("Not enough points to purchase \the [SO.object.name]!"))
+			if(SO.object.get_cost() >= SSsupply.points)
+				to_chat(usr, "<span class='warning'>Not enough points to purchase \the [SO.object.name]!</span>")
 			else
 				SSsupply.requestlist -= SO
 				SSsupply.shoppinglist += SO
-				SSsupply.points -= SO.object.cost
+				SSsupply.points -= SO.object.get_cost()
 
 		else
-			to_chat(user, SPAN_WARNING("Could not find order number [id] to approve."))
+			to_chat(user, "<span class='warning'>Could not find order number [id] to approve.</span>")
 
 		return 1
 
@@ -236,7 +236,7 @@
 		if(SO)
 			SSsupply.requestlist -= SO
 		else
-			to_chat(user, SPAN_WARNING("Could not find order number [id] to deny."))
+			to_chat(user, "<span class='warning'>Could not find order number [id] to deny.</span>")
 
 		return 1
 
@@ -245,9 +245,9 @@
 		var/datum/supply_order/SO = find_order_by_id(id, SSsupply.shoppinglist)
 		if(SO)
 			SSsupply.shoppinglist -= SO
-			SSsupply.points += SO.object.cost
+			SSsupply.points += SO.object.get_cost()
 		else
-			to_chat(user, SPAN_WARNING("Could not find order number [id] to cancel."))
+			to_chat(user, "<span class='warning'>Could not find order number [id] to cancel.</span>")
 
 		return 1
 
@@ -257,13 +257,13 @@
 		if(SO)
 			SSsupply.donelist -= SO
 		else
-			to_chat(user, SPAN_WARNING("Could not find order number [id] to delete."))
+			to_chat(user, "<span class='warning'>Could not find order number [id] to delete.</span>")
 
 		return 1
 
 	if(href_list["print_receipt"])
 		if(!can_print())
-			to_chat(user, SPAN_WARNING("No printer connected to print receipts."))
+			to_chat(user, "<span class='warning'>No printer connected to print receipts.</span>")
 			return 1
 
 		var/id = text2num(href_list["print_receipt"])
@@ -277,14 +277,14 @@
 			if(SUPPLY_LIST_ID_DONE)
 				list_to_search = SSsupply.donelist
 			else
-				to_chat(user, SPAN_WARNING("Invalid list ID for order number [id]. Receipt not printed."))
+				to_chat(user, "<span class='warning'>Invalid list ID for order number [id]. Receipt not printed.</span>")
 				return 1
 
 		var/datum/supply_order/SO = find_order_by_id(id, list_to_search)
 		if(SO)
 			print_order(SO, user)
 		else
-			to_chat(user, SPAN_WARNING("Could not find order number [id] to print receipt."))
+			to_chat(user, "<span class='warning'>Could not find order number [id] to print receipt.</span>")
 
 		return 1
 
@@ -295,24 +295,24 @@
 /datum/nano_module/supply/proc/generate_categories()
 	category_names.Cut()
 	category_contents.Cut()
-	var/singleton/hierarchy/supply_pack/root = GET_SINGLETON(/singleton/hierarchy/supply_pack)
-	for(var/singleton/hierarchy/supply_pack/sp in root.children)
+	var/decl/hierarchy/supply_pack/root = decls_repository.get_decl(/decl/hierarchy/supply_pack)
+	for(var/decl/hierarchy/supply_pack/sp in root.children)
 		if(!sp.is_category())
 			continue // No children
 		category_names.Add(sp.name)
 		var/list/category[0]
-		for(var/singleton/hierarchy/supply_pack/spc in sp.get_descendents())
+		for(var/decl/hierarchy/supply_pack/spc in sp.get_descendents())
 			if((spc.hidden || spc.contraband || !spc.sec_available()) && !emagged)
 				continue
 			category.Add(list(list(
 				"name" = spc.name,
-				"cost" = spc.cost,
+				"cost" = spc.get_cost(),
 				"ref" = "\ref[spc]"
 			)))
 		category_contents[sp.name] = category
 
-/datum/nano_module/supply/proc/generate_order_contents(order_ref)
-	var/singleton/hierarchy/supply_pack/sp = locate(order_ref) in SSsupply.master_supply_list
+/datum/nano_module/supply/proc/generate_order_contents(var/order_ref)
+	var/decl/hierarchy/supply_pack/sp = locate(order_ref) in SSsupply.master_supply_list
 	if(!istype(sp))
 		return FALSE
 	contents_of_order.Cut()
@@ -330,7 +330,7 @@
 			"amount" = amount
 		)))
 
-	if(length(sp.contains) == 0) // Handles the case where sp.contains is empty, e.g. for livecargo
+	if(sp.contains.len == 0) // Handles the case where sp.contains is empty, e.g. for livecargo
 		contents_of_order.Add(list(list(
 			"name" = sp.containername,
 			"amount" = 1
@@ -355,12 +355,12 @@
 		return "Docked"
 	return "Docking/Undocking"
 
-/datum/nano_module/supply/proc/order_to_nanoui(datum/supply_order/SO, list_id)
+/datum/nano_module/supply/proc/order_to_nanoui(var/datum/supply_order/SO, var/list_id)
 	return list(list(
 		"id" = SO.ordernum,
 		"object" = SO.object.name,
 		"orderer" = SO.orderedby,
-		"cost" = SO.object.cost,
+		"cost" = SO.object.get_cost(),
 		"reason" = SO.reason,
 		"list_id" = list_id
 		))
@@ -371,7 +371,7 @@
 		return os.has_component(PART_PRINTER)
 	return 0
 
-/datum/nano_module/supply/proc/print_order(datum/supply_order/O, mob/user)
+/datum/nano_module/supply/proc/print_order(var/datum/supply_order/O, var/mob/user)
 	if(!O)
 		return
 
@@ -388,7 +388,7 @@
 	t += "<hr>"
 	print_text(t, user)
 
-/datum/nano_module/supply/proc/print_summary(mob/user)
+/datum/nano_module/supply/proc/print_summary(var/mob/user)
 	var/t = ""
 	t += "<center><BR><b><large>[GLOB.using_map.station_name]</large></b><BR><i>[station_date]</i><BR><i>Export overview<field></i></center><hr>"
 	for(var/source in SSsupply.point_source_descriptions)

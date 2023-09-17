@@ -39,7 +39,8 @@
 	tag_interior_door = "mininghomesolars_interiordoor"
 	},
 /obj/machinery/atmospherics/unary/vent_pump/high_volume/external_air{
-	id_tag = "mininghome_solars_pump"
+	id_tag = "mininghome_solars_pump";
+	power_rating = 30000
 	},
 /turf/simulated/floor/tiled/techfloor,
 /area/map_template/mininghome_power)
@@ -115,16 +116,12 @@
 /area/map_template/mininghome_power)
 "aB" = (
 /obj/machinery/atmospherics/pipe/simple/hidden{
-	dir = 4
+	dir = 4;
+	icon_state = "intact"
 	},
 /obj/machinery/light/small,
-/obj/structure/cable/yellow{
-	d1 = 4;
-	d2 = 8;
-	icon_state = "4-8"
-	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_eva)
+/area/map_template/mininghome_hall)
 "aD" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
@@ -134,11 +131,13 @@
 	icon_state = "1-2"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/alarm{
 	dir = 4;
-	pixel_x = -23
+	pixel_x = -23;
+	pixel_y = 0
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_power)
@@ -212,7 +211,8 @@
 /area/map_template/mininghome_mess)
 "bh" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/light/spot{
 	dir = 4
@@ -225,14 +225,16 @@
 	dir = 8
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
 "bu" = (
 /obj/structure/ore_box,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hangar)
@@ -271,7 +273,8 @@
 	},
 /obj/machinery/atmospherics/unary/vent_pump/high_volume/external_air{
 	dir = 1;
-	id_tag = "mininghome_solars_pump"
+	id_tag = "mininghome_solars_pump";
+	power_rating = 30000
 	},
 /turf/simulated/floor/tiled/techfloor,
 /area/map_template/mininghome_power)
@@ -284,7 +287,8 @@
 	},
 /obj/machinery/atmospherics/unary/vent_scrubber/on,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -296,11 +300,6 @@
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
 	dir = 5
-	},
-/obj/structure/cable/yellow{
-	d1 = 1;
-	d2 = 4;
-	icon_state = "1-4"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -356,7 +355,7 @@
 "cy" = (
 /obj/effect/floor_decal/industrial/hatch/yellow,
 /turf/simulated/floor/plating,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "cD" = (
 /obj/structure/closet/crate/trashcart,
 /turf/simulated/floor/steel_dirty,
@@ -378,7 +377,8 @@
 	icon_state = "0-4"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -390,7 +390,8 @@
 	dir = 4
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -403,10 +404,12 @@
 "cV" = (
 /obj/structure/largecrate,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 4
+	dir = 4;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hangar)
@@ -432,10 +435,11 @@
 /area/map_template/mininghome_lockers)
 "dm" = (
 /obj/machinery/atmospherics/pipe/simple/hidden{
-	dir = 4
+	dir = 4;
+	icon_state = "intact"
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_eva)
+/area/map_template/mininghome_hall)
 "dq" = (
 /obj/effect/paint/black,
 /turf/simulated/wall/r_titanium,
@@ -446,7 +450,7 @@
 	output_turf = 8
 	},
 /turf/simulated/floor/plating,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "dQ" = (
 /obj/structure/cable/yellow{
 	d1 = 2;
@@ -461,13 +465,15 @@
 	},
 /obj/machinery/computer/modular/preset/civilian,
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "dT" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 1
+	dir = 1;
+	icon_state = "corner_white"
 	},
 /obj/random/material,
 /obj/random/material,
@@ -561,10 +567,12 @@
 /area/map_template/mininghome_hall)
 "eF" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/alarm{
 	dir = 8;
+	icon_state = "alarm0";
 	pixel_x = 24
 	},
 /turf/simulated/floor/steel_dirty,
@@ -618,6 +626,7 @@
 "fd" = (
 /obj/machinery/alarm{
 	dir = 8;
+	icon_state = "alarm0";
 	pixel_x = 24
 	},
 /obj/machinery/light/spot{
@@ -636,7 +645,8 @@
 "ff" = (
 /obj/structure/ore_box,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hangar)
@@ -647,10 +657,12 @@
 "fj" = (
 /obj/structure/table/steel,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 1
+	dir = 1;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -661,7 +673,8 @@
 "fm" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_power)
@@ -676,6 +689,7 @@
 /obj/machinery/light/small,
 /obj/machinery/alarm{
 	dir = 1;
+	icon_state = "alarm0";
 	pixel_y = -22
 	},
 /obj/machinery/atmospherics/unary/vent_scrubber/on{
@@ -729,7 +743,8 @@
 	dir = 4
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 1
+	dir = 1;
+	icon_state = "corner_white"
 	},
 /obj/item/device/flashlight/lantern{
 	pixel_x = -14;
@@ -772,10 +787,6 @@
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
-"gn" = (
-/obj/effect/paint/black,
-/turf/simulated/wall/r_titanium,
-/area/map_template/mininghome_processing)
 "gq" = (
 /obj/effect/floor_decal/industrial/warning/corner{
 	dir = 1;
@@ -811,6 +822,7 @@
 /obj/effect/floor_decal/industrial/outline/yellow,
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /obj/machinery/light/spot,
@@ -836,7 +848,8 @@
 	},
 /obj/machinery/alarm{
 	dir = 4;
-	pixel_x = -23
+	pixel_x = -23;
+	pixel_y = 0
 	},
 /turf/simulated/floor/tiled/freezer,
 /area/map_template/mininghome_lockers)
@@ -851,7 +864,8 @@
 /area/map_template/mininghome_lockers)
 "gJ" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/access_button{
 	command = "cycle_interior";
@@ -865,31 +879,30 @@
 	dir = 10
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden{
-	dir = 9
+	dir = 9;
+	icon_state = "intact"
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
 	dir = 10
-	},
-/obj/structure/cable/yellow{
-	d1 = 1;
-	d2 = 2;
-	icon_state = "1-2"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
 "gM" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/alarm{
 	dir = 8;
+	icon_state = "alarm0";
 	pixel_x = 24
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_living_south)
 "gZ" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /obj/random/junk,
 /turf/simulated/floor/steel_dirty,
@@ -909,7 +922,8 @@
 "hg" = (
 /obj/machinery/atmospherics/unary/vent_pump/on,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/vending/wallmed1{
 	pixel_y = 32
@@ -962,7 +976,8 @@
 /area/map_template/mininghome_power)
 "hr" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -971,7 +986,8 @@
 	dir = 8
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -1008,7 +1024,8 @@
 	icon_state = "1-4"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_power)
@@ -1023,8 +1040,8 @@
 /turf/simulated/floor/tiled/techfloor,
 /area/map_template/mininghome_hangar)
 "hN" = (
-/obj/random/ironing_board_structure,
-/obj/item/ironing_iron,
+/obj/structure/bed/roller/ironingboard,
+/obj/item/ironingiron,
 /turf/simulated/floor/tiled/freezer,
 /area/map_template/mininghome_lockers)
 "hP" = (
@@ -1040,7 +1057,8 @@
 /area/map_template/mininghome_hall)
 "hU" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -1055,7 +1073,8 @@
 /obj/effect/floor_decal/corner/red,
 /obj/machinery/alarm{
 	dir = 4;
-	pixel_x = -23
+	pixel_x = -23;
+	pixel_y = 0
 	},
 /turf/simulated/floor/tiled/white,
 /area/map_template/mininghome_mess)
@@ -1073,10 +1092,12 @@
 /obj/structure/bed,
 /obj/item/bedsheet/ce,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 1
+	dir = 1;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_living_south)
@@ -1087,7 +1108,8 @@
 /area/map_template/mininghome_robotics)
 "io" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
-	dir = 9
+	dir = 9;
+	pixel_y = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
 	dir = 4
@@ -1098,7 +1120,8 @@
 	icon_state = "1-8"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown,
 /obj/machinery/light_switch{
@@ -1111,6 +1134,7 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
 /obj/machinery/alarm/cold{
 	dir = 4;
+	icon_state = "alarm0";
 	pixel_x = -22
 	},
 /turf/simulated/floor/tiled/freezer,
@@ -1132,7 +1156,8 @@
 	icon_state = "1-2"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -1149,10 +1174,12 @@
 	icon_state = "1-4"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 8
+	dir = 8;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -1164,7 +1191,8 @@
 	dir = 8
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -1184,7 +1212,9 @@
 "jo" = (
 /obj/structure/hygiene/sink{
 	dir = 4;
-	pixel_x = 11
+	icon_state = "sink";
+	pixel_x = 11;
+	pixel_y = 0
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
 	dir = 9
@@ -1211,6 +1241,7 @@
 "jz" = (
 /obj/machinery/alarm{
 	dir = 1;
+	icon_state = "alarm0";
 	pixel_y = -22
 	},
 /turf/simulated/floor/tiled/freezer,
@@ -1234,7 +1265,7 @@
 	dir = 4
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "jN" = (
 /obj/effect/floor_decal/industrial/warning{
 	dir = 1
@@ -1312,11 +1343,6 @@
 	dir = 4
 	},
 /obj/effect/floor_decal/floordetail/pryhole,
-/obj/structure/cable/yellow{
-	d1 = 4;
-	d2 = 8;
-	icon_state = "4-8"
-	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
 "kE" = (
@@ -1329,12 +1355,13 @@
 	},
 /obj/machinery/alarm{
 	dir = 1;
+	icon_state = "alarm0";
 	pixel_y = -22
 	},
 /turf/simulated/floor/tiled/techfloor,
 /area/map_template/mininghome_solars)
 "kN" = (
-/obj/structure/closet/firecloset,
+/obj/structure/closet/walllocker/firecloset,
 /obj/effect/floor_decal/industrial/outline/yellow,
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hangar)
@@ -1347,7 +1374,8 @@
 	icon_state = "1-4"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -1383,7 +1411,8 @@
 /area/map_template/mininghome_solars)
 "lj" = (
 /obj/machinery/atmospherics/pipe/simple/hidden{
-	dir = 4
+	dir = 4;
+	icon_state = "intact"
 	},
 /obj/machinery/light/small,
 /obj/machinery/airlock_sensor{
@@ -1392,7 +1421,7 @@
 	pixel_y = -25
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_eva)
+/area/map_template/mininghome_hall)
 "lq" = (
 /obj/structure/table/steel,
 /obj/machinery/atmospherics/unary/vent_pump/on{
@@ -1421,7 +1450,8 @@
 	dir = 1
 	},
 /obj/machinery/atmospherics/pipe/manifold/hidden/scrubbers{
-	dir = 1
+	dir = 1;
+	icon_state = "map-scrubbers"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hangar)
@@ -1543,7 +1573,7 @@
 	dir = 1
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "mZ" = (
 /obj/machinery/light/small{
 	dir = 8
@@ -1561,7 +1591,7 @@
 	dir = 4
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "nu" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
@@ -1599,6 +1629,7 @@
 /obj/effect/floor_decal/corner/brown/half,
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /obj/item/clothing/head/beret/mininghome_scg,
@@ -1634,7 +1665,8 @@
 	pixel_x = 36
 	},
 /obj/machinery/atmospherics/unary/vent_pump/high_volume/external_air{
-	id_tag = "mininghome_solars_pump"
+	id_tag = "mininghome_solars_pump";
+	power_rating = 30000
 	},
 /turf/simulated/floor/tiled/techfloor,
 /area/map_template/mininghome_power)
@@ -1661,11 +1693,6 @@
 /obj/machinery/atmospherics/pipe/manifold/hidden/scrubbers{
 	dir = 8
 	},
-/obj/structure/cable/yellow{
-	d1 = 1;
-	d2 = 2;
-	icon_state = "1-2"
-	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
 "nW" = (
@@ -1681,10 +1708,12 @@
 	icon_state = "1-2"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 4
+	dir = 4;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -1697,7 +1726,8 @@
 	dir = 8
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -1712,7 +1742,7 @@
 	dir = 4
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "oF" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 5
@@ -1723,20 +1753,16 @@
 	icon_state = "1-2"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_living_north)
 "oJ" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
-/obj/structure/cable/yellow{
-	d1 = 1;
-	d2 = 2;
-	icon_state = "1-2"
-	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "oR" = (
 /obj/structure/cable/yellow{
 	d1 = 4;
@@ -1744,7 +1770,8 @@
 	icon_state = "4-8"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/light{
 	dir = 1
@@ -1753,7 +1780,8 @@
 /area/map_template/mininghome_hall)
 "pb" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -1787,7 +1815,8 @@
 	icon_state = "4-8"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -1798,10 +1827,12 @@
 	icon_state = "4-8"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 8
+	dir = 8;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_power)
@@ -1818,7 +1849,8 @@
 	dir = 4
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -1829,7 +1861,8 @@
 /area/map_template/mininghome_lockers)
 "pB" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/light{
 	dir = 8
@@ -1855,7 +1888,8 @@
 	icon_state = "1-2"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hangar)
@@ -1882,7 +1916,8 @@
 /area/map_template/mininghome_robotics)
 "qf" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hangar)
@@ -1902,7 +1937,8 @@
 	dir = 4
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/vending/wallmed1{
 	pixel_y = 32
@@ -1927,7 +1963,8 @@
 	dir = 4
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -1937,7 +1974,7 @@
 	id = "mininghome_internal"
 	},
 /turf/simulated/floor/plating,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "ri" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -1951,7 +1988,8 @@
 	icon_state = "4-8"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -1968,10 +2006,12 @@
 /area/map_template/mininghome_power)
 "rt" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/alarm{
 	dir = 8;
+	icon_state = "alarm0";
 	pixel_x = 24
 	},
 /turf/simulated/floor/steel_dirty,
@@ -2002,6 +2042,7 @@
 /obj/effect/floor_decal/corner/brown/half,
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /obj/structure/closet/dilapidated{
@@ -2035,13 +2076,8 @@
 	name = "Primary Airlock"
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden,
-/obj/structure/cable/yellow{
-	d1 = 1;
-	d2 = 2;
-	icon_state = "1-2"
-	},
 /turf/simulated/floor/tiled/techfloor/grid,
-/area/map_template/mininghome_eva)
+/area/map_template/mininghome_hall)
 "sk" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 6
@@ -2060,13 +2096,15 @@
 /obj/structure/table/steel,
 /obj/effect/floor_decal/corner/brown/half,
 /obj/effect/floor_decal/corner/brown{
-	dir = 4
+	dir = 4;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
 "sv" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /obj/random/material,
 /obj/random/material,
@@ -2119,10 +2157,12 @@
 /obj/structure/bed,
 /obj/item/bedsheet,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 8
+	dir = 8;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_living_north)
@@ -2141,13 +2181,8 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
 	},
-/obj/structure/cable/yellow{
-	d1 = 4;
-	d2 = 8;
-	icon_state = "4-8"
-	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "tg" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 9
@@ -2164,7 +2199,8 @@
 /area/map_template/mininghome_hangar)
 "tm" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/light{
 	dir = 1
@@ -2208,7 +2244,8 @@
 	dir = 1
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown,
 /turf/simulated/floor/steel_dirty,
@@ -2222,11 +2259,6 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
 	},
-/obj/structure/cable/yellow{
-	d1 = 4;
-	d2 = 8;
-	icon_state = "4-8"
-	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
 "tH" = (
@@ -2234,14 +2266,16 @@
 	dir = 8
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "tP" = (
 /obj/machinery/vending/fitness,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 8
+	dir = 8;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_power)
@@ -2254,7 +2288,8 @@
 	dir = 4
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -2277,16 +2312,18 @@
 	},
 /obj/machinery/alarm{
 	dir = 1;
+	icon_state = "alarm0";
 	pixel_y = -22
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "ud" = (
 /obj/machinery/light{
 	dir = 4
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -2319,14 +2356,15 @@
 "uT" = (
 /obj/machinery/suit_storage_unit/mining/alt,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
 "uU" = (
 /obj/effect/floor_decal/industrial/outline/yellow,
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "uY" = (
 /obj/machinery/atmospherics/pipe/manifold/hidden/scrubbers,
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
@@ -2336,10 +2374,12 @@
 /area/map_template/mininghome_hangar)
 "uZ" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 4
+	dir = 4;
+	icon_state = "corner_white"
 	},
 /obj/structure/closet/dilapidated{
 	desc = "A dilpidated closet, the paint is flecking off. A old name plate is labeled G. Freeman."
@@ -2386,7 +2426,8 @@
 	dir = 1
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 8
+	dir = 8;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hangar)
@@ -2414,7 +2455,8 @@
 "vH" = (
 /obj/machinery/atmospherics/unary/vent_pump/on,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/light/spot{
 	dir = 1
@@ -2425,16 +2467,11 @@
 /obj/effect/floor_decal/corner/brown/half,
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
-/obj/structure/cable/yellow{
-	d1 = 1;
-	d2 = 2;
-	icon_state = "1-2"
-	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
 "vK" = (
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "vO" = (
 /obj/structure/cable/yellow{
 	d1 = 1;
@@ -2466,11 +2503,6 @@
 	dir = 4
 	},
 /obj/machinery/atmospherics/pipe/manifold/hidden/supply,
-/obj/structure/cable/yellow{
-	d1 = 4;
-	d2 = 8;
-	icon_state = "4-8"
-	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
 "wd" = (
@@ -2482,7 +2514,8 @@
 /area/map_template/mininghome_hall)
 "wj" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/item/device/radio/intercom{
 	dir = 4;
@@ -2508,7 +2541,8 @@
 	},
 /obj/effect/floor_decal/corner/brown/half,
 /obj/effect/floor_decal/corner/brown{
-	dir = 4
+	dir = 4;
+	icon_state = "corner_white"
 	},
 /obj/machinery/light,
 /turf/simulated/floor/steel_dirty,
@@ -2519,17 +2553,8 @@
 	dir = 1
 	},
 /obj/structure/table/steel,
-/obj/machinery/power/apc{
-	dir = 1;
-	name = "north bump";
-	pixel_y = 24
-	},
-/obj/structure/cable/yellow{
-	d2 = 2;
-	icon_state = "0-2"
-	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "wz" = (
 /obj/machinery/door/airlock/civilian,
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
@@ -2590,6 +2615,7 @@
 /obj/effect/floor_decal/corner/brown/half,
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /turf/simulated/floor/steel_dirty,
@@ -2614,7 +2640,8 @@
 	},
 /obj/machinery/atmospherics/unary/vent_pump/on,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_power)
@@ -2631,7 +2658,8 @@
 	dir = 1
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_power)
@@ -2650,6 +2678,7 @@
 	},
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /obj/machinery/light/small,
@@ -2683,10 +2712,6 @@
 /obj/effect/catwalk_plated/dark,
 /turf/simulated/floor/plating,
 /area/map_template/mininghome_power)
-"yj" = (
-/obj/effect/paint/black,
-/turf/simulated/wall/r_titanium,
-/area/map_template/mininghome_eva)
 "ym" = (
 /obj/effect/floor_decal/corner/red{
 	dir = 1
@@ -2702,9 +2727,10 @@
 	pixel_y = 23
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "yt" = (
 /obj/machinery/power/apc{
+	dir = 2;
 	name = "south bump";
 	pixel_y = -24
 	},
@@ -2715,7 +2741,8 @@
 /obj/structure/table/steel,
 /obj/machinery/recharger,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/item/device/radio/intercom{
 	dir = 8;
@@ -2726,7 +2753,8 @@
 "yB" = (
 /obj/structure/closet/secure_closet/guncabinet,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -2783,7 +2811,8 @@
 "yQ" = (
 /obj/machinery/atmospherics/unary/vent_scrubber/on,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/light/spot{
 	dir = 1
@@ -2823,13 +2852,15 @@
 	},
 /obj/effect/floor_decal/industrial/outline/yellow,
 /turf/simulated/floor/plating,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "zk" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 4
+	dir = 4;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -2900,7 +2931,7 @@
 	dir = 1
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_eva)
+/area/map_template/mininghome_hall)
 "zJ" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
 	dir = 6
@@ -2929,10 +2960,12 @@
 /area/map_template/mininghome_robotics)
 "zS" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 8
+	dir = 8;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -2961,7 +2994,8 @@
 "Aa" = (
 /obj/structure/ore_box,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -2977,10 +3011,12 @@
 "Ai" = (
 /obj/machinery/vending/cigarette,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 4
+	dir = 4;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -3003,7 +3039,8 @@
 	icon_state = "4-8"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -3012,7 +3049,7 @@
 	dir = 6
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "AG" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 10
@@ -3024,7 +3061,8 @@
 /area/map_template/mininghome_hangar)
 "AN" = (
 /obj/effect/floor_decal/corner/brown{
-	dir = 1
+	dir = 1;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -3040,7 +3078,8 @@
 /obj/structure/table/steel,
 /obj/machinery/atmospherics/unary/vent_pump/on,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -3051,7 +3090,7 @@
 	name = "mining conveyor"
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "AY" = (
 /obj/machinery/door/airlock/mining,
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
@@ -3113,10 +3152,12 @@
 	icon_state = "2-4"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 1
+	dir = 1;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -3124,14 +3165,16 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_power)
 "Bl" = (
 /obj/machinery/alarm{
 	dir = 4;
-	pixel_x = -21
+	pixel_x = -21;
+	pixel_y = 0
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hangar)
@@ -3179,6 +3222,7 @@
 "BE" = (
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /obj/machinery/light,
@@ -3191,14 +3235,15 @@
 	},
 /obj/machinery/light,
 /turf/simulated/floor/plating,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "BN" = (
 /obj/effect/wallframe_spawn/reinforced/no_grille,
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "BT" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -3238,7 +3283,8 @@
 "Cl" = (
 /obj/machinery/alarm{
 	dir = 4;
-	pixel_x = -23
+	pixel_x = -23;
+	pixel_y = 0
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_robotics)
@@ -3279,7 +3325,8 @@
 /area/space)
 "CG" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/random/material,
 /obj/random/material,
@@ -3348,7 +3395,7 @@
 	},
 /obj/machinery/recharger,
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "DE" = (
 /obj/effect/paint/black,
 /turf/simulated/wall/r_titanium,
@@ -3399,14 +3446,15 @@
 /obj/structure/table/steel,
 /obj/machinery/cell_charger,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
 "DZ" = (
 /obj/machinery/computer/mining,
 /turf/simulated/wall/r_titanium,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "Ea" = (
 /obj/machinery/door/airlock/civilian,
 /obj/machinery/door/firedoor,
@@ -3417,23 +3465,25 @@
 	dir = 4
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
-	dir = 9
+	dir = 9;
+	pixel_y = 0
 	},
 /obj/effect/floor_decal/industrial/warning{
 	dir = 1
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "Et" = (
 /obj/machinery/firealarm{
+	dir = 2;
 	pixel_y = 24
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "EH" = (
 /obj/structure/ore_box,
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "EJ" = (
 /obj/machinery/atmospherics/pipe/simple/hidden{
 	dir = 9
@@ -3444,7 +3494,8 @@
 "EK" = (
 /obj/effect/floor_decal/corner/brown/half,
 /obj/effect/floor_decal/corner/brown{
-	dir = 4
+	dir = 4;
+	icon_state = "corner_white"
 	},
 /obj/structure/closet/emcloset,
 /turf/simulated/floor/steel_dirty,
@@ -3456,7 +3507,10 @@
 /area/map_template/mininghome_hangar)
 "ET" = (
 /obj/structure/hygiene/shower{
-	dir = 4
+	dir = 4;
+	icon_state = "shower";
+	pixel_x = 0;
+	pixel_y = 0
 	},
 /obj/machinery/light/small{
 	dir = 1
@@ -3467,19 +3521,15 @@
 /obj/effect/floor_decal/corner/brown/half,
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
 "Fa" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
-/obj/structure/cable/yellow{
-	d1 = 1;
-	d2 = 2;
-	icon_state = "1-2"
-	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "Ff" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -3496,7 +3546,8 @@
 "Fk" = (
 /obj/effect/floor_decal/corner/brown/half,
 /obj/effect/floor_decal/corner/brown{
-	dir = 1
+	dir = 1;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hangar)
@@ -3524,7 +3575,8 @@
 "Fp" = (
 /obj/effect/floor_decal/corner/brown/half,
 /obj/effect/floor_decal/corner/brown{
-	dir = 4
+	dir = 4;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hangar)
@@ -3543,7 +3595,8 @@
 	dir = 4
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/item/device/radio/intercom{
 	dir = 8;
@@ -3554,6 +3607,16 @@
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_living_north)
+"FA" = (
+/obj/machinery/atmospherics/unary/vent_pump/on{
+	power_rating = 20000
+	},
+/obj/effect/floor_decal/corner/brown/half{
+	dir = 1;
+	icon_state = "bordercolorhalf"
+	},
+/turf/simulated/floor/steel_dirty,
+/area/map_template/mininghome_hall)
 "FE" = (
 /obj/structure/cable/yellow{
 	d1 = 1;
@@ -3568,7 +3631,8 @@
 /area/map_template/mininghome_hall)
 "FK" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/light{
 	dir = 4
@@ -3598,55 +3662,32 @@
 /obj/machinery/atmospherics/unary/vent_scrubber/on,
 /turf/simulated/floor/tiled/freezer,
 /area/map_template/mininghome_mess)
-"FW" = (
-/obj/machinery/atmospherics/pipe/manifold4w/hidden,
-/obj/structure/cable/yellow{
-	d1 = 2;
-	d2 = 4;
-	icon_state = "2-4"
-	},
-/turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_eva)
 "Gb" = (
 /obj/structure/grille,
 /turf/simulated/floor/asteroid,
 /area/space)
-"Gc" = (
-/obj/machinery/atmospherics/unary/vent_pump/high_volume/external_air{
-	dir = 8;
-	id_tag = "mininghome_primary_pump"
-	},
-/obj/structure/cable/yellow{
-	d2 = 8;
-	icon_state = "0-8"
-	},
-/obj/machinery/power/apc/hyper{
-	dir = 4;
-	name = "east bump";
-	pixel_x = 24;
-	req_access = list()
-	},
-/turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_eva)
 "Gi" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "Gl" = (
 /obj/machinery/atmospherics/pipe/manifold4w/hidden,
 /turf/simulated/floor/tiled/techfloor,
 /area/map_template/mininghome_power)
 "Gt" = (
-/obj/machinery/light/spot,
-/turf/simulated/floor/asteroid,
-/area/map_template/mininghome_eva)
+/obj/machinery/atmospherics/pipe/simple/hidden/supply,
+/obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
+/turf/simulated/floor/steel_dirty,
+/area/map_template/mininghome_hall)
 "Gw" = (
 /obj/structure/closet/emcloset,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 1
+	dir = 1;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_power)
@@ -3658,6 +3699,7 @@
 /obj/effect/floor_decal/corner/brown/half,
 /obj/machinery/alarm{
 	dir = 1;
+	icon_state = "alarm0";
 	pixel_y = -22
 	},
 /obj/random/tool,
@@ -3683,24 +3725,27 @@
 	dir = 8
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 4
+	dir = 4;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hangar)
 "GX" = (
 /obj/machinery/mining/drill,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 1
+	dir = 1;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
 "Ha" = (
 /obj/structure/closet/crate/plastic,
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "Hf" = (
 /obj/effect/wallframe_spawn/reinforced/titanium,
 /obj/machinery/door/firedoor,
@@ -3732,10 +3777,11 @@
 	},
 /obj/machinery/atmospherics/unary/vent_pump/high_volume/external_air{
 	dir = 8;
-	id_tag = "mininghome_primary_pump"
+	id_tag = "mininghome_primary_pump";
+	power_rating = 20000
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_eva)
+/area/map_template/mininghome_hall)
 "Hz" = (
 /obj/effect/floor_decal/asteroid,
 /turf/simulated/floor/asteroid,
@@ -3806,7 +3852,8 @@
 	icon_state = "1-8"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -3898,11 +3945,6 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
 	dir = 4
 	},
-/obj/structure/cable/yellow{
-	d1 = 4;
-	d2 = 8;
-	icon_state = "4-8"
-	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
 "Jd" = (
@@ -3921,7 +3963,8 @@
 /area/map_template/mininghome_lockers)
 "Jn" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -4014,7 +4057,7 @@
 /obj/effect/floor_decal/industrial/hatch/yellow,
 /obj/machinery/door/firedoor,
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "KJ" = (
 /obj/machinery/door/airlock/multi_tile/glass/mining,
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
@@ -4038,9 +4081,9 @@
 	dir = 8
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 8
+	dir = 8;
+	icon_state = "corner_white"
 	},
-/obj/item/device/kit/paint/flames_blue,
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
 "KV" = (
@@ -4077,10 +4120,12 @@
 "Lb" = (
 /obj/effect/floor_decal/industrial/warning,
 /obj/effect/floor_decal/corner/brown{
-	dir = 4
+	dir = 4;
+	icon_state = "corner_white"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 1
+	dir = 1;
+	icon_state = "corner_white"
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -4106,7 +4151,8 @@
 	icon_state = "2-8"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -4116,6 +4162,7 @@
 /area/map_template/mininghome_lockers)
 "Lh" = (
 /obj/machinery/door/airlock/glass/mining{
+	id_tag = null;
 	name = "Shuttle Fuel Bay Interior";
 	normalspeed = 0
 	},
@@ -4131,7 +4178,8 @@
 "Ln" = (
 /obj/effect/floor_decal/corner/brown/half,
 /obj/effect/floor_decal/corner/brown{
-	dir = 1
+	dir = 1;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -4149,7 +4197,8 @@
 /area/map_template/mininghome_hangar)
 "LD" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
-	dir = 9
+	dir = 9;
+	pixel_y = 0
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_living_south)
@@ -4164,7 +4213,8 @@
 /area/map_template/mininghome_power)
 "LH" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -4180,10 +4230,11 @@
 	},
 /obj/machinery/atmospherics/unary/vent_pump/high_volume/external_air{
 	dir = 4;
-	id_tag = "mininghome_primary_pump"
+	id_tag = "mininghome_primary_pump";
+	power_rating = 20000
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_eva)
+/area/map_template/mininghome_hall)
 "LO" = (
 /obj/structure/cable/yellow{
 	d1 = 1;
@@ -4201,7 +4252,8 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hangar)
@@ -4234,13 +4286,16 @@
 /obj/structure/bed,
 /obj/item/bedsheet/blue,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 8
+	dir = 8;
+	icon_state = "corner_white"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 8
+	dir = 8;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_living_south)
@@ -4320,16 +4375,12 @@
 /obj/machinery/atmospherics/pipe/manifold/hidden/scrubbers{
 	dir = 1
 	},
-/obj/structure/cable/yellow{
-	d1 = 4;
-	d2 = 8;
-	icon_state = "4-8"
-	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
 "Mx" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown,
 /obj/structure/closet/dilapidated{
@@ -4342,7 +4393,8 @@
 	dir = 8
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -4351,11 +4403,6 @@
 	dir = 4
 	},
 /obj/machinery/atmospherics/pipe/manifold4w/hidden/scrubbers,
-/obj/structure/cable/yellow{
-	d1 = 4;
-	d2 = 8;
-	icon_state = "4-8"
-	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
 "MI" = (
@@ -4371,7 +4418,8 @@
 "MJ" = (
 /obj/structure/closet/emcloset,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_power)
@@ -4383,6 +4431,7 @@
 /obj/effect/floor_decal/corner/brown/half,
 /obj/machinery/alarm{
 	dir = 1;
+	icon_state = "alarm0";
 	pixel_y = -22
 	},
 /turf/simulated/floor/steel_dirty,
@@ -4431,7 +4480,8 @@
 	dir = 4
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/item/device/radio/intercom{
 	dir = 8;
@@ -4445,6 +4495,7 @@
 	},
 /obj/machinery/alarm{
 	dir = 8;
+	icon_state = "alarm0";
 	pixel_x = 24
 	},
 /turf/simulated/floor/tiled/techfloor,
@@ -4452,7 +4503,8 @@
 "NM" = (
 /obj/structure/ore_box,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/light/spot{
 	dir = 8
@@ -4484,13 +4536,14 @@
 /area/map_template/mininghome_lockers)
 "NU" = (
 /obj/machinery/atmospherics/pipe/simple/hidden{
-	dir = 4
+	dir = 4;
+	icon_state = "intact"
 	},
 /obj/machinery/oxygen_pump{
 	pixel_y = 32
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_eva)
+/area/map_template/mininghome_hall)
 "NV" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 4
@@ -4518,7 +4571,7 @@
 "NY" = (
 /obj/machinery/atmospherics/pipe/manifold4w/hidden,
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_eva)
+/area/map_template/mininghome_hall)
 "Oc" = (
 /obj/machinery/atmospherics/unary/tank/air,
 /turf/simulated/floor/tiled/techfloor,
@@ -4536,11 +4589,6 @@
 	d2 = 2;
 	icon_state = "1-2"
 	},
-/obj/structure/cable/yellow{
-	d1 = 1;
-	d2 = 8;
-	icon_state = "1-8"
-	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
 "Og" = (
@@ -4553,7 +4601,8 @@
 	dir = 1
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -4564,6 +4613,7 @@
 /obj/machinery/power/apc{
 	dir = 1;
 	name = "north bump";
+	pixel_x = 0;
 	pixel_y = 24
 	},
 /obj/structure/cable/yellow{
@@ -4635,7 +4685,7 @@
 	dir = 4
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "OQ" = (
 /obj/structure/cable/yellow{
 	d1 = 1;
@@ -4669,7 +4719,7 @@
 	dir = 4
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "Pg" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
 	dir = 4
@@ -4684,6 +4734,7 @@
 /obj/machinery/power/apc{
 	dir = 1;
 	name = "north bump";
+	pixel_x = 0;
 	pixel_y = 24
 	},
 /obj/machinery/atmospherics/unary/vent_pump/on,
@@ -4692,7 +4743,8 @@
 	icon_state = "0-4"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -4712,6 +4764,7 @@
 "PN" = (
 /obj/machinery/alarm{
 	dir = 1;
+	icon_state = "alarm0";
 	pixel_y = -22
 	},
 /obj/machinery/portable_atmospherics/canister/oxygen,
@@ -4743,10 +4796,11 @@
 	dir = 8
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "PU" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/item/device/radio/intercom{
 	dir = 8;
@@ -4767,10 +4821,11 @@
 "PY" = (
 /obj/machinery/atmospherics/unary/vent_pump/high_volume/external_air{
 	dir = 4;
-	id_tag = "mininghome_primary_pump"
+	id_tag = "mininghome_primary_pump";
+	power_rating = 20000
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_eva)
+/area/map_template/mininghome_hall)
 "Qc" = (
 /obj/structure/cable/yellow{
 	d1 = 1;
@@ -4784,10 +4839,12 @@
 	dir = 8
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/alarm{
 	dir = 8;
+	icon_state = "alarm0";
 	pixel_x = 24
 	},
 /turf/simulated/floor/steel_dirty,
@@ -4807,13 +4864,15 @@
 /obj/machinery/atmospherics/unary/vent_pump/on,
 /obj/machinery/recharger,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_living_south)
 "Qp" = (
 /obj/machinery/atmospherics/pipe/manifold/hidden{
-	dir = 4
+	dir = 4;
+	icon_state = "map"
 	},
 /turf/simulated/floor/tiled/techfloor,
 /area/map_template/mininghome_power)
@@ -4824,7 +4883,8 @@
 	icon_state = "4-8"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -4863,13 +4923,8 @@
 /obj/machinery/atmospherics/pipe/manifold/hidden/supply{
 	dir = 1
 	},
-/obj/structure/cable/yellow{
-	d1 = 1;
-	d2 = 8;
-	icon_state = "1-8"
-	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "QA" = (
 /obj/structure/cable/yellow,
 /obj/machinery/power/apc/hyper{
@@ -4889,7 +4944,8 @@
 	dir = 8
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -4899,7 +4955,7 @@
 	dir = 4
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "QK" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
 	dir = 9
@@ -4923,10 +4979,11 @@
 "QS" = (
 /obj/machinery/atmospherics/unary/vent_pump/high_volume/external_air{
 	dir = 8;
-	id_tag = "mininghome_primary_pump"
+	id_tag = "mininghome_primary_pump";
+	power_rating = 20000
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_eva)
+/area/map_template/mininghome_hall)
 "QU" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
@@ -4949,16 +5006,19 @@
 /obj/effect/floor_decal/corner/brown/half,
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hangar)
 "Rb" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/machinery/alarm{
 	dir = 8;
+	icon_state = "alarm0";
 	pixel_x = 24
 	},
 /turf/simulated/floor/steel_dirty,
@@ -4974,7 +5034,8 @@
 "Rf" = (
 /obj/structure/bed/chair,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
@@ -5002,7 +5063,7 @@
 	name = "Primary Airlock"
 	},
 /turf/simulated/floor/tiled/techfloor/grid,
-/area/map_template/mininghome_eva)
+/area/map_template/mininghome_hall)
 "Rs" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
 	dir = 5
@@ -5010,13 +5071,8 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 5
 	},
-/obj/structure/cable/yellow{
-	d1 = 1;
-	d2 = 4;
-	icon_state = "1-4"
-	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "Ru" = (
 /obj/effect/floor_decal/industrial/warning/corner{
 	dir = 4
@@ -5069,10 +5125,12 @@
 	icon_state = "2-8"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 4
+	dir = 4;
+	icon_state = "corner_white"
 	},
 /obj/machinery/light_switch{
 	pixel_x = -6;
@@ -5091,7 +5149,7 @@
 	dir = 1
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "RW" = (
 /obj/effect/floor_decal/industrial/warning{
 	dir = 4
@@ -5105,7 +5163,8 @@
 /area/map_template/mininghome_hangar)
 "RZ" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_power)
@@ -5147,7 +5206,8 @@
 	dir = 4
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 1
+	dir = 1;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hangar)
@@ -5216,7 +5276,7 @@
 	dir = 1
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "SV" = (
 /obj/structure/plasticflaps,
 /obj/machinery/conveyor{
@@ -5224,7 +5284,7 @@
 	id = "mininghome_internal"
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "SX" = (
 /obj/machinery/door/airlock/civilian,
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
@@ -5251,7 +5311,8 @@
 	icon_state = "0-2"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_living_south)
@@ -5306,7 +5367,8 @@
 	pixel_y = 32
 	},
 /obj/machinery/atmospherics/unary/vent_pump/high_volume/external_air{
-	id_tag = "mininghome_solars_pump"
+	id_tag = "mininghome_solars_pump";
+	power_rating = 30000
 	},
 /turf/simulated/floor/tiled/techfloor,
 /area/map_template/mininghome_power)
@@ -5316,10 +5378,11 @@
 	},
 /obj/machinery/atmospherics/unary/vent_pump/high_volume/external_air{
 	dir = 8;
-	id_tag = "mininghome_primary_pump"
+	id_tag = "mininghome_primary_pump";
+	power_rating = 20000
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_eva)
+/area/map_template/mininghome_hall)
 "Ub" = (
 /obj/effect/floor_decal/corner/brown/half,
 /turf/simulated/floor/steel_dirty,
@@ -5342,7 +5405,8 @@
 /area/map_template/mininghome_hangar)
 "Up" = (
 /obj/machinery/atmospherics/pipe/simple/hidden{
-	dir = 5
+	dir = 5;
+	icon_state = "intact"
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
 	dir = 6
@@ -5361,7 +5425,8 @@
 /area/map_template/mininghome_hall)
 "Uy" = (
 /obj/structure/bed/chair{
-	dir = 8
+	dir = 8;
+	icon_state = "chair_preview"
 	},
 /obj/effect/floor_decal/corner/red{
 	dir = 1
@@ -5397,14 +5462,16 @@
 	icon_state = "4-8"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 1
+	dir = 1;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
 "UE" = (
 /obj/machinery/atmospherics/unary/vent_pump/on,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -5423,10 +5490,11 @@
 	},
 /obj/structure/dispenser/oxygen,
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "Vc" = (
 /obj/machinery/alarm{
 	dir = 1;
+	icon_state = "alarm0";
 	pixel_y = -22
 	},
 /turf/simulated/floor/tiled/techfloor,
@@ -5454,6 +5522,7 @@
 /obj/effect/floor_decal/corner/brown/half,
 /obj/machinery/alarm{
 	dir = 1;
+	icon_state = "alarm0";
 	pixel_y = -22
 	},
 /obj/machinery/light,
@@ -5463,10 +5532,12 @@
 /obj/structure/bed,
 /obj/item/bedsheet/blue,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 1
+	dir = 1;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_living_north)
@@ -5486,7 +5557,7 @@
 /obj/effect/floor_decal/industrial/outline/yellow,
 /obj/machinery/portable_atmospherics/canister/oxygen,
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "VB" = (
 /obj/machinery/atmospherics/portables_connector{
 	dir = 1
@@ -5519,7 +5590,8 @@
 	dir = 8
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -5582,16 +5654,19 @@
 /area/map_template/mininghome_hangar)
 "Wp" = (
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 4
+	dir = 4;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown{
-	dir = 1
+	dir = 1;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
 "Wr" = (
 /obj/machinery/atmospherics/pipe/simple/hidden{
-	dir = 4
+	dir = 4;
+	icon_state = "intact"
 	},
 /obj/machinery/light/small{
 	dir = 1
@@ -5637,7 +5712,8 @@
 "WB" = (
 /obj/machinery/mining/drill,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -5647,19 +5723,14 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
 /obj/machinery/door/firedoor,
-/obj/structure/cable/yellow{
-	d1 = 1;
-	d2 = 2;
-	icon_state = "1-2"
-	},
 /turf/simulated/floor/tiled/techfloor/grid,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "WQ" = (
 /obj/machinery/light{
 	dir = 8
 	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "WR" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
 /obj/structure/cable/yellow{
@@ -5668,7 +5739,8 @@
 	icon_state = "1-2"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_living_south)
@@ -5687,7 +5759,8 @@
 /obj/machinery/mech_recharger,
 /obj/effect/floor_decal/corner/brown/half,
 /obj/effect/floor_decal/corner/brown{
-	dir = 1
+	dir = 1;
+	icon_state = "corner_white"
 	},
 /mob/living/exosuit/premade/powerloader/flames_blue,
 /turf/simulated/floor/steel_dirty,
@@ -5723,7 +5796,8 @@
 	icon_state = "4-8"
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /obj/structure/cable/yellow{
 	d1 = 2;
@@ -5748,7 +5822,8 @@
 	dir = 8
 	},
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 1
+	dir = 1;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_living_north)
@@ -5781,7 +5856,8 @@
 /area/map_template/mininghome_hangar)
 "XA" = (
 /obj/machinery/atmospherics/pipe/simple/hidden{
-	dir = 6
+	dir = 6;
+	icon_state = "intact"
 	},
 /obj/machinery/recharger/wallcharger{
 	pixel_y = 24
@@ -5830,7 +5906,9 @@
 "XX" = (
 /obj/structure/hygiene/sink{
 	dir = 4;
-	pixel_x = 11
+	icon_state = "sink";
+	pixel_x = 11;
+	pixel_y = 0
 	},
 /turf/simulated/floor/tiled/freezer,
 /area/map_template/mininghome_bathroom)
@@ -5864,7 +5942,8 @@
 "Yd" = (
 /obj/machinery/atmospherics/unary/vent_pump/high_volume/external_air{
 	dir = 1;
-	id_tag = "mininghome_solars_pump"
+	id_tag = "mininghome_solars_pump";
+	power_rating = 30000
 	},
 /turf/simulated/floor/tiled/techfloor,
 /area/map_template/mininghome_power)
@@ -5887,7 +5966,8 @@
 	},
 /obj/effect/floor_decal/corner/brown/half,
 /obj/effect/floor_decal/corner/brown{
-	dir = 1
+	dir = 1;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_power)
@@ -5902,7 +5982,8 @@
 	},
 /obj/structure/cable/yellow,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_living_north)
@@ -5939,13 +6020,8 @@
 /obj/machinery/atmospherics/pipe/manifold/hidden/supply{
 	dir = 4
 	},
-/obj/structure/cable/yellow{
-	d1 = 1;
-	d2 = 2;
-	icon_state = "1-2"
-	},
 /turf/simulated/floor/tiled/techfloor,
-/area/map_template/mininghome_processing)
+/area/map_template/mininghome_hall)
 "YQ" = (
 /obj/machinery/atmospherics/unary/vent_pump/on{
 	dir = 1;
@@ -5954,13 +6030,15 @@
 /obj/effect/floor_decal/corner/brown/half,
 /obj/machinery/firealarm{
 	dir = 1;
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_lockers)
 "Zg" = (
 /obj/effect/floor_decal/corner/brown{
-	dir = 8
+	dir = 8;
+	icon_state = "corner_white"
 	},
 /turf/simulated/floor/steel_dirty,
 /area/map_template/mininghome_hall)
@@ -5985,6 +6063,7 @@
 /obj/machinery/power/apc{
 	dir = 1;
 	name = "north bump";
+	pixel_x = 0;
 	pixel_y = 24
 	},
 /obj/structure/cable/yellow{
@@ -5996,14 +6075,18 @@
 "ZD" = (
 /obj/machinery/light/small,
 /obj/structure/hygiene/shower{
-	dir = 8
+	dir = 8;
+	icon_state = "shower";
+	pixel_x = 0;
+	pixel_y = 0
 	},
 /turf/simulated/floor/tiled/freezer,
 /area/map_template/mininghome_bathroom)
 "ZO" = (
 /obj/structure/closet/emcloset,
 /obj/effect/floor_decal/corner/brown/half{
-	dir = 8
+	dir = 8;
+	icon_state = "bordercolorhalf"
 	},
 /obj/effect/floor_decal/corner/brown,
 /turf/simulated/floor/steel_dirty,
@@ -19026,12 +19109,12 @@ VZ
 VZ
 VZ
 VZ
-yj
-yj
-yj
-yj
-yj
-yj
+DE
+DE
+DE
+DE
+DE
+DE
 Lb
 VO
 uT
@@ -19228,12 +19311,12 @@ VZ
 VZ
 VZ
 VZ
-yj
+DE
 PY
 LL
 PY
 PY
-yj
+DE
 cN
 hb
 sE
@@ -19429,13 +19512,13 @@ VZ
 VZ
 VZ
 VZ
-Gt
-yj
+tU
+DE
 NU
 dm
 dm
 lj
-yj
+DE
 qS
 wd
 wd
@@ -19636,13 +19719,13 @@ Rl
 zI
 NY
 NY
-FW
+NY
 sb
 gJ
-TL
-TL
-TL
-TL
+Gt
+Gt
+Gt
+Gt
 cf
 DH
 DE
@@ -19833,13 +19916,13 @@ VZ
 VZ
 VZ
 VZ
-Gt
-yj
+tU
+DE
 NU
 dm
 dm
 aB
-yj
+DE
 fK
 la
 Mq
@@ -20036,18 +20119,18 @@ VZ
 VZ
 VZ
 VZ
-yj
+DE
 QS
 TX
 Ht
-Gc
-yj
+QS
+DE
 WB
 bA
 bA
 wi
 Vz
-cZ
+Db
 mv
 DE
 VZ
@@ -20238,18 +20321,18 @@ VZ
 VZ
 VZ
 VZ
-yj
-yj
-yj
-yj
-yj
-yj
+DE
+DE
+DE
+DE
+DE
+DE
 GX
 rb
 hw
 Aa
 Vz
-cZ
+Db
 ae
 DE
 VZ
@@ -20445,12 +20528,12 @@ VZ
 VZ
 VZ
 VZ
-yj
 DE
 DE
 DE
 DE
-UE
+DE
+FA
 vY
 EY
 DE
@@ -21057,7 +21140,7 @@ VZ
 eh
 MQ
 hU
-cZ
+Db
 lb
 Hf
 eh
@@ -21259,7 +21342,7 @@ eh
 eh
 Hf
 hU
-cZ
+Db
 lb
 Hf
 eh
@@ -21461,7 +21544,7 @@ eh
 eh
 Hf
 gZ
-cZ
+Db
 lb
 Hf
 eh
@@ -21663,7 +21746,7 @@ eh
 eh
 Hf
 hU
-cZ
+Db
 lb
 Hf
 eh
@@ -21865,7 +21948,7 @@ eh
 eh
 Hf
 hU
-cZ
+Db
 lb
 Hf
 eh
@@ -22067,7 +22150,7 @@ eh
 eh
 Hf
 hU
-cZ
+Db
 lb
 Hf
 eh
@@ -22471,7 +22554,7 @@ eh
 eh
 Hf
 hU
-cZ
+Db
 lb
 Hf
 eh
@@ -22673,7 +22756,7 @@ eh
 eh
 Hf
 hU
-cZ
+Db
 yN
 Hf
 eh
@@ -22875,7 +22958,7 @@ eh
 eh
 Hf
 hU
-cZ
+Db
 lb
 Hf
 eh
@@ -23077,7 +23160,7 @@ eh
 eh
 Hf
 hU
-cZ
+Db
 lb
 Hf
 eh
@@ -23279,7 +23362,7 @@ eh
 eh
 Hf
 hU
-cZ
+Db
 lb
 Hf
 eh
@@ -23683,7 +23766,7 @@ VZ
 VZ
 DE
 hU
-cZ
+Db
 lb
 DE
 VZ
@@ -23692,11 +23775,11 @@ VZ
 VZ
 VZ
 VZ
-gn
-gn
-gn
-gn
-gn
+DE
+DE
+DE
+DE
+DE
 VZ
 VZ
 VZ
@@ -23885,7 +23968,7 @@ VZ
 VZ
 DE
 hU
-cZ
+Db
 EY
 DE
 VZ
@@ -23894,11 +23977,11 @@ VZ
 VZ
 VZ
 VZ
-gn
+DE
 EH
 WQ
 vK
-gn
+DE
 VZ
 VZ
 fv
@@ -24096,11 +24179,11 @@ VZ
 VZ
 VZ
 VZ
-gn
+DE
 vK
 vK
 EH
-gn
+DE
 VZ
 VZ
 VZ
@@ -24289,7 +24372,7 @@ VZ
 VZ
 DE
 oR
-cZ
+Db
 xL
 WY
 WY
@@ -24301,10 +24384,10 @@ WY
 WY
 tH
 tH
-gn
-gn
-gn
-gn
+DE
+DE
+DE
+DE
 VZ
 VZ
 fv
@@ -24491,7 +24574,7 @@ VZ
 VZ
 DE
 Qq
-cZ
+Db
 lb
 WY
 ik
@@ -24506,7 +24589,7 @@ uU
 SV
 zg
 cy
-gn
+DE
 VZ
 VZ
 fv
@@ -24708,7 +24791,7 @@ vK
 DZ
 BN
 BH
-gn
+DE
 fv
 VZ
 VZ
@@ -24910,7 +24993,7 @@ vK
 vK
 BN
 rd
-gn
+DE
 VZ
 VZ
 fv
@@ -25112,7 +25195,7 @@ vK
 AX
 DZ
 dO
-gn
+DE
 VZ
 fv
 VZ
@@ -25314,7 +25397,7 @@ vK
 vK
 BN
 cy
-gn
+DE
 VZ
 VZ
 VZ
@@ -25516,7 +25599,7 @@ vK
 vK
 BN
 BH
-gn
+DE
 VZ
 VZ
 fv
@@ -25712,13 +25795,13 @@ py
 LH
 LH
 ZO
-gn
+DE
 yo
 vK
 vK
 BN
 rd
-gn
+DE
 VZ
 VZ
 VZ
@@ -25920,7 +26003,7 @@ oJ
 Rs
 BN
 KH
-gn
+DE
 VZ
 VZ
 VZ
@@ -26116,13 +26199,13 @@ ay
 wd
 cZ
 lb
-gn
+DE
 Et
 vK
 tb
 vK
 jL
-gn
+DE
 VZ
 VZ
 VZ
@@ -26318,13 +26401,13 @@ jf
 pb
 ri
 EK
-gn
+DE
 wy
 Fa
 Qz
 Gi
 tX
-gn
+DE
 fv
 fv
 fv
@@ -26526,7 +26609,7 @@ Pc
 OP
 Pc
 QF
-gn
+DE
 fv
 VZ
 VZ
@@ -26728,7 +26811,7 @@ Av
 Ed
 vK
 SU
-gn
+DE
 VZ
 VZ
 fv
@@ -26930,7 +27013,7 @@ PS
 RU
 vK
 UU
-gn
+DE
 VZ
 fv
 fv
@@ -27127,12 +27210,12 @@ Jn
 VY
 Ub
 Lg
-gn
-gn
-gn
-gn
-gn
-gn
+DE
+DE
+DE
+DE
+DE
+DE
 fv
 fv
 VZ

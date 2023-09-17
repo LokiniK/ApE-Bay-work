@@ -22,10 +22,14 @@
 "ag" = (
 /obj/machinery/door/airlock/external{
 	frequency = 1439;
-	icon_state = "door_closed"
+	icon_state = "door_closed";
+	locked = 0
 	},
 /turf/simulated/floor,
 /area/smugglers/base)
+"ah" = (
+/turf/simulated/floor/asteroid,
+/area/space)
 "aj" = (
 /obj/item/ammo_casing/pistol/magnum{
 	pixel_x = 5;
@@ -54,6 +58,7 @@
 	pixel_x = 25
 	},
 /obj/machinery/atmospherics/unary/vent_pump/high_volume{
+	dir = 2;
 	id_tag = "asteroid_base_dock_pump"
 	},
 /obj/effect/floor_decal/industrial/warning/full,
@@ -67,17 +72,21 @@
 "an" = (
 /turf/unsimulated/mask,
 /area/mine/explored)
+"ao" = (
+/turf/space,
+/area/mine/unexplored)
 "ap" = (
 /obj/machinery/atmospherics/unary/outlet_injector{
 	injecting = 1;
 	use_power = 1
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/space)
 "aq" = (
 /obj/machinery/door/airlock/external{
 	frequency = 1439;
 	icon_state = "door_closed";
+	locked = 0;
 	name = "Internal Airlock"
 	},
 /turf/simulated/floor,
@@ -89,7 +98,7 @@
 	d2 = 2;
 	icon_state = "0-2"
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/smugglers/base)
 "au" = (
 /obj/item/device/flashlight/flare/glowstick/yellow{
@@ -141,7 +150,8 @@
 "ay" = (
 /obj/item/stack/cable_coil{
 	pixel_x = 5;
-	pixel_y = 5
+	pixel_y = 5;
+	pixel_z = 0
 	},
 /obj/item/stack/cable_coil,
 /obj/structure/cable{
@@ -154,6 +164,7 @@
 /obj/machinery/power/apc{
 	dir = 1;
 	name = "north bump";
+	pixel_x = 0;
 	pixel_y = 24
 	},
 /turf/simulated/floor,
@@ -195,7 +206,8 @@
 /obj/structure/cable{
 	d1 = 1;
 	d2 = 2;
-	icon_state = "1-2"
+	icon_state = "1-2";
+	pixel_y = 0
 	},
 /turf/simulated/floor,
 /area/smugglers/base)
@@ -206,18 +218,21 @@
 /obj/structure/cable{
 	d1 = 1;
 	d2 = 2;
-	icon_state = "1-2"
+	icon_state = "1-2";
+	pixel_y = 0
 	},
 /turf/simulated/floor,
 /area/smugglers/base)
 "aD" = (
 /obj/machinery/atmospherics/pipe/manifold/visible/black{
-	dir = 1
+	dir = 1;
+	icon_state = "map"
 	},
 /obj/structure/cable{
 	d1 = 1;
 	d2 = 2;
-	icon_state = "1-2"
+	icon_state = "1-2";
+	pixel_y = 0
 	},
 /turf/simulated/floor,
 /area/smugglers/base)
@@ -248,7 +263,9 @@
 	pixel_y = 25;
 	tag_airpump = "asteroid_base_east_pump";
 	tag_exterior_door = "asteroid_base_east_outer";
-	tag_interior_door = "asteroid_base_east_inner"
+	tag_exterior_sensor = null;
+	tag_interior_door = "asteroid_base_east_inner";
+	tag_interior_sensor = null
 	},
 /obj/machinery/access_button{
 	command = "cycle_interior";
@@ -358,7 +375,8 @@
 	d1 = 16;
 	d2 = 0;
 	dir = 4;
-	icon_state = "0-2"
+	icon_state = "0-2";
+	pixel_y = 0
 	},
 /obj/structure/cable{
 	d2 = 8;
@@ -690,6 +708,7 @@
 /obj/machinery/power/apc{
 	dir = 1;
 	name = "north bump";
+	pixel_x = 0;
 	pixel_y = 24
 	},
 /turf/simulated/floor/tiled,
@@ -898,7 +917,7 @@
 /area/smugglers/dorms)
 "cj" = (
 /obj/effect/decal/cleanable/cobweb,
-/turf/simulated/floor/ceiling,
+/turf/simulated/floor/airless/ceiling,
 /area/smugglers/dorms)
 "cl" = (
 /obj/effect/decal/cleanable/dirt,
@@ -929,13 +948,13 @@
 "cp" = (
 /obj/effect/decal/cleanable/vomit,
 /obj/random/medical/lite,
-/turf/simulated/floor/ceiling,
+/turf/simulated/floor/airless/ceiling,
 /area/smugglers/dorms)
 "cq" = (
 /obj/structure/hygiene/toilet{
 	dir = 8
 	},
-/turf/simulated/floor/ceiling,
+/turf/simulated/floor/airless/ceiling,
 /area/smugglers/dorms)
 "cr" = (
 /obj/structure/bed/chair{
@@ -1004,7 +1023,9 @@
 /turf/simulated/floor/tiled,
 /area/smugglers/dorms)
 "cB" = (
-/obj/machinery/light/small,
+/obj/machinery/light/small{
+	dir = 2
+	},
 /obj/effect/decal/cleanable/dirt,
 /turf/simulated/floor/tiled,
 /area/smugglers/dorms)
@@ -1032,7 +1053,7 @@
 	pixel_y = 30
 	},
 /obj/random/soap,
-/turf/simulated/floor/ceiling,
+/turf/simulated/floor/airless/ceiling,
 /area/smugglers/dorms)
 
 (1,1,1) = {"
@@ -4430,7 +4451,7 @@ aa
 aa
 aa
 aa
-ab
+ah
 af
 ay
 aQ
@@ -4531,7 +4552,7 @@ aa
 aa
 aa
 aa
-ab
+ah
 an
 af
 az
@@ -4634,7 +4655,7 @@ aa
 aa
 aa
 aa
-aa
+ao
 af
 aA
 aO

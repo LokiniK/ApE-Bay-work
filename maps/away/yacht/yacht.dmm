@@ -12,8 +12,8 @@
 /area/yacht/bridge)
 "ad" = (
 /obj/machinery/shipsensors,
-/turf/simulated/floor{
-	map_airless = 1
+/turf/simulated/floor/airless{
+	icon_state = "dmg2"
 	},
 /area/yacht/bridge)
 "ae" = (
@@ -38,7 +38,8 @@
 /area/yacht/bridge)
 "aj" = (
 /obj/machinery/computer/ship/sensors{
-	dir = 4
+	dir = 4;
+	icon_state = "computer"
 	},
 /turf/simulated/floor/wood/walnut,
 /area/yacht/bridge)
@@ -51,7 +52,8 @@
 /area/yacht/bridge)
 "al" = (
 /obj/machinery/computer/ship/engines{
-	dir = 8
+	dir = 8;
+	icon_state = "computer"
 	},
 /turf/simulated/floor/wood/walnut,
 /area/yacht/bridge)
@@ -102,6 +104,7 @@
 "ar" = (
 /obj/machinery/alarm{
 	dir = 1;
+	icon_state = "alarm0";
 	pixel_y = -22
 	},
 /obj/effect/decal/cleanable/dirt,
@@ -124,7 +127,9 @@
 	icon_state = "0-8"
 	},
 /obj/machinery/power/apc{
+	dir = 2;
 	name = "Yacht bridge";
+	pixel_x = 0;
 	pixel_y = -24
 	},
 /obj/effect/decal/cleanable/dirt,
@@ -177,10 +182,8 @@
 /obj/structure/disposaloutlet{
 	dir = 4
 	},
-/turf/simulated/floor{
-	map_airless = 1
-	},
-/area/yacht/engine)
+/turf/space,
+/area/space)
 "aB" = (
 /turf/simulated/wall/titanium,
 /area/yacht/living)
@@ -263,7 +266,7 @@
 "aM" = (
 /obj/structure/table/marble,
 /obj/item/pizzabox/vegetable,
-/obj/item/reagent_containers/glass/rag,
+/obj/item/reagent_containers/misc/rag,
 /obj/effect/decal/cleanable/dirt,
 /turf/simulated/floor/wood/yew,
 /area/yacht/living)
@@ -671,6 +674,7 @@
 /obj/machinery/power/apc{
 	dir = 1;
 	name = "Yacht engine";
+	pixel_x = 0;
 	pixel_y = 24
 	},
 /obj/effect/decal/cleanable/dirt,
@@ -712,13 +716,12 @@
 "cc" = (
 /obj/structure/cable{
 	d2 = 2;
-	icon_state = "0-2"
+	icon_state = "0-2";
+	pixel_y = 0
 	},
 /obj/machinery/power/solar,
 /obj/effect/floor_decal/solarpanel,
-/turf/simulated/floor{
-	map_airless = 1
-	},
+/turf/simulated/floor/airless,
 /area/yacht/engine)
 "cd" = (
 /obj/structure/closet/crate/hydroponics,
@@ -804,7 +807,8 @@
 /area/yacht/engine)
 "cn" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/universal{
-	dir = 4
+	dir = 4;
+	icon_state = "map_universal"
 	},
 /obj/effect/decal/cleanable/dirt,
 /turf/simulated/floor/plating,
@@ -822,14 +826,15 @@
 	d1 = 16;
 	d2 = 0;
 	dir = 4;
-	icon_state = "0-2"
+	icon_state = "0-2";
+	pixel_y = 0
 	},
 /obj/effect/decal/cleanable/ash,
 /obj/effect/decal/cleanable/blood/oil/streak,
 /obj/effect/decal/cleanable/generic,
 /obj/effect/decal/cleanable/molten_item,
-/turf/simulated/floor{
-	map_airless = 1
+/turf/simulated/floor/airless{
+	icon_state = "dmg2"
 	},
 /area/yacht/engine)
 "cq" = (
@@ -849,8 +854,8 @@
 	icon_state = "1-8"
 	},
 /obj/item/stock_parts/circuitboard/broken,
-/turf/simulated/floor{
-	map_airless = 1
+/turf/simulated/floor/airless{
+	icon_state = "dmg2"
 	},
 /area/yacht/engine)
 "cr" = (
@@ -870,8 +875,8 @@
 	icon_state = "1-8"
 	},
 /obj/item/storage/toolbox/syndicate,
-/turf/simulated/floor{
-	map_airless = 1
+/turf/simulated/floor/airless{
+	icon_state = "dmg2"
 	},
 /area/yacht/engine)
 "cs" = (
@@ -891,9 +896,7 @@
 	icon_state = "1-8"
 	},
 /obj/item/plastique,
-/turf/simulated/floor{
-	map_airless = 1
-	},
+/turf/simulated/floor/airless,
 /area/yacht/engine)
 "ct" = (
 /obj/structure/cable{
@@ -911,9 +914,7 @@
 	d2 = 8;
 	icon_state = "1-8"
 	},
-/turf/simulated/floor{
-	map_airless = 1
-	},
+/turf/simulated/floor/airless,
 /area/yacht/engine)
 "cu" = (
 /obj/effect/decal/cleanable/dirt,
@@ -922,9 +923,7 @@
 	d2 = 8;
 	icon_state = "4-8"
 	},
-/turf/simulated/floor{
-	map_airless = 1
-	},
+/turf/simulated/floor/airless,
 /area/yacht/engine)
 "cC" = (
 /obj/structure/cable,
@@ -963,7 +962,8 @@
 /area/yacht/engine)
 "cJ" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/red{
-	dir = 4
+	dir = 4;
+	icon_state = "intact"
 	},
 /turf/simulated/wall/titanium,
 /area/yacht/engine)
@@ -972,17 +972,13 @@
 	dir = 8;
 	use_power = 1
 	},
-/turf/simulated/floor{
-	map_airless = 1
-	},
-/area/yacht/engine)
+/turf/space,
+/area/space)
 "cL" = (
 /obj/structure/cable,
 /obj/machinery/power/solar,
 /obj/effect/floor_decal/solarpanel,
-/turf/simulated/floor{
-	map_airless = 1
-	},
+/turf/simulated/floor/airless,
 /area/yacht/engine)
 "cN" = (
 /obj/structure/closet/toolcloset,
@@ -1000,7 +996,8 @@
 	},
 /obj/machinery/alarm{
 	dir = 4;
-	pixel_x = -23
+	pixel_x = -23;
+	pixel_y = 0
 	},
 /obj/machinery/portable_atmospherics/hydroponics,
 /obj/effect/decal/cleanable/dirt,
@@ -1012,7 +1009,7 @@
 	level = 2
 	},
 /obj/item/shovel/spade,
-/obj/item/reagent_containers/glass/bucket,
+/obj/item/reagent_containers/misc/bucket,
 /obj/effect/decal/cleanable/dirt,
 /turf/simulated/floor/wood/yew,
 /area/yacht/living)
@@ -1132,6 +1129,7 @@
 	external_pressure_bound = 0;
 	external_pressure_bound_default = 0;
 	icon_state = "map_vent_in";
+	id_tag = null;
 	initialize_directions = 1;
 	internal_pressure_bound = 4000;
 	internal_pressure_bound_default = 4000;
@@ -1148,6 +1146,7 @@
 	external_pressure_bound = 0;
 	external_pressure_bound_default = 0;
 	icon_state = "map_vent_in";
+	id_tag = null;
 	initialize_directions = 1;
 	internal_pressure_bound = 4000;
 	internal_pressure_bound_default = 4000;
@@ -1196,7 +1195,8 @@
 /area/yacht/engine)
 "dz" = (
 /obj/machinery/atmospherics/pipe/manifold/visible/black{
-	dir = 8
+	dir = 8;
+	icon_state = "map"
 	},
 /obj/structure/window/reinforced,
 /obj/effect/decal/cleanable/dirt,
@@ -1216,7 +1216,6 @@
 /obj/machinery/atmospherics/pipe/simple/visible/black{
 	dir = 6
 	},
-/obj/machinery/radio_beacon,
 /turf/simulated/floor/plating,
 /area/yacht/engine)
 "dD" = (
@@ -1230,9 +1229,7 @@
 /obj/machinery/atmospherics/unary/engine{
 	dir = 1
 	},
-/turf/simulated/floor{
-	map_airless = 1
-	},
+/turf/simulated/floor/airless,
 /area/yacht/engine)
 "dF" = (
 /obj/effect/shuttle_landmark/nav_yacht/nav3,
@@ -1270,7 +1267,8 @@
 "gb" = (
 /obj/structure/cable{
 	d2 = 2;
-	icon_state = "0-2"
+	icon_state = "0-2";
+	pixel_y = 0
 	},
 /obj/effect/decal/cleanable/dirt,
 /obj/machinery/constructable_frame/computerframe,
@@ -1283,11 +1281,13 @@
 /area/yacht/engine)
 "hb" = (
 /obj/machinery/power/terminal{
-	dir = 1
+	dir = 1;
+	icon_state = "term"
 	},
 /obj/structure/cable{
 	d2 = 2;
-	icon_state = "0-2"
+	icon_state = "0-2";
+	pixel_y = 0
 	},
 /obj/item/storage/toolbox/electrical,
 /obj/effect/decal/cleanable/dirt,
@@ -1322,9 +1322,7 @@
 	frequency = 1439;
 	id_tag = "yacht_outer"
 	},
-/turf/simulated/floor{
-	map_airless = 1
-	},
+/turf/simulated/floor/airless,
 /area/yacht/engine)
 "kb" = (
 /obj/structure/cable{
@@ -1351,7 +1349,7 @@
 	id_tag = "yacht_sensor";
 	pixel_y = -24
 	},
-/turf/simulated/floor,
+/turf/simulated/floor/airless,
 /area/yacht/engine)
 "lb" = (
 /obj/structure/cable{
@@ -1361,7 +1359,8 @@
 	},
 /obj/effect/decal/cleanable/dirt,
 /obj/machinery/atmospherics/pipe/simple/hidden{
-	dir = 4
+	dir = 4;
+	icon_state = "intact"
 	},
 /obj/machinery/door/airlock/external/bolted{
 	frequency = 1439;
@@ -1382,7 +1381,8 @@
 	},
 /obj/effect/decal/cleanable/dirt,
 /obj/machinery/atmospherics/pipe/manifold/hidden{
-	dir = 1
+	dir = 1;
+	icon_state = "map"
 	},
 /turf/simulated/floor/plating,
 /area/yacht/engine)
@@ -1413,7 +1413,9 @@
 /area/yacht/engine)
 "pb" = (
 /obj/machinery/alarm{
+	alarm_id = "misc_research";
 	dir = 8;
+	icon_state = "alarm0";
 	pixel_x = 24
 	},
 /obj/effect/decal/cleanable/dirt,
@@ -1427,7 +1429,8 @@
 	dir = 1
 	},
 /obj/machinery/atmospherics/pipe/simple/hidden/red{
-	dir = 4
+	dir = 4;
+	icon_state = "intact"
 	},
 /obj/effect/decal/cleanable/dirt,
 /turf/simulated/floor/plating,
@@ -1446,7 +1449,7 @@
 /turf/simulated/floor/plating,
 /area/yacht/engine)
 "tb" = (
-/obj/structure/closet/firecloset,
+/obj/structure/closet/walllocker/firecloset,
 /obj/effect/decal/cleanable/dirt,
 /obj/machinery/atmospherics/pipe/simple/hidden/supply{
 	dir = 9

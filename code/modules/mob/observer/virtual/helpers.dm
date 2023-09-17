@@ -13,8 +13,7 @@
 /****************
 * Range Helpers *
 ****************/
-/proc/clients_in_range(atom/movable/center_vmob)
-	RETURN_TYPE(/list)
+/proc/clients_in_range(var/atom/movable/center_vmob)
 	. = list()
 
 	ACQUIRE_VIRTUAL_OR_TURF(center_vmob)
@@ -23,8 +22,7 @@
 		if(C)
 			. |= C
 
-/proc/hearers_in_range(atom/movable/center_vmob, hearing_range = world.view)
-	RETURN_TYPE(/list)
+/proc/hearers_in_range(var/atom/movable/center_vmob, var/hearing_range = world.view)
 	. = list()
 
 	ACQUIRE_VIRTUAL_OR_TURF(center_vmob)
@@ -32,8 +30,7 @@
 		if(v_mob.abilities & VIRTUAL_ABILITY_HEAR)
 			. |= v_mob.host
 
-/proc/viewers_in_range(atom/movable/center_vmob)
-	RETURN_TYPE(/list)
+/proc/viewers_in_range(var/atom/movable/center_vmob)
 	. = list()
 
 	ACQUIRE_VIRTUAL_OR_TURF(center_vmob)
@@ -49,8 +46,7 @@
 // Thus, unlike viewing hearing is communicative. I.e. if Mob A can hear Mob B then Mob B can also hear Mob A.
 
 // Gets the hosts of all the virtual mobs that can hear the given movable atom (or rather, it's virtual mob or turf in that existence order)
-/proc/all_hearers(atom/movable/heard_vmob, range = world.view)
-	RETURN_TYPE(/list)
+/proc/all_hearers(var/atom/movable/heard_vmob, var/range = world.view)
 	. = list()
 
 	ACQUIRE_VIRTUAL_OR_TURF(heard_vmob)
@@ -70,8 +66,7 @@
 //		* The viewing mob has the SEE_MOBS sight flag.
 
 // Gets the hosts of all virtual mobs that can see the given atom movable as well as its turf
-/proc/all_viewers(mob/observer/virtual/viewed_atom)
-	RETURN_TYPE(/list)
+/proc/all_viewers(var/mob/observer/virtual/viewed_atom)
 	. = list()
 
 	viewed_atom = istype(viewed_atom) ? viewed_atom.host : viewed_atom
@@ -88,13 +83,13 @@
 
 // This proc returns all hosts of virtual mobs in the given atom's view range (using its turf), ignoring invisibility, VIRUAL_ABILITY_SEE, and most other restrictions.
 // In most cases you actually want the all_* procs above. This helper was designed with LOOC in mind.
-/proc/hosts_in_view_range(atom/movable/viewing_atom)
-	RETURN_TYPE(/list)
+/proc/hosts_in_view_range(var/atom/movable/viewing_atom)
 	. = list()
 
 	ACQUIRE_VIRTUAL_OR_TURF(viewing_atom)
 	// As per http://www.byond.com/docs/ref/info.html#/proc/view by using a non-mob/client this automatically skips the vast majority of sight checks
-	for(var/mob/observer/virtual/v_mob in viewers(world.view, get_turf(viewing_atom.loc)))
+//ORIG	for(var/mob/observer/virtual/v_mob in viewers(world.view, get_turf(viewing_atom.loc)))
+	for(var/mob/observer/virtual/v_mob in hear(world.view, get_turf(viewing_atom.loc))) //INF
 		. |= v_mob.host
 
 /*
@@ -102,10 +97,10 @@
 */
 
 // Eye mobs technically see everything always, the owner just has an overlay applied, thus this helper
-/atom/movable/proc/virtual_can_see_turf(turf/T)
+/atom/movable/proc/virtual_can_see_turf(var/turf/T)
 	return TRUE // We assume objects have already been filtered using viewers() or similar proc
 
-/mob/observer/eye/virtual_can_see_turf(turf/T)
+/mob/observer/eye/virtual_can_see_turf(var/turf/T)
 	return visualnet.is_turf_visible(T)
 
 #undef ACQUIRE_VIRTUAL_OR_TURF

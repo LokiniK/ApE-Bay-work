@@ -14,13 +14,13 @@
 	name = "Concealable Armor"
 	desc = "An armor vest that can be worn under a jacket. About as tough as a light plate."
 	item_cost = 15
-	path = /obj/item/clothing/accessory/armor_plate/sneaky
+	path = /obj/item/clothing/accessory/armorplate/sneaky
 
 /datum/uplink_item/item/stealth_items/tactical_sneaky_armor
 	name = "Concealable Tactical Armor"
 	desc = "An armor vest that can be worn under a jacket. About as tough as a medium plate."
 	item_cost = 25
-	path = /obj/item/clothing/accessory/armor_plate/sneaky/tactical
+	path = /obj/item/clothing/accessory/armorplate/sneaky/tactical
 
 /datum/uplink_item/item/stealth_items/balaclava
 	name = "Balaclava"
@@ -45,25 +45,12 @@
 	item_cost = 12
 	path = /obj/item/card/id/syndicate
 
-/datum/uplink_item/item/stealth_items/cosmetic_surgery_kit
-	name = "Cosmetic Surgery Auto-Kit"
-	desc = "A small self-contained auto-surgery device that has the ability to conduct larynxial, facial and even melanin re-structuring surgery,  \
-	in a (mostly) blood-less manner."
-	item_cost = 12
-	path = /obj/item/device/cosmetic_surgery_kit
-
 /datum/uplink_item/item/stealth_items/chameleon_kit
 	name = "Chameleon Kit"
 	desc = "Comes with a full set of appearance changing clothing you need to impersonate most people.  \
 	Accessories, backpack, and gun included!"
 	item_cost = 20
 	path = /obj/item/storage/backpack/chameleon/sydie_kit
-
-/datum/uplink_item/item/stealth_items/corpse_cube
-	name = "Fake Corpse Cube"
-	desc = "For when reports of death were greatly exaggerated. Bundled with a DNA sampler for extracting a target's DNA to inject into the cube."
-	item_cost = 20
-	path = /obj/item/storage/box/syndie_kit/corpse_cube
 
 /datum/uplink_item/item/stealth_items/voice
 	name = "Modified Gas Mask"
@@ -76,6 +63,7 @@
 	name = "Chameleon Projector"
 	desc = "Use this to scan a small, portable object in order to disguise yourself as said object."
 	item_cost = 32
+	antag_costs = list(MODE_MERCENARY = 22)
 	path = /obj/item/device/chameleon
 
 /datum/uplink_item/item/stealth_items/sneakies

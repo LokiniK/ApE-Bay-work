@@ -24,7 +24,7 @@
 	var/show_intent_icons = 0
 	var/hotkey_ui_hidden = 0	//This is to hide the buttons that can be used via hotkeys. (hotkeybuttons list of buttons)
 
-	var/obj/screen/lingchemdisplay
+	var/obj/screen/ling_chem/changeling_chems //INF WAS var/obj/screen/lingchemdisplay
 	var/obj/screen/r_hand_hud_object
 	var/obj/screen/l_hand_hud_object
 	var/obj/screen/action_intent
@@ -46,7 +46,7 @@
 /datum/hud/Destroy()
 	. = ..()
 	stamina_bar = null
-	lingchemdisplay = null
+	changeling_chems = null //INF WAS lingchemdisplay
 	r_hand_hud_object = null
 	l_hand_hud_object = null
 	action_intent = null
@@ -62,7 +62,7 @@
 		var/stamina = mymob.get_stamina()
 		if(stamina < 100)
 			stamina_bar.invisibility = 0
-			stamina_bar.icon_state = "priv_prog_bar_[floor(stamina/5)*5]"
+			stamina_bar.icon_state = "prog_bar_[Floor(stamina/5)*5]"
 
 /datum/hud/proc/hidden_inventory_update()
 	if(!mymob) return
@@ -157,23 +157,27 @@
 	var/ui_color = mymob.client.prefs.UI_style_color
 	var/ui_alpha = mymob.client.prefs.UI_style_alpha
 
+	if(istype(mymob, /mob/living))
+		mymob.overlay_fullscreen("fade",/obj/screen/fullscreen/fade)
+		spawn(3 SECONDS)
+			mymob.clear_fullscreen("fade", animated = 10)
 
 	FinalizeInstantiation(ui_style, ui_color, ui_alpha)
 
-/datum/hud/proc/FinalizeInstantiation(ui_style, ui_color, ui_alpha)
+/datum/hud/proc/FinalizeInstantiation(var/ui_style, var/ui_color, var/ui_alpha)
 	return
 
 //Triggered when F12 is pressed (Unless someone changed something in the DMF)
-/mob/verb/button_pressed_F12(full = 0 as null)
+/mob/verb/button_pressed_F12(var/full = 0 as null)
 	set name = "F12"
 	set hidden = 1
 
 	if(!hud_used)
-		to_chat(usr, SPAN_WARNING("This mob type does not use a HUD."))
+		to_chat(usr, "<span class='warning'>This mob type does not use a HUD.</span>")
 		return
 
 	if(!ishuman(src))
-		to_chat(usr, SPAN_WARNING("Inventory hiding is currently only supported for human mobs, sorry."))
+		to_chat(usr, "<span class='warning'>Inventory hiding is currently only supported for human mobs, sorry.</span>")
 		return
 
 	if(!client) return

@@ -54,15 +54,15 @@
 	new prizeselect(get_turf(src))
 
 /obj/machinery/computer/arcade/emp_act(severity)
-	if(inoperable())
+	if(stat & (NOPOWER|BROKEN))
 		..(severity)
 		return
 	var/empprize = null
 	var/num_of_prizes = 0
 	switch(severity)
-		if (EMP_ACT_HEAVY)
+		if(1)
 			num_of_prizes = rand(1,4)
-		if (EMP_ACT_LIGHT)
+		if(2)
 			num_of_prizes = rand(0,2)
 	for(num_of_prizes; num_of_prizes > 0; num_of_prizes--)
 		empprize = pickweight(prizes)
@@ -126,11 +126,12 @@
 
 	dat += "</b></center>"
 
-	show_browser(user, dat, "window=arcade")
+	var/datum/browser/popup = new(user, "arcade", "Arcade")
+	popup.set_content(dat)
+	popup.open()
 	onclose(user, "arcade")
-	return
 
-/obj/machinery/computer/arcade/battle/CanUseTopic(mob/user, datum/topic_state/state, href_list)
+/obj/machinery/computer/arcade/battle/CanUseTopic(var/mob/user, var/datum/topic_state/state, var/href_list)
 	if((blocked || gameover) && href_list && (href_list["attack"] || href_list["heal"] || href_list["charge"]))
 		return min(..(), STATUS_UPDATE)
 	return ..()
@@ -150,7 +151,7 @@
 			turtle--
 		src.enemy_hp -= attackamt
 
-		. = TOPIC_REFRESH
+		updateDialog()
 		sleep(10)
 		src.arcade_action(user)
 
@@ -165,7 +166,7 @@
 		src.player_hp += healamt
 		src.blocked = 1
 
-		. = TOPIC_REFRESH
+		updateDialog()
 		sleep(10)
 		src.arcade_action(user)
 
@@ -177,7 +178,7 @@
 		if(turtle > 0)
 			turtle--
 
-		. = TOPIC_REFRESH
+		updateDialog()
 		sleep(10)
 		src.arcade_action(user)
 
@@ -192,21 +193,23 @@
 		if(emagged)
 			emagged = FALSE
 			SetupGame()
-		. = TOPIC_REFRESH
+		updateDialog()
 
-/obj/machinery/computer/arcade/battle/proc/arcade_action(user)
+/obj/machinery/computer/arcade/battle/proc/arcade_action(var/user)
 	if ((src.enemy_mp <= 0) || (src.enemy_hp <= 0))
 		if(!gameover)
 			src.gameover = 1
 			src.temp = "[src.enemy_name] has fallen! Rejoice!"
 
 			if(emagged)
+				SSstatistics.add_field("arcade_win_emagged")
 				new /obj/effect/spawner/newbomb/timer/syndicate(src.loc)
 				new /obj/item/clothing/head/collectable/petehat(src.loc)
 				log_and_message_admins("has outbombed Cuban Pete and been awarded a bomb.")
 				SetupGame()
 				emagged = FALSE
 			else
+				SSstatistics.add_field("arcade_win_normal")
 				src.prizevend()
 
 	else if (emagged && (turtle >= 4))
@@ -225,8 +228,10 @@
 			sleep(10)
 			src.temp = "You have been drained! GAME OVER"
 			if(emagged)
+				SSstatistics.add_field("arcade_loss_mana_emagged")
 				explode()
 			else
+				SSstatistics.add_field("arcade_loss_mana_normal")
 
 	else if ((src.enemy_hp <= 10) && (src.enemy_mp > 4))
 		src.temp = "[src.enemy_name] heals for 4 health!"
@@ -242,16 +247,19 @@
 		src.gameover = 1
 		src.temp = "You have been crushed! GAME OVER"
 		if(emagged)
+			SSstatistics.add_field("arcade_loss_hp_emagged")
 			explode()
 		else
+			SSstatistics.add_field("arcade_loss_hp_normal")
 
+	updateDialog()
 	src.blocked = 0
 
 /obj/machinery/computer/arcade/proc/explode()
-	explosion(loc, 3, EX_ACT_HEAVY)
+	explosion(loc, 0, 1, 2, 3)
 	qdel(src)
 
-/obj/machinery/computer/arcade/battle/emag_act(charges, mob/user)
+/obj/machinery/computer/arcade/battle/emag_act(var/charges, var/mob/user)
 	if(!emagged)
 		temp = "If you die in the game, you die for real!"
 		player_hp = 30

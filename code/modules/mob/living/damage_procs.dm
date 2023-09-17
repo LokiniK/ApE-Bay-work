@@ -7,7 +7,7 @@
 	Returns
 	standard 0 if fail
 */
-/mob/living/proc/apply_damage(damage = 0, damagetype = DAMAGE_BRUTE, def_zone = null, damage_flags = EMPTY_BITFIELD, used_weapon, armor_pen, silent = FALSE)
+/mob/living/proc/apply_damage(var/damage = 0,var/damagetype = BRUTE, var/def_zone = null, var/damage_flags = 0, var/used_weapon = null, var/armor_pen, var/silent = FALSE)
 	if(!damage)
 		return FALSE
 
@@ -18,41 +18,31 @@
 	if(!damage)
 		return FALSE
 
-	switch (damagetype)
-		if (DAMAGE_EMP, DAMAGE_FIRE)
-			return FALSE // These damages are handled separately by existing legacy code
-		if (DAMAGE_BIO)
-			damagetype = DAMAGE_TOXIN
-		if (DAMAGE_EXPLODE, DAMAGE_PSIONIC)
-			damagetype = DAMAGE_BRUTE
-
 	switch(damagetype)
-		if (DAMAGE_BRUTE)
+		if(BRUTE)
 			adjustBruteLoss(damage)
-		if (DAMAGE_BURN)
+		if(BURN)
 			if(MUTATION_COLD_RESISTANCE in mutations)
 				damage = 0
 			adjustFireLoss(damage)
-		if (DAMAGE_TOXIN)
+		if(TOX)
 			adjustToxLoss(damage)
-		if (DAMAGE_OXY)
+		if(OXY)
 			adjustOxyLoss(damage)
-		if (DAMAGE_GENETIC)
+		if(CLONE)
 			adjustCloneLoss(damage)
-		if (DAMAGE_STUN, DAMAGE_PAIN)
+		if(PAIN)
 			adjustHalLoss(damage)
-		if (DAMAGE_SHOCK)
+		if(ELECTROCUTE)
 			electrocute_act(damage, used_weapon, 1, def_zone)
-		if (DAMAGE_RADIATION)
+		if(IRRADIATE)
 			apply_radiation(damage)
-		if (DAMAGE_BRAIN)
-			adjustBrainLoss(damage)
 
 	updatehealth()
 	return TRUE
 
 
-/mob/living/proc/apply_radiation(damage = 0)
+/mob/living/proc/apply_radiation(var/damage = 0)
 	if(!damage)
 		return FALSE
 
@@ -60,57 +50,44 @@
 	return TRUE
 
 
-/mob/living/proc/apply_damages(brute = 0, burn = 0, tox = 0, oxy = 0, clone = 0, halloss = 0, def_zone = null, damage_flags = 0)
-	if (brute)
-		apply_damage(brute, DAMAGE_BRUTE, def_zone)
-	if(burn)
-		apply_damage(burn, DAMAGE_BURN, def_zone)
-	if(tox)
-		apply_damage(tox, DAMAGE_TOXIN, def_zone)
-	if (oxy)
-		apply_damage(oxy, DAMAGE_OXY, def_zone)
-	if (clone)
-		apply_damage(clone, DAMAGE_GENETIC, def_zone)
-	if (halloss)
-		apply_damage(halloss, DAMAGE_PAIN, def_zone)
+/mob/living/proc/apply_damages(var/brute = 0, var/burn = 0, var/tox = 0, var/oxy = 0, var/clone = 0, var/halloss = 0, var/def_zone = null, var/damage_flags = 0)
+	if(brute)	apply_damage(brute, BRUTE, def_zone)
+	if(burn)	apply_damage(burn, BURN, def_zone)
+	if(tox)		apply_damage(tox, TOX, def_zone)
+	if(oxy)		apply_damage(oxy, OXY, def_zone)
+	if(clone)	apply_damage(clone, CLONE, def_zone)
+	if(halloss) apply_damage(halloss, PAIN, def_zone)
 	return TRUE
 
 
-/mob/living/proc/apply_effect(effect = 0, effecttype = EFFECT_STUN, blocked = 0)
+/mob/living/proc/apply_effect(var/effect = 0,var/effecttype = STUN, var/blocked = 0)
 	if(!effect || (blocked >= 100))	return FALSE
 
 	switch(effecttype)
-		if (EFFECT_STUN)
+		if(STUN)
 			Stun(effect * blocked_mult(blocked))
-		if (EFFECT_WEAKEN)
+		if(WEAKEN)
 			Weaken(effect * blocked_mult(blocked))
-		if (EFFECT_PARALYZE)
+		if(PARALYZE)
 			Paralyse(effect * blocked_mult(blocked))
-		if (EFFECT_PAIN)
+		if(PAIN)
 			adjustHalLoss(effect * blocked_mult(blocked))
-		if (EFFECT_STUTTER)
+		if(STUTTER)
 			if(status_flags & CANSTUN) // stun is usually associated with stutter - TODO CANSTUTTER flag?
 				stuttering = max(stuttering, effect * blocked_mult(blocked))
-		if (EFFECT_EYE_BLUR)
+		if(EYE_BLUR)
 			eye_blurry = max(eye_blurry, effect * blocked_mult(blocked))
-		if (EFFECT_DROWSY)
+		if(DROWSY)
 			drowsyness = max(drowsyness, effect * blocked_mult(blocked))
 	updatehealth()
 	return TRUE
 
-/mob/living/proc/apply_effects(stun = 0, weaken = 0, paralyze = 0, stutter = 0, eyeblur = 0, drowsy = 0, agony = 0, blocked = 0)
-	if (stun)
-		apply_effect(stun, EFFECT_STUN, blocked)
-	if (weaken)
-		apply_effect(weaken, EFFECT_WEAKEN, blocked)
-	if (paralyze)
-		apply_effect(paralyze, EFFECT_PARALYZE, blocked)
-	if (stutter)
-		apply_effect(stutter, EFFECT_STUTTER, blocked)
-	if (eyeblur)
-		apply_effect(eyeblur, EFFECT_EYE_BLUR, blocked)
-	if (drowsy)
-		apply_effect(drowsy, EFFECT_DROWSY, blocked)
-	if (agony)
-		apply_effect(agony, EFFECT_PAIN, blocked)
+/mob/living/proc/apply_effects(var/stun = 0, var/weaken = 0, var/paralyze = 0, var/stutter = 0, var/eyeblur = 0, var/drowsy = 0, var/agony = 0, var/blocked = 0)
+	if(stun)		apply_effect(stun,      STUN, blocked)
+	if(weaken)		apply_effect(weaken,    WEAKEN, blocked)
+	if(paralyze)	apply_effect(paralyze,  PARALYZE, blocked)
+	if(stutter)		apply_effect(stutter,   STUTTER, blocked)
+	if(eyeblur)		apply_effect(eyeblur,   EYE_BLUR, blocked)
+	if(drowsy)		apply_effect(drowsy,    DROWSY, blocked)
+	if(agony)		apply_effect(agony,     PAIN, blocked)
 	return TRUE

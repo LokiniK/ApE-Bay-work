@@ -10,7 +10,7 @@
 	path = /obj/item/ammo_casing/shotgun/blank
 
 /datum/fabricator_recipe/arms_ammo/flaregun
-	name = "flare launcher"
+	name = "flare gun"
 	path = /obj/item/gun/projectile/flare
 
 /datum/fabricator_recipe/arms_ammo/hidden
@@ -28,6 +28,10 @@
 /datum/fabricator_recipe/arms_ammo/hidden/magazine_smg_rubber
 	name = "ammunition (SMG rubber) top mounted"
 	path = /obj/item/ammo_magazine/smg_top/rubber
+
+/datum/fabricator_recipe/arms_ammo/hidden/magazine_merc_smg_rubber
+	name = "ammunition (SMG rubber)"
+	path = /obj/item/ammo_magazine/smg/rubber
 
 /datum/fabricator_recipe/arms_ammo/hidden/flamethrower
 	path = /obj/item/flamethrower/full
@@ -84,21 +88,25 @@
 	name = "ammunition (rifle magazine)"
 	path = /obj/item/ammo_magazine/rifle
 
-/datum/fabricator_recipe/arms_ammo/hidden/magazine_bullpupheavy
-	name = "ammunition (heavy bullpup rifle)"
-	path = /obj/item/ammo_magazine/mil_rifle/heavy
+/datum/fabricator_recipe/arms_ammo/hidden/magazine_carbine
+	name = "ammunition (military rifle)"
+	path = /obj/item/ammo_magazine/mil_rifle
 
-/datum/fabricator_recipe/arms_ammo/hidden/magazine_bullpuplight
-	name = "ammunition (light bullpup rifle)"
-	path = /obj/item/ammo_magazine/mil_rifle/light
+/datum/fabricator_recipe/arms_ammo/hidden/magazine_amr_carbine
+	name = "ammunition (heavy bullpup)"
+	path = /obj/item/ammo_magazine/c12755
 
-/datum/fabricator_recipe/arms_ammo/hidden/shotgun
+/datum/fabricator_recipe/arms_ammo/hidden/shotgun_slug //inf, was shotgun
 	name = "ammunition (slug, shotgun)"
 	path = /obj/item/ammo_casing/shotgun
 
 /datum/fabricator_recipe/arms_ammo/hidden/shotgun_pellet
 	name = "ammunition (shell, shotgun)"
 	path = /obj/item/ammo_casing/shotgun/pellet
+
+/datum/fabricator_recipe/arms_ammo/hidden/shotgun_flechette
+	name = "ammunition (flechette, shotgun)"
+	path = /obj/item/ammo_casing/shotgun/flechette
 
 /datum/fabricator_recipe/arms_ammo/hidden/tacknife
 	path = /obj/item/material/knife/combat
@@ -124,17 +132,5 @@
 	path = /obj/item/ammo_magazine/speedloader/clip
 
 /datum/fabricator_recipe/arms_ammo/hidden/pistolstripperclip
-	name = "ammunition (magnum pistol stripper clip)"
+	name = "ammunition (pistol stripper clip)"
 	path = /obj/item/ammo_magazine/speedloader/pclip
-
-/datum/fabricator_recipe/arms_ammo/hidden/broomstickstripperclip
-	name = "ammunition (holdout pistol stripper clip)"
-	path = /obj/item/ammo_magazine/speedloader/hpclip
-
-/datum/fabricator_recipe/arms_ammo/hidden/rifleinternalclip
-	name = "ammunition (en-bloc clip)"
-	path = /obj/item/ammo_magazine/iclipr
-
-/datum/fabricator_recipe/arms_ammo/hidden/beandrum
-	name = "ammunition (drum magazine, beanbag)"
-	path = /obj/item/ammo_magazine/shotgunmag/beanbag

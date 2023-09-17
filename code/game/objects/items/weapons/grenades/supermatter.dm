@@ -11,7 +11,7 @@
 		STOP_PROCESSING(SSobj, src)
 	. = ..()
 
-/obj/item/grenade/supermatter/detonate(mob/living/user)
+/obj/item/grenade/supermatter/detonate()
 	..()
 	START_PROCESSING(SSobj, src)
 	implode_at = world.time + 10 SECONDS
@@ -21,7 +21,7 @@
 /obj/item/grenade/supermatter/on_update_icon()
 	overlays.Cut()
 	if(implode_at)
-		overlays += image(icon = 'icons/obj/machines/power/fusion_field.dmi', icon_state = "emfield_s1")
+		overlays += image(icon = 'icons/obj/machines/power/fusion.dmi', icon_state = "emfield_s1")
 
 /obj/item/grenade/supermatter/Process()
 	if(!isturf(loc))
@@ -32,5 +32,5 @@
 	playsound(src, 'sound/effects/supermatter.ogg', 100)
 	supermatter_pull(src, world.view, STAGE_THREE)
 	if(world.time > implode_at)
-		explosion(loc, 4, EX_ACT_HEAVY)
+		explosion(loc, 0, 1, 3, 4)
 		qdel(src)

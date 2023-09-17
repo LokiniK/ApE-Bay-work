@@ -1,10 +1,11 @@
 /obj/item/book/manual/nt_regs
 	name = "Corporate Regulations"
 	desc = "A set of corporate guidelines for employees of a megacorporation."
-	icon_state = "booknanoregs"
+	icon = 'infinity/icons/obj/library.dmi'
+	icon_state = "bookNTLaw"
 	author = "Employee Materials"
 	title = "Corporate Regulations"
-	url = "Corporate_Regulations"
+	url = "Корпоративные_законы"
 
 /obj/item/book/manual/hydroponics_pod_people
 	name = "The Diona Harvest - From Seed to Market"

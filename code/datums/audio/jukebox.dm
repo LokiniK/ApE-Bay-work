@@ -8,7 +8,7 @@
 	var/volume_max = 50
 	var/volume_step = 10
 	var/frequency = 1
-	var/range = 7
+	var/range = 12
 	var/falloff = 1
 	var/template
 	var/ui_title
@@ -25,7 +25,7 @@
 	owner = _owner
 	tracks = list()
 	for (var/path in GLOB.jukebox_tracks)
-		var/singleton/audio/track/track = GET_SINGLETON(path)
+		var/decl/audio/track/track = decls_repository.get_decl(path)
 		AddTrack(track.display || track.title, track.source)
 	sound_id = "[/jukebox]_[sequential_id(/jukebox)]"
 	template = _template
@@ -43,11 +43,6 @@
 
 /jukebox/proc/AddTrack(title = "Track [length(tracks) + 1]", source)
 	tracks += new /jukebox_track (title, source)
-
-
-/jukebox/proc/ClearTracks()
-	QDEL_NULL_LIST(tracks)
-	tracks = list()
 
 
 /jukebox/proc/Next()
@@ -70,7 +65,7 @@
 	_index = text2num(_index)
 	if (!IsInteger(_index))
 		return
-	index = clamp(_index, 1, length(tracks))
+	index = Clamp(_index, 1, length(tracks))
 	if (playing)
 		Stop()
 		Play()
@@ -90,7 +85,7 @@
 		return
 	playing = TRUE
 	token = GLOB.sound_player.PlayLoopingSound(owner, sound_id, track.source,
-		volume, range, falloff, frequency = frequency, prefer_mute = TRUE)
+		volume, range, falloff, frequency = frequency, preference = /datum/client_preference/play_jukeboxes, prefer_mute = TRUE)
 	owner.queue_icon_update()
 
 
@@ -124,6 +119,11 @@
 		"volume" = volume,
 		"tracks" = data_tracks
 	)
+	// [INF] Кнопка извлечения
+	if(istype(owner, /obj/machinery/jukebox))
+		var/obj/machinery/jukebox/J = owner
+		data["tape"] = J.tape
+	// [/INF]
 	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new (user, src, ui_key, template, ui_title, ui_width, ui_height, state = state)
@@ -139,6 +139,12 @@
 		if ("play") Play()
 		if ("volume") Volume("[href_list["dat"]]")
 		if ("track") Track("[href_list["dat"]]")
+		//[INF]
+		if ("eject")
+			if(istype(owner, /obj/machinery/jukebox))
+				var/obj/machinery/jukebox/J = owner
+				J.eject()
+		//[/INF]
 	return TOPIC_REFRESH
 
 
@@ -155,40 +161,40 @@
 
 
 GLOBAL_LIST_INIT(jukebox_tracks, list(
-	/singleton/audio/track/absconditus,
-	/singleton/audio/track/ambispace,
-	/singleton/audio/track/asfarasitgets,
-	/singleton/audio/track/clouds_of_fire,
-	/singleton/audio/track/comet_haley,
-	/singleton/audio/track/df_theme,
-	/singleton/audio/track/digit_one,
-	/singleton/audio/track/dilbert,
-	/singleton/audio/track/eighties,
-	/singleton/audio/track/elevator,
-	/singleton/audio/track/elibao,
-	/singleton/audio/track/endless_space,
-	/singleton/audio/track/floating,
-	/singleton/audio/track/hull_rupture,
-	/singleton/audio/track/human,
-	/singleton/audio/track/inorbit,
-	/singleton/audio/track/lasers,
-	/singleton/audio/track/level3_mod,
-	/singleton/audio/track/lysendraa,
-	/singleton/audio/track/marhaba,
-	/singleton/audio/track/martiancowboy,
-	/singleton/audio/track/misanthropic_corridors,
-	/singleton/audio/track/monument,
-	/singleton/audio/track/nebula,
-	/singleton/audio/track/on_the_rocks,
-	/singleton/audio/track/one_loop,
-	/singleton/audio/track/pwmur,
-	/singleton/audio/track/rimward_cruise,
-	/singleton/audio/track/space_oddity,
-	/singleton/audio/track/thunderdome,
-	/singleton/audio/track/torch,
-	/singleton/audio/track/torn,
-	/singleton/audio/track/treacherous_voyage,
-	/singleton/audio/track/voidsent,
-	/singleton/audio/track/wake,
-	/singleton/audio/track/wildencounters
+	/decl/audio/track/absconditus,
+	/decl/audio/track/ambispace,
+	/decl/audio/track/asfarasitgets,
+	/decl/audio/track/clouds_of_fire,
+	/decl/audio/track/comet_haley,
+	/decl/audio/track/df_theme,
+	/decl/audio/track/digit_one,
+	/decl/audio/track/dilbert,
+	/decl/audio/track/eighties,
+	/decl/audio/track/elevator,
+	/decl/audio/track/elibao,
+	/decl/audio/track/endless_space,
+	/decl/audio/track/floating,
+	/decl/audio/track/hull_rupture,
+	/decl/audio/track/human,
+	/decl/audio/track/inorbit,
+	/decl/audio/track/lasers,
+	/decl/audio/track/level3_mod,
+	/decl/audio/track/lysendraa,
+	/decl/audio/track/marhaba,
+	/decl/audio/track/martiancowboy,
+	/decl/audio/track/misanthropic_corridors,
+	/decl/audio/track/monument,
+	/decl/audio/track/nebula,
+	/decl/audio/track/on_the_rocks,
+	/decl/audio/track/one_loop,
+	/decl/audio/track/pwmur,
+	/decl/audio/track/rimward_cruise,
+	/decl/audio/track/space_oddity,
+	/decl/audio/track/thunderdome,
+	/decl/audio/track/torch,
+	/decl/audio/track/torn,
+	/decl/audio/track/treacherous_voyage,
+	/decl/audio/track/voidsent,
+	/decl/audio/track/wake,
+	/decl/audio/track/wildencounters
 ))

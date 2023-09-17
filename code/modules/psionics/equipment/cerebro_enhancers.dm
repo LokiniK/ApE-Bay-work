@@ -13,9 +13,28 @@
 	var/operating = FALSE
 	var/list/boosted_faculties
 	var/boosted_rank = PSI_RANK_PARAMOUNT
-	var/unboosted_rank = PSI_RANK_MASTER
+	var/unboosted_rank = PSI_RANK_GRANDMASTER
 	var/max_boosted_faculties = 3
 	var/boosted_psipower = 120
+	tint = 0 //INF, WAS NOTHING (0) (we have tint = 2 at space helmets)
+
+/obj/item/clothing/head/helmet/space/psi_amp/medium
+	name = "heavy psionic hood"
+	desc = "A heavily reinforced helmet with array of cerebro-energetic enhancers, which make you look like you have third eye."
+	action_button_name = "Install Boosters"
+	icon_state = "psihelmet"
+	armor = list(
+		melee = ARMOR_MELEE_VERY_HIGH,
+		bullet = ARMOR_BALLISTIC_RIFLE,
+		laser = ARMOR_LASER_HANDGUNS,
+		energy = ARMOR_ENERGY_RESISTANT,
+		bomb = ARMOR_BOMB_PADDED
+		)
+
+	boosted_rank = PSI_RANK_GRANDMASTER
+	unboosted_rank = PSI_RANK_MASTER
+	max_boosted_faculties = 2
+	boosted_psipower = 90
 
 /obj/item/clothing/head/helmet/space/psi_amp/lesser
 	name = "psionic amplifier"
@@ -24,16 +43,16 @@
 	flags_inv = 0
 	body_parts_covered = 0
 
-	max_boosted_faculties = 1
+	max_boosted_faculties = 2
 	boosted_rank = PSI_RANK_MASTER
 	unboosted_rank = PSI_RANK_OPERANT
-	boosted_psipower = 50
+	boosted_psipower = 60
 
 /obj/item/clothing/head/helmet/space/psi_amp/Initialize()
 	. = ..()
 	verbs += /obj/item/clothing/head/helmet/space/psi_amp/proc/integrate
 
-/obj/item/clothing/head/helmet/space/psi_amp/attack_self(mob/user)
+/obj/item/clothing/head/helmet/space/psi_amp/attack_self(var/mob/user)
 
 	if(operating)
 		return
@@ -53,7 +72,7 @@
 
 	var/removed
 	var/slots_left = max_boosted_faculties - LAZYLEN(boosted_faculties)
-	var/singleton/psionic_faculty/faculty = SSpsi.get_faculty(choice)
+	var/decl/psionic_faculty/faculty = SSpsi.get_faculty(choice)
 	if(faculty.id in boosted_faculties)
 		LAZYREMOVE(boosted_faculties, faculty.id)
 		removed = TRUE

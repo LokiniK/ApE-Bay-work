@@ -1,43 +1,6 @@
-/**
- * Generic attack and damage proc, called on the attacked atom.
- *
- * **Parameters**:
- * - `user` - The attacking mob.
- * - `damage` (int) - The damage value.
- * - `attack_verb` (string) - The verb/string used for attack messages.
- * - `wallbreaker` (boolean) - Whether or not the attack is considered a 'wallbreaker' attack - I.e., hulk.
- * - `damtype` (string, one of `DAMAGE_*`) - The attack's damage type.
- * - `armorcheck` (string) - TODO: Unused. Remove.
- * - `dam_flags` (bitfield, any of `DAMAGE_FLAG_*`) - Damage flags associated with the attack.
- *
- * Returns boolean.
- */
-/atom/proc/attack_generic(mob/user, damage, attack_verb = "hits", wallbreaker = FALSE, damtype = DAMAGE_BRUTE, armorcheck = "melee", dam_flags = EMPTY_BITFIELD)
-	if (damage && get_max_health())
-		user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
-		user.do_attack_animation(src)
-		if (!can_damage_health(damage, damtype))
-			playsound(src, damage_hitsound, 50)
-			user.visible_message(
-				SPAN_WARNING("\The [user] bonks \the [src] harmlessly!"),
-				SPAN_WARNING("You bonk \the [src] harmlessly!")
-			)
-			return
-		var/damage_flags = EMPTY_BITFIELD
-		if (wallbreaker)
-			SET_FLAGS(damage_flags, DAMAGE_FLAG_TURF_BREAKER)
-		playsound(src, damage_hitsound, 75)
-		if (damage_health(damage, damtype, damage_flags, skip_can_damage_check = TRUE))
-			user.visible_message(
-				SPAN_DANGER("\The [user] smashes through \the [src]!"),
-				SPAN_DANGER("You smash through \the [src]!")
-			)
-		else
-			user.visible_message(
-				SPAN_DANGER("\The [user] [attack_verb] \the [src]!"),
-				SPAN_DANGER("You [attack_verb] \the [src]!")
-			)
-
+// Generic damage proc (slimes and monkeys).
+/atom/proc/attack_generic(mob/user as mob)
+	return 0
 
 /*
 	Humans:
@@ -45,7 +8,7 @@
 
 	Otherwise pretty standard.
 */
-/mob/living/carbon/human/UnarmedAttack(atom/A, proximity)
+/mob/living/carbon/human/UnarmedAttack(var/atom/A, var/proximity)
 
 	if(!..())
 		return
@@ -59,36 +22,21 @@
 
 	A.attack_hand(src)
 
-
-/**
- * Called when the atom is clicked on by a mob with an empty hand.
- *
- * **Parameters**:
- * - `user` - The mob that clicked on the atom.
- */
-/atom/proc/attack_hand(mob/user)
+/atom/proc/attack_hand(mob/user as mob)
 	return
 
-
-/**
- * Called when a mob attempts to use an empty hand on itself.
- *
- * **Parameters**:
- * - `bp_hand` (string, `BP_R_HAND` or `BP_L_HAND`) - The targeted and used hand's bodypart slot.
- */
-/mob/proc/attack_empty_hand(bp_hand)
+/mob/proc/attack_empty_hand(var/bp_hand)
 	return
 
-
-/mob/living/carbon/human/RestrainedClickOn(atom/A)
+/mob/living/carbon/human/RestrainedClickOn(var/atom/A)
 	return
 
-/mob/living/CtrlClickOn(atom/A)
+/mob/living/CtrlClickOn(var/atom/A)
 	. = ..()
 	if(!. && a_intent == I_GRAB && length(available_maneuvers))
 		. = perform_maneuver(prepared_maneuver || available_maneuvers[1], A)
 
-/mob/living/carbon/human/RangedAttack(atom/A, params)
+/mob/living/carbon/human/RangedAttack(var/atom/A, var/params)
 	//Climbing up open spaces
 	if((istype(A, /turf/simulated/floor) || istype(A, /turf/unsimulated/floor) || istype(A, /obj/structure/lattice) || istype(A, /obj/structure/catwalk)) && isturf(loc) && bound_overlay && !is_physically_disabled()) //Climbing through openspace
 		return climb_up(A)
@@ -100,17 +48,17 @@
 
 	. = ..()
 
-/mob/living/RestrainedClickOn(atom/A)
+/mob/living/RestrainedClickOn(var/atom/A)
 	return
 
 /*
 	Aliens
 */
 
-/mob/living/carbon/alien/RestrainedClickOn(atom/A)
+/mob/living/carbon/alien/RestrainedClickOn(var/atom/A)
 	return
 
-/mob/living/carbon/alien/UnarmedAttack(atom/A, proximity)
+/mob/living/carbon/alien/UnarmedAttack(var/atom/A, var/proximity)
 
 	if(!..())
 		return 0
@@ -123,10 +71,10 @@
 	Nothing happening here
 */
 
-/mob/living/carbon/slime/RestrainedClickOn(atom/A)
+/mob/living/carbon/slime/RestrainedClickOn(var/atom/A)
 	return
 
-/mob/living/carbon/slime/UnarmedAttack(atom/A, proximity)
+/mob/living/carbon/slime/UnarmedAttack(var/atom/A, var/proximity)
 
 	if(!..())
 		return
@@ -147,7 +95,7 @@
 
 		switch(src.a_intent)
 			if (I_HELP) // We just poke the other
-				M.visible_message(SPAN_NOTICE("[src] gently pokes [M]!"), SPAN_NOTICE("[src] gently pokes you!"))
+				M.visible_message("<span class='notice'>[src] gently pokes [M]!</span>", "<span class='notice'>[src] gently pokes you!</span>")
 			if (I_DISARM) // We stun the target, with the intention to feed
 				var/stunprob = 1
 
@@ -165,16 +113,16 @@
 					var/shock_damage = max(0, powerlevel-3) * rand(6,10)
 					M.electrocute_act(shock_damage, src, 1.0, ran_zone())
 				else if(prob(40))
-					M.visible_message(SPAN_DANGER("[src] has pounced at [M]!"), SPAN_DANGER("[src] has pounced at you!"))
+					M.visible_message("<span class='danger'>[src] has pounced at [M]!</span>", "<span class='danger'>[src] has pounced at you!</span>")
 					M.Weaken(power)
 				else
-					M.visible_message(SPAN_DANGER("[src] has tried to pounce at [M]!"), SPAN_DANGER("[src] has tried to pounce at you!"))
+					M.visible_message("<span class='danger'>[src] has tried to pounce at [M]!</span>", "<span class='danger'>[src] has tried to pounce at you!</span>")
 				M.updatehealth()
 			if (I_GRAB) // We feed
 				Wrap(M)
 			if (I_HURT) // Attacking
 				if(iscarbon(M) && prob(15))
-					M.visible_message(SPAN_DANGER("[src] has pounced at [M]!"), SPAN_DANGER("[src] has pounced at you!"))
+					M.visible_message("<span class='danger'>[src] has pounced at [M]!</span>", "<span class='danger'>[src] has pounced at you!</span>")
 					M.Weaken(power)
 				else
 					A.attack_generic(src, (is_adult ? rand(20,40) : rand(5,25)), "glomped")
@@ -189,7 +137,7 @@
 /*
 	Animals
 */
-/mob/living/simple_animal/UnarmedAttack(atom/A, proximity)
+/mob/living/simple_animal/UnarmedAttack(var/atom/A, var/proximity)
 
 	if(!..())
 		return
@@ -202,15 +150,9 @@
 			admin_attack_log(src, A, "Has attacked its victim.", "Has been attacked by its attacker.")
 	if(a_intent == I_HELP)
 		A.attack_animal(src)
-	else if (get_natural_weapon())
+	else
 		A.attackby(get_natural_weapon(), src)
 
-
-/**
- * Called when a `simple_animal` mob clicks on the atom with an 'empty hand.'
- *
- * **Parameters**:
- * - `user` - The mob clicking on the atom.
- */
+// Attack hand but for simple animals
 /atom/proc/attack_animal(mob/user)
-	return attack_hand(user)
+	return attack_hand(user) 

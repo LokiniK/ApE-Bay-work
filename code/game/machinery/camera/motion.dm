@@ -6,7 +6,7 @@
 
 /obj/machinery/camera/proc/internal_process()
 	// motion camera event loop
-	if (GET_FLAGS(stat, MACHINE_STAT_EMPED) || !is_powered())
+	if (stat & (EMPED|NOPOWER))
 		return
 	if(!isMotion())
 		. = PROCESS_KILL
@@ -24,7 +24,7 @@
 				// If they aren't in range, lose the target.
 				lostTarget(target)
 
-/obj/machinery/camera/proc/newTarget(mob/target)
+/obj/machinery/camera/proc/newTarget(var/mob/target)
 	if (istype(target, /mob/living/silicon/ai)) return 0
 	if (detectTime == 0)
 		detectTime = world.time // start the clock
@@ -32,14 +32,14 @@
 		motionTargets += target
 	return 1
 
-/obj/machinery/camera/proc/lostTarget(mob/target)
+/obj/machinery/camera/proc/lostTarget(var/mob/target)
 	if (target in motionTargets)
 		motionTargets -= target
-	if (length(motionTargets) == 0)
+	if (motionTargets.len == 0)
 		cancelAlarm()
 
 /obj/machinery/camera/proc/cancelAlarm()
-	if (!status || (!is_powered()))
+	if (!status || (stat & NOPOWER))
 		return 0
 	if (detectTime == -1)
 		GLOB.motion_alarm.clearAlarm(loc, src)
@@ -47,7 +47,7 @@
 	return 1
 
 /obj/machinery/camera/proc/triggerAlarm()
-	if (!status || (!is_powered()))
+	if (!status || (stat & NOPOWER))
 		return 0
 	if (!detectTime) return 0
 	GLOB.motion_alarm.triggerAlarm(loc, src)

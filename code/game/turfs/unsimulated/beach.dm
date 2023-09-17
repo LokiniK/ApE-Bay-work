@@ -1,20 +1,20 @@
 /turf/unsimulated/beach
-	name = "beach"
+	name = "Beach"
 	icon = 'icons/misc/beach.dmi'
 
 /turf/unsimulated/beach/sand
-	name = "band"
+	name = "Sand"
 	icon_state = "sand"
 
 /turf/unsimulated/beach/coastline
-	name = "coastline"
+	name = "Coastline"
 	icon = 'icons/misc/beach2.dmi'
 	icon_state = "sandwater"
 
 /turf/unsimulated/beach/water
-	name = "water"
+	name = "Water"
 	icon_state = "water"
-	turf_flags = TURF_DISALLOW_BLOB | TURF_IS_WET
+	turf_flags = TURF_IS_WET
 
 /turf/unsimulated/beach/water/New()
 	..()

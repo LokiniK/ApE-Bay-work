@@ -1,8 +1,9 @@
 /obj/effect/shield
 	name = "energy shield"
 	desc = "An impenetrable field of energy, capable of blocking anything as long as it's active."
-	icon = 'icons/obj/machines/shielding.dmi'
+	icon = 'infinity/icons/obj/machines/shielding.dmi'
 	icon_state = "shield_normal"
+//	alpha = 100			// INF
 	anchored = TRUE
 	layer = ABOVE_HUMAN_LAYER
 	density = TRUE
@@ -11,6 +12,7 @@
 	var/disabled_for = 0
 	var/diffused_for = 0
 	atmos_canpass = CANPASS_PROC
+	dir = WEST			// INF
 
 
 /obj/effect/shield/on_update_icon()
@@ -19,9 +21,7 @@
 	else
 		set_opacity(0)
 
-	if (!gen)
-		color = COLOR_RED_LIGHT
-	else if (gen.check_flag(MODEFLAG_OVERCHARGE))
+	if(gen && gen.check_flag(MODEFLAG_OVERCHARGE))
 		color = COLOR_VIOLET
 	else
 		color = COLOR_DEEP_SKY_BLUE
@@ -38,16 +38,6 @@
 	..()
 	update_nearby_tiles()
 
-
-/obj/effect/shield/Initialize(mapload, obj/machinery/power/shield_generator/new_gen)
-	. = ..(mapload)
-
-	if (QDELETED(new_gen))
-		log_debug(append_admin_tools("Shield effect ([name]) was created without a valid generator in [get_area(src)].", location = get_turf(src)))
-		return INITIALIZE_HINT_QDEL
-	gen = new_gen
-
-
 /obj/effect/shield/Destroy()
 	. = ..()
 	if(gen)
@@ -61,7 +51,7 @@
 
 
 // Temporarily collapses this shield segment.
-/obj/effect/shield/proc/fail(duration)
+/obj/effect/shield/proc/fail(var/duration)
 	if(duration <= 0)
 		return
 
@@ -92,7 +82,7 @@
 		gen.damaged_segments -= src
 
 
-/obj/effect/shield/proc/diffuse(duration)
+/obj/effect/shield/proc/diffuse(var/duration)
 	if (!gen)
 		return
 
@@ -109,19 +99,19 @@
 	update_icon()
 	update_explosion_resistance()
 
-/obj/effect/shield/attack_generic(source, damage, emote)
+/obj/effect/shield/attack_generic(var/source, var/damage, var/emote)
 	take_damage(damage, SHIELD_DAMTYPE_PHYSICAL)
-	if(gen?.check_flag(MODEFLAG_OVERCHARGE) && istype(source, /mob/living))
+	if(gen.check_flag(MODEFLAG_OVERCHARGE) && istype(source, /mob/living/))
 		overcharge_shock(source)
 	..(source, damage, emote)
 
 
 // Fails shield segments in specific range. Range of 1 affects the shielded turf only.
-/obj/effect/shield/proc/fail_adjacent_segments(range, hitby = null)
+/obj/effect/shield/proc/fail_adjacent_segments(var/range, var/hitby = null)
 	if(hitby)
-		visible_message(SPAN_DANGER("\The [src] flashes a bit as \the [hitby] collides with it, eventually fading out in a rain of sparks!"))
+		visible_message("<span class='danger'>\The [src] flashes a bit as \the [hitby] collides with it, eventually fading out in a rain of sparks!</span>")
 	else
-		visible_message(SPAN_DANGER("\The [src] flashes a bit as it eventually fades out in a rain of sparks!"))
+		visible_message("<span class='danger'>\The [src] flashes a bit as it eventually fades out in a rain of sparks!</span>")
 	fail(range * 2)
 
 	for(var/obj/effect/shield/S in range(range, src))
@@ -131,7 +121,7 @@
 		// The closer we are to impact site, the longer it takes for shield to come back up.
 		S.fail(-(-range + get_dist(src, S)) * 2)
 
-/obj/effect/shield/proc/take_damage(damage, damtype, hitby)
+/obj/effect/shield/proc/take_damage(var/damage, var/damtype, var/hitby)
 	if(!gen)
 		qdel(src)
 		return
@@ -165,7 +155,7 @@
 
 
 // As we have various shield modes, this handles whether specific things can pass or not.
-/obj/effect/shield/CanPass(atom/movable/mover, turf/target, height=0, air_group=0)
+/obj/effect/shield/CanPass(var/atom/movable/mover, var/turf/target, var/height=0, var/air_group=0)
 	// Somehow we don't have a generator. This shouldn't happen. Delete the shield.
 	if(!gen)
 		qdel(src)
@@ -184,18 +174,17 @@
 
 
 /obj/effect/shield/c_airblock(turf/other)
-	return gen?.check_flag(MODEFLAG_ATMOSPHERIC) ? BLOCKED : 0
+	return gen.check_flag(MODEFLAG_ATMOSPHERIC) ? BLOCKED : 0
 
 
 // EMP. It may seem weak but keep in mind that multiple shield segments are likely to be affected.
-/obj/effect/shield/emp_act(severity)
+/obj/effect/shield/emp_act(var/severity)
 	if(!disabled_for)
 		take_damage(rand(30,60) / severity, SHIELD_DAMTYPE_EM)
-	..()
 
 
 // Explosions
-/obj/effect/shield/ex_act(severity)
+/obj/effect/shield/ex_act(var/severity)
 	if(!disabled_for)
 		take_damage(rand(10,15) / severity, SHIELD_DAMTYPE_PHYSICAL)
 
@@ -207,42 +196,34 @@
 
 
 // Projectiles
-/obj/effect/shield/bullet_act(obj/item/projectile/proj)
-	if (proj.damage_type == DAMAGE_BURN)
+/obj/effect/shield/bullet_act(var/obj/item/projectile/proj)
+	if(proj.damage_type == BURN)
 		take_damage(proj.get_structure_damage(), SHIELD_DAMTYPE_HEAT)
-	else if (proj.damage_type == DAMAGE_BRUTE)
+	else if (proj.damage_type == BRUTE)
 		take_damage(proj.get_structure_damage(), SHIELD_DAMTYPE_PHYSICAL)
 	else
 		take_damage(proj.get_structure_damage(), SHIELD_DAMTYPE_EM)
 
 
-/obj/effect/shield/use_weapon(obj/item/weapon, mob/user, list/click_params)
-	SHOULD_CALL_PARENT(FALSE) // Fully handled here
-	user.setClickCooldown(user.get_attack_speed(weapon))
+// Attacks with hand tools. Blocked by Hyperkinetic flag.
+/obj/effect/shield/attackby(var/obj/item/I as obj, var/mob/user as mob)
+	user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
 	user.do_attack_animation(src)
-	playsound(src, weapon.hitsound, 50, TRUE)
-	if (!gen.check_flag(MODEFLAG_HYPERKINETIC))
-		user.visible_message(
-			SPAN_WARNING("\The [user] tries to attack \the [src] with \a [weapon], but it passes through!"),
-			SPAN_WARNING("You try to attack \the [src] with \the [weapon], but it passes through!")
-		)
-		return TRUE
-	user.visible_message(
-		SPAN_DANGER("\The [user] hits \the [src] with \a [weapon]!"),
-		SPAN_DANGER("You hit \the [src] with \the [weapon]!")
-	)
-	switch (weapon.damtype)
-		if (DAMAGE_BURN)
-			take_damage(weapon.force, SHIELD_DAMTYPE_HEAT)
-		if (DAMAGE_BRUTE)
-			take_damage(weapon.force, SHIELD_DAMTYPE_PHYSICAL)
+
+	if(gen.check_flag(MODEFLAG_HYPERKINETIC))
+		user.visible_message("<span class='danger'>\The [user] hits \the [src] with \the [I]!</span>")
+		if(I.damtype == BURN)
+			take_damage(I.force, SHIELD_DAMTYPE_HEAT)
+		else if (I.damtype == BRUTE)
+			take_damage(I.force, SHIELD_DAMTYPE_PHYSICAL)
 		else
-			take_damage(weapon.force, SHIELD_DAMTYPE_EM)
-	return TRUE
+			take_damage(I.force, SHIELD_DAMTYPE_EM)
+	else
+		user.visible_message("<span class='danger'>\The [user] tries to attack \the [src] with \the [I], but it passes through!</span>")
 
 
 // Special treatment for meteors because they would otherwise penetrate right through the shield.
-/obj/effect/shield/Bumped(atom/movable/mover)
+/obj/effect/shield/Bumped(var/atom/movable/mover)
 	if(!gen)
 		qdel(src)
 		return 0
@@ -251,10 +232,10 @@
 	return ..()
 
 
-/obj/effect/shield/proc/overcharge_shock(mob/living/M)
+/obj/effect/shield/proc/overcharge_shock(var/mob/living/M)
 	M.adjustFireLoss(rand(20, 40))
 	M.Weaken(5)
-	to_chat(M, SPAN_DANGER("As you come into contact with \the [src] a surge of energy paralyses you!"))
+	to_chat(M, "<span class='danger'>As you come into contact with \the [src] a surge of energy paralyses you!</span>")
 	take_damage(10, SHIELD_DAMTYPE_EM)
 
 // Called when a flag is toggled. Can be used to add on-toggle behavior, such as visual changes.
@@ -279,54 +260,58 @@
 
 // Shield collision checks below
 
-/atom/movable/proc/can_pass_shield(obj/machinery/power/shield_generator/gen)
+/atom/movable/proc/can_pass_shield(var/obj/machinery/power/shield_generator/gen)
 	return 1
 
 
 // Other mobs
-/mob/living/can_pass_shield(obj/machinery/power/shield_generator/gen)
+/mob/living/can_pass_shield(var/obj/machinery/power/shield_generator/gen)
 	return !gen.check_flag(MODEFLAG_NONHUMANS)
 
 // Human mobs
-/mob/living/carbon/human/can_pass_shield(obj/machinery/power/shield_generator/gen)
+/mob/living/carbon/human/can_pass_shield(var/obj/machinery/power/shield_generator/gen)
 	if(isSynthetic())
 		return !gen.check_flag(MODEFLAG_ANORGANIC)
 	return !gen.check_flag(MODEFLAG_HUMANOIDS)
 
 // Silicon mobs
-/mob/living/silicon/can_pass_shield(obj/machinery/power/shield_generator/gen)
+/mob/living/silicon/can_pass_shield(var/obj/machinery/power/shield_generator/gen)
 	return !gen.check_flag(MODEFLAG_ANORGANIC)
 
 
 // Generic objects. Also applies to bullets and meteors.
-/obj/can_pass_shield(obj/machinery/power/shield_generator/gen)
+/obj/can_pass_shield(var/obj/machinery/power/shield_generator/gen)
 	return !gen.check_flag(MODEFLAG_HYPERKINETIC)
 
 // Beams
-/obj/item/projectile/beam/can_pass_shield(obj/machinery/power/shield_generator/gen)
+/obj/item/projectile/beam/can_pass_shield(var/obj/machinery/power/shield_generator/gen)
+	return !gen.check_flag(MODEFLAG_PHOTONIC)
+
+// Beams
+/obj/item/projectile/ship_munition/energy/can_pass_shield(var/obj/machinery/power/shield_generator/gen)
 	return !gen.check_flag(MODEFLAG_PHOTONIC)
 
 
 // Shield on-impact logic here. This is called only if the object is actually blocked by the field (can_pass_shield applies first)
-/atom/movable/proc/shield_impact(obj/effect/shield/S)
+/atom/movable/proc/shield_impact(var/obj/effect/shield/S)
 	return
 
-/mob/living/shield_impact(obj/effect/shield/S)
+/mob/living/shield_impact(var/obj/effect/shield/S)
 	if(!S.gen.check_flag(MODEFLAG_OVERCHARGE))
 		return
 	S.overcharge_shock(src)
 
-/obj/effect/meteor/shield_impact(obj/effect/shield/S)
+/obj/effect/meteor/shield_impact(var/obj/effect/shield/S)
 	if(!S.gen.check_flag(MODEFLAG_HYPERKINETIC))
 		return
 	S.take_damage(get_shield_damage(), SHIELD_DAMTYPE_PHYSICAL, src)
-	visible_message(SPAN_DANGER("\The [src] breaks into dust!"))
+	visible_message("<span class='danger'>\The [src] breaks into dust!</span>")
 	make_debris()
 	qdel(src)
 
 // Small visual effect, makes the shield tiles brighten up by changing color for a moment, and spreads to nearby shields.
-/obj/effect/shield/proc/impact_effect(i, list/affected_shields = list())
-	i = clamp(i, 1, 10)
+/obj/effect/shield/proc/impact_effect(var/i, var/list/affected_shields = list())
+	i = between(1, i, 10)
 	var/backcolor = color
 	if(gen && gen.check_flag(MODEFLAG_OVERCHARGE))
 		color = COLOR_PINK
@@ -336,9 +321,9 @@
 	affected_shields |= src
 	i--
 	if(i)
-		addtimer(new Callback(src, .proc/spread_impact_effect, i, affected_shields), 2)
+		addtimer(CALLBACK(src, .proc/spread_impact_effect, i, affected_shields), 2)
 
-/obj/effect/shield/proc/spread_impact_effect(i, list/affected_shields = list())
+/obj/effect/shield/proc/spread_impact_effect(var/i, var/list/affected_shields = list())
 	for(var/direction in GLOB.cardinal)
 		var/turf/T = get_step(src, direction)
 		if(T) // Incase we somehow stepped off the map.
@@ -346,6 +331,6 @@
 				if(!(F in affected_shields))
 					F.impact_effect(i, affected_shields) // Spread the effect to them
 
-/obj/effect/shield/attack_hand(mob/living/user)
+/obj/effect/shield/attack_hand(var/mob/living/user)
 	impact_effect(3) // Harmless, but still produces the 'impact' effect.
 	..()

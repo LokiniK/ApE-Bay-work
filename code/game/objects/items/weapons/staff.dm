@@ -1,7 +1,7 @@
 /obj/item/staff
-	name = "wizard's staff"
+	name = "wizards staff"
 	desc = "Apparently a staff used by the wizard."
-	icon = 'icons/obj/cult.dmi'
+	icon = 'icons/obj/wizard.dmi'
 	icon_state = "staff"
 	force = 3.0
 	throwforce = 5.0
@@ -13,11 +13,11 @@
 /obj/item/staff/broom
 	name = "broom"
 	desc = "Used for sweeping, and flying into the night while cackling. Black cat not included."
-	icon = 'icons/obj/cult.dmi'
+	icon = 'icons/obj/wizard.dmi'
 	icon_state = "broom"
 
 /obj/item/staff/gentcane
-	name = "gentleman's cane"
+	name = "Gentlemans Cane"
 	desc = "An ebony can with an ivory tip."
 	icon = 'icons/obj/weapons/melee_physical.dmi'
 	icon_state = "cane"

@@ -1,7 +1,7 @@
 /obj/machinery/papershredder
 	name = "paper shredder"
 	desc = "For those documents you don't want seen."
-	icon = 'icons/obj/machines/bureaucracy/papershredder.dmi'
+	icon = 'icons/obj/bureaucracy.dmi'
 	icon_state = "papershredder0"
 	density = TRUE
 	anchored = TRUE
@@ -20,7 +20,10 @@
 		/obj/item/sample/print = 1
 		)
 
-/obj/machinery/papershredder/attackby(obj/item/W, mob/user)
+/obj/machinery/papershredder/unsecured
+	anchored = FALSE
+
+/obj/machinery/papershredder/attackby(var/obj/item/W, var/mob/user)
 
 	if(istype(W, /obj/item/storage))
 		empty_bin(user, W)
@@ -32,13 +35,13 @@
 				paper_result = shred_amounts[shred_type]
 		if(paper_result)
 			if(paperamount == max_paper)
-				to_chat(user, SPAN_WARNING("\The [src] is full; please empty it before you continue."))
+				to_chat(user, "<span class='warning'>\The [src] is full; please empty it before you continue.</span>")
 				return
 			paperamount += paper_result
 			qdel(W)
 			playsound(src.loc, 'sound/items/pshred.ogg', 75, 1)
 			if(paperamount > max_paper)
-				to_chat(user, SPAN_DANGER("\The [src] was too full, and shredded paper goes everywhere!"))
+				to_chat(user, "<span class='danger'>\The [src] was too full, and shredded paper goes everywhere!</span>")
 				for(var/i=(paperamount-max_paper);i>0;i--)
 					var/obj/item/shreddedp/SP = get_shredded_paper()
 					SP.dropInto(loc)
@@ -58,21 +61,21 @@
 		return
 
 	if(!paperamount)
-		to_chat(usr, SPAN_NOTICE("\The [src] is empty."))
+		to_chat(usr, "<span class='notice'>\The [src] is empty.</span>")
 		return
 
 	empty_bin(usr)
 
-/obj/machinery/papershredder/proc/empty_bin(mob/living/user, obj/item/storage/empty_into)
+/obj/machinery/papershredder/proc/empty_bin(var/mob/living/user, var/obj/item/storage/empty_into)
 
 	if(empty_into) // If the user tries to empty the bin into something
 
 		if(paperamount == 0) // Can't empty what is already empty
-			to_chat(user, SPAN_NOTICE("\The [src] is empty."))
+			to_chat(user, "<span class='notice'>\The [src] is empty.</span>")
 			return
 
 		if(empty_into && !istype(empty_into)) // Make sure we can store paper in the thing
-			to_chat(user, SPAN_NOTICE("You cannot put shredded paper into the [empty_into]."))
+			to_chat(user, "<span class='notice'>You cannot put shredded paper into the [empty_into].</span>")
 			return
 
 		// Move papers one by one as they fit; stop when we are empty or can't fit any more
@@ -89,9 +92,9 @@
 
 		// Report on how we did
 		if(paperamount == 0)
-			to_chat(user, SPAN_NOTICE("You empty \the [src] into \the [empty_into]."))
+			to_chat(user, "<span class='notice'>You empty \the [src] into \the [empty_into].</span>")
 		if(paperamount > 0)
-			to_chat(user, SPAN_NOTICE("\The [empty_into] will not fit any more shredded paper."))
+			to_chat(user, "<span class='notice'>\The [empty_into] will not fit any more shredded paper.</span>")
 
 	else // Just dump the paper out on the floor
 		while(paperamount > 0)
@@ -105,26 +108,26 @@
 		return new /obj/item/shreddedp(get_turf(src))
 
 /obj/machinery/papershredder/on_update_icon()
-	icon_state = "papershredder[max(0,min(5,floor(paperamount/2)))]"
+	icon_state = "papershredder[max(0,min(5,Floor(paperamount/2)))]"
 
-/obj/item/shreddedp/attackby(obj/item/W as obj, mob/user)
+/obj/item/shreddedp/attackby(var/obj/item/W as obj, var/mob/user)
 	if(istype(W, /obj/item/flame/lighter))
 		burnpaper(W, user)
 	else
 		..()
 
-/obj/item/shreddedp/proc/burnpaper(obj/item/flame/lighter/P, mob/user)
+/obj/item/shreddedp/proc/burnpaper(var/obj/item/flame/lighter/P, var/mob/user)
 	if(user.restrained())
 		return
 	if(!P.lit)
-		to_chat(user, SPAN_WARNING("\The [P] is not lit."))
+		to_chat(user, "<span class='warning'>\The [P] is not lit.</span>")
 		return
-	user.visible_message(SPAN_WARNING("\The [user] holds \the [P] up to \the [src]. It looks like \he's trying to burn it!"), \
-		SPAN_WARNING("You hold \the [P] up to \the [src], burning it slowly."))
-	if(!do_after(user, 2 SECONDS, src, DO_PUBLIC_UNIQUE))
+	user.visible_message("<span class='warning'>\The [user] holds \the [P] up to \the [src]. It looks like \he's trying to burn it!</span>", \
+		"<span class='warning'>You hold \the [P] up to \the [src], burning it slowly.</span>")
+	if(!do_after(user,20, src))
 		return
-	user.visible_message(SPAN_DANGER("\The [user] burns right through \the [src], turning it to ash. It flutters through the air before settling on the floor in a heap."), \
-		SPAN_DANGER("You burn right through \the [src], turning it to ash. It flutters through the air before settling on the floor in a heap."))
+	user.visible_message("<span class='danger'>\The [user] burns right through \the [src], turning it to ash. It flutters through the air before settling on the floor in a heap.</span>", \
+		"<span class='danger'>You burn right through \the [src], turning it to ash. It flutters through the air before settling on the floor in a heap.</span>")
 	FireBurn()
 
 /obj/item/shreddedp/proc/FireBurn()
@@ -133,7 +136,7 @@
 
 /obj/item/shreddedp
 	name = "shredded paper"
-	icon = 'icons/obj/paper.dmi'
+	icon = 'icons/obj/bureaucracy.dmi'
 	icon_state = "shredp"
 	randpixel = 5
 	throwforce = 0

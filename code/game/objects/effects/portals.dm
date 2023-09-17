@@ -1,7 +1,7 @@
 /obj/effect/portal
 	name = "portal"
 	desc = "Looks unstable. Best to test it with the clown."
-	icon = 'icons/obj/portals.dmi'
+	icon = 'icons/obj/stationobjs.dmi'
 	icon_state = "portal"
 	density = TRUE
 	unacidable = TRUE
@@ -29,7 +29,7 @@
 		return
 	return
 
-/obj/effect/portal/New(start, end, delete_after = 300, failure_rate)
+/obj/effect/portal/New(var/start, var/end, var/delete_after = 300, var/failure_rate)
 	..()
 	if(failure_rate)
 		failchance = failure_rate
@@ -38,6 +38,8 @@
 			dangerous = 1
 	playsound(src, 'sound/effects/phasein.ogg', 25, 1)
 	target = end
+	for(var/mob/living/M in src.loc)
+		src.teleport(M)
 
 	if(delete_after)
 		spawn(delete_after)

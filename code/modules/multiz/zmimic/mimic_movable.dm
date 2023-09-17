@@ -1,8 +1,8 @@
 /atom/movable
 	/// The mimic (if any) that's *directly* copying us.
-	var/atom/movable/openspace/mimic/bound_overlay
+	var/tmp/atom/movable/openspace/mimic/bound_overlay
 	/// If TRUE, this atom is ignored by Z-Mimic.
-	var/z_flags
+	var/no_z_overlay
 
 /atom/movable/forceMove(atom/dest)
 	. = ..(dest)
@@ -82,7 +82,12 @@
 	icon_state = "dark"
 	plane = OPENTURF_MAX_PLANE
 	layer = MIMICED_LIGHTING_LAYER
-	color = "#0000004b"
+	blend_mode = BLEND_MULTIPLY
+	color = list(
+		SHADOWER_DARKENING_FACTOR, 0, 0,
+		0, SHADOWER_DARKENING_FACTOR, 0,
+		0, 0, SHADOWER_DARKENING_FACTOR
+	)
 
 /atom/movable/openspace/multiplier/Destroy()
 	var/turf/myturf = loc
@@ -145,10 +150,8 @@
 	var/mimiced_type
 	var/original_z
 	var/override_depth
-	var/have_performed_fixup = FALSE
 
 /atom/movable/openspace/mimic/New()
-	SHOULD_CALL_PARENT(FALSE) // Probably a reason for this but I don't know it
 	atom_flags |= ATOM_FLAG_INITIALIZED
 	SSzcopy.openspace_overlays += 1
 
@@ -164,9 +167,8 @@
 
 	return ..()
 
-/atom/movable/openspace/mimic/can_use_item(obj/item/tool, mob/user, click_params)
-	USE_FEEDBACK_FAILURE("\The [src] is too far away.")
-	return FALSE
+/atom/movable/openspace/mimic/attackby(obj/item/W, mob/user)
+	to_chat(user, SPAN_NOTICE("\The [src] is too far away."))
 
 /atom/movable/openspace/mimic/attack_hand(mob/user)
 	to_chat(user, SPAN_NOTICE("You cannot reach \the [src] from here."))
@@ -182,12 +184,12 @@
 			deltimer(destruction_timer)
 			destruction_timer = null
 	else if (!destruction_timer)
-		destruction_timer = QDEL_IN(src, 10 SECONDS)
+		destruction_timer = addtimer(CALLBACK(src, /datum/.proc/qdel_self), 10 SECONDS, TIMER_STOPPABLE)
 
 // Called when the turf we're on is deleted/changed.
 /atom/movable/openspace/mimic/proc/owning_turf_changed()
 	if (!destruction_timer)
-		destruction_timer = QDEL_IN(src, 10 SECONDS)
+		destruction_timer = addtimer(CALLBACK(src, /datum/.proc/qdel_self), 10 SECONDS, TIMER_STOPPABLE)
 
 // -- TURF PROXY --
 
@@ -195,11 +197,10 @@
 /atom/movable/openspace/turf_proxy
 	plane = OPENTURF_MAX_PLANE
 	mouse_opacity = 0
-	z_flags = ZMM_IGNORE // Only one of these should ever be visible at a time, the mimic logic will handle that.
+	no_z_overlay = TRUE  // Only one of these should ever be visible at a time, the mimic logic will handle that.
 
-/atom/movable/openspace/turf_proxy/use_tool(obj/item/tool, mob/user, list/click_params)
-	SHOULD_CALL_PARENT(FALSE)
-	return tool.resolve_attackby(loc, user, click_params)
+/atom/movable/openspace/turf_proxy/attackby(obj/item/W, mob/user)
+	loc.attackby(W, user)
 
 /atom/movable/openspace/turf_proxy/attack_hand(mob/user as mob)
 	loc.attack_hand(user)
@@ -207,9 +208,9 @@
 /atom/movable/openspace/turf_proxy/attack_generic(mob/user as mob)
 	loc.attack_generic(user)
 
-/atom/movable/openspace/turf_proxy/examine(...)
+/atom/movable/openspace/turf_proxy/examine(mob/examiner)
 	SHOULD_CALL_PARENT(FALSE)
-	. = loc.examine(arglist(args))
+	. = loc.examine(examiner)
 
 
 // -- TURF MIMIC --
@@ -225,9 +226,8 @@
 	ASSERT(isturf(loc))
 	delegate = loc:below
 
-/atom/movable/openspace/turf_mimic/use_tool(obj/item/tool, mob/user, list/click_params)
-	SHOULD_CALL_PARENT(FALSE)
-	return tool.resolve_attackby(loc, user, click_params)
+/atom/movable/openspace/turf_mimic/attackby(obj/item/W, mob/user)
+	loc.attackby(W, user)
 
 /atom/movable/openspace/turf_mimic/attack_hand(mob/user as mob)
 	to_chat(user, SPAN_NOTICE("You cannot reach \the [src] from here."))
@@ -235,6 +235,6 @@
 /atom/movable/openspace/turf_mimic/attack_generic(mob/user as mob)
 	to_chat(user, SPAN_NOTICE("You cannot reach \the [src] from here."))
 
-/atom/movable/openspace/turf_mimic/examine(...)
+/atom/movable/openspace/turf_mimic/examine(mob/examiner)
 	SHOULD_CALL_PARENT(FALSE)
-	. = delegate.examine(arglist(args))
+	. = delegate.examine(examiner)

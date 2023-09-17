@@ -2,21 +2,21 @@
 	holder_type = /obj/machinery/alarm
 	wire_count = 5
 	descriptions = list(
-		new /datum/wire_description(AALARM_WIRE_IDSCAN, "This wire is connected to the ID scanning panel.", SKILL_EXPERIENCED),
+		new /datum/wire_description(AALARM_WIRE_IDSCAN, "This wire is connected to the ID scanning panel.", SKILL_EXPERT),
 		new /datum/wire_description(AALARM_WIRE_POWER, "This wire seems to be carrying a heavy current."),
 		new /datum/wire_description(AALARM_WIRE_SYPHON, "This wire runs to atmospherics logic circuits of some sort."),
 		new /datum/wire_description(AALARM_WIRE_AI_CONTROL, "This wire connects to automated control systems."),
 		new /datum/wire_description(AALARM_WIRE_AALARM, "This wire gives power to the actual alarm mechanism.")
 	)
 
-var/global/const/AALARM_WIRE_IDSCAN = 1
-var/global/const/AALARM_WIRE_POWER = 2
-var/global/const/AALARM_WIRE_SYPHON = 4
-var/global/const/AALARM_WIRE_AI_CONTROL = 8
-var/global/const/AALARM_WIRE_AALARM = 16
+var/const/AALARM_WIRE_IDSCAN = 1
+var/const/AALARM_WIRE_POWER = 2
+var/const/AALARM_WIRE_SYPHON = 4
+var/const/AALARM_WIRE_AI_CONTROL = 8
+var/const/AALARM_WIRE_AALARM = 16
 
 
-/datum/wires/alarm/CanUse(mob/living/L)
+/datum/wires/alarm/CanUse(var/mob/living/L)
 	var/obj/machinery/alarm/A = holder
 	if(A.wiresexposed && A.buildstage == 2)
 		return 1
@@ -25,14 +25,9 @@ var/global/const/AALARM_WIRE_AALARM = 16
 /datum/wires/alarm/GetInteractWindow(mob/user)
 	var/obj/machinery/alarm/A = holder
 	. += ..()
-	. += text({"
-		<br>
-		[(A.locked ? "The Air Alarm is locked." : "The Air Alarm is unlocked.")]<br>
-		[((A.shorted || A.inoperable()) ? "The Air Alarm is offline." : "The Air Alarm is working properly!")]<br>
-		[(A.aidisabled ? "The 'AI control allowed' light is off." : "The 'AI control allowed' light is on.")]
-	"})
+	. += text("<br>\n[(A.locked ? "The Air Alarm is locked." : "The Air Alarm is unlocked.")]<br>\n[((A.shorted || (A.stat & (NOPOWER|BROKEN))) ? "The Air Alarm is offline." : "The Air Alarm is working properly!")]<br>\n[(A.aidisabled ? "The 'AI control allowed' light is off." : "The 'AI control allowed' light is on.")]")
 
-/datum/wires/alarm/UpdateCut(index, mended)
+/datum/wires/alarm/UpdateCut(var/index, var/mended)
 	var/obj/machinery/alarm/A = holder
 	switch(index)
 		if(AALARM_WIRE_IDSCAN)
@@ -66,7 +61,7 @@ var/global/const/AALARM_WIRE_AALARM = 16
 				A.post_alert(2)
 			A.update_icon()
 
-/datum/wires/alarm/UpdatePulsed(index)
+/datum/wires/alarm/UpdatePulsed(var/index)
 	var/obj/machinery/alarm/A = holder
 	switch(index)
 		if(AALARM_WIRE_IDSCAN)
@@ -112,3 +107,19 @@ var/global/const/AALARM_WIRE_AALARM = 16
 			if (A.alarm_area.atmosalert(0, A))
 				A.post_alert(0)
 			A.update_icon()
+
+/datum/wires/alarm/SolveWireFunction(var/function)
+	var/sf = ""
+	switch(function)
+		if(AALARM_WIRE_IDSCAN)
+			sf = "Port A"
+		if(AALARM_WIRE_POWER)
+			sf = "Port B"
+		if(AALARM_WIRE_SYPHON)
+			sf = "Port C"
+		if(AALARM_WIRE_AI_CONTROL)
+			sf = "Port D"
+		if(AALARM_WIRE_AALARM)
+			sf = "Port E"
+
+	return sf

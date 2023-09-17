@@ -1,20 +1,20 @@
 /obj/structure/closet/crate/secure/loot
 	name = "abandoned crate"
 	desc = "What could be inside?"
-	closet_appearance = /singleton/closet_appearance/crate/secure
+	icon_state = "secure_crate"
 	var/list/code = list()
 	var/list/lastattempt = list()
 	var/attempts = 10
-	var/codelen = 4
+	var/passwordlen = 4
 	locked = 1
 
 /obj/structure/closet/crate/secure/loot/New()
 	..()
 	var/list/digits = list("1", "2", "3", "4", "5", "6", "7", "8", "9", "0")
 
-	for(var/i in 1 to codelen)
+	for(var/i in 1 to passwordlen)
 		code += pick(digits)
-		digits -= code[length(code)]
+		digits -= code[code.len]
 
 	generate_loot()
 
@@ -36,9 +36,20 @@
 		if(16 to 20)
 			for(var/i = 0, i < 10, i++)
 				new/obj/item/ore/diamond(src)
-		if(21 to 25)
+		if(21 to 25) // INF, машина (/obj/machinery/portable_atmospherics/hydroponics) заменена комплектом "собери сам"
+			new/obj/item/stack/material/steel(src, 15)
+			new/obj/item/stack/cable_coil(src)
 			for(var/i = 0, i < 3, i++)
-				new/obj/machinery/portable_atmospherics/hydroponics(src)
+				new/obj/item/stock_parts/circuitboard/tray(src)
+				new/obj/item/stock_parts/matter_bin(src)
+				new/obj/item/stock_parts/matter_bin(src)
+				new/obj/item/reagent_containers/glass/beaker(src)
+				new/obj/item/weedkiller(src)
+				new/obj/item/pipe(src)
+				new/obj/item/pipe(src)
+				new/obj/item/stock_parts/console_screen(src)
+				new/obj/item/stock_parts/keyboard(src)
+				new/obj/item/stock_parts/power/apc/buildable(src)
 		if(26 to 30)
 			for(var/i = 0, i < 3, i++)
 				new/obj/item/reagent_containers/glass/beaker/noreact(src)
@@ -70,7 +81,8 @@
 		if(63 to 64)
 			var/t = rand(4,7)
 			for(var/i = 0, i < t, ++i)
-				new_simple_coin(src)
+				var/newcoin = pick(/obj/item/material/coin/silver, /obj/item/material/coin/silver, /obj/item/material/coin/silver, /obj/item/material/coin/iron, /obj/item/material/coin/iron, /obj/item/material/coin/iron, /obj/item/material/coin/gold, /obj/item/material/coin/diamond, /obj/item/material/coin/phoron, /obj/item/material/coin/uranium, /obj/item/material/coin/platinum)
+				new newcoin(src)
 		if(65 to 66)
 			new/obj/item/clothing/suit/ianshirt(src)
 		if(67 to 68)
@@ -141,72 +153,62 @@
 	if(!locked)
 		return
 
-	to_chat(user, SPAN_NOTICE("The crate is locked with a Deca-code lock."))
-	var/input = input(user, "Enter [codelen] digits.", "Deca-Code Lock", "") as text
+	to_chat(user, "<span class='notice'>The crate is locked with a Deca-code lock.</span>")
+	var/input = input(user, "Enter [passwordlen] digits.", "Deca-Code Lock", "") as text
 	if(!Adjacent(user))
 		return
 
-	if(input == null || length(input) != codelen)
-		to_chat(user, SPAN_NOTICE("You leave the crate alone."))
+	if(input == null || length(input) != passwordlen)
+		to_chat(user, "<span class='notice'>You leave the crate alone.</span>")
 	else if(check_input(input) && locked)
-		to_chat(user, SPAN_NOTICE("The crate unlocks!"))
+		to_chat(user, "<span class='notice'>The crate unlocks!</span>")
 		playsound(user, 'sound/machines/lockreset.ogg', 50, 1)
 		..()
 	else
-		visible_message(SPAN_WARNING("A red light on \the [src]'s control panel flashes briefly."))
+		visible_message("<span class='warning'>A red light on \the [src]'s control panel flashes briefly.</span>")
 		attempts--
 		if (attempts == 0)
-			to_chat(user, SPAN_DANGER("The crate's anti-tamper system activates!"))
+			to_chat(user, "<span class='danger'>The crate's anti-tamper system activates!</span>")
 			var/turf/T = get_turf(src.loc)
-			explosion(T, 1, EX_ACT_LIGHT)
+			explosion(T, 0, 0, 1, 2)
 			qdel(src)
 
-/obj/structure/closet/crate/secure/loot/emag_act(remaining_charges, mob/user)
+/obj/structure/closet/crate/secure/loot/emag_act(var/remaining_charges, var/mob/user)
 	if (locked)
-		to_chat(user, SPAN_NOTICE("The crate unlocks!"))
+		to_chat(user, "<span class='notice'>The crate unlocks!</span>")
 		locked = 0
 
-/obj/structure/closet/crate/secure/loot/proc/check_input(input)
-	if(length(input) != codelen)
+/obj/structure/closet/crate/secure/loot/proc/check_input(var/input)
+	if(length(input) != passwordlen)
 		return 0
 
 	. = 1
 	lastattempt.Cut()
-	for(var/i in 1 to codelen)
+	for(var/i in 1 to passwordlen)
 		var/guesschar = copytext(input, i, i+1)
 		lastattempt += guesschar
 		if(guesschar != code[i])
 			. = 0
 
+/obj/structure/closet/crate/secure/loot/attackby(obj/item/W as obj, mob/user as mob)
+	if(locked)
+		if (istype(W, /obj/item/device/multitool)) // Greetings Urist McProfessor, how about a nice game of cows and bulls?
+			to_chat(user, "<span class='notice'>DECA-CODE LOCK ANALYSIS:</span>")
+			if (attempts == 1)
+				to_chat(user, "<span class='warning'>* Anti-Tamper system will activate on the next failed access attempt.</span>")
+			else
+				to_chat(user, "<span class='notice'>* Anti-Tamper system will activate after [src.attempts] failed access attempts.</span>")
+			if(lastattempt.len)
+				var/bulls = 0
+				var/cows = 0
 
-/obj/structure/closet/crate/secure/loot/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Multitool - Check last code attempt
-	if (isMultitool(tool))
-		if (!locked)
-			USE_FEEDBACK_FAILURE("\The [src] is not locked.")
-			return TRUE
-		user.visible_message(
-			SPAN_NOTICE("\The [user] scans \the [src] with \a [tool]."),
-			SPAN_NOTICE("You scan \the [src] with \the [tool].")
-		)
-		var/data = "<h2>DECA-CODE LOCK ANALYSIS:</h2>"
-		if (attempts == 1)
-			data += "<p style='color: red; font-weight: bold;'>* Anti-Tamper system will activate on the next failed access attempt.</p>"
-		else
-			data += "<p>* Anti-Tamper system will activate after <b>[src.attempts]</b> failed access attempts.</p>"
-		if(length(lastattempt))
-			var/bulls = 0
-			var/cows = 0
-
-			var/list/code_contents = code.Copy()
-			for(var/i in 1 to codelen)
-				if(lastattempt[i] == code[i])
-					++bulls
-				else if(lastattempt[i] in code_contents)
-					++cows
-				code_contents -= lastattempt[i]
-			data += "<p>Last code attempt had [bulls] correct digits at correct positions and [cows] correct digits at incorrect positions.</p>"
-		show_browser(user, data, "window=[name]")
-		return
-
-	return ..()
+				var/list/code_contents = code.Copy()
+				for(var/i in 1 to passwordlen)
+					if(lastattempt[i] == code[i])
+						++bulls
+					else if(lastattempt[i] in code_contents)
+						++cows
+					code_contents -= lastattempt[i]
+				to_chat(user, "<span class='notice'>Last code attempt had [bulls] correct digits at correct positions and [cows] correct digits at incorrect positions.</span>")
+			return
+	..()

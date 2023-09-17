@@ -3,15 +3,15 @@
 	wire_count = 3
 	descriptions = list(
 		new /datum/wire_description(SUIT_STORAGE_WIRE_ELECTRIFY, "This wire seems to be carrying a heavy current."),
-		new /datum/wire_description(SUIT_STORAGE_WIRE_SAFETY, "This wire seems connected to a safety override", SKILL_EXPERIENCED),
+		new /datum/wire_description(SUIT_STORAGE_WIRE_SAFETY, "This wire seems connected to a safety override", SKILL_EXPERT),
 		new /datum/wire_description(SUIT_STORAGE_WIRE_LOCKED, "This wire is connected to the ID scanning panel.")
 	)
 
-var/global/const/SUIT_STORAGE_WIRE_ELECTRIFY	= 1
-var/global/const/SUIT_STORAGE_WIRE_SAFETY		= 2
-var/global/const/SUIT_STORAGE_WIRE_LOCKED		= 4
+var/const/SUIT_STORAGE_WIRE_ELECTRIFY	= 1
+var/const/SUIT_STORAGE_WIRE_SAFETY		= 2
+var/const/SUIT_STORAGE_WIRE_LOCKED		= 4
 
-/datum/wires/suit_storage_unit/CanUse(mob/living/L)
+/datum/wires/suit_storage_unit/CanUse(var/mob/living/L)
 	var/obj/machinery/suit_cycler/S = holder
 	if(!istype(L, /mob/living/silicon))
 		if(S.electrified)
@@ -28,7 +28,7 @@ var/global/const/SUIT_STORAGE_WIRE_LOCKED		= 4
 	. += "The red light is [S.safeties ? "off" : "blinking"].<BR>"
 	. += "The yellow light is [S.locked ? "on" : "off"].<BR>"
 
-/datum/wires/suit_storage_unit/UpdatePulsed(index)
+/datum/wires/suit_storage_unit/UpdatePulsed(var/index)
 	var/obj/machinery/suit_cycler/S = holder
 	switch(index)
 		if(SUIT_STORAGE_WIRE_SAFETY)
@@ -38,7 +38,7 @@ var/global/const/SUIT_STORAGE_WIRE_LOCKED		= 4
 		if(SUIT_STORAGE_WIRE_LOCKED)
 			S.locked = !S.locked
 
-/datum/wires/suit_storage_unit/UpdateCut(index, mended)
+/datum/wires/suit_storage_unit/UpdateCut(var/index, var/mended)
 	var/obj/machinery/suit_cycler/S = holder
 	switch(index)
 		if(SUIT_STORAGE_WIRE_SAFETY)
@@ -50,3 +50,14 @@ var/global/const/SUIT_STORAGE_WIRE_LOCKED		= 4
 				S.electrified = 0
 			else
 				S.electrified = -1
+
+/datum/wires/suit_storage_unit/SolveWireFunction(var/function)
+	var/sf = ""
+	switch(function)
+		if(SUIT_STORAGE_WIRE_ELECTRIFY)
+			sf = "Port A"
+		if(SUIT_STORAGE_WIRE_SAFETY)
+			sf = "Port B"
+		if(SUIT_STORAGE_WIRE_LOCKED)
+			sf = "Port C"
+	return sf

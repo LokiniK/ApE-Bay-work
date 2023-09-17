@@ -1,8 +1,8 @@
 //CORTICAL BORER ORGANS.
 /obj/item/organ/internal/borer
 	name = "cortical borer"
-	icon = 'icons/mob/simple_animal/animal.dmi'
-	icon_state = "brainslug"
+	icon = 'icons/obj/objects.dmi'
+	icon_state = "borer"
 	organ_tag = BP_BRAIN
 	desc = "A disgusting space slug."
 	parent_organ = BP_HEAD
@@ -32,7 +32,7 @@
 			goo.basecolor = "#412464"
 			goo.update_icon()
 
-/obj/item/organ/internal/borer/removed(mob/living/user)
+/obj/item/organ/internal/borer/removed(var/mob/living/user)
 
 	..()
 

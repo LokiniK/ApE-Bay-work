@@ -1,4 +1,7 @@
-/mob/living/carbon/Initialize(mapload)
+/mob/living/carbon
+	var/list/guards = list()
+
+/mob/living/carbon/New()
 	//setup reagent holders
 	bloodstr = new/datum/reagents/metabolism(120, src, CHEM_BLOOD)
 	touching = new/datum/reagents/metabolism(1000, src, CHEM_TOUCH)
@@ -6,8 +9,7 @@
 
 	if (!default_language && species_language)
 		default_language = all_languages[species_language]
-	. = ..()
-
+	..()
 
 /mob/living/carbon/Destroy()
 	QDEL_NULL(touching)
@@ -54,11 +56,11 @@
 	if(germ_level < GERM_LEVEL_MOVE_CAP && prob(8))
 		germ_level++
 
-/mob/living/carbon/relaymove(mob/living/user, direction)
+/mob/living/carbon/relaymove(var/mob/living/user, direction)
 	if((user in contents) && istype(user))
 		if(user.last_special <= world.time)
 			user.last_special = world.time + 50
-			src.visible_message(SPAN_DANGER("You hear something rumbling inside [src]'s stomach..."))
+			src.visible_message("<span class='danger'>You hear something rumbling inside [src]'s stomach...</span>")
 			var/obj/item/I = user.get_active_hand()
 			if(I && I.force)
 				var/d = rand(round(I.force / 4), I.force)
@@ -70,7 +72,7 @@
 					H.updatehealth()
 				else
 					src.take_organ_damage(d, 0)
-				user.visible_message(SPAN_DANGER("[user] attacks [src]'s stomach wall with the [I.name]!"))
+				user.visible_message("<span class='danger'>[user] attacks [src]'s stomach wall with the [I.name]!</span>")
 				playsound(user.loc, 'sound/effects/attackblob.ogg', 50, 1)
 
 				if(prob(src.getBruteLoss() - 50))
@@ -92,15 +94,19 @@
 	if (ishuman(M))
 		var/mob/living/carbon/human/H = M
 		var/obj/item/organ/external/temp = H.organs_by_name[BP_R_HAND]
+			
+		if(guards && !(M.a_intent == I_HELP))
+			for(var/mob/living/simple_animal/hostile/commanded/guard in (guards & hearers(src,10)))
+				guard.hunt_on(H)
+
 		if (H.hand)
 			temp = H.organs_by_name[BP_L_HAND]
 		if(temp && !temp.is_usable())
-			to_chat(H, SPAN_WARNING("You can't use your [temp.name]"))
+			to_chat(H, "<span class='warning'>You can't use your [temp.name]</span>")
 			return
-
 	return
 
-/mob/living/carbon/electrocute_act(shock_damage, obj/source, siemens_coeff = 1.0, def_zone = null)
+/mob/living/carbon/electrocute_act(var/shock_damage, var/obj/source, var/siemens_coeff = 1.0, var/def_zone = null)
 	if(status_flags & GODMODE)	return 0	//godmode
 
 	shock_damage = apply_shock(shock_damage, def_zone, siemens_coeff)
@@ -113,15 +119,15 @@
 	playsound(loc, "sparks", 50, 1, -1)
 	if (shock_damage > 15)
 		src.visible_message(
-			SPAN_WARNING("[src] was electrocuted[source ? " by the [source]" : ""]!"), \
-			SPAN_DANGER("You feel a powerful shock course through your body!"), \
-			SPAN_WARNING("You hear a heavy electrical crack.") \
+			"<span class='warning'>[src] was electrocuted[source ? " by the [source]" : ""]!</span>", \
+			"<span class='danger'>You feel a powerful shock course through your body!</span>", \
+			"<span class='warning'>You hear a heavy electrical crack.</span>" \
 		)
 	else
 		src.visible_message(
-			SPAN_WARNING("[src] was shocked[source ? " by the [source]" : ""]."), \
-			SPAN_WARNING("You feel a shock course through your body."), \
-			SPAN_WARNING("You hear a zapping sound.") \
+			"<span class='warning'>[src] was shocked[source ? " by the [source]" : ""].</span>", \
+			"<span class='warning'>You feel a shock course through your body.</span>", \
+			"<span class='warning'>You hear a zapping sound.</span>" \
 		)
 
 	switch(shock_damage)
@@ -144,21 +150,20 @@
 
 	return shock_damage
 
-/mob/living/carbon/proc/apply_shock(shock_damage, def_zone, siemens_coeff = 1.0)
+/mob/living/carbon/proc/apply_shock(var/shock_damage, var/def_zone, var/siemens_coeff = 1.0)
 	shock_damage *= siemens_coeff
 	if(shock_damage < 0.5)
 		return 0
 	if(shock_damage < 1)
 		shock_damage = 1
-	apply_damage(shock_damage, DAMAGE_BURN, def_zone, used_weapon="Electrocution")
+	apply_damage(shock_damage, BURN, def_zone, used_weapon="Electrocution")
 	return(shock_damage)
 
-
 /mob/proc/swap_hand()
-	GLOB.hands_swapped_event.raise_event(src)
-
+	return
 
 /mob/living/carbon/swap_hand()
+	. = ..()
 	hand = !hand
 	if(hud_used.l_hand_hud_object && hud_used.r_hand_hud_object)
 		if(hand)	//This being 1 means the left hand is in use
@@ -171,7 +176,7 @@
 	if(istype(I))
 		I.on_active_hand(src)
 
-/mob/living/carbon/proc/activate_hand(selhand) //0 or "r" or "right" for right hand; 1 or "l" or "left" for left hand.
+/mob/living/carbon/proc/activate_hand(var/selhand) //0 or "r" or "right" for right hand; 1 or "l" or "left" for left hand.
 
 	if(istext(selhand))
 		selhand = lowertext(selhand)
@@ -185,32 +190,36 @@
 		swap_hand()
 
 /mob/living/carbon/proc/help_shake_act(mob/living/carbon/M)
-	var/datum/pronouns/P = src.choose_from_pronouns()
 	if(!is_asystole())
 		if (on_fire)
 			playsound(src.loc, 'sound/weapons/thudswoosh.ogg', 50, 1, -1)
 			if (M.on_fire)
-				M.visible_message(SPAN_WARNING("[M] tries to pat out [src]'s flames, but to no avail!"),
-				SPAN_WARNING("You try to pat out [src]'s flames, but to no avail! Put yourself out first!"))
+				M.visible_message("<span class='warning'>[M] tries to pat out [src]'s flames, but to no avail!</span>",
+				"<span class='warning'>You try to pat out [src]'s flames, but to no avail! Put yourself out first!</span>")
 			else
-				M.visible_message(SPAN_WARNING("[M] tries to pat out [src]'s flames!"),
-				SPAN_WARNING("You try to pat out [src]'s flames! Hot!"))
-				if(do_after(M, 1.5 SECONDS, src, DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
+				M.visible_message("<span class='warning'>[M] tries to pat out [src]'s flames!</span>",
+				"<span class='warning'>You try to pat out [src]'s flames! Hot!</span>")
+				if(do_after(M, 1.5 SECONDS, src))
 					src.fire_stacks -= 0.5
 					if (prob(10) && (M.fire_stacks <= 0))
 						M.fire_stacks += 1
 					M.IgniteMob()
 					if (M.on_fire)
-						M.visible_message(SPAN_DANGER("The fire spreads from [src] to [M]!"),
-						SPAN_DANGER("The fire spreads to you as well!"))
+						M.visible_message("<span class='danger'>The fire spreads from [src] to [M]!</span>",
+						"<span class='danger'>The fire spreads to you as well!</span>")
 					else
 						src.fire_stacks -= 0.5 //Less effective than stop, drop, and roll - also accounting for the fact that it takes half as long.
 						if (src.fire_stacks <= 0)
-							M.visible_message(SPAN_WARNING("[M] successfully pats out [src]'s flames."),
-							SPAN_WARNING("You successfully pat out [src]'s flames."))
+							M.visible_message("<span class='warning'>[M] successfully pats out [src]'s flames.</span>",
+							"<span class='warning'>You successfully pat out [src]'s flames.</span>")
 							src.ExtinguishMob()
 							src.fire_stacks = 0
 		else
+			var/t_him = "it"
+			if (src.gender == MALE)
+				t_him = "him"
+			else if (src.gender == FEMALE)
+				t_him = "her"
 			if (istype(src,/mob/living/carbon/human) && src:w_uniform)
 				var/mob/living/carbon/human/H = src
 				H.w_uniform.add_fingerprint(M)
@@ -219,20 +228,20 @@
 			var/mob/living/carbon/human/H = src
 			if(istype(H)) show_ssd = H.species.show_ssd
 			if(show_ssd && ssd_check())
-				M.visible_message(SPAN_NOTICE("[M] shakes [src] trying to wake [P.him] up!"), \
-				SPAN_NOTICE("You shake [src], but they do not respond... Maybe they have S.S.D?"))
+				M.visible_message("<span class='notice'>[M] shakes [src] trying to wake [t_him] up!</span>", \
+				"<span class='notice'>You shake [src], but they do not respond... Maybe they have S.S.D?</span>")
 			else if(lying || src.sleeping || player_triggered_sleeping)
 				src.player_triggered_sleeping = 0
 				src.sleeping = max(0,src.sleeping - 5)
-				M.visible_message(SPAN_NOTICE("[M] shakes [src] trying to wake [P.him] up!"), \
-									SPAN_NOTICE("You shake [src] trying to wake [P.him] up!"))
+				M.visible_message("<span class='notice'>[M] shakes [src] trying to wake [t_him] up!</span>", \
+									"<span class='notice'>You shake [src] trying to wake [t_him] up!</span>")
 			else
 				var/mob/living/carbon/human/hugger = M
 				if(istype(hugger))
 					hugger.species.hug(hugger,src)
 				else
-					M.visible_message(SPAN_NOTICE("[M] hugs [src] to make [P.him] feel better!"), \
-								SPAN_NOTICE("You hug [src] to make [P.him] feel better!"))
+					M.visible_message("<span class='notice'>[M] hugs [src] to make [t_him] feel better!</span>", \
+								"<span class='notice'>You hug [src] to make [t_him] feel better!</span>")
 				if(M.fire_stacks >= (src.fire_stacks + 3))
 					src.fire_stacks += 1
 					M.fire_stacks -= 1
@@ -256,7 +265,7 @@
 /mob/living/carbon/proc/getDNA()
 	return dna
 
-/mob/living/carbon/proc/setDNA(datum/dna/newDNA)
+/mob/living/carbon/proc/setDNA(var/datum/dna/newDNA)
 	dna = newDNA
 
 // ++++ROCKDTBEN++++ MOB PROCS //END
@@ -266,11 +275,6 @@
 	return
 
 /mob/living/carbon/throw_item(atom/target)
-	if (istype(loc, /obj/item/holder))
-		var/obj/item/holder/H = loc
-		if (istype(H.loc, /obj/item/organ/internal/stomach))
-			return
-
 	src.throw_mode_off()
 	if(src.stat || !target)
 		return
@@ -294,11 +298,11 @@
 			var/turf/start_T = get_turf(loc) //Get the start and target tile for the descriptors
 			var/turf/end_T = get_turf(target)
 			if(start_T && end_T && usr == src)
-				var/start_T_descriptor = SPAN_COLOR("#6b5d00", "[start_T] \[[start_T.x],[start_T.y],[start_T.z]\] ([start_T.loc])")
-				var/end_T_descriptor = SPAN_COLOR("#6b4400", "[start_T] \[[end_T.x],[end_T.y],[end_T.z]\] ([end_T.loc])")
+				var/start_T_descriptor = "<font color='#6b5d00'>[start_T] \[[start_T.x],[start_T.y],[start_T.z]\] ([start_T.loc])</font>"
+				var/end_T_descriptor = "<font color='#6b4400'>[start_T] \[[end_T.x],[end_T.y],[end_T.z]\] ([end_T.loc])</font>"
 				admin_attack_log(usr, M, "Threw the victim from [start_T_descriptor] to [end_T_descriptor].", "Was from [start_T_descriptor] to [end_T_descriptor].", "threw, from [start_T_descriptor] to [end_T_descriptor], ")
 
-	else if (istype(item, /obj/item))
+	else if (istype(item, /obj/item/))
 		var/obj/item/I = item
 		itemsize = I.w_class
 
@@ -320,21 +324,23 @@
 	throw_range *= skill_mod
 
 	//actually throw it!
-	src.visible_message(SPAN_WARNING("[message]"), range = min(itemsize*2,world.view))
+	src.visible_message("<span class='warning'>[message]</span>", range = min(itemsize*2,world.view))
 
 	if(!src.lastarea)
 		src.lastarea = get_area(src.loc)
-	if(!check_space_footing())
+	if((istype(src.loc, /turf/space)) || (src.lastarea.has_gravity == 0))
 		if(prob((itemsize * itemsize * 10) * MOB_MEDIUM/src.mob_size))
-			var/direction = get_dir(target, src)
-			step(src,direction)
-			space_drift(direction)
+			src.inertia_dir = get_dir(target, src)
+			step(src, inertia_dir)
 
 	item.throw_at(target, throw_range, item.throw_speed * skill_mod, src)
 
+	//[INF]
+	playsound(src, 'infinity/sound/effects/throw.ogg', 50, 1)
+	attack_twitch(src)
+	//[/INF]
+
 /mob/living/carbon/fire_act(datum/gas_mixture/air, exposed_temperature, exposed_volume)
-	if (status_flags & GODMODE)
-		return
 	..()
 	var/temp_inc = max(min(BODYTEMP_HEATING_MAX*(1-get_heat_protection()), exposed_temperature - bodytemperature), 0)
 	bodytemperature += temp_inc
@@ -360,7 +366,7 @@
 		if(buckled && buckled.buckle_require_restraints)
 			buckled.unbuckle_mob()
 	else
-		..()
+	 ..()
 
 	return
 
@@ -371,31 +377,30 @@
 	if(alert("Are you sure you want to [player_triggered_sleeping ? "wake up?" : "sleep for a while? Use 'sleep' again to wake up"]", "Sleep", "No", "Yes") == "Yes")
 		player_triggered_sleeping = !player_triggered_sleeping
 
-/mob/living/carbon/Bump(atom/movable/AM, yes)
+/mob/living/carbon/Bump(var/atom/movable/AM, yes)
 	if(now_pushing || !yes)
 		return
 	..()
 
 /mob/living/carbon/slip(slipped_on, stun_duration = 8)
-	if(!has_gravity())
+	var/area/A = get_area(src)
+	if(!A.has_gravity())
 		return FALSE
-
 	if(buckled)
 		return FALSE
-
 	stop_pulling()
 	to_chat(src, SPAN_WARNING("You slipped on [slipped_on]!"))
 	playsound(loc, 'sound/misc/slip.ogg', 50, 1, -3)
-	Weaken(floor(stun_duration/2))
+	Weaken(Floor(stun_duration/2))
 	return TRUE
 
-/mob/living/carbon/proc/add_chemical_effect(effect, magnitude = 1)
+/mob/living/carbon/proc/add_chemical_effect(var/effect, var/magnitude = 1)
 	if(effect in chem_effects)
 		chem_effects[effect] += magnitude
 	else
 		chem_effects[effect] = magnitude
 
-/mob/living/carbon/proc/add_up_to_chemical_effect(effect, magnitude = 1)
+/mob/living/carbon/proc/add_up_to_chemical_effect(var/effect, var/magnitude = 1)
 	if(effect in chem_effects)
 		chem_effects[effect] = max(magnitude, chem_effects[effect])
 	else
@@ -419,7 +424,7 @@
 /mob/living/carbon/show_inv(mob/user as mob)
 	user.set_machine(src)
 	var/dat = {"
-	<B><HR>[FONT_LARGE(name)]</B>
+	<B><HR><FONT size=3>[name]</FONT></B>
 	<BR><HR>
 	<BR><B>Head(Mask):</B> <A href='?src=\ref[src];item=mask'>[(wear_mask ? wear_mask : "Nothing")]</A>
 	<BR><B>Left Hand:</B> <A href='?src=\ref[src];item=l_hand'>[(l_hand ? l_hand  : "Nothing")]</A>
@@ -440,10 +445,10 @@
 /mob/living/carbon/proc/can_devour(atom/movable/victim)
 	return FALSE
 
-/mob/living/carbon/proc/should_have_organ(organ_check)
+/mob/living/carbon/proc/should_have_organ(var/organ_check)
 	return 0
 
-/mob/living/carbon/proc/can_feel_pain(check_organ)
+/mob/living/carbon/proc/can_feel_pain(var/check_organ)
 	if(isSynthetic())
 		return 0
 	return !(species && species.species_flags & SPECIES_FLAG_NO_PAIN)
@@ -464,7 +469,7 @@
 	// overridden in human_defense.dm
 	return null
 
-/mob/living/carbon/proc/SetStasis(factor, source = "misc")
+/mob/living/carbon/proc/SetStasis(var/factor, var/source = "misc")
 	if((species && (species.species_flags & SPECIES_FLAG_NO_SCAN)) || isSynthetic())
 		return
 	stasis_sources[source] = factor
@@ -492,16 +497,16 @@
 /mob/living/carbon/proc/get_ingested_reagents()
 	return reagents
 
-/mob/living/carbon/proc/set_nutrition(amt)
-	nutrition = clamp(amt, 0, initial(nutrition))
+/mob/living/carbon/proc/set_nutrition(var/amt)
+	nutrition = Clamp(amt, 0, initial(nutrition))
 
-/mob/living/carbon/proc/adjust_nutrition(amt)
+/mob/living/carbon/proc/adjust_nutrition(var/amt)
 	set_nutrition(nutrition + amt)
 
-/mob/living/carbon/proc/set_hydration(amt)
-	hydration = clamp(amt, 0, initial(hydration))
+/mob/living/carbon/proc/set_hydration(var/amt)
+	hydration = Clamp(amt, 0, initial(hydration))
 
-/mob/living/carbon/proc/adjust_hydration(amt)
+/mob/living/carbon/proc/adjust_hydration(var/amt)
 	set_hydration(hydration + amt)
 
 /mob/living/carbon/proc/set_internals(obj/item/tank/source, source_string)
@@ -512,12 +517,9 @@
 	if(!old_internal && internal)
 		if(!source_string)
 			source_string = source.name
-		to_chat(src, SPAN_NOTICE("You are now running on internals from \the [source_string]."))
+		to_chat(src, "<span class='notice'>You are now running on internals from \the [source_string].</span>")
 		playsound(src, 'sound/effects/internals.ogg', 50, 0)
 	if(old_internal && !internal)
-		to_chat(src, SPAN_WARNING("You are no longer running on internals."))
+		to_chat(src, "<span class='warning'>You are no longer running on internals.</span>")
 	if(internals)
 		internals.icon_state = "internal[!!internal]"
-
-/mob/living/carbon/proc/vomit(timevomit = 1, level = 3, delay = 0)
-	return

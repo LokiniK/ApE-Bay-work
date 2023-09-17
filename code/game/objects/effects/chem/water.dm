@@ -9,7 +9,10 @@
 	..()
 	QDEL_IN(src, 15 SECONDS) // In case whatever made it forgets to delete it
 
-/obj/effect/effect/water/proc/set_up(turf/target, step_count = 5, delay = 5)
+/obj/effect/effect/water/set_color() // Call it after you move reagents to it
+	icon += reagents.get_color()
+
+/obj/effect/effect/water/proc/set_up(var/turf/target, var/step_count = 5, var/delay = 5)
 	set waitfor = FALSE
 	if(!target)
 		return
@@ -31,14 +34,14 @@
 			//each step splash 1/5 of the reagents on non-mobs
 			//could determine the # of steps until target, but that would be complicated
 			for(var/atom/A in splash_others)
-				reagents.splash(A, (reagents.total_volume/step_count)/length(splash_others))
+				reagents.splash(A, (reagents.total_volume/step_count)/splash_others.len)
 			for(var/mob/living/M in splash_mobs)
-				reagents.splash(M, reagents.total_volume/length(splash_mobs))
+				reagents.splash(M, reagents.total_volume/splash_mobs.len)
 			if(reagents.total_volume < 1)
 				break
 			if(T == get_turf(target))
 				for(var/atom/A in splash_others)
-					reagents.splash(A, reagents.total_volume/length(splash_others)) //splash anything left
+					reagents.splash(A, reagents.total_volume/splash_others.len) //splash anything left
 				break
 
 		sleep(delay)
@@ -60,7 +63,3 @@
 	name = "chemicals"
 	icon = 'icons/obj/chempuff.dmi'
 	icon_state = ""
-
-/obj/effect/effect/water/chempuff/on_reagent_change(max_vol)
-	if (reagents)
-		set_color(reagents.get_color())

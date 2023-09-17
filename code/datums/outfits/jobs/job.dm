@@ -1,6 +1,6 @@
-/singleton/hierarchy/outfit/job
+/decl/hierarchy/outfit/job
 	name = "Standard Gear"
-	hierarchy_type = /singleton/hierarchy/outfit/job
+	hierarchy_type = /decl/hierarchy/outfit/job
 
 	uniform = /obj/item/clothing/under/color/grey
 	l_ear = /obj/item/device/radio/headset

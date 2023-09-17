@@ -22,24 +22,24 @@
 	icon = 'icons/obj/playing_cards.dmi'
 	var/list/cards = list()
 
-/obj/item/deck/inherit_custom_item_data(datum/custom_item/citem)
+/obj/item/deck/inherit_custom_item_data(var/datum/custom_item/citem)
 	. = ..()
 	if(islist(citem.additional_data["extra_cards"]))
-		for(var/card_singleton in citem.additional_data["extra_cards"])
-			if(islist(card_singleton))
+		for(var/card_decl in citem.additional_data["extra_cards"])
+			if(islist(card_decl))
 				var/datum/playingcard/custom/P = new()
-				if(!isnull(card_singleton["name"]))
-					P.name = card_singleton["name"]
-				if(!isnull(card_singleton["card_icon"]))
-					P.card_icon = card_singleton["card_icon"]
-				if(!isnull(card_singleton["back_icon"]))
-					P.back_icon = card_singleton["back_icon"]
-				if(!isnull(card_singleton["desc"]))
-					P.desc = card_singleton["desc"]
-				if(!isnull(card_singleton["use_custom_front"]))
-					P.use_custom_front = card_singleton["use_custom_front"]
-				if(!isnull(card_singleton["use_custom_back"]))
-					P.use_custom_back = card_singleton["use_custom_back"]
+				if(!isnull(card_decl["name"]))
+					P.name = card_decl["name"]
+				if(!isnull(card_decl["card_icon"]))
+					P.card_icon = card_decl["card_icon"]
+				if(!isnull(card_decl["back_icon"]))
+					P.back_icon = card_decl["back_icon"]
+				if(!isnull(card_decl["desc"]))
+					P.desc = card_decl["desc"]
+				if(!isnull(card_decl["use_custom_front"]))
+					P.use_custom_front = card_decl["use_custom_front"]
+				if(!isnull(card_decl["use_custom_back"]))
+					P.use_custom_back = card_decl["use_custom_back"]
 				cards += P
 
 /obj/item/deck/holder
@@ -87,6 +87,11 @@
 
 /obj/item/deck/attackby(obj/O, mob/user)
 	if(istype(O,/obj/item/hand))
+//[INF]
+		if(user.a_intent != I_HURT)
+			to_chat(user, SPAN_WARNING("You can do it only at harm intent!"))
+			return
+//[/INF]
 		var/obj/item/hand/H = O
 		for(var/datum/playingcard/P in H.cards)
 			cards += P
@@ -109,12 +114,16 @@
 
 	var/mob/living/carbon/user = usr
 
-	if(!length(cards))
+	if(!cards.len)
 		to_chat(usr, "There are no cards in the deck.")
 		return
 
-	var/obj/item/hand/H = user.IsHolding(/obj/item/hand)
-	if (!H)
+	var/obj/item/hand/H
+	if(user.l_hand && istype(user.l_hand,/obj/item/hand))
+		H = user.l_hand
+	else if(user.r_hand && istype(user.r_hand,/obj/item/hand))
+		H = user.r_hand
+	else
 		H = new(get_turf(src))
 		user.put_in_hands(H)
 
@@ -124,8 +133,10 @@
 	H.cards += P
 	cards -= P
 	H.update_icon()
+	H.name = "hand of [(H.cards.len)] cards" //INF
 	user.visible_message("\The [user] draws a card.")
-	to_chat(user, "It's the [P].")
+//ORIG	to_chat(user, "It's the [P].")
+	to_chat(user, "It's the <b>[P]</b>.") //INF
 
 /obj/item/deck/verb/deal_card()
 
@@ -136,7 +147,7 @@
 
 	if(usr.stat || !Adjacent(usr)) return
 
-	if(!length(cards))
+	if(!cards.len)
 		to_chat(usr, "There are no cards in the deck.")
 		return
 
@@ -151,9 +162,9 @@
 
 	deal_at(usr, M)
 
-/obj/item/deck/proc/deal_at(mob/user, mob/target)
+/obj/item/deck/proc/deal_at(mob/user, atom/target) //INF, WAS mob/user, mob/target
 	var/obj/item/hand/H = new(get_step(user, user.dir))
-
+	user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN / 2) //INF
 	H.cards += cards[1]
 	cards -= cards[1]
 	H.concealed = 1
@@ -162,7 +173,13 @@
 		user.visible_message("\The [user] deals a card to \himself.")
 	else
 		user.visible_message("\The [user] deals a card to \the [target].")
-	H.throw_at(get_step(target,target.dir),10,1,user)
+//ORIG	H.throw_at(get_step(target,target.dir),10,1,user)
+//[INF]
+	if(ismob(target))
+		H.throw_at(get_step(target,target.dir),10,1,user)
+	else
+		H.throw_at(get_turf(target),10,1,user)
+//[/INF]
 
 /obj/item/hand/attackby(obj/O, mob/user)
 	if(istype(O,/obj/item/hand))
@@ -172,25 +189,45 @@
 		H.concealed = src.concealed
 		qdel(src)
 		H.update_icon()
+		H.name = "hand of [(H.cards.len)] cards" //INF
 		return
 	..()
 
-/obj/item/deck/attack_self(mob/user)
+/obj/item/deck/attack_self(var/mob/user)
 
 	cards = shuffle(cards)
 	user.visible_message("\The [user] shuffles [src].")
 
 /obj/item/deck/MouseDrop(atom/over)
+//[INF]
+	if(over == usr && !usr.restrained() && !usr.stat && (list_find(usr.contents, src) || in_range(src, usr)))
+		if(ishuman(over))
+			if(!usr.get_active_hand())		//if active hand is empty
+				var/mob/living/carbon/human/H = over
+				var/obj/item/organ/external/temp = H.organs_by_name[BP_R_HAND]
+
+				if(H.hand)
+					temp = H.organs_by_name[BP_L_HAND]
+				if(temp && !temp.is_usable())
+					to_chat(over, "<span class='notice'>You try to move your [temp.name], but cannot!</span>")
+					return
+
+				to_chat(over, "<span class='notice'>You pick up the [src].</span>")
+				usr.put_in_hands(src)
+	return
+//[/INF]
+/*[ORIG]
 	if(!usr || !over) return
 	if(!Adjacent(usr) || !over.Adjacent(usr)) return // should stop you from dragging through windows
 
 	if(!ishuman(over) || !(over in viewers(3))) return
 
-	if(!length(cards))
+	if(!cards.len)
 		to_chat(usr, "There are no cards in the deck.")
 		return
 
 	deal_at(usr, over)
+[/ORIG]*/
 
 /obj/item/pack
 	name = "card pack"
@@ -208,7 +245,7 @@
 /obj/item/pack/proc/SetupCards()
 	return
 
-/obj/item/pack/attack_self(mob/user)
+/obj/item/pack/attack_self(var/mob/user)
 	user.visible_message("[user] rips open \the [src]!")
 	var/obj/item/hand/H = new()
 
@@ -229,7 +266,7 @@
 	var/concealed = 0
 	var/list/datum/playingcard/cards = list()
 
-/obj/item/hand/attack_self(mob/user)
+/obj/item/hand/attack_self(var/mob/user)
 	concealed = !concealed
 	update_icon()
 	user.visible_message("\The [user] [concealed ? "conceals" : "reveals"] their hand.")
@@ -242,7 +279,7 @@
 			to_discard[P.name] = P
 		var/discarding = null
 		//don't prompt if only 1 card
-		if(length(to_discard) == 1)
+		if(to_discard.len == 1)
 			discarding = to_discard[1]
 		else
 			discarding = input(user, "Which card do you wish to take?") as null|anything in to_discard
@@ -256,7 +293,7 @@
 		new_hand.update_icon()
 		src.update_icon()
 
-		if(!length(cards))
+		if(!cards.len)
 			qdel(src)
 
 		user.put_in_hands(new_hand)
@@ -265,16 +302,16 @@
 
 /obj/item/hand/examine(mob/user)
 	. = ..()
-	if((!concealed || src.loc == user) && length(cards))
+	if((!concealed || src.loc == user) && cards.len)
 		to_chat(user, "It contains: ")
 		for(var/datum/playingcard/P in cards)
 			to_chat(user, "The [P.name].")
 
-/obj/item/hand/on_update_icon(direction = 0)
-	if(!length(cards))
+/obj/item/hand/on_update_icon(var/direction = 0)
+	if(!cards.len)
 		qdel(src)
 		return
-	else if(length(cards) > 1)
+	else if(cards.len > 1)
 		name = "hand of cards"
 		desc = "Some playing cards."
 	else if(concealed)
@@ -287,7 +324,7 @@
 
 	overlays.Cut()
 
-	if(length(cards) == 1)
+	if(cards.len == 1)
 		var/datum/playingcard/P = cards[1]
 		var/image/I = P.card_image(concealed, src.icon)
 		I.pixel_x += (-5+rand(10))
@@ -295,13 +332,21 @@
 		overlays += I
 		return
 
-	var/offset = floor(20/length(cards))
+	var/offset = Floor(20/cards.len)
+
 	var/matrix/M = matrix()
-	M.Update(
-		rotation = (direction & EAST|WEST) ? 90 : 0,
-		offset_x = (direction == EAST) ? -2 : (direction == WEST) ? 3 : 0,
-		offset_y = direction == SOUTH ? 4 : 0
-	)
+	if(direction)
+		switch(direction)
+			if(NORTH)
+				M.Translate( 0,  0)
+			if(SOUTH)
+				M.Translate( 0,  4)
+			if(WEST)
+				M.Turn(90)
+				M.Translate( 3,  0)
+			if(EAST)
+				M.Turn(90)
+				M.Translate(-2,  0)
 	var/i = 0
 	for(var/datum/playingcard/P in cards)
 		var/image/I = P.card_image(concealed, src.icon)
@@ -315,7 +360,7 @@
 				I.pixel_y = 8-(offset*i)
 			else
 				I.pixel_x = -7+(offset*i)
-		I.SetTransform(others = M)
+		I.transform = M
 		overlays += I
 		i++
 
@@ -340,7 +385,7 @@
 		if(isturf(D.loc))		//Decks hiding in inventories are safe. Respect the sanctity of loadout items.
 			deck_list += D
 
-	if(length(deck_list))
+	if(deck_list.len)
 		var/obj/item/deck/the_deck = pick(deck_list)
 		var/datum/playingcard/the_card = length(the_deck.cards) ? pick(the_deck.cards) : null
 

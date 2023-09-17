@@ -25,7 +25,6 @@
 		melee = ARMOR_MELEE_SMALL
 		)
 	flags_inv = (HIDEMASK|HIDEEARS|HIDEEYES|HIDEFACE)
-	item_flags = null
 	body_parts_covered = HEAD|FACE|EYES
 	action_button_name = "Flip Welding Mask"
 	siemens_coefficient = 0.9
@@ -33,6 +32,12 @@
 	var/base_state
 	flash_protection = FLASH_PROTECTION_MAJOR
 	tint = TINT_HEAVY
+	sprite_sheets = list(
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_head_resomi.dmi',
+		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/head.dmi',
+		SPECIES_TAJARA = 'icons/mob/species/tajaran/helmet.dmi',
+		SPECIES_EROSAN = 'infinity/icons/mob/species/erosan/helmet.dmi',
+		)
 
 /obj/item/clothing/head/welding/attack_self()
 	if(!base_state)
@@ -119,7 +124,6 @@
 	item_state = "cake0"
 	var/onfire = 0
 	body_parts_covered = HEAD
-	item_flags = null
 
 /obj/item/clothing/head/cakehat/Process()
 	if(!onfire)
@@ -127,9 +131,9 @@
 		return
 
 	var/turf/location = src.loc
-	if(ismob(location))
+	if(istype(location, /mob/))
 		var/mob/living/carbon/human/M = location
-		if(M.IsHolding(src) || M.head == src)
+		if(M.l_hand == src || M.r_hand == src || M.head == src)
 			location = M.loc
 
 	if (istype(location, /turf))
@@ -139,13 +143,13 @@
 	src.onfire = !( src.onfire )
 	if (src.onfire)
 		src.force = 3
-		src.damtype = DAMAGE_BURN
+		src.damtype = "fire"
 		src.icon_state = "cake1"
 		src.item_state = "cake1"
 		START_PROCESSING(SSobj, src)
 	else
 		src.force = null
-		src.damtype = DAMAGE_BRUTE
+		src.damtype = "brute"
 		src.icon_state = "cake0"
 		src.item_state = "cake0"
 	return
@@ -177,6 +181,28 @@
 	icon_state = "tccushankadown"
 	icon_state_up = "tccushankaup"
 
+
+
+/obj/item/clothing/head/cap/desert
+    name = "Suncap"
+    desc = "A big suncap designed for use in the desert. Unathi use it to withstand scorhing heat rays when \"Burning Mother\" at it's zenith, something that their heads cannot handle. This one features foldable flaps to keep back of the neck protected. It's too big to fit anyone, but unathi."
+    icon_state = "unathi_suncap"
+    item_state = "unathi_suncap"
+    flags_inv = HIDEEARS|BLOCKHEADHAIR
+    var/icon_state_up = "unathi_suncap_u"
+    species_restricted  = list(SPECIES_UNATHI)
+    body_parts_covered = HEAD
+
+/obj/item/clothing/head/cap/desert/attack_self(mob/user as mob)
+    if(icon_state == initial(icon_state))
+        icon_state = icon_state_up
+        item_state = icon_state_up
+        to_chat(user, "You raise the ear flaps on the Suncap.")
+    else
+        icon_state = initial(icon_state)
+        item_state = initial(icon_state)
+        to_chat(user, "You lower the ear flaps on the Suncap.")
+
 /*
  * Pumpkin head
  */
@@ -185,7 +211,6 @@
 	desc = "A jack o' lantern! Believed to ward off evil spirits."
 	icon_state = "hardhat0_pumpkin"//Could stand to be renamed
 	flags_inv = HIDEMASK|HIDEEARS|HIDEEYES|HIDEFACE|BLOCKHAIR
-	item_flags = null
 	body_parts_covered = HEAD|FACE|EYES
 	brightness_on = 0.2
 	light_overlay = "helmet_light"
@@ -202,13 +227,13 @@
 	siemens_coefficient = 1.5
 	item_icons = list()
 
-/obj/item/clothing/head/kitty/on_update_icon(mob/living/carbon/human/user)
-	if(!istype(user)) return
-	var/icon/ears = new/icon("icon" = 'icons/mob/onmob/onmob_head.dmi', "icon_state" = "kitty")
-	ears.Blend(user.head_hair_color, ICON_ADD)
+	update_icon(var/mob/living/carbon/human/user)
+		if(!istype(user)) return
+		var/icon/ears = new/icon("icon" = 'icons/mob/onmob/onmob_head.dmi', "icon_state" = "kitty")
+		ears.Blend(rgb(user.r_hair, user.g_hair, user.b_hair), ICON_ADD)
 
-	var/icon/earbit = new/icon("icon" = 'icons/mob/onmob/onmob_head.dmi', "icon_state" = "kittyinner")
-	ears.Blend(earbit, ICON_OVERLAY)
+		var/icon/earbit = new/icon("icon" = 'icons/mob/onmob/onmob_head.dmi', "icon_state" = "kittyinner")
+		ears.Blend(earbit, ICON_OVERLAY)
 
 /obj/item/clothing/head/richard
 	name = "chicken mask"

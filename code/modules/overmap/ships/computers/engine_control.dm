@@ -8,7 +8,15 @@
 	machine_desc = "Allows remote control of a spacecraft's gas thrusters, and displays information about remaining fuel."
 	var/display_state = "status"
 
-/obj/machinery/computer/ship/engines/ui_interact(mob/user, ui_key = "main", datum/nanoui/ui = null, force_open = 1)
+/obj/machinery/computer/ship/engines/adv
+	icon_keyboard = null
+	icon_state = "adv_engines"
+	icon_screen = "adv_engines_screen"
+	light_color = "#05A6A8"
+	base_type = /obj/machinery/computer/ship/engines
+
+
+/obj/machinery/computer/ship/engines/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1)
 	if(!linked)
 		display_reconnect_dialog(user, "ship control systems")
 		return
@@ -41,7 +49,7 @@
 		ui.open()
 		ui.set_auto_update(1)
 
-/obj/machinery/computer/ship/engines/OnTopic(mob/user, list/href_list, state)
+/obj/machinery/computer/ship/engines/OnTopic(var/mob/user, var/list/href_list, state)
 	if(..())
 		return ..()
 
@@ -60,13 +68,13 @@
 		var/newlim = input("Input new thrust limit (0..100%)", "Thrust limit", linked.thrust_limit*100) as num
 		if(!CanInteract(user, state))
 			return TOPIC_NOACTION
-		linked.thrust_limit = clamp(newlim/100, 0, 1)
+		linked.thrust_limit = Clamp(newlim/100, 0, 1)
 		for(var/datum/ship_engine/E in linked.engines)
 			E.set_thrust_limit(linked.thrust_limit)
 		return TOPIC_REFRESH
 
 	if(href_list["global_limit"])
-		linked.thrust_limit = clamp(linked.thrust_limit + text2num(href_list["global_limit"]), 0, 1)
+		linked.thrust_limit = Clamp(linked.thrust_limit + text2num(href_list["global_limit"]), 0, 1)
 		for(var/datum/ship_engine/E in linked.engines)
 			E.set_thrust_limit(linked.thrust_limit)
 		return TOPIC_REFRESH
@@ -77,13 +85,13 @@
 			var/newlim = input("Input new thrust limit (0..100)", "Thrust limit", E.get_thrust_limit()) as num
 			if(!CanInteract(user, state))
 				return
-			var/limit = clamp(newlim/100, 0, 1)
+			var/limit = Clamp(newlim/100, 0, 1)
 			if(istype(E))
 				E.set_thrust_limit(limit)
 			return TOPIC_REFRESH
 		if(href_list["limit"])
 			var/datum/ship_engine/E = locate(href_list["engine"])
-			var/limit = clamp(E.get_thrust_limit() + text2num(href_list["limit"]), 0, 1)
+			var/limit = Clamp(E.get_thrust_limit() + text2num(href_list["limit"]), 0, 1)
 			if(istype(E))
 				E.set_thrust_limit(limit)
 			return TOPIC_REFRESH

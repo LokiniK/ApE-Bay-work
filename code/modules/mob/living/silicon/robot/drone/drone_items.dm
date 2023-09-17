@@ -3,7 +3,7 @@
 /obj/item/gripper
 	name = "magnetic gripper"
 	desc = "A simple grasping tool specialized in construction and engineering work."
-	icon = 'icons/obj/gripper.dmi'
+	icon = 'icons/obj/device.dmi'
 	icon_state = "gripper"
 
 	item_flags = ITEM_FLAG_NO_BLUDGEON
@@ -26,12 +26,14 @@
 		/obj/item/fuel_assembly,
 		/obj/item/stack/material/deuterium,
 		/obj/item/stack/material/tritium,
-		/obj/item/stack/tile
-		)
+		/obj/item/stack/tile,
+		//[INF],
+		/obj/item/stack/cable_coil,
+		/obj/item/clamp
+		//[/INF]
+	)
 
 	var/obj/item/wrapped = null // Item currently being held.
-	var/wrapped_offset_y = -8
-	var/wrapped_offset_x = 0
 
 // VEEEEERY limited version for mining borgs. Basically only for swapping cells and upgrading the drills.
 /obj/item/gripper/miner
@@ -112,7 +114,7 @@
 		/obj/item/disk/botany
 	)
 
-/obj/item/gripper/service //Used to handle food, drinks, seeds, and service fabricator items.
+/obj/item/gripper/service //Used to handle food, drinks, and seeds.
 	name = "service gripper"
 	icon_state = "gripper"
 	desc = "A simple grasping tool used to perform tasks in the service sector, such as handling food, drinks, and seeds."
@@ -120,12 +122,7 @@
 		/obj/item/reagent_containers/glass,
 		/obj/item/reagent_containers/food,
 		/obj/item/seeds,
-		/obj/item/glass_extra,
-		/obj/item/clothing/mask/smokable,
-		/obj/item/paper,
-		/obj/item/pen,
-		/obj/item/storage/pill_bottle/dice,
-		/obj/item/dice
+		/obj/item/glass_extra
 	)
 
 /obj/item/gripper/organ //Used to handle organs.
@@ -147,7 +144,7 @@
 	can_hold = list(/obj/item/auto_cpr)
 
 /obj/item/gripper/ivbag // Used to handle IV bags. Deliberately more limited than the organ gripper so the Emergency Response module can't do surgery.
-	name = "\improper IV bag gripper"
+	name = "IV bag gripper"
 	icon_state = "gripper"
 	desc = "A simple grasping tool for holding and manipulating IV bags."
 	can_hold = list(/obj/item/reagent_containers/ivbag)
@@ -203,38 +200,28 @@
 
 	if(wrapped.loc != src)
 		wrapped = null
-		update_icon()
 		return
 
-	to_chat(src.loc, SPAN_WARNING("You drop \the [wrapped]."))
+	to_chat(src.loc, "<span class='warning'>You drop \the [wrapped].</span>")
 	wrapped.dropInto(loc)
 	wrapped = null
-	update_icon()
+	//on_update_icon()
 
 /obj/item/gripper/attack(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
 	// Don't fall through and smack people with gripper, instead just no-op
 	return 0
 
-/obj/item/gripper/resolve_attackby(atom/target, mob/living/user, params)
+/obj/item/gripper/resolve_attackby(var/atom/target, var/mob/living/user, params)
 
 	// Ensure fumbled items are accessible.
 	if(!wrapped)
 		for(var/obj/item/thing in src.contents)
 			wrapped = thing
-			update_icon()
 			break
 
 	if(wrapped) //Already have an item.
 		//Temporary put wrapped into user so target's attackby() checks pass.
 		wrapped.forceMove(user)
-
-		if (istype(target, /obj/structure/table))
-			var/obj/structure/table/table = target
-			wrapped.dropInto(get_turf(target))
-			table.auto_align(wrapped, params)
-			wrapped = null
-			update_icon()
-			return
 
 		//The force of the wrapped obj gets set to zero during the attack() and afterattack().
 		var/force_holder = wrapped.force
@@ -244,7 +231,7 @@
 		var/resolved = wrapped.resolve_attackby(target,user,params)
 
 		//If resolve_attackby forces waiting before taking wrapped, we need to let it finish before doing the rest.
-		addtimer(new Callback(src, .proc/finish_using, target, user, params, force_holder, resolved), 0)
+		addtimer(CALLBACK(src, .proc/finish_using, target, user, params, force_holder, resolved), 0)
 
 	else if(istype(target,/obj/item)) //Check that we're not pocketing a mob.
 		var/obj/item/I = target
@@ -267,12 +254,11 @@
 					return
 			else
 				I.forceMove(src)
-			to_chat(user, SPAN_NOTICE("You collect \the [I]."))
+			to_chat(user, "<span class='notice'>You collect \the [I].</span>")
 			wrapped = I
-			update_icon()
 			return
 		else
-			to_chat(user, SPAN_DANGER("Your gripper cannot hold \the [target]."))
+			to_chat(user, "<span class='danger'>Your gripper cannot hold \the [target].</span>")
 
 	else if(istype(target,/obj/machinery/power/apc))
 		var/obj/machinery/power/apc/A = target
@@ -282,7 +268,6 @@
 			if(cell)
 				wrapped = cell
 				cell.forceMove(src)
-				update_icon()
 
 	else if(istype(target,/mob/living/silicon/robot))
 		var/mob/living/silicon/robot/A = target
@@ -294,17 +279,15 @@
 				A.update_icon()
 				A.cell.forceMove(src)
 				A.cell = null
-				user.visible_message(SPAN_DANGER("[user] removes the power cell from [A]!"), "You remove the power cell.")
+				user.visible_message("<span class='danger'>[user] removes the power cell from [A]!</span>", "You remove the power cell.")
 				A.power_down()
-				update_icon()
 
-/obj/item/gripper/proc/finish_using(atom/target, mob/living/user, params, force_holder, resolved)
+/obj/item/gripper/proc/finish_using(var/atom/target, var/mob/living/user, params, force_holder, resolved)
 
 	if(QDELETED(wrapped))
 		if (wrapped)
 			wrapped.forceMove(null)
 		wrapped = null
-		update_icon()
 		return
 
 	if(!resolved && wrapped && target)
@@ -318,23 +301,13 @@
 		wrapped.forceMove(src)
 	else
 		wrapped = null
-		update_icon()
-
-
-/obj/item/gripper/on_update_icon()
-	underlays.Cut()
-	SetName(initial(name))
-	if (wrapped)
-		underlays += image(wrapped.icon, wrapped.icon_state, pixel_x = wrapped_offset_x, pixel_y = wrapped_offset_y)
-		SetName("[name] ([wrapped.name])")
-
 
 //TODO: Matter decompiler.
 /obj/item/matter_decompiler
 
 	name = "matter decompiler"
 	desc = "Eating trash, bits of glass, or other debris will replenish your stores."
-	icon = 'icons/obj/gripper.dmi'
+	icon = 'icons/obj/device.dmi'
 	icon_state = "decompiler"
 
 	//Metal, glass, wood, plastic.
@@ -359,8 +332,8 @@
 	var/grabbed_something = 0
 
 	for(var/mob/M in T)
-		if(istype(M,/mob/living/simple_animal/passive/lizard) || istype(M,/mob/living/simple_animal/passive/mouse))
-			src.loc.visible_message(SPAN_DANGER("[src.loc] sucks [M] into its decompiler. There's a horrible crunching noise."),SPAN_DANGER("It's a bit of a struggle, but you manage to suck [M] into your decompiler. It makes a series of visceral crunching noises."))
+		if(istype(M,/mob/living/simple_animal/friendly/lizard) || istype(M,/mob/living/simple_animal/friendly/mouse))
+			src.loc.visible_message("<span class='danger'>[src.loc] sucks [M] into its decompiler. There's a horrible crunching noise.</span>","<span class='danger'>It's a bit of a struggle, but you manage to suck [M] into your decompiler. It makes a series of visceral crunching noises.</span>")
 			new/obj/effect/decal/cleanable/blood/splatter(get_turf(src))
 			qdel(M)
 			if(wood)
@@ -376,14 +349,14 @@
 			if(!istype(D))
 				return
 
-			to_chat(D, SPAN_DANGER("You begin decompiling [M]."))
+			to_chat(D, "<span class='danger'>You begin decompiling [M].</span>")
 
-			if(!do_after(D, 5 SECONDS, M, DO_PUBLIC_UNIQUE))
+			if(!do_after(D,50,M))
 				return
 
 			if(!M || !D) return
 
-			to_chat(D, SPAN_DANGER("You carefully and thoroughly decompile [M], storing as much of its resources as you can within yourself."))
+			to_chat(D, "<span class='danger'>You carefully and thoroughly decompile [M], storing as much of its resources as you can within yourself.</span>")
 			qdel(M)
 			new/obj/effect/decal/cleanable/blood/oil(get_turf(src))
 
@@ -411,7 +384,7 @@
 				plastic.add_charge(2000)
 		else if(istype(W,/obj/item/light))
 			var/obj/item/light/L = W
-			if(L.status >= LIGHT_BROKEN)
+			if(L.status >= 2)
 				if(metal)
 					metal.add_charge(250)
 				if(glass)
@@ -464,9 +437,9 @@
 		grabbed_something = 1
 
 	if(grabbed_something)
-		to_chat(user, SPAN_NOTICE("You deploy your decompiler and clear out the contents of \the [T]."))
+		to_chat(user, "<span class='notice'>You deploy your decompiler and clear out the contents of \the [T].</span>")
 	else
-		to_chat(user, SPAN_DANGER("Nothing on \the [T] is useful to you."))
+		to_chat(user, "<span class='danger'>Nothing on \the [T] is useful to you.</span>")
 	return
 
 //PRETTIER TOOL LIST.
@@ -485,11 +458,11 @@
 		if (!O)
 			window += "<br><b>Depleted Resource</b>"
 		else
-			window += "<br>[O]: [IsHolding(O) ? "<b>Activated</b>" : "<a href='?src=\ref[src];act=\ref[O]'>Activate</a>"]"
+			window += "<br>[O]: [activated(O) ? "<b>Activated</b>" : "<a href='?src=\ref[src];act=\ref[O]'>Activate</a>"]"
 	if (emagged)
 		if (!module.emag)
 			window += "<br><b>Depleted Resource</b>"
 		else
-			window += "<br>[module.emag]: [IsHolding(module.emag) ? "<b>Activated</b>" : "<a href='?src=\ref[src];act=\ref[module.emag]'>Activate</a>"]"
+			window += "<br>[module.emag]: [activated(module.emag) ? "<b>Activated</b>" : "<a href='?src=\ref[src];act=\ref[module.emag]'>Activate</a>"]"
 	window = strip_improper("<head><title>Drone modules</title></head><tt>[JOINTEXT(window)]</tt>")
 	show_browser(src, window, "window=robotmod")

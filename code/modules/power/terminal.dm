@@ -5,10 +5,9 @@
 
 /obj/machinery/power/terminal
 	name = "terminal"
-	icon = 'icons/obj/machines/apc.dmi'
 	icon_state = "term"
 	desc = "It's an underfloor wiring terminal for power equipment."
-	level = ATOM_LEVEL_UNDER_TILE
+	level = 1
 	layer = EXPOSED_WIRE_TERMINAL_LAYER
 	var/obj/item/stock_parts/power/terminal/master
 	anchored = TRUE
@@ -16,7 +15,7 @@
 /obj/machinery/power/terminal/New()
 	..()
 	var/turf/T = src.loc
-	if(level==ATOM_LEVEL_UNDER_TILE) hide(!T.is_plating())
+	if(level==1) hide(!T.is_plating())
 	return
 
 /obj/machinery/power/terminal/proc/master_machine()
@@ -24,8 +23,8 @@
 	if(istype(machine))
 		return machine
 
-/obj/machinery/power/terminal/hide(do_hide)
-	if(do_hide && level == ATOM_LEVEL_UNDER_TILE)
+/obj/machinery/power/terminal/hide(var/do_hide)
+	if(do_hide && level == 1)
 		layer = WIRE_TERMINAL_LAYER
 	else
 		reset_plane_and_layer()

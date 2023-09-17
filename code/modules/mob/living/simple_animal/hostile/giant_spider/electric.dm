@@ -7,8 +7,8 @@
 	icon_living = "spark"
 	icon_dead = "spark_dead"
 
-	maxHealth = 65
-	health = 65
+	maxHealth = 210
+	health = 210
 
 
 	base_attack_cooldown = 15

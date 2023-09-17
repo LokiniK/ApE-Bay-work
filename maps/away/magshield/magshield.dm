@@ -2,9 +2,13 @@
 
 /obj/effect/overmap/visitable/sector/magshield
 	name = "orbital station"
-	desc = "Sensors detect an orbital station above the exoplanet. Sporadic magentic impulses are registred inside it. Planet landing is impossible due to lower orbits being cluttered with chaotically moving metal chunks."
+	scanner_name = "orbital station"
+	scanner_desc = @{"[i]Registration[/i]: UNKNOWN
+[i]Class[/i]: Installation
+[i]Transponder[/i]: None Detected
+[b]Notice[/b]: Sensors detect an orbital station above the exoplanet. Sporadic magentic impulses are registred inside it. Planet landing is impossible due to lower orbits being cluttered with chaotically moving metal chunks"}
 	icon_state = "object"
-
+	known = 0
 
 	initial_generic_waypoints = list(
 		"nav_magshield_1",
@@ -19,7 +23,7 @@
 	id = "awaysite_magshield"
 	description = "It's an orbital shield station."
 	suffixes = list("magshield/magshield.dmm")
-	spawn_cost = 1
+	spawn_cost = 0.5 // INF, WAS 1
 	area_usage_test_exempted_root_areas = list(/area/magshield)
 
 /obj/effect/shuttle_landmark/nav_magshield/nav1
@@ -55,6 +59,7 @@
 	var/heavy_range = 10
 	var/lighter_range = 20
 	var/chance = 0
+	var/being_stopped = 0
 
 /obj/structure/magshield/maggen/Initialize()
 	. = ..()
@@ -72,7 +77,7 @@
 		var/turf/T = get_turf(src)
 		var/area/A = get_area(src)
 		log_game("EMP with size ([heavy_range], [lighter_range]) in area [A] ([T.x], [T.y], [T.z])")
-		visible_message(SPAN_NOTICE("\the [src] suddenly activates."), SPAN_NOTICE("Few lightnings jump between [src]'s rotating hands. You feel everything metal being pulled towards \the [src]."))
+		visible_message("<span class='notice'>\the [src] suddenly activates.</span>", "<span class='notice'>Few lightnings jump between [src]'s rotating hands. You feel everything metal being pulled towards \the [src].</span>")
 		for(var/mob/living/carbon/M in hear(10, get_turf(src)))
 			eye_safety = M.eyecheck()
 			if(eye_safety < FLASH_PROTECTION_MODERATE)
@@ -81,40 +86,34 @@
 
 /obj/structure/magshield/maggen/attack_hand(mob/user)
 	..()
-	to_chat(user, SPAN_NOTICE(" You don't see how you could turn off \the [src]. You can try to stick something in rotating hands."))
+	to_chat(user, "<span class='notice'> You don't see how you could turn off \the [src]. You can try to stick something in rotating hands.</span>")
 
-
-/obj/structure/magshield/maggen/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Rods - Jam generator
-	if (istype(tool, /obj/item/stack/material/rods))
-		var/obj/item/stack/material/rods/rods = tool
-		user.visible_message(
-			SPAN_NOTICE("\The [user] starts to stick [rods.get_vague_name(FALSE)] into \the [src]'s rotating hands."),
-			SPAN_NOTICE("You start to stick [rods.get_exact_name(1)] into \the [src]'s rotating hands.")
-		)
-		if (!do_after(user, 10 SECONDS, src, DO_PUBLIC_UNIQUE) || !user.use_sanity_check(src, tool))
-			return TRUE
-		user.visible_message(
-			SPAN_WARNING("\The [user] sticks [rods.get_vague_name(FALSE)] into \the [src]'s rotating hands."),
-			SPAN_WARNING("You stick [rods.get_exact_name(1)] into \the [src]'s rotating hands.")
-		)
-		rods.use(1)
-		visible_message(SPAN_DANGER("\The [src] stops rotating and releases a cloud of sparks. Better get to a safe distance!"))
-		var/datum/effect/effect/system/spark_spread/sparks = new(src)
-		sparks.set_up(10, EMPTY_BITFIELD, src)
-		sparks.start()
-		addtimer(new Callback(src, .proc/explode), 5 SECONDS)
-		return TRUE
-
-	return ..()
-
-
-/obj/structure/magshield/maggen/proc/explode()
-	visible_message(SPAN_DANGER("\The [src] explodes!"))
-	explosion(src, 17, EX_ACT_DEVASTATING)
-	empulse(src, heavy_range * 2, lighter_range * 2, 1)
-	qdel_self()
-
+/obj/structure/magshield/maggen/attackby(obj/item/W as obj, mob/user as mob)
+	if (being_stopped)
+		to_chat(user, "<span class='notice'> Somebody is already interacting with \the [src].</span>")
+		return
+	if(istype(W, /obj/item/stack/material/rods))
+		var/obj/item/stack/material/rods/R = W
+		to_chat(user, "<span class='notice'> You start to stick [R.singular_name] into rotating hands to make them stuck.</span>")
+		being_stopped = 1
+		if (!do_after(user, 100, src))
+			to_chat(user, "<span class='notice'> You pull back [R.singular_name].</span>")
+			being_stopped = 0
+			return
+		R.use(1)
+		visible_message("<span class='warning'>\The [src] stops rotating and releases cloud of sparks. Better get to safe distance!</span>")
+		var/datum/effect/effect/system/spark_spread/s = new /datum/effect/effect/system/spark_spread
+		s.set_up(10, 0, src)
+		s.start()
+		sleep(50)
+		visible_message("<span class='warning'>\The [src] explodes!</span>")
+		var/turf/T = get_turf(src)
+		explosion(T, 2, 3, 4, 10, 1)
+		empulse(src, heavy_range*2, lighter_range*2, 1)
+		qdel(src)
+	if(istype(W, /obj/item/mop))
+		to_chat(user, "<span class='notice'> You stick [W] into rotating hands. It breaks to smallest pieces.</span>")
+		qdel(W)
 
 /obj/structure/magshield/rad_sensor
 	name = "radiation sensor"

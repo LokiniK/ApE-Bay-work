@@ -1,18 +1,43 @@
-/proc/NewStutter(phrase,stunned)
+//This file was auto-corrected by findeclaration.exe on 25.5.2012 20:42:32
+
+proc/Intoxicated(phrase)
+	phrase = html_decode(phrase)
+	var/leng=length_char(phrase)	// INF Localization
+	var/counter=length_char(phrase)	// INF Localization
+	var/newphrase=""
+	var/newletter=""
+	while(counter>=1)
+		newletter=copytext_char(phrase,(leng-counter)+1,(leng-counter)+2)
+		if(rand(1,3)==3)
+			if(lowertext(newletter)=="o")	newletter="u"
+			if(lowertext(newletter)=="s")	newletter="ch"
+			if(lowertext(newletter)=="a")	newletter="ah"
+			if(lowertext(newletter)=="c")	newletter="k"
+		switch(rand(1,7))
+			if(1,3,5,8)	newletter="[lowertext(newletter)]"
+			if(2,4,6,15)	newletter="[uppertext(newletter)]"
+			if(7)	newletter+="'"
+			//if(9,10)	newletter="<b>[newletter]</b>"
+			//if(11,12)	newletter="<big>[newletter]</big>"
+			//if(13)	newletter="<small>[newletter]</small>"
+		newphrase+="[newletter]";counter-=1
+	return newphrase
+
+proc/NewStutter(phrase,stunned)
 	phrase = html_decode(phrase)
 
 	var/list/split_phrase = splittext(phrase," ") //Split it up into words.
 
 	var/list/unstuttered_words = split_phrase.Copy()
 	var/i = rand(1,3)
-	if(stunned) i = length(split_phrase)
+	if(stunned) i = split_phrase.len
 	for(,i > 0,i--) //Pick a few words to stutter on.
 
-		if (!length(unstuttered_words))
+		if (!unstuttered_words.len)
 			break
 		var/word = pick(unstuttered_words)
 		unstuttered_words -= word //Remove from unstuttered words so we don't stutter it again.
-		var/index = split_phrase.Find(word) //Find the word in the split phrase so we can replace it.
+		var/index = list_find(split_phrase, word) //Find the word in the split phrase so we can replace it.
 
 		//Search for dipthongs (two letters that make one sound.)
 		var/first_sound = copytext_char(word,1,3)
@@ -34,10 +59,10 @@
 
 	return sanitize(jointext(split_phrase," "))
 
-/proc/Stagger(mob/M,d) //Technically not a filter, but it relates to drunkenness.
+proc/Stagger(mob/M,d) //Technically not a filter, but it relates to drunkenness.
 	step(M, pick(d,turn(d,90),turn(d,-90)))
 
-/proc/Ellipsis(original_msg, chance = 50)
+proc/Ellipsis(original_msg, chance = 50)
 	if(chance <= 0) return "..."
 	if(chance >= 100) return original_msg
 
@@ -64,26 +89,26 @@ distortion_speed - multiplier for the chance increase.
 distortion - starting distortion.
 english_only - whether to use traditional english letters only (for use in NanoUI)
 */
-/proc/RadioChat(mob/living/user, message, distortion_chance = 60, distortion_speed = 1, distortion = 1, english_only = 0)
+proc/RadioChat(mob/living/user, message, distortion_chance = 60, distortion_speed = 1, distortion = 1, english_only = 0)
 	var/datum/language/language
 	if(user)
 		language = user.get_default_language()
 	message = html_decode(message)
 	var/new_message = ""
 	var/input_size = length(message)
-	var/lentext = 0
+	var/length_char = 0
 	if(input_size < 20) // Short messages get distorted too. Bit hacksy.
 		distortion += (20-input_size)/2
-	while(lentext <= input_size)
-		var/newletter=copytext_char(message, lentext, lentext+1)
+	while(length_char <= input_size)
+		var/newletter=copytext_char(message, length_char, length_char+1)
 		if(!prob(distortion_chance))
 			new_message += newletter
-			lentext += 1
+			length_char += 1
 			continue
 		if(newletter != " ")
 			if(prob(0.08 * distortion)) // Major cutout
 				newletter = "*zzzt*"
-				lentext += rand(1, (length(message) - lentext)) // Skip some characters
+				length_char += rand(1, (length(message) - length_char)) // Skip some characters
 				distortion += 1 * distortion_speed
 			else if(prob(0.8 * distortion)) // Minor cut out
 				if(prob(25))
@@ -109,14 +134,14 @@ english_only - whether to use traditional english letters only (for use in NanoU
 					if(english_only)
 						newletter += "*"
 					else
-						newletter = pick("ø", "ð", "%", "æ", "µ")
+						newletter = pick("ш", "Р", "%", "ж", "µ")
 				distortion += 0.5 * distortion_speed
 			else if(prob(0.75 * distortion)) // Incomprehensible
 				newletter = pick("<", ">", "!", "$", "%", "^", "&", "*", "~", "#")
 				distortion += 0.75 * distortion_speed
 			else if(prob(0.05 * distortion)) // Total cut out
 				if(!english_only)
-					newletter = "|w¡¼b»%> -BZZT-"
+					newletter = "¦wЎјb»%> -BZZT-"
 				else
 					newletter = "srgt%$hjc< -BZZT-"
 				new_message += newletter
@@ -126,13 +151,13 @@ english_only - whether to use traditional english letters only (for use in NanoU
 					if("s")
 						newletter = "$"
 					if("e")
-						newletter = "£"
+						newletter = "Ј"
 					if("w")
-						newletter = "ø"
+						newletter = "ш"
 					if("y")
-						newletter = "¡"
+						newletter = "Ў"
 					if("x")
-						newletter = "æ"
+						newletter = "ж"
 					if("u")
 						newletter = "µ"
 		else
@@ -142,5 +167,6 @@ english_only - whether to use traditional english letters only (for use in NanoU
 		if(prob(20))
 			capitalize(newletter)
 		new_message += newletter
-		lentext += 1
+		length_char += 1
 	return new_message
+

@@ -46,6 +46,9 @@
 	desc = "A dice with ten sides. This one is for the tens digit."
 	icon_state = "d10010"
 	sides = 10
+/obj/item/dice/d100/Initialize()
+	. = ..()
+	icon_state = "[name][rand(1,sides)*10]"
 
 /obj/item/dice/proc/roll_die()
 	var/result = rand(1, sides)
@@ -60,14 +63,19 @@
 		comment = "Ouch, bad luck."
 	return list(result, comment)
 
+/obj/item/dice/d100/roll_die()
+	var/result = rand(1, 10)
+	result = result * 10
+	return list(result, "")
+
 /obj/item/dice/attack_self(mob/user as mob)
 	var/list/roll_result = roll_die()
 	var/result = roll_result[1]
 	var/comment = roll_result[2]
 	icon_state = "[name][result]"
-	user.visible_message(SPAN_NOTICE("[user] has thrown [src]. It lands on [result]. [comment]"), \
-						 SPAN_NOTICE("You throw [src]. It lands on a [result]. [comment]"), \
-						 SPAN_NOTICE("You hear [src] landing on a [result]. [comment]"))
+	user.visible_message("<span class='notice'>[user] has thrown [src]. It lands on [result]. [comment]</span>", \
+						 "<span class='notice'>You throw [src]. It lands on a [result]. [comment]</span>", \
+						 "<span class='notice'>You hear [src] landing on a [result]. [comment]</span>")
 
 /obj/item/dice/throw_impact()
 	..()
@@ -75,4 +83,4 @@
 	var/result = roll_result[1]
 	var/comment = roll_result[2]
 	icon_state = "[name][result]"
-	src.visible_message(SPAN_NOTICE("\The [src] lands on [result]. [comment]"))
+	src.visible_message("<span class='notice'>\The [src] lands on [result]. [comment]</span>")

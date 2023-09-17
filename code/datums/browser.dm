@@ -6,8 +6,8 @@
 	var/height = 0
 	var/atom/ref = null
 	var/window_options = "focus=0;can_close=1;can_minimize=1;can_maximize=0;can_resize=1;titlebar=1;" // window option is set using window_id
-	var/list/stylesheets = list()
-	var/list/scripts = list()
+	var/stylesheets[0]
+	var/scripts[0]
 	var/title_image
 	var/head_elements
 	var/body_elements
@@ -16,15 +16,7 @@
 	var/title_buttons = ""
 
 
-/datum/browser/Destroy()
-	if (user)
-		user.unset_machine()
-		user = null
-	ref = null
-	return ..()
-
-
-/datum/browser/New(nuser, nwindow_id, ntitle = 0, nwidth = 0, nheight = 0, atom/nref = null)
+/datum/browser/New(nuser, nwindow_id, ntitle = 0, nwidth = 0, nheight = 0, var/atom/nref = null)
 
 	user = nuser
 	window_id = nwindow_id
@@ -36,6 +28,9 @@
 		height = nheight
 	if (nref)
 		ref = nref
+	// If a client exists, but they have disabled fancy windowing, disable it!
+	if(user && user.client && user.client.get_preference_value(/datum/client_preference/browser_style) == GLOB.PREF_PLAIN)
+		return
 	add_stylesheet("common", 'html/browser/common.css') // this CSS sheet is common to all UIs
 
 /datum/browser/proc/set_title(ntitle)
@@ -84,7 +79,7 @@
 
 	return {"<!DOCTYPE html>
 <html>
-	<meta charset=ISO-8859-1">
+	<meta charset="UTF-8">
 	<head>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		[head_content]
@@ -109,7 +104,7 @@
 	[get_footer()]
 	"}
 
-/datum/browser/proc/open(use_onclose = 1)
+/datum/browser/proc/open(var/use_onclose = 1)
 	var/window_size = ""
 	if (width && height)
 		window_size = "size=[width]x[height];"
@@ -117,7 +112,7 @@
 	if (use_onclose)
 		onclose(user, window_id, ref)
 
-/datum/browser/proc/update(force_open = 0, use_onclose = 1)
+/datum/browser/proc/update(var/force_open = 0, var/use_onclose = 1)
 	if(force_open)
 		open(use_onclose)
 	else
@@ -158,7 +153,7 @@
 // to pass a "close=1" parameter to the atom's Topic() proc for special handling.
 // Otherwise, the user mob's machine var will be reset directly.
 //
-/proc/onclose(mob/user, windowid, atom/ref=null)
+/proc/onclose(mob/user, windowid, var/atom/ref=null)
 	if(!user || !user.client) return
 	var/param = "null"
 	if(ref)
@@ -177,7 +172,7 @@
 // if a valid atom reference is supplied, call the atom's Topic() with "close=1"
 // otherwise, just reset the client mob's machine var.
 //
-/client/verb/windowclose(atomref as text)
+/client/verb/windowclose(var/atomref as text)
 	set hidden = 1						// hide this verb from the user's panel
 	set name = ".windowclose"			// no autocomplete on cmd line
 

@@ -8,11 +8,14 @@
 
 	var/update_cycle
 
-/obj/machinery/atmospherics/unary/generator_input/on_update_icon()
-	if(node)
-		icon_state = "intact"
-	else
-		icon_state = "exposed"
+	update_icon()
+		if(node)
+			icon_state = "intact"
+		else
+			icon_state = "exposed"
 
-/obj/machinery/atmospherics/unary/generator_input/proc/return_exchange_air()
-	return air_contents
+		return
+
+	proc
+		return_exchange_air()
+			return air_contents

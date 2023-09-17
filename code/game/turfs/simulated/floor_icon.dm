@@ -1,6 +1,6 @@
-var/global/list/flooring_cache = list()
+var/list/flooring_cache = list()
 
-/turf/simulated/floor/on_update_icon(update_neighbors)
+/turf/simulated/floor/on_update_icon(var/update_neighbors)
 
 	update_flood_overlay()
 
@@ -43,7 +43,7 @@ var/global/list/flooring_cache = list()
 
 		has_smooth = ~(has_border & (NORTH | SOUTH | EAST | WEST))
 
-		if(flooring.can_paint && decals && length(decals))
+		if(flooring.can_paint && decals && decals.len)
 			overlays |= decals
 
 		//We can only have inner corners if we're smoothed with something
@@ -71,9 +71,9 @@ var/global/list/flooring_cache = list()
 				icon_state = flooring.icon_base+"0"
 		*/
 
-	if(decals && length(decals))
+	if(decals && decals.len)
 		for(var/image/I in decals)
-			if (floor(I.layer) != floor(layer))
+			if(I.layer != DECAL_PLATING_LAYER)
 				continue
 			overlays |= I
 
@@ -92,7 +92,7 @@ var/global/list/flooring_cache = list()
 			F.queue_ao(FALSE)
 			F.update_icon()
 
-/turf/simulated/floor/proc/get_flooring_overlay(cache_key, icon_base, icon_dir = 0, external = FALSE)
+/turf/simulated/floor/proc/get_flooring_overlay(var/cache_key, var/icon_base, var/icon_dir = 0, var/external = FALSE)
 	if(!flooring_cache[cache_key])
 		var/image/I = image(icon = flooring.icon, icon_state = icon_base, dir = icon_dir)
 		I.turf_decal_layerise()
@@ -113,7 +113,7 @@ var/global/list/flooring_cache = list()
 		flooring_cache[cache_key] = I
 	return flooring_cache[cache_key]
 
-/turf/simulated/floor/proc/get_damage_overlay(cache_key, blend)
+/turf/simulated/floor/proc/get_damage_overlay(var/cache_key, var/blend)
 	if(!flooring_cache[cache_key])
 		var/image/I = image(icon = 'icons/turf/flooring/damage.dmi', icon_state = cache_key)
 		if(blend)
@@ -122,8 +122,9 @@ var/global/list/flooring_cache = list()
 		flooring_cache[cache_key] = I
 	return flooring_cache[cache_key]
 
-/singleton/flooring/proc/test_link(turf/origin, turf/T)
+/decl/flooring/proc/test_link(var/turf/origin, var/turf/T)
 	var/is_linked = FALSE
+	if(!T) return 0 //INF
 	//is_wall is true for wall turfs and for floors containing a low wall
 	if(T.is_wall())
 		if(wall_smooth == SMOOTH_ALL)
@@ -168,5 +169,5 @@ var/global/list/flooring_cache = list()
 						break
 	return is_linked
 
-/singleton/flooring/proc/symmetric_test_link(turf/A, turf/B)
+/decl/flooring/proc/symmetric_test_link(var/turf/A, var/turf/B)
 	return test_link(A, B) && test_link(B,A)

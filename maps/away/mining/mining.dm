@@ -3,6 +3,7 @@
 //MINING-1 // CLUSTER
 /obj/effect/overmap/visitable/sector/cluster
 	name = "asteroid cluster"
+	scanner_name = "asteroid cluster"
 	desc = "Large group of asteroids. Mineral content detected."
 	icon_state = "sector"
 	initial_generic_waypoints = list(
@@ -14,17 +15,14 @@
 		"nav_cluster_6",
 		"nav_cluster_7"
 	)
-
+	known = 0
 
 /obj/effect/overmap/visitable/sector/cluster/generate_skybox()
-	var/image/res = overlay_image('icons/skybox/rockbox.dmi', "rockbox", COLOR_ASTEROID_ROCK, RESET_COLOR)
-	res.blend_mode = BLEND_OVERLAY
-	return res
+	return overlay_image('icons/skybox/rockbox.dmi', "rockbox", COLOR_ASTEROID_ROCK, RESET_COLOR)
 
 /obj/effect/overmap/visitable/sector/cluster/get_skybox_representation()
 	var/image/res = overlay_image('icons/skybox/rockbox.dmi', "rockbox", COLOR_ASTEROID_ROCK, RESET_COLOR)
-	res.blend_mode = BLEND_OVERLAY
-	res.SetTransform(scale = 0.5)
+	res.transform *= 0.5
 	return res
 
 /datum/map_template/ruin/away_site/mining_asteroid
@@ -77,7 +75,11 @@
 //MINING-2 // SIGNAL
 /obj/effect/overmap/visitable/sector/away
 	name = "faint signal from an asteroid"
-	desc = "Faint signal detected, originating from the human-made structures on the site's surface."
+	scanner_name = "faint signal from an asteroid"
+	scanner_desc = @{"[i]Registration[/i]: UNKNOWN
+[i]Class[/i]: UNKNOWN
+[i]Transponder[/i]: None Detected
+[b]Notice[/b]: Faint signal detected, originating from the human-made structures on the site's surface"}
 	icon_state = "sector"
 	initial_generic_waypoints = list(
 		"nav_away_1",
@@ -88,15 +90,14 @@
 		"nav_away_6",
 		"nav_away_7"
 	)
-
+	known = 0
 
 /obj/effect/overmap/visitable/sector/away/generate_skybox()
 	return overlay_image('icons/skybox/rockbox.dmi', "rockbox", COLOR_ASTEROID_ROCK, RESET_COLOR)
 
 /obj/effect/overmap/visitable/sector/away/get_skybox_representation()
 	var/image/res = overlay_image('icons/skybox/rockbox.dmi', "rockbox", COLOR_ASTEROID_ROCK, RESET_COLOR)
-	res.blend_mode = BLEND_OVERLAY
-	res.SetTransform(scale = 0.3)
+	res.transform *= 0.3
 	return res
 
 /datum/map_template/ruin/away_site/mining_signal
@@ -159,11 +160,10 @@
 		"nav_orb_6",
 		"nav_orb_7"
 	)
-
+	known = 0
 
 /obj/effect/overmap/visitable/sector/orb/get_skybox_representation()
 	var/image/res = overlay_image('icons/skybox/skybox_rock_128.dmi', "bigrock", COLOR_ASTEROID_ROCK, RESET_COLOR)
-	res.blend_mode = BLEND_OVERLAY
 	res.pixel_x = rand(256,512)
 	res.pixel_y = rand(256,512)
 	return res
@@ -173,7 +173,7 @@
 	id = "awaysite_mining_orb"
 	description = "A sort of circular asteroid with a bird."
 	suffixes = list("mining/mining-orb.dmm")
-	spawn_cost = 1
+	spawn_cost = 10 // INF, WAS 1
 	accessibility_weight = 10
 	generate_mining_by_z = 1
 	base_turf_for_zs = /turf/simulated/floor/asteroid
@@ -217,7 +217,7 @@
 /obj/structure/totem
 	name = "totem"
 	desc = "Some kind of post, pillar, plinth, column, or totem."
-	icon = 'icons/obj/totems.dmi'
+	icon = 'icons/obj/stationobjs.dmi'
 	icon_state = "totem"
 	density = TRUE
 	anchored = TRUE
@@ -230,15 +230,15 @@
 
 /obj/structure/totem/examine(mob/user)
 	. = ..()
-	to_chat(user, "It's been engraved with the symbols '𒊏𒁲𒌋 𒊑𒉿𒌉 [number]'.") //for the sake of the reader, "RADIU RIPITUR"
+	to_chat(user, "It's been engraved with the symbols '<font face='Shage'>RWH QaG [number]</font>'.") //i am not a linguist
 
-/obj/item/stool/stone/New(newloc)
+
+/obj/item/stool/stone/New(var/newloc)
 	..(newloc,"sandstone")
 
-/turf/simulated/floor/stone
+/turf/simulated/floor/airless/stone
 	name = "temple floor"
 	desc = "You can only imagine what once took place in these halls."
 	icon = 'icons/turf/flooring/cult.dmi'
 	icon_state = "cult_g"
 	color = "#c9ae5e"
-	map_airless = TRUE

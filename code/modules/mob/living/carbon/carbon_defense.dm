@@ -1,15 +1,19 @@
 
-/mob/living/carbon/standard_weapon_hit_effects(obj/item/I, mob/living/user, effective_force, hit_zone)
+/mob/living/carbon/standard_weapon_hit_effects(obj/item/I, mob/living/user, var/effective_force, var/hit_zone)
 	if(!effective_force)
 		return 0
 
 	//Apply weapon damage
 	var/damage_flags = I.damage_flags()
 	var/datum/wound/created_wound = apply_damage(effective_force, I.damtype, hit_zone, damage_flags, used_weapon=I, armor_pen=I.armor_penetration)
+	
+	if(guards)
+		for(var/mob/living/simple_animal/hostile/commanded/guard in (guards & hearers(src,10)))
+			guard.hunt_on(user)
 
 	//Melee weapon embedded object code.
-	if (istype(created_wound) && I && I.can_embed() && I.damtype == DAMAGE_BRUTE && !I.anchored && !is_robot_module(I))
-		var/weapon_sharp = (damage_flags & DAMAGE_FLAG_SHARP)
+	if(istype(created_wound) && I && I.can_embed() && I.damtype == BRUTE && !I.anchored && !is_robot_module(I))
+		var/weapon_sharp = (damage_flags & DAM_SHARP)
 		var/damage = effective_force //just the effective damage used for sorting out embedding, no further damage is applied here
 		damage *= 1 - get_blocked_ratio(hit_zone, I.damtype, I.damage_flags(), I.armor_penetration, I.force)
 

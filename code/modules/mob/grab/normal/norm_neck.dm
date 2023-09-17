@@ -10,7 +10,6 @@
 
 
 	stop_move = 1
-	force_stand = TRUE
 	reverse_facing = 1
 	can_absorb = 1
 	shield_assailant = 1
@@ -23,29 +22,15 @@
 
 	icon_state = "kill"
 
-	break_chance_table = list(3, 5, 7, 9)
+	break_chance_table = list(3, 18, 45, 100)
 
-/datum/grab/normal/neck/process_effect(obj/item/grab/G)
+/datum/grab/normal/neck/process_effect(var/obj/item/grab/G)
 	var/mob/living/carbon/human/affecting = G.affecting
-	var/mob/living/carbon/human/assailant = G.assailant
-
-	if (assailant.incapacitated(INCAPACITATION_ALL))
-		affecting.visible_message(SPAN_WARNING("[assailant] lets go of \his grab!"))
-		qdel(G)
-		return
 
 	affecting.drop_l_hand()
 	affecting.drop_r_hand()
 
 	if(affecting.lying)
 		affecting.Weaken(4)
-
-	if(affecting.stat != CONSCIOUS)
-		force_stand = FALSE
-		shield_assailant = FALSE
-
-	else
-		force_stand = TRUE
-		shield_assailant = TRUE
 
 	affecting.adjustOxyLoss(1)

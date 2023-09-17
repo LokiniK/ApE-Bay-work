@@ -9,13 +9,13 @@
 
 /obj/item/clothingbag/attack_self(mob/user as mob)
 	if(!opened)
-		user.visible_message(SPAN_NOTICE("\The [user] tears open \the [src.name]!"), SPAN_NOTICE("You tear open \the [src.name]!"))
+		user.visible_message("<span class='notice'>\The [user] tears open \the [src.name]!</span>", "<span class='notice'>You tear open \the [src.name]!</span>")
 		opened = 1
 		icon_state = icon_used
 		for(var/obj/item in contents)
 			item.dropInto(loc)
 	else
-		to_chat(user, SPAN_WARNING("\The [src.name] is already ripped open and is now completely useless!"))
+		to_chat(user, "<span class='warning'>\The [src.name] is already ripped open and is now completely useless!</span>")
 
 /obj/item/clothingbag/rubbersuit
 	name = "rubber suit bag"
@@ -23,14 +23,17 @@
 
 /obj/item/clothingbag/rubbersuit/New()
 	..()
-	switch(rand(1,3))
+	switch(rand(1,4))
 		if(1)
 			new/obj/item/clothing/suit/rubber(src)
 			new/obj/item/clothing/mask/rubber/species(src)
 		if(2)
+			new/obj/item/clothing/suit/rubber/tajaran(src)
+			new/obj/item/clothing/mask/rubber/species/tajaran(src)
+		if(3)
 			new/obj/item/clothing/suit/rubber/skrell(src)
 			new/obj/item/clothing/mask/rubber/species/skrell(src)
-		if(3)
+		if(4)
 			new/obj/item/clothing/suit/rubber/unathi(src)
 			new/obj/item/clothing/mask/rubber/species/unathi(src)
 

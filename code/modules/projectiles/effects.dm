@@ -10,11 +10,14 @@
 
 	mouse_opacity = 0
 
+/obj/effect/projectile/proc/set_transform(var/matrix/M)
+	if(istype(M))
+		transform = M
 
 //----------------------------
 // Laser beam
 //----------------------------
-/obj/effect/projectile/laser
+/obj/effect/projectile/laser/
 	light_color = COLOR_RED_LIGHT
 
 /obj/effect/projectile/laser/tracer
@@ -130,7 +133,7 @@
 //----------------------------
 // Treye beam
 //----------------------------
-/obj/effect/projectile/trilaser
+/obj/effect/projectile/trilaser/
 	light_color = COLOR_LUMINOL
 
 /obj/effect/projectile/trilaser/tracer
@@ -145,7 +148,7 @@
 //----------------------------
 // Emitter beam
 //----------------------------
-/obj/effect/projectile/laser/emitter
+/obj/effect/projectile/laser/emitter/
 	light_max_bright = 1
 	light_color = "#00cc00"
 
@@ -161,7 +164,7 @@
 //----------------------------
 // Stun beam
 //----------------------------
-/obj/effect/projectile/stun
+/obj/effect/projectile/stun/
 	light_color = COLOR_YELLOW
 
 /obj/effect/projectile/stun/tracer
@@ -272,3 +275,18 @@
 
 /obj/effect/projectile/incen/impact
 	icon_state = "impact_incen"
+
+//----------------------------
+// psionic beams "GANGWAY"
+//----------------------------
+/obj/effect/projectile/psibeam
+	light_color = COLOR_PURPLE
+
+/obj/effect/projectile/psibeam/tracer
+	icon_state = "beam_psibeam"
+
+/obj/effect/projectile/psibeam/muzzle
+	icon_state = "muzzle_psibeam"
+
+/obj/effect/projectile/psibeam/impact
+	icon_state = "impact_psibeam"

@@ -49,10 +49,7 @@
 	var/has_been_rev = 0//Tracks if this mind has been a rev or not
 
 	var/faction 			//associated faction
-	var/datum/changeling/changeling		//changeling holde
-
-	///String. Last spoken message.
-	var/last_words
+	var/datum/changeling/changeling		//changeling holder
 
 	var/rev_cooldown = 0
 
@@ -64,9 +61,7 @@
 
 	var/list/initial_email_login = list("login" = "", "password" = "")
 
-	var/list/known_mobs = list()
-
-/datum/mind/New(key)
+/datum/mind/New(var/key)
 	src.key = key
 	..()
 
@@ -94,7 +89,7 @@
 	current = new_character		//link ourself to our new body
 	new_character.mind = src	//and link our new body to ourself
 
-	if(learned_spells && length(learned_spells))
+	if(learned_spells && learned_spells.len)
 		restore_spells(new_character)
 
 	if(changeling)
@@ -108,7 +103,7 @@
 		alert("Not before round-start!", "Alert")
 		return
 
-	var/out = "<B>[name]</B>[(current&&(current.real_name!=name))?" (as [current.real_name])":""]<br>"
+	var/out = "<meta charset=\"UTF-8\"><B>[name]</B>[(current&&(current.real_name!=name))?" (as [current.real_name])":""]<br>"
 	out += "Mind currently owned by key: [key] [active?"(synced)":"(not synced)"]<br>"
 	out += "Assigned role: [assigned_role]. <a href='?src=\ref[src];role_edit=1'>Edit</a><br>"
 	out += "<hr>"
@@ -120,7 +115,7 @@
 	out += "</table><hr>"
 	out += "<b>Objectives</b></br>"
 
-	if(objectives && length(objectives))
+	if(objectives && objectives.len)
 		var/num = 1
 		for(var/datum/objective/O in objectives)
 			out += "<b>Objective #[num]:</b> [O.explanation_text] "
@@ -204,6 +199,7 @@
 		if(href_list["set_psi_faculty"] && href_list["set_psi_faculty_rank"])
 			current.set_psi_rank(href_list["set_psi_faculty"], text2num(href_list["set_psi_faculty_rank"]))
 			log_and_message_admins("set [key_name(current)]'s [href_list["set_psi_faculty"]] faculty to [text2num(href_list["set_psi_faculty_rank"])].")
+			send2adminirc(":: SET PSI FACULTY :: [key_name_admin(usr)] set [key_name(current)]'s [href_list["set_psi_faculty"]] faculty to [text2num(href_list["set_psi_faculty_rank"])].")  // INF
 			var/datum/admins/admin = GLOB.admins[usr.key]
 			if(istype(admin)) admin.show_player_panel(current)
 			return TRUE
@@ -211,20 +207,11 @@
 	if(href_list["add_antagonist"])
 		var/datum/antagonist/antag = GLOB.all_antag_types_[href_list["add_antagonist"]]
 		if(antag)
-			if(!current)
-				to_chat(usr, SPAN_WARNING("\The [src] could not be made into a [antag.role_text]! They do not have a mob."))
-				return
-			if(src in antag.current_antagonists)
-				to_chat(usr, SPAN_WARNING("\The [src] is already a [antag.role_text]!"))
-				return
-			var/result = antag.can_become_antag_detailed(src, TRUE)
-			if(result)
-				to_chat(usr, SPAN_WARNING("\The [src] could not be made into a [antag.role_text]! [result]."))
-				return
 			if(antag.add_antagonist(src, 1, 1, 0, 1, 1)) // Ignore equipment and role type for this.
 				log_admin("[key_name_admin(usr)] made [key_name(src)] into a [antag.role_text].")
+				send2adminirc(":: ADD ANTAGONIST :: [key_name_admin(usr)] made [key_name(src)] into a [antag.role_text].")  // INF
 			else
-				to_chat(usr, SPAN_WARNING("\The [src] could not be made into a [antag.role_text]!"))
+				to_chat(usr, "<span class='warning'>[src] could not be made into a [antag.role_text]!</span>")
 
 	else if(href_list["remove_antagonist"])
 		var/datum/antagonist/antag = GLOB.all_antag_types_[href_list["remove_antagonist"]]
@@ -268,15 +255,15 @@
 				if(!ambition)
 					ambition = new /datum/goal/ambition(mind)
 				ambition.description = new_ambition
-				to_chat(mind.current, SPAN_WARNING("Your ambitions have been changed by higher powers, they are now: [ambition.description]"))
+				to_chat(mind.current, "<span class='warning'>Your ambitions have been changed by higher powers, they are now: [ambition.description]</span>")
 				log_and_message_admins("made [key_name(mind.current)]'s ambitions be '[ambition.description]'.")
 			else
-				to_chat(mind.current, SPAN_WARNING("Your ambitions have been unmade by higher powers."))
+				to_chat(mind.current, "<span class='warning'>Your ambitions have been unmade by higher powers.</span>")
 				log_and_message_admins("has cleared [key_name(mind.current)]'s ambitions.")
 				if(ambition)
 					qdel(ambition)
 		else
-			to_chat(usr, SPAN_WARNING("The mind has ceased to be."))
+			to_chat(usr, "<span class='warning'>The mind has ceased to be.</span>")
 
 	else if (href_list["obj_edit"] || href_list["obj_add"])
 		var/datum/objective/objective
@@ -286,7 +273,7 @@
 		if (href_list["obj_edit"])
 			objective = locate(href_list["obj_edit"])
 			if (!objective) return
-			objective_pos = objectives.Find(objective)
+			objective_pos = list_find(objectives, objective)
 
 			//Text strings are easy to manipulate. Revised for simplicity.
 			var/temp_obj_type = "[objective.type]"//Convert path into a text string.
@@ -294,7 +281,7 @@
 			if(!def_value)//If it's a custom objective, it will be an empty string.
 				def_value = "custom"
 
-		var/new_obj_type = input("Select objective type:", "Objective type", def_value) as null|anything in list("assassinate", "debrain", "protect", "prevent", "harm", "brig", "hijack", "escape", "survive", "steal", "download", "mercenary", "capture", "absorb", "custom")
+		var/new_obj_type = input("Select objective type:", "Objective type", def_value) as null|anything in list("assassinate", "debrain", "protect", "harm", "brig", "hijack", "escape", "survive", "steal", "download", "mercenary", "kidnap", "capture", "absorb", "custom")
 		if (!new_obj_type) return
 
 		var/datum/objective/new_objective = null
@@ -332,6 +319,10 @@
 					new_objective:target = M.mind
 					new_objective.explanation_text = "[objective_type] [M.real_name], the [M.mind.special_role ? M.mind:special_role : M.mind:assigned_role]."
 
+			/*if ("prevent") //inf
+				new_objective = new /datum/objective/block
+				new_objective.owner = src*/
+
 			if ("hijack")
 				new_objective = new /datum/objective/hijack
 				new_objective.owner = src
@@ -346,6 +337,10 @@
 
 			if ("mercenary")
 				new_objective = new /datum/objective/nuclear
+				new_objective.owner = src
+
+			if ("kidnap") //inf
+				new_objective = new /datum/objective/nuclear/kidnap
 				new_objective.owner = src
 
 			if ("steal")
@@ -403,7 +398,7 @@
 	else if(href_list["implant"])
 		var/mob/living/carbon/human/H = current
 
-		SET_BIT(H.hud_updateflag, IMPLOYAL_HUD)   // updates that players HUD images so secHUD's pick up they are implanted or not.
+		BITSET(H.hud_updateflag, IMPLOYAL_HUD)   // updates that players HUD images so secHUD's pick up they are implanted or not.
 
 		switch(href_list["implant"])
 			if("remove")
@@ -412,21 +407,22 @@
 						if(I in organs.implants)
 							qdel(I)
 							break
-				to_chat(H, SPAN_NOTICE(FONT_LARGE("<B>Your loyalty implant has been deactivated.</B>")))
+				to_chat(H, "<span class='notice'><font size =3><B>Your loyalty implant has been deactivated.</B></font></span>")
 				log_admin("[key_name_admin(usr)] has de-loyalty implanted [current].")
 			if("add")
-				to_chat(H, SPAN_DANGER(FONT_LARGE("You somehow have become the recepient of a loyalty transplant, and it just activated!")))
+				to_chat(H, "<span class='danger'><font size =3>You somehow have become the recepient of a loyalty transplant, and it just activated!</font></span>")
 				H.implant_loyalty(H, override = TRUE)
 				log_admin("[key_name_admin(usr)] has loyalty implanted [current].")
+			else
 	else if (href_list["silicon"])
-		SET_BIT(current.hud_updateflag, SPECIALROLE_HUD)
+		BITSET(current.hud_updateflag, SPECIALROLE_HUD)
 		switch(href_list["silicon"])
 
 			if("unemag")
 				var/mob/living/silicon/robot/R = current
 				if (istype(R))
 					R.emagged = FALSE
-					if (R.IsHolding(R.module.emag))
+					if (R.activated(R.module.emag))
 						R.module_active = null
 					if(R.module_state_1 == R.module.emag)
 						R.module_state_1 = null
@@ -445,7 +441,7 @@
 					for (var/mob/living/silicon/robot/R in ai.connected_robots)
 						R.emagged = FALSE
 						if (R.module)
-							if (R.IsHolding(R.module.emag))
+							if (R.activated(R.module.emag))
 								R.module_active = null
 							if(R.module_state_1 == R.module.emag)
 								R.module_state_1 = null
@@ -469,7 +465,7 @@
 				if (usr.client.holder.rights & R_FUN)
 					var/obj/item/device/uplink/suplink = find_syndicate_uplink()
 					if(!suplink)
-						to_chat(usr, SPAN_WARNING("Failed to find an uplink."))
+						to_chat(usr, "<span class='warning'>Failed to find an uplink.</span>")
 						return
 					var/crystals = suplink.uses
 					crystals = input("Amount of telecrystals for [key]","Operative uplink", crystals) as null|num
@@ -479,7 +475,7 @@
 
 	else if (href_list["obj_announce"])
 		var/obj_count = 1
-		to_chat(current, SPAN_NOTICE("Your current objectives:"))
+		to_chat(current, "<span class='notice'>Your current objectives:</span>")
 		for(var/datum/objective/objective in objectives)
 			to_chat(current, "<B>Objective #[obj_count]</B>: [objective.explanation_text]")
 			obj_count++
@@ -524,7 +520,7 @@
 	special_role =    null
 	role_alt_title =  null
 	assigned_job =    null
-	faction =		  MOB_FACTION_NEUTRAL
+	//faction =       null //Uncommenting this causes a compile error due to 'undefined type', fucked if I know.
 	changeling =      null
 	initial_account = null
 	objectives =      list()
@@ -532,10 +528,6 @@
 	has_been_rev =    0
 	rev_cooldown =    0
 	brigged_since =   -1
-
-/datum/mind/proc/add_known_mob(mob/M)
-	if(ismob(M))
-		known_mobs += M
 
 //Antagonist role check
 /mob/living/proc/check_special_role(role)
@@ -592,7 +584,7 @@
 	..()
 	mind.assigned_role = "Animal"
 
-/mob/living/simple_animal/passive/corgi/mind_initialize()
+/mob/living/simple_animal/friendly/corgi/mind_initialize()
 	..()
 	mind.assigned_role = "Corgi"
 

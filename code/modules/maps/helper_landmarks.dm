@@ -13,7 +13,7 @@
 	. = ..()
 	return INITIALIZE_HINT_LATELOAD
 
-/obj/effect/landmark/carnage_mark/LateInitialize(mapload)
+/obj/effect/landmark/carnage_mark/LateInitialize()
 	var/area/A = get_area(src)
 	for(var/atom/movable/AM in A)
 		if(AM && !AM.anchored && AM.simulated && prob(movement_prob))
@@ -30,7 +30,7 @@
 /obj/effect/landmark/clear/Initialize()
 	var/turf/simulated/wall/W = get_turf(src)
 	if(istype(W))
-		W.dismantle_wall(TRUE, TRUE)
+		W.dismantle_wall(1,1,1)
 	var/turf/simulated/mineral/M = W
 	if(istype(M))
 		M.GetDrilled()
@@ -58,7 +58,7 @@
 	. = ..()
 	GLOB.shuttle_added.register_global(src, .proc/check_shuttle)
 
-/obj/effect/landmark/delete_on_shuttle/proc/check_shuttle(shuttle)
+/obj/effect/landmark/delete_on_shuttle/proc/check_shuttle(var/shuttle)
 	if(SSshuttle.shuttles[shuttle_name] == shuttle)
 		GLOB.shuttle_moved_event.register(shuttle, src, .proc/delete_everything)
 		shuttle_datum = shuttle

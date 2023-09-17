@@ -1,16 +1,16 @@
-/mob/proc/can_emote(emote_type)
+/mob/proc/can_emote(var/emote_type)
 	return (stat == CONSCIOUS)
 
-/mob/living/can_emote(emote_type)
-	return (..() && !(silent && emote_type == AUDIBLE_MESSAGE))
+/mob/living/can_emote(var/emote_type)
+	return (..() && !(silent && emote_type == AUDIBLE_MESSAGE) && emoteCooldownCheck() == 1)
 
-/mob/proc/emote(act, m_type, message)
+/mob/proc/emote(var/act, var/m_type, var/message)
 	// s-s-snowflake
-	if((src.stat == DEAD || status_flags & FAKEDEATH) && act != "deathgasp")
+	if(src.stat == DEAD && act != "deathgasp")
 		return
 	if(usr == src) //client-called emote
 		if (client && (client.prefs.muted & MUTE_IC))
-			to_chat(src, SPAN_WARNING("You cannot send IC messages (muted)."))
+			to_chat(src, "<span class='warning'>You cannot send IC messages (muted).</span>")
 			return
 
 		if(act == "help")
@@ -18,7 +18,7 @@
 			return
 
 		if(!can_emote(m_type))
-			to_chat(src, SPAN_WARNING("You cannot currently [m_type == AUDIBLE_MESSAGE ? "audibly" : "visually"] emote!"))
+			to_chat(src, "<span class='warning'>You cannot currently [m_type == AUDIBLE_MESSAGE ? "audibly" : "visually"] emote!</span>")
 			return
 
 		if(act == "me")
@@ -42,9 +42,9 @@
 		act = copytext(tempstr,1,splitpoint)
 		message = copytext(tempstr,splitpoint+1,0)
 
-	var/singleton/emote/use_emote = usable_emotes[act]
+	var/decl/emote/use_emote = usable_emotes[act]
 	if(!use_emote)
-		to_chat(src, SPAN_WARNING("Unknown emote '[act]'. Type <b>say *help</b> for a list of usable emotes."))
+		to_chat(src, "<span class='warning'>Unknown emote '[act]'. Type <b>say *help</b> for a list of usable emotes.</span>")
 		return
 
 	if(m_type != use_emote.message_type && use_emote.conscious && stat != CONSCIOUS)
@@ -60,18 +60,20 @@
 		if (I.implanted)
 			I.trigger(act, src)
 
-/mob/proc/format_emote(emoter = null, message = null)
+
+/mob/proc/format_emote(var/emoter = null, var/message = null)
 	var/pretext
 	var/subtext
 	var/nametext
 	var/end_char
 	var/start_char
 	var/name_anchor
-	var/anchor_char = get_prefix_key(/singleton/prefix/visible_emote)
+	var/anchor_char = get_prefix_key(/decl/prefix/visible_emote)
 
 	if(!message || !emoter)
 		return
 
+	message = replacetext(message, "&#255;", "__:Я:_") // Никому же в голову не придет такое написать? (2) ~bear1ake@inf-dev
 	message = html_decode(message)
 
 	name_anchor = findtext(message, anchor_char)
@@ -85,7 +87,7 @@
 	// Oh shit, we got this far! Let's see... did the user attempt to use more than one token?
 	if(findtext(subtext, anchor_char))
 		// abort abort!
-		to_chat(emoter, SPAN_WARNING("You may use only one \"[anchor_char]\" symbol in your emote."))
+		to_chat(emoter, "<span class='warning'>You may use only one \"[anchor_char]\" symbol in your emote.</span>")
 		return
 
 	if(pretext)
@@ -113,9 +115,12 @@
 	subtext = html_encode(subtext)
 	// Store the player's name in a nice bold, naturalement
 	nametext = "<B>[emoter]</B>"
-	return pretext + nametext + subtext
+	var/overall = pretext + nametext + subtext
+	overall = replacetext(overall, "__:Я:_", "&#255;")
+	return overall
 
-/mob/proc/custom_emote(m_type = VISIBLE_MESSAGE, message = null)
+/mob/proc/custom_emote(var/m_type = VISIBLE_MESSAGE, var/message = null)
+	log_emote(message, src)
 
 	if((usr && stat) || (!use_me && usr == src))
 		to_chat(src, "You are unable to emote.")
@@ -132,8 +137,9 @@
 	else
 		return
 	message = process_chat_markup(message)
-	if (message)
-		log_emote("[name]/[key] : [message]")
+	message = say_emphasis(message)
+
+
 	//do not show NPC animal emotes to ghosts, it turns into hellscape
 	var/check_ghosts = client ? /datum/client_preference/ghost_sight : null
 	if(m_type == VISIBLE_MESSAGE)
@@ -142,16 +148,16 @@
 		audible_message(message, checkghosts = check_ghosts)
 
 // Specific mob type exceptions below.
-/mob/living/silicon/ai/emote(act, type, message)
+/mob/living/silicon/ai/emote(var/act, var/type, var/message)
 	var/obj/machinery/hologram/holopad/T = src.holo
 	if(T && T.masters[src]) //Is the AI using a holopad?
 		src.holopad_emote(message)
 	else //Emote normally, then.
 		..()
 
-/mob/living/captive_brain/emote(message)
+/mob/living/captive_brain/emote(var/message)
 	return
 
-/mob/observer/ghost/emote(act, type, message)
+/mob/observer/ghost/emote(var/act, var/type, var/message)
 	if(message && act == "me")
-		communicate(/singleton/communication_channel/dsay, client, message, /singleton/dsay_communication/emote)
+		communicate(/decl/communication_channel/dsay, client, message, /decl/dsay_communication/emote)

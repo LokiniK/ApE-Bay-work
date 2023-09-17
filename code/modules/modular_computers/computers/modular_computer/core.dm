@@ -1,13 +1,13 @@
 /obj/item/modular_computer/Process()
 	if(!enabled) // The computer is turned off
 		last_power_usage = 0
-		return
+		return 0
 
 	handle_power() // Handles all power interaction
 
-	if (get_damage_value() > broken_damage)
+	if(damage > broken_damage)
 		shutdown_computer()
-		return
+		return 0
 
 	var/datum/extension/interactive/ntos/os = get_extension(src, /datum/extension/interactive/ntos)
 	if(os)
@@ -18,27 +18,27 @@
 		ambience_last_played = world.time
 		playsound(src.loc, pick(beepsounds),15,1,10, is_ambiance = 1)
 
-/obj/item/modular_computer/ui_interact(mob/user, ui_key = "main", datum/nanoui/ui = null, force_open = 1)
+/obj/item/modular_computer/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1)
 	var/datum/extension/interactive/ntos/os = get_extension(src, /datum/extension/interactive/ntos)
 	if(os)
 		os.ui_interact(user)
 
-/// Used to perform preset-specific hardware changes.
+// Used to perform preset-specific hardware changes.
 /obj/item/modular_computer/proc/install_default_hardware()
-	return
+	return 1
 
-/// Used to install preset-specific programs
+// Used to install preset-specific programs
 /obj/item/modular_computer/proc/install_default_programs()
-	return
+	return 1
 
-/obj/item/modular_computer/proc/install_default_programs_by_job(mob/living/carbon/human/H)
+/obj/item/modular_computer/proc/install_default_programs_by_job(var/mob/living/carbon/human/H)
 	var/datum/job/jb = SSjobs.get_by_title(H.job)
 	if(!jb) return
 	for(var/prog_type in jb.software_on_spawn)
 		var/datum/computer_file/program/prog_file = prog_type
 		if(initial(prog_file.usage_flags) & hardware_flag)
 			prog_file = new prog_file
-			hard_drive.create_file(prog_file)
+			hard_drive.store_file(prog_file)
 
 /obj/item/modular_computer/Initialize()
 	START_PROCESSING(SSobj, src)
@@ -67,7 +67,7 @@
 		qdel(CH)
 	return ..()
 
-/obj/item/modular_computer/emag_act(remaining_charges, mob/user)
+/obj/item/modular_computer/emag_act(var/remaining_charges, var/mob/user)
 	if(computer_emagged)
 		to_chat(user, "\The [src] was already emagged.")
 		return NO_EMAG_ACT
@@ -81,8 +81,11 @@
 
 	overlays.Cut()
 	var/datum/extension/interactive/ntos/os = get_extension(src, /datum/extension/interactive/ntos)
+	var/crappy_type_check
+	if(istype(src, /obj/item/modular_computer/telescreen) )
+		crappy_type_check++
 	if(os)
-		overlays += os.get_screen_overlay()
+		overlays += os.get_screen_overlay(crappy_type_check)
 		overlays += os.get_keyboard_overlay()
 
 	if(enabled)
@@ -90,13 +93,13 @@
 	else
 		set_light(0)
 
-/obj/item/modular_computer/proc/turn_on(mob/user)
+/obj/item/modular_computer/proc/turn_on(var/mob/user)
 	if(bsod)
 		return
 	if(tesla_link)
-		tesla_link.enabled = TRUE
+		tesla_link.enabled = 1
 	var/issynth = issilicon(user) // Robots and AIs get different activation messages.
-	if (get_damage_value() > broken_damage)
+	if(damage > broken_damage)
 		if(issynth)
 			to_chat(user, "You send an activation signal to \the [src], but it responds with an error code. It must be damaged.")
 		else
@@ -115,19 +118,19 @@
 		else
 			to_chat(user, "You press the power button but \the [src] does not respond.")
 
-/obj/item/modular_computer/proc/shutdown_computer(loud = 1)
+/obj/item/modular_computer/proc/shutdown_computer(var/loud = 1)
 	QDEL_NULL_LIST(terminals)
 
 	if(loud)
 		visible_message("\The [src] shuts down.", range = 1)
 
-	enabled = FALSE
+	enabled = 0
 	var/datum/extension/interactive/ntos/os = get_extension(src, /datum/extension/interactive/ntos)
 	if(os)
 		os.system_shutdown()
 
-/obj/item/modular_computer/proc/enable_computer(mob/user = null)
-	enabled = TRUE
+/obj/item/modular_computer/proc/enable_computer(var/mob/user = null)
+	enabled = 1
 	var/datum/extension/interactive/ntos/os = get_extension(src, /datum/extension/interactive/ntos)
 	if(os)
 		os.system_boot()

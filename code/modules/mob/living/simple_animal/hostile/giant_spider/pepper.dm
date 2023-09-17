@@ -7,13 +7,13 @@
 	icon_living = "pepper"
 	icon_dead = "pepper_dead"
 
-	maxHealth = 70
-	health = 70
+	maxHealth = 210
+	health = 210
 
 	poison_chance = 20
 	poison_per_bite = 5
 	poison_type = /datum/reagent/toxin/irritanttoxin
 
 /mob/living/simple_animal/hostile/giant_spider/pepper/Initialize()
-	SetTransform(scale = 1.1)
+	scale(1.1)
 	return ..()

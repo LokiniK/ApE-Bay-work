@@ -1,4 +1,4 @@
-/mob/living/carbon/alien/diona/get_scooped(mob/living/carbon/grabber)
+/mob/living/carbon/alien/diona/get_scooped(var/mob/living/carbon/grabber)
 	if(grabber.species.name == SPECIES_DIONA && do_merge(grabber))
 		return
 	else return ..()
@@ -6,36 +6,27 @@
 /mob/living/carbon/alien/diona/MouseDrop(atom/over_object)
 	var/mob/living/carbon/H = over_object
 
-	if(istype(H) && Adjacent(H) && (usr == H) && (H.a_intent == "grab") && hat && H.HasFreeHand())
+	if(istype(H) && Adjacent(H) && (usr == H) && (H.a_intent == "grab") && hat && !(H.l_hand && H.r_hand))
 		H.put_in_hands(hat)
-		H.visible_message(SPAN_DANGER("\The [H] removes \the [src]'s [hat]."))
+		H.visible_message("<span class='danger'>\The [H] removes \the [src]'s [hat].</span>")
 		hat = null
 		update_icons()
 		return
 
 	return ..()
 
-
-/mob/living/carbon/alien/diona/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Hat - Equip hat
-	if (istype(tool, /obj/item/clothing/head))
-		if (hat)
-			USE_FEEDBACK_FAILURE("\The [src] is already wearing \a [hat].")
-			return TRUE
-		if (!user.unEquip(tool, src))
-			FEEDBACK_UNEQUIP_FAILURE(user, tool)
-			return TRUE
-		wear_hat(tool)
-		user.visible_message(
-			SPAN_NOTICE("\The [user] puts \a [tool] on \the [src]."),
-			SPAN_NOTICE("You put \the [tool] on \the [src].")
-		)
-		return TRUE
-
+/mob/living/carbon/alien/diona/attackby(var/obj/item/W, var/mob/user)
+	if(user.a_intent == I_HELP && istype(W, /obj/item/clothing/head))
+		if(hat)
+			to_chat(user, "<span class='warning'>\The [src] is already wearing \the [hat].</span>")
+			return
+		user.unEquip(W)
+		wear_hat(W)
+		user.visible_message("<span class='notice'>\The [user] puts \the [W] on \the [src].</span>")
+		return
 	return ..()
 
-
-/mob/living/carbon/alien/diona/UnarmedAttack(atom/A)
+/mob/living/carbon/alien/diona/UnarmedAttack(var/atom/A)
 
 	setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
 
@@ -53,7 +44,7 @@
 		// don't want to touch that pile.
 
 		if(istype(A, /obj/machinery/seed_storage))
-			visible_message(SPAN_DANGER("\The [src] headbutts \the [A]!"))
+			visible_message("<span class='danger'>\The [src] headbutts \the [A]!</span>")
 			var/obj/machinery/seed_storage/G = A
 			if(LAZYLEN(G.piles))
 				var/datum/seed_pile/pile = pick(G.piles)
@@ -65,7 +56,7 @@
 						G.piles -= pile
 						qdel(pile)
 					S.forceMove(get_turf(G))
-					G.visible_message(SPAN_NOTICE("\A [S] falls out!"))
+					G.visible_message("<span class='notice'>\A [S] falls out!</span>")
 			return
 		// End superhacky stuff.
 
@@ -76,15 +67,15 @@
 
 	if(istype(A, /mob))
 		if(src != A && !gestalt_with(A))
-			visible_message(SPAN_NOTICE("\The [src] butts its head into \the [A]."))
+			visible_message("<span class='notice'>\The [src] butts its head into \the [A].</span>")
 		return
 
 	. = ..()
 
-/mob/living/carbon/alien/diona/RangedAttack(atom/A, params)
+/mob/living/carbon/alien/diona/RangedAttack(atom/A, var/params)
 	if((a_intent == I_HURT || a_intent == I_GRAB) && holding_item)
 		setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
-		visible_message(SPAN_DANGER("\The [src] spits \a [holding_item] at \the [A]!"))
+		visible_message("<span class='danger'>\The [src] spits \a [holding_item] at \the [A]!</span>")
 		var/atom/movable/temp = holding_item
 		unEquip(holding_item)
 		if(temp)
@@ -92,7 +83,7 @@
 		return TRUE
 	. = ..()
 
-/mob/living/carbon/alien/diona/proc/handle_tray_interaction(obj/machinery/portable_atmospherics/hydroponics/tray)
+/mob/living/carbon/alien/diona/proc/handle_tray_interaction(var/obj/machinery/portable_atmospherics/hydroponics/tray)
 
 	if(incapacitated())
 		return
@@ -107,38 +98,38 @@
 	if(tray.dead)
 		if(tray.remove_dead(src, silent = TRUE))
 			reagents.add_reagent(/datum/reagent/nutriment/glucose, rand(10,20))
-			visible_message(SPAN_NOTICE("<b>\The [src]</b> chews up the dead plant, clearing \the [tray] out."), SPAN_NOTICE("You devour the dead plant, clearing \the [tray]."))
+			visible_message("<span class='notice'><b>\The [src]</b> chews up the dead plant, clearing \the [tray] out.</span>", "<span class='notice'>You devour the dead plant, clearing \the [tray].</span>")
 		return
 
 	if(tray.harvest)
 		if(tray.harvest(src))
-			visible_message(SPAN_NOTICE("<b>\The [src]</b> harvests from \the [tray]."), SPAN_NOTICE("You harvest the contents of \the [tray]."))
+			visible_message("<span class='notice'><b>\The [src]</b> harvests from \the [tray].</span>", "<span class='notice'>You harvest the contents of \the [tray].</span>")
 		return
 
 	if(tray.weedlevel || tray.pestlevel)
 		reagents.add_reagent(/datum/reagent/nutriment/glucose, (tray.weedlevel + tray.pestlevel))
 		tray.weedlevel = 0
 		tray.pestlevel = 0
-		visible_message(SPAN_NOTICE("<b>\The [src]</b> begins rooting through \the [tray], ripping out pests and weeds, and eating them noisily."),SPAN_NOTICE("You begin rooting through \the [tray], ripping out pests and weeds, and eating them noisily."))
+		visible_message("<span class='notice'><b>\The [src]</b> begins rooting through \the [tray], ripping out pests and weeds, and eating them noisily.</span>","<span class='notice'>You begin rooting through \the [tray], ripping out pests and weeds, and eating them noisily.</span>")
 		return
 
 	if(tray.nutrilevel < 10)
 		var/nutrition_cost = (10-tray.nutrilevel) * 5
 		if(nutrition >= nutrition_cost)
-			visible_message(SPAN_NOTICE("<b>\The [src]</b> secretes a trickle of green liquid, refilling [tray]."),SPAN_NOTICE("You secrete some nutrients into \the [tray]."))
+			visible_message("<span class='notice'><b>\The [src]</b> secretes a trickle of green liquid, refilling [tray].</span>","<span class='notice'>You secrete some nutrients into \the [tray].</span>")
 			tray.nutrilevel = 10
 			adjust_nutrition(-((10-tray.nutrilevel) * 5))
 		else
-			to_chat(src, SPAN_NOTICE("You haven't eaten enough to refill \the [tray]'s nutrients."))
+			to_chat(src, "<span class='notice'>You haven't eaten enough to refill \the [tray]'s nutrients.</span>")
 		return
 
 	if(tray.waterlevel < 100)
-		var/nutrition_cost = floor((100-tray.nutrilevel)/10) * 5
+		var/nutrition_cost = Floor((100-tray.nutrilevel)/10) * 5
 		if(nutrition >= nutrition_cost)
-			visible_message(SPAN_NOTICE("<b>\The [src]</b> secretes a trickle of clear liquid, refilling [tray]."),SPAN_NOTICE("You secrete some water into \the [tray]."))
+			visible_message("<span class='notice'><b>\The [src]</b> secretes a trickle of clear liquid, refilling [tray].</span>","<span class='notice'>You secrete some water into \the [tray].</span>")
 			tray.waterlevel = 100
 		else
-			to_chat(src, SPAN_NOTICE("You haven't eaten enough to refill \the [tray]'s water."))
+			to_chat(src, "<span class='notice'>You haven't eaten enough to refill \the [tray]'s water.</span>")
 		return
 
-	visible_message(SPAN_NOTICE("<b>\The [src]</b> rolls around in \the [tray] for a bit."),SPAN_NOTICE("You roll around in \the [tray] for a bit."))
+	visible_message("<span class='notice'><b>\The [src]</b> rolls around in \the [tray] for a bit.</span>","<span class='notice'>You roll around in \the [tray] for a bit.</span>")

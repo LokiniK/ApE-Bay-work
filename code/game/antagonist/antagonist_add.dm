@@ -1,4 +1,4 @@
-/datum/antagonist/proc/add_antagonist(datum/mind/player, ignore_role, do_not_equip, move_to_spawn, do_not_announce, preserve_appearance)
+/datum/antagonist/proc/add_antagonist(var/datum/mind/player, var/ignore_role, var/do_not_equip, var/move_to_spawn, var/do_not_announce, var/preserve_appearance)
 
 	if(!add_antagonist_mind(player, ignore_role))
 		return
@@ -26,15 +26,11 @@
 		if(!do_not_equip)
 			equip(player.current)
 
-	if(faction && player.current)
-		if(no_prior_faction)
-			player.current.last_faction = faction
-		else
-			player.current.last_faction = player.current.faction
+	if(player.current)
 		player.current.faction = faction
 	return 1
 
-/datum/antagonist/proc/add_antagonist_mind(datum/mind/player, ignore_role, nonstandard_role_type, nonstandard_role_msg)
+/datum/antagonist/proc/add_antagonist_mind(var/datum/mind/player, var/ignore_role, var/nonstandard_role_type, var/nonstandard_role_msg)
 	if(!istype(player))
 		return 0
 	if(!player.current)
@@ -44,7 +40,6 @@
 	if(!can_become_antag(player, ignore_role))
 		return 0
 	current_antagonists |= player
-	GLOB.destroyed_event.register(player, src, .proc/remove_antagonist)
 
 	if(faction_verb)
 		player.current.verbs |= faction_verb
@@ -56,44 +51,56 @@
 		player.current.client.verbs += /client/proc/aooc
 
 	spawn(1 SECOND) //Added a delay so that this should pop up at the bottom and not the top of the text flood the new antag gets.
-		to_chat(player.current, SPAN_NOTICE("Once you decide on a goal to pursue, you can optionally display it to \
+/*[ORIGINAL]
+		to_chat(player.current, "<span class='notice'>Once you decide on a goal to pursue, you can optionally display it to \
 			everyone at the end of the shift with the <b>Set Ambition</b> verb, located in the IC tab.  You can change this at any time, \
-			and it otherwise has no bearing on your round."))
-	player.current.verbs += /mob/living/proc/set_ambition
+			and it otherwise has no bearing on your round.</span>")
+[/ORIGINAL]*/
+//[INF]
+	if(ambitious)
+/* INF
+		to_chat(player.current, SPAN_NOTICE("Вы можете самостоятельно назначить себе особые цели, которые будут видны \
+		всем игрокам после завершения раунда. Если ваши основные цели вызывают у вас отторжение и вы хотели бы \
+		выполнить что-то <u>более интересное</u>, то вы можете использовать <b>Set Ambition</b> для выставления \
+		себе желаемых целей (они могут отличаться от стандартных - проявите фантазию).<br>\
+		Старайтесь действовать после получаса игры - до этого планируйте и делайте вид, что вы - обычный член персонала. \
+		Не заставляйте экипаж скучать 2 часа, чтобы вы в последние 10 минут попыталсь бесславно выполнить механо-задания."))
+*/
+		to_chat(player.current, SPAN_NOTICE("Вы должны самостоятельно придумать себе цели, которые будете \
+		преследовать как антагонист. Они должны содержать в себе что-то, что вредит и представляет угрозу экипажу \
+		(примеры или конкретные задания, возможно, были описаны выше). Не забывайте также о том, что вашему \
+		персонажу желательно пережить все события, а не умереть \"геройской смертью\". \
+		Используйте для этого <b>Set Ambition</b> (во вкладке IC), чтобы после завершения раунда другие игроки видели, \
+		к чему вы стремились."))
+
+		player.current.verbs += /mob/living/proc/set_ambition
 
 	// Handle only adding a mind and not bothering with gear etc.
 	if(nonstandard_role_type)
 		faction_members |= player
-		to_chat(player.current, SPAN_DANGER(FONT_LARGE("You are \a [nonstandard_role_type]!")))
+		to_chat(player.current, "<span class='danger'><font size=3>You are \a [nonstandard_role_type]!</font></span>")
 		player.special_role = nonstandard_role_type
 		if(nonstandard_role_msg)
-			to_chat(player.current, SPAN_NOTICE("[nonstandard_role_msg]"))
+			to_chat(player.current, "<span class='notice'>[nonstandard_role_msg]</span>")
 		update_icons_added(player)
 	return 1
 
-/datum/antagonist/proc/remove_antagonist(datum/mind/player, show_message, implanted)
-	GLOB.destroyed_event.unregister(player, src, .proc/remove_antagonist)
+/datum/antagonist/proc/remove_antagonist(var/datum/mind/player, var/show_message, var/implanted)
 	if(!istype(player))
-		current_antagonists -= player
 		return 0
-	if (player.current)
-		if (faction_verb)
-			player.current.verbs -= faction_verb
-		if (faction && player.current.faction == faction)
-			if(player.current.faction == player.current.last_faction)
-				player.current.faction = MOB_FACTION_NEUTRAL
-			else
-				player.current.faction = player.current.last_faction
-			player.current.last_faction = faction
+	if(player.current && faction_verb)
+		player.current.verbs -= faction_verb
+	if(faction && player.current.faction == faction)
+		player.current.faction = MOB_FACTION_NEUTRAL
 	if(player in current_antagonists)
-		to_chat(player.current, SPAN_DANGER(FONT_LARGE("You are no longer a [role_text]!")))
+		to_chat(player.current, "<span class='danger'><font size = 3>You are no longer a [role_text]!</font></span>")
 		current_antagonists -= player
 		faction_members -= player
 		player.special_role = null
 		update_icons_removed(player)
 
 		if(player.current)
-			SET_BIT(player.current.hud_updateflag, SPECIALROLE_HUD)
+			BITSET(player.current.hud_updateflag, SPECIALROLE_HUD)
 			player.current.reset_skillset() //Reset their skills to be job-appropriate.
 
 		if(!is_special_character(player))

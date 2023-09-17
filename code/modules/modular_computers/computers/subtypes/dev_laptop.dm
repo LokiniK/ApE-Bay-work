@@ -1,20 +1,20 @@
 /obj/item/modular_computer/laptop
-	anchored = TRUE
 	name = "laptop computer"
 	desc = "A portable clamshell computer."
-	hardware_flag = PROGRAM_LAPTOP
-	icon_state_unpowered = "laptop-open"
-	icon = 'icons/obj/modular_laptop.dmi'
+	icon = 'infinity/icons/obj/modular_laptop.dmi'
 	icon_state = "laptop-open"
-	w_class = ITEM_SIZE_NORMAL
-	base_idle_power_usage = 25
-	base_active_power_usage = 200
-	max_hardware_size = 2
-	light_strength = 3
-	health_max = 200
-	broken_damage = 100
-	w_class = ITEM_SIZE_NORMAL
+	icon_state_unpowered = "laptop-open"
 	var/icon_state_closed = "laptop-closed"
+	anchored = FALSE
+	w_class = ITEM_SIZE_NORMAL
+	base_idle_power_usage = 5
+	base_active_power_usage = 50
+	light_strength = 3
+	max_damage = 200
+	broken_damage = 100
+	max_hardware_size = 2
+	hardware_flag = PROGRAM_LAPTOP
+	w_class = ITEM_SIZE_NORMAL
 	interact_sounds = list("keyboard", "keystroke")
 	interact_sound_volume = 20
 
@@ -22,18 +22,27 @@
 	. = ..()
 	screen_on = anchored
 
-/obj/item/modular_computer/laptop/AltClick(mob/user)
+/obj/item/modular_computer/laptop/CouldUseTopic(var/mob/user)
+	..()
+	if(istype(user, /mob/living/carbon))
+		if(prob(50))
+			playsound(src, "keyboard", 20)
+		else
+			playsound(src, "keystroke", 20)
+
+/obj/item/modular_computer/laptop/AltClick(var/mob/user)
 // Prevents carrying of open laptops inhand.
 // While they work inhand, i feel it'd make tablets lose some of their high-mobility advantage they have over laptops now.
 	if(!CanPhysicallyInteract(user))
-		return FALSE
-	if(!isturf(loc))
+		return
+	if(!istype(loc, /turf/))
 		to_chat(usr, "\The [src] has to be on a stable surface first!")
-		return TRUE
+		return
 	anchored = !anchored
 	screen_on = anchored
+
+	dir = get_dir(loc, user.loc)
 	update_icon()
-	return TRUE
 
 /obj/item/modular_computer/laptop/on_update_icon()
 	if(anchored)
@@ -42,5 +51,18 @@
 		overlays.Cut()
 		icon_state = icon_state_closed
 
-/obj/item/modular_computer/laptop/preset
-	anchored = FALSE
+/obj/item/modular_computer/laptop/verb/rotatelaptop()
+	set name = "Rotate laptop"
+	set category = "Object"
+	set src in view(1)
+
+	if(usr.stat == DEAD)
+		if(!round_is_spooky())
+			to_chat(src, "<span class='warning'>The veil is not thin enough for you to do that.</span>")
+			return
+
+	src.set_dir(turn(src.dir, -90))
+
+/obj/item/modular_computer/laptop/update_verbs()
+	..()
+	verbs |= /obj/item/modular_computer/laptop/verb/rotatelaptop

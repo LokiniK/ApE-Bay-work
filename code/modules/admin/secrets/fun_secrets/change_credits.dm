@@ -7,19 +7,20 @@ GLOBAL_VAR_INIT(end_credits_title, null)
 
 /datum/admin_secret_item/fun_secret/change_credits_song/do_execute()
 	set waitfor = FALSE
-	var/list/available = GET_SINGLETON_SUBTYPE_MAP(/singleton/audio/track)
+	var/list/available = decls_repository.get_decls_of_subtype(/decl/audio/track)
 	var/list/tracks = list()
 	for (var/key in available)
-		var/singleton/audio/track/track = available[key]
+		var/decl/audio/track/track = available[key]
 		tracks[track.title] = track
 	available = null
 	var/data = input(usr, "Select Credits Track", "Credits Track") as null | anything in tracks
 	if (isnull(data))
 		return
-	var/singleton/audio/track/track = tracks[tracks]
+	var/decl/audio/track/track = tracks[tracks]
 	if (!track)
 		return
 	GLOB.end_credits_song = track.source
+	SSstatistics.add_field_details("admin_verb","CECS")
 
 
 
@@ -35,3 +36,4 @@ GLOBAL_VAR_INIT(end_credits_title, null)
 	if (data == "")
 		data = null
 	GLOB.end_credits_title = data
+	SSstatistics.add_field_details("admin_verb","CECT")

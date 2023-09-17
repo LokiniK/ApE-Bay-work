@@ -329,7 +329,7 @@
 		var/crew = selected_mission.flight_plan.manifest.get_value(in_line = 1)
 		var/time = selected_mission.flight_plan.planned_depart.get_value()
 		if(!crew || !time)
-			to_chat(user, SPAN_WARNING("Please fill in the crew manifest and departure time first."))
+			to_chat(user, "<span class='warning'>Please fill in the crew manifest and departure time first.</span>")
 			return 1
 		var/place = selected_shuttle.name
 		if(alert(user, "Would you like to choose a custom gathering point, or just use [place]?", "Announcement Creation", "Default", "Custom") == "Custom")
@@ -341,10 +341,10 @@
 			return 1
 		var/datum/shuttle_log/my_log = SSshuttle.shuttle_logs[selected_shuttle]
 		if(world.time - my_log.last_spam >= 1 MINUTE) //Slow down with that spam button
-			GLOB.global_announcer.autosay("The [selected_shuttle.name] is planning to depart on a mission promptly at [time]. The following crew members are to make their way to \the [place] immediately: [crew].", "Hangar Announcement System")
+			GLOB.global_announcer.autosay("[selected_shuttle.name] планирует отбывать на миссию в [time]. Следующим членам экипажа проследовать в [place] незамедлительно: [crew].", "Hangar Announcement System")
 			my_log.last_spam = world.time
 		else
-			to_chat(user, SPAN_WARNING("It's too soon after the previous announcement!"))
+			to_chat(user, "<span class='warning'>It's too soon after the previous announcement!</span>")
 		return 1
 	if(href_list["email_crew"])
 		var/shuttle_name = href_list["shuttle"]

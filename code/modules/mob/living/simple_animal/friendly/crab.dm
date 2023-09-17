@@ -1,5 +1,5 @@
 //Look Sir, free crabs!
-/mob/living/simple_animal/passive/crab
+/mob/living/simple_animal/friendly/crab
 	name = "crab"
 	desc = "A hard-shelled crustacean. Seems quite content to lounge around all the time."
 	icon_state = "crab"
@@ -20,16 +20,19 @@
 	)
 	density = FALSE
 
-	meat_type = /obj/item/reagent_containers/food/snacks/shellfish/crab
+	meat_amount =   3
 	skin_material = MATERIAL_SKIN_CHITIN
 	skin_amount =   10
 	bone_material = null
 	bone_amount =   0
 
+	var/obj/item/inventory_head
+	var/obj/item/inventory_mask
+
 	ai_holder = /datum/ai_holder/simple_animal/passive/crab
 	say_list_type = /datum/say_list/crab
 
-/mob/living/simple_animal/passive/crab/Life()
+/mob/living/simple_animal/crab/Life()
 	. = ..()
 	if(!.)
 		return FALSE
@@ -43,7 +46,7 @@
 	regenerate_icons()
 
 //COFFEE! SQUEEEEEEEEE!
-/mob/living/simple_animal/passive/crab/Coffee
+/mob/living/simple_animal/crab/Coffee
 	name = "Coffee"
 	real_name = "Coffee"
 	desc = "It's Coffee, the other pet!"

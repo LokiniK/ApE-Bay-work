@@ -1,21 +1,19 @@
 /obj/structure/table/rack
 	name = "rack"
 	desc = "Different from the Middle Ages version."
-	icon = 'icons/obj/structures/furniture.dmi'
+	icon = 'icons/obj/objects.dmi'
 	icon_state = "rack"
 	can_plate = 0
 	can_reinforce = 0
 	flipped = -1
-	obj_flags = EMPTY_BITFIELD // No tabling objects
 
-/obj/structure/table/rack/New()
-	..()
-	verbs -= /obj/structure/table/verb/do_flip
-	verbs -= /obj/structure/table/proc/do_put
+	material = DEFAULT_FURNITURE_MATERIAL
 
 /obj/structure/table/rack/Initialize()
-	auto_align()
 	. = ..()
+	auto_align()
+	verbs -= /obj/structure/table/verb/do_flip
+	verbs -= /obj/structure/table/proc/do_put
 
 /obj/structure/table/rack/update_connections()
 	return
@@ -30,8 +28,5 @@
 	return FALSE
 
 /obj/structure/table/rack/holorack/dismantle(obj/item/wrench/W, mob/user)
-	to_chat(user, SPAN_WARNING("You cannot dismantle \the [src]."))
+	to_chat(user, "<span class='warning'>You cannot dismantle \the [src].</span>")
 	return
-
-/obj/structure/table/rack/dark
-	color = COLOR_GRAY40

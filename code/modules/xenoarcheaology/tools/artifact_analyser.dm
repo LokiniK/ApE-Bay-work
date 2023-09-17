@@ -1,8 +1,8 @@
 /obj/machinery/artifact_analyser
 	name = "Anomaly Analyser"
 	desc = "Studies the emissions of anomalous materials to discover their uses."
-	icon = 'icons/obj/machines/research/xenoarcheology_scanner.dmi'
-	icon_state = "xenoarch_console"
+	icon = 'icons/obj/xenoarchaeology.dmi'
+	icon_state = "xenoarch_analyser1"
 	anchored = TRUE
 	density = TRUE
 	var/scan_in_progress = 0
@@ -27,7 +27,7 @@
 /obj/machinery/artifact_analyser/DefaultTopicState()
 	return GLOB.physical_state
 
-/obj/machinery/artifact_analyser/interface_interact(mob/user)
+/obj/machinery/artifact_analyser/interface_interact(var/mob/user)
 	interact(user)
 	return TRUE
 
@@ -38,7 +38,7 @@
 		reconnect_scanner()
 
 	if(!owned_scanner)
-		dat += "<b>[SPAN_COLOR("red", "Unable to locate analysis pad.")]</b><br>"
+		dat += "<b><font color=red>Unable to locate analysis pad.</font></b><br>"
 	else if(scan_in_progress)
 		dat += "Please wait. Analysis in progress.<br>"
 		dat += "<a href='?src=\ref[src];halt_scan=1'>Halt scanning.</a><br>"
@@ -71,14 +71,13 @@
 			results = get_scan_info(scanned_object)
 
 		src.visible_message("<b>[name]</b> states, \"Scanning complete.\"")
-		var/obj/item/paper/anomaly_scan/P = new(src.loc)
+		var/obj/item/paper/P = new(src.loc)
 		P.SetName("[src] report #[++report_num]")
 		P.info = "<b>[src] analysis report #[report_num]</b><br>"
 		P.info += "<br>"
 		P.info += "\icon[scanned_object] [results]"
 		P.stamped = list(/obj/item/stamp)
 		P.queue_icon_update()
-		P.is_copy = FALSE
 
 		if(scanned_object && istype(scanned_object, /obj/machinery/artifact))
 			var/obj/machinery/artifact/A = scanned_object
@@ -129,7 +128,7 @@
 		interact(user)
 
 //hardcoded responses, oh well
-/obj/machinery/artifact_analyser/proc/get_scan_info(obj/scanned_obj)
+/obj/machinery/artifact_analyser/proc/get_scan_info(var/obj/scanned_obj)
 	switch(scanned_obj.type)
 		if(/obj/machinery/auto_cloner)
 			return "Automated cloning pod - appears to rely on an artificial ecosystem formed by semi-organic nanomachines and the contained liquid.<br>The liquid resembles protoplasmic residue supportive of unicellular organism developmental conditions.<br>The structure is composed of a titanium alloy."
@@ -143,6 +142,8 @@
 			return "Tribal pylon - subject resembles statues/emblems built by cargo cult civilisations to honour energy systems from post-warp civilisations."
 		if(/obj/machinery/replicator)
 			return "Automated construction unit - subject appears to be able to synthesize various objects given a material, some with simple internal circuitry. Method unknown."
+		if(/obj/structure/crystal)
+			return "Crystal formation - pseudo-organic crystalline matrix, unlikely to have formed naturally. No known technology exists to synthesize this exact composition."
 		if(/obj/machinery/artifact)
 			var/obj/machinery/artifact/A = scanned_obj
 			var/out = "Anomalous alien device - composed of an unknown alloy.<br><br>"
@@ -153,9 +154,6 @@
 			if(A.secondary_effect)
 				out += "<br><br>Internal scans indicate ongoing secondary activity operating independently from primary systems.<br><br>"
 				out += A.secondary_effect.getDescription()
-
-			if (A.damage_desc)
-				out += "<br><br>[A.damage_desc]"
 
 			return out
 		else

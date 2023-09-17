@@ -15,10 +15,10 @@
 		movable_flags |= MOVABLE_FLAG_PROXMOVE //Dont want it active during the throw... loooots of unneeded checking.
 	return ..()
 
-/obj/item/slugegg/attack_self(mob/living/user)
+/obj/item/slugegg/attack_self(var/mob/living/user)
 	squish()
 
-/obj/item/slugegg/HasProximity(atom/movable/AM)
+/obj/item/slugegg/HasProximity(var/atom/movable/AM)
 	if(isliving(AM))
 		if(istype(AM,/mob/living/carbon/human))
 			var/mob/living/carbon/human/H = AM
@@ -31,7 +31,7 @@
 		squish()
 
 /obj/item/slugegg/proc/squish()
-	src.visible_message(SPAN_WARNING("\The [src] bursts open!"))
+	src.visible_message("<span class='warning'>\The [src] bursts open!</span>")
 	new /mob/living/simple_animal/hostile/voxslug(get_turf(src))
 	playsound(src.loc,'sound/effects/attackblob.ogg',100, 1)
 	qdel(src)
@@ -51,7 +51,7 @@
 	ammo_type = /obj/item/slugegg
 	max_ammo = 2
 	ammo = 2
-	ammo_gen_time = 600
+	ammo_gen_time = 150
 	var/mode = "Impact"
 
 /obj/item/gun/launcher/alien/slugsling/consume_next_projectile()
@@ -61,6 +61,6 @@
 	return S
 
 
-/obj/item/gun/launcher/alien/slugsling/attack_self(mob/living/user)
+/obj/item/gun/launcher/alien/slugsling/attack_self(var/mob/living/user)
 	mode = mode == "Impact" ? "Sentry" : "Impact"
-	to_chat(user,SPAN_NOTICE("You switch \the [src]'s mode to \"[mode]\""))
+	to_chat(user,"<span class='notice'>You switch \the [src]'s mode to \"[mode]\"</span>")

@@ -1,6 +1,6 @@
 //////////////////////////////Construct Spells/////////////////////////
 
-/proc/findNullRod(atom/target)
+proc/findNullRod(var/atom/target)
 	if(istype(target,/obj/item/nullrod))
 		return 1
 	else if(target.contents)

@@ -157,7 +157,7 @@
 	name = "TTV bomb - proximity"
 	assembly_type = /obj/item/device/assembly/prox_sensor
 
-/obj/effect/spawner/newbomb/radio/custom/New(newloc, ph, ox, co)
+/obj/effect/spawner/newbomb/radio/custom/New(var/newloc, ph, ox, co)
 	if(ph != null) phoron_amt = ph
 	if(ox != null) oxygen_amt = ox
 	if(co != null) carbon_amt = co
@@ -195,7 +195,7 @@
 	V.attached_device = S
 
 	S.holder = V
-	S.set_secure(TRUE)
+	S.toggle_secure()
 
 	V.update_icon()
 	return INITIALIZE_HINT_QDEL

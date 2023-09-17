@@ -1,5 +1,5 @@
 // See specific map job files for valid jobs. They use types so cannot be compiled at this level.
-/singleton/cultural_info/culture/nabber
+/decl/cultural_info/culture/nabber
 	name = CULTURE_NABBER_CMINUS
 
 	description = "You have been trained to Xynergy Grade PLACEHOLDER."
@@ -12,10 +12,10 @@
 	var/list/hidden_valid_jobs = list(/datum/job/ai, /datum/job/cyborg)
 	var/title_suffix
 
-/singleton/cultural_info/culture/nabber/get_formal_name_suffix()
+/decl/cultural_info/culture/nabber/get_formal_name_suffix()
 	return title_suffix
 
-/singleton/cultural_info/culture/nabber/New()
+/decl/cultural_info/culture/nabber/New()
 	..()
 
 	// Make sure this will show up in the manifest and on IDs.
@@ -28,7 +28,8 @@
 		LAZYADD(job_titles, initial(job.title))
 	if(!LAZYLEN(job_titles))
 		LAZYADD(job_titles, "none")
-	description = "You have been trained by Xynergy to [name]. This makes you suitable for the following roles: [english_list(job_titles)]."
+	description = "Вы были обучены корпорацией Xynergy до класса [name]. Это позволяет вам работать на следующих \
+	должностях: [english_list(job_titles)]."
 
 	// Set up our qualifications.
 	LAZYADD(qualifications, "<b>[name]</b>")
@@ -39,29 +40,29 @@
 	if(LAZYLEN(hidden_valid_jobs))
 		LAZYADD(valid_jobs, hidden_valid_jobs)
 
-/singleton/cultural_info/culture/nabber/c
+/decl/cultural_info/culture/nabber/c
 	name = CULTURE_NABBER_C
 	valid_jobs = list(/datum/job/janitor)
 
-/singleton/cultural_info/culture/nabber/c/plus
+/decl/cultural_info/culture/nabber/c/plus
 	name = CULTURE_NABBER_CPLUS
 
-/singleton/cultural_info/culture/nabber/b
+/decl/cultural_info/culture/nabber/b
 	name = CULTURE_NABBER_B
-	valid_jobs = list(/datum/job/chef)
+	valid_jobs = list(/datum/job/bartender, /datum/job/chef)
 
-/singleton/cultural_info/culture/nabber/b/minus
+/decl/cultural_info/culture/nabber/b/minus
 	name = CULTURE_NABBER_BMINUS
 
-/singleton/cultural_info/culture/nabber/b/plus
+/decl/cultural_info/culture/nabber/b/plus
 	name = CULTURE_NABBER_BPLUS
 
-/singleton/cultural_info/culture/nabber/a
+/decl/cultural_info/culture/nabber/a
 	name = CULTURE_NABBER_A
 	valid_jobs = list(/datum/job/chemist, /datum/job/roboticist)
 
-/singleton/cultural_info/culture/nabber/a/minus
+/decl/cultural_info/culture/nabber/a/minus
 	name = CULTURE_NABBER_AMINUS
 
-/singleton/cultural_info/culture/nabber/a/plus
+/decl/cultural_info/culture/nabber/a/plus
 	name = CULTURE_NABBER_APLUS

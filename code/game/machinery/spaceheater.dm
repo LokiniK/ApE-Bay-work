@@ -2,7 +2,7 @@
 	use_power = POWER_USE_OFF
 	anchored = FALSE
 	density = TRUE
-	icon = 'icons/obj/atmospherics/atmos.dmi'
+	icon = 'icons/obj/atmos.dmi'
 	icon_state = "sheater-off"
 	name = "space heater"
 	desc = "Made by Space Amish using traditional space techniques, this heater is guaranteed not to set anything, or anyone, on fire."
@@ -20,7 +20,7 @@
 	cell = new/obj/item/cell/high(src)
 	update_icon()
 
-/obj/machinery/space_heater/on_update_icon(rebuild_overlay = 0)
+/obj/machinery/space_heater/on_update_icon(var/rebuild_overlay = 0)
 	if(!on)
 		icon_state = "sheater-off"
 		set_light(0)
@@ -49,7 +49,7 @@
 		to_chat(user, "The charge meter reads [cell ? round(cell.percent(),1) : 0]%")
 
 /obj/machinery/space_heater/emp_act(severity)
-	if(inoperable())
+	if(stat & (BROKEN|NOPOWER))
 		..(severity)
 		return
 	if(cell)
@@ -67,20 +67,17 @@
 				if(!user.unEquip(I, src))
 					return
 				cell = I
-				user.visible_message(SPAN_NOTICE("[user] inserts a power cell into [src]."), SPAN_NOTICE("You insert the power cell into [src]."))
+				user.visible_message("<span class='notice'>[user] inserts a power cell into [src].</span>", "<span class='notice'>You insert the power cell into [src].</span>")
 				power_change()
 		else
 			to_chat(user, "The hatch must be open to insert a power cell.")
 			return
 	else if(isScrewdriver(I))
 		panel_open = !panel_open
-		user.visible_message(
-			SPAN_NOTICE("\The [user] [panel_open ? "opens" : "closes"] the hatch on \the [src]."),
-			SPAN_NOTICE("You [panel_open ? "open" : "close"] the hatch on \the [src].")
-		)
+		user.visible_message("<span class='notice'>[user] [panel_open ? "opens" : "closes"] the hatch on the [src].</span>", "<span class='notice'>You [panel_open ? "open" : "close"] the hatch on the [src].</span>")
 		update_icon(1)
 		if(!panel_open && user.machine == src)
-			show_browser(user, null, "window=spaceheater")
+			close_browser(user, "window=spaceheater")
 			user.unset_machine()
 	else
 		..()
@@ -119,16 +116,13 @@
 /obj/machinery/space_heater/physical_attack_hand(mob/user)
 	if(!panel_open)
 		on = !on
-		user.visible_message(
-			SPAN_NOTICE("[user] switches [on ? "on" : "off"] the [src]."),
-			SPAN_NOTICE("You switch [on ? "on" : "off"] the [src].")
-		)
+		user.visible_message("<span class='notice'>[user] switches [on ? "on" : "off"] the [src].</span>","<span class='notice'>You switch [on ? "on" : "off"] the [src].</span>")
 		update_icon()
 		return TRUE
 
 /obj/machinery/space_heater/Topic(href, href_list, state = GLOB.physical_state)
 	if (..())
-		show_browser(usr, null, "window=spaceheater")
+		close_browser(usr, "window=spaceheater")
 		usr.unset_machine()
 		return 1
 
@@ -142,7 +136,7 @@
 
 		if("cellremove")
 			if(panel_open && cell && !usr.get_active_hand())
-				usr.visible_message(SPAN_NOTICE("\The [usr] removes \the [cell] from \the [src]."), SPAN_NOTICE("You remove \the [cell] from \the [src]."))
+				usr.visible_message("<span class='notice'>\The usr] removes \the [cell] from \the [src].</span>", "<span class='notice'>You remove \the [cell] from \the [src].</span>")
 				cell.update_icon()
 				usr.put_in_hands(cell)
 				cell.add_fingerprint(usr)
@@ -158,7 +152,7 @@
 					cell = C
 					C.add_fingerprint(usr)
 					power_change()
-					usr.visible_message(SPAN_NOTICE("[usr] inserts \the [C] into \the [src]."), SPAN_NOTICE("You insert \the [C] into \the [src]."))
+					usr.visible_message("<span class='notice'>[usr] inserts \the [C] into \the [src].</span>", "<span class='notice'>You insert \the [C] into \the [src].</span>")
 
 	updateDialog()
 

@@ -1,16 +1,15 @@
-/singleton/psionic_faculty/psychokinesis
+/decl/psionic_faculty/psychokinesis
 	id = PSI_PSYCHOKINESIS
 	name = "Psychokinesis"
 	associated_intent = I_GRAB
 	armour_types = list("melee", "bullet")
 
-/singleton/psionic_power/psychokinesis
+/decl/psionic_power/psychokinesis
 	faculty = PSI_PSYCHOKINESIS
 	use_manifest = TRUE
 	use_sound = null
-	abstract_type = /singleton/psionic_power/psychokinesis
 
-/singleton/psionic_power/psychokinesis/psiblade
+/decl/psionic_power/psychokinesis/psiblade
 	name =            "Psiblade"
 	cost =            10
 	cooldown =        30
@@ -18,7 +17,7 @@
 	use_description = "Click on or otherwise activate an empty hand while on harm intent to manifest a psychokinetic cutting blade. The power the blade will vary based on your mastery of the faculty."
 	admin_log = FALSE
 
-/singleton/psionic_power/psychokinesis/psiblade/invoke(mob/living/user, mob/living/target)
+/decl/psionic_power/psychokinesis/psiblade/invoke(var/mob/living/user, var/mob/living/target)
 	if((target && user != target) || user.a_intent != I_HURT)
 		return FALSE
 	. = ..()
@@ -33,36 +32,36 @@
 			else
 				return new /obj/item/psychic_power/psiblade(user, user)
 
-/singleton/psionic_power/psychokinesis/tinker
+/decl/psionic_power/psychokinesis/tinker
 	name =            "Tinker"
 	cost =            5
 	cooldown =        10
-	min_rank =        PSI_RANK_MASTER
+	min_rank =        PSI_RANK_OPERANT
 	use_description = "Click on or otherwise activate an empty hand while on help intent to manifest a psychokinetic tool. Use it in-hand to switch between tool types."
 	admin_log = FALSE
 
-/singleton/psionic_power/psychokinesis/tinker/invoke(mob/living/user, mob/living/target)
+/decl/psionic_power/psychokinesis/tinker/invoke(var/mob/living/user, var/mob/living/target)
 	if((target && user != target) || user.a_intent != I_HELP)
 		return FALSE
 	. = ..()
 	if(.)
 		return new /obj/item/psychic_power/tinker(user)
 
-/singleton/psionic_power/psychokinesis/telekinesis
+/decl/psionic_power/psychokinesis/telekinesis
 	name =            "Telekinesis"
 	cost =            5
-	cooldown =        10
+	cooldown =        20
 	use_ranged =      TRUE
 	use_manifest =    FALSE
 	min_rank =        PSI_RANK_GRANDMASTER
 	use_description = "Click on a distant target while on grab intent to manifest a psychokinetic grip. Use it manipulate objects at a distance."
 	admin_log = FALSE
 	use_sound = 'sound/effects/psi/power_used.ogg'
-	var/static/list/valid_machine_types = list(
+	var/global/list/valid_machine_types = list(
 		/obj/machinery/door
 	)
 
-/singleton/psionic_power/psychokinesis/telekinesis/invoke(mob/living/user, mob/living/target)
+/decl/psionic_power/psychokinesis/telekinesis/invoke(var/mob/living/user, var/mob/living/target)
 	if(user.a_intent != I_GRAB)
 		return FALSE
 	. = ..()
@@ -70,17 +69,17 @@
 
 		var/distance = get_dist(user, target)
 		if(distance > user.psi.get_rank(PSI_PSYCHOKINESIS))
-			to_chat(user, SPAN_WARNING("Your telekinetic power won't reach that far."))
+			to_chat(user, "<span class='warning'>Your telekinetic power won't reach that far.</span>")
 			return FALSE
 
 		if(istype(target, /mob) || istype(target, /obj))
 			var/obj/item/psychic_power/telekinesis/tk = new(user)
 			if(tk.set_focus(target))
 				tk.sparkle()
-				user.visible_message(SPAN_NOTICE("\The [user] reaches out."))
+				user.visible_message("<span class='notice'>\The [user] reaches out.</span>")
 				return tk
 		else if(istype(target, /obj/structure))
-			user.visible_message(SPAN_NOTICE("\The [user] makes a strange gesture."))
+			user.visible_message("<span class='notice'>\The [user] makes a strange gesture.</span>")
 			var/obj/O = target
 			O.attack_hand(user)
 			return TRUE
@@ -91,3 +90,18 @@
 					machine.attack_hand(user)
 					return TRUE
 	return FALSE
+
+/decl/psionic_power/psychokinesis/net
+	name =            "Psionic Net"
+	cost =            20
+	cooldown =        40
+	min_rank =        PSI_RANK_PARAMOUNT
+	use_description = "Click on or otherwise activate an empty hand while on disarm intent to manifest a psychokinetic net. Throw it to capture your victim."
+	admin_log = FALSE
+
+/decl/psionic_power/psychokinesis/net/invoke(var/mob/living/user, var/mob/living/target)
+	if((target && user != target) || user.a_intent != I_DISARM)
+		return FALSE
+	. = ..()
+	if(.)
+		return new /obj/item/energy_net/psionic(user)

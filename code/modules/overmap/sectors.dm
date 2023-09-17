@@ -1,12 +1,10 @@
-GLOBAL_LIST_EMPTY(known_overmap_sectors)
 //===================================================================================
 //Overmap object representing zlevel(s)
 //===================================================================================
 /obj/effect/overmap/visitable
 	name = "map object"
 	scannable = TRUE
-
-	var/list/map_z = list()
+	scanner_desc = "!! No Data Available !!"
 
 	var/list/initial_generic_waypoints //store landmark_tag of landmarks that should be added to the actual lists below on init.
 	var/list/initial_restricted_waypoints //For use with non-automatic landmarks (automatic ones add themselves).
@@ -15,17 +13,10 @@ GLOBAL_LIST_EMPTY(known_overmap_sectors)
 	var/list/restricted_waypoints = list() //waypoints for specific shuttles
 	var/docking_codes
 
-	var/start_x			//Coordinates for self placing
-	var/start_y			//will use random values if unset
-
-	var/sector_flags = OVERMAP_SECTOR_IN_SPACE
-
 	var/hide_from_reports = FALSE
 
-	/// null | num | list. If a num or a (num, num) list, the radius or random bounds for placing this sector near the main map's overmap icon.
-	var/list/place_near_main
-
-	var/blob_count = 0
+	var/has_distress_beacon
+	var/fore_dir = NORTH
 
 /obj/effect/overmap/visitable/Initialize()
 	. = ..()
@@ -38,30 +29,13 @@ GLOBAL_LIST_EMPTY(known_overmap_sectors)
 	if(!GLOB.using_map.overmap_z)
 		build_overmap()
 
-	var/map_low = OVERMAP_EDGE
-	var/map_high = GLOB.using_map.overmap_size - OVERMAP_EDGE
-	var/turf/home
-	if (place_near_main)
-		var/obj/effect/overmap/visitable/main = map_sectors["1"]
-		if (islist(place_near_main))
-			place_near_main = Roundm(Frand(place_near_main[1], place_near_main[2]), 0.1)
-		home = CircularRandomTurfAround(main, abs(place_near_main), map_low, map_low, map_high, map_high)
-		log_debug("place_near_main moving [src] near [main] ([main.x],[main.y]) with radius [place_near_main], got ([home.x],[home.y])")
-	else
-		start_x = start_x || rand(map_low, map_high)
-		start_y = start_y || rand(map_low, map_high)
-		home = locate(start_x, start_y, GLOB.using_map.overmap_z)
-	forceMove(home)
+	start_x = start_x || rand(OVERMAP_EDGE, GLOB.using_map.overmap_size - OVERMAP_EDGE)
+	start_y = start_y || rand(OVERMAP_EDGE, GLOB.using_map.overmap_size - OVERMAP_EDGE)
+
+	forceMove(locate(start_x, start_y, GLOB.using_map.overmap_z))
 
 	for(var/obj/effect/overmap/event/E in loc)
 		qdel(E)
-
-	if(HAS_FLAGS(sector_flags, OVERMAP_SECTOR_KNOWN))
-		LAZYADD(GLOB.known_overmap_sectors, src)
-		layer = ABOVE_LIGHTING_LAYER
-		plane = EFFECTS_ABOVE_LIGHTING_PLANE
-		for(var/obj/machinery/computer/ship/helm/H as anything in GLOB.overmap_helm_computers)
-			H.add_known_sector(src)
 
 	docking_codes = "[ascii2text(rand(65,90))][ascii2text(rand(65,90))][ascii2text(rand(65,90))][ascii2text(rand(65,90))]"
 
@@ -69,11 +43,6 @@ GLOBAL_LIST_EMPTY(known_overmap_sectors)
 
 	LAZYADD(SSshuttle.sectors_to_initialize, src) //Queued for further init. Will populate the waypoint lists; waypoints not spawned yet will be added in as they spawn.
 	SSshuttle.clear_init_queue()
-
-
-/obj/effect/overmap/visitable/Destroy()
-	LAZYREMOVE(GLOB.known_overmap_sectors, src)
-	. = ..()
 
 //This is called later in the init order by SSshuttle to populate sector objects. Importantly for subtypes, shuttles will be created by then.
 /obj/effect/overmap/visitable/proc/populate_sector_objects()
@@ -89,9 +58,9 @@ GLOBAL_LIST_EMPTY(known_overmap_sectors)
 		map_sectors["[zlevel]"] = src
 
 	GLOB.using_map.player_levels |= map_z
-	if(!HAS_FLAGS(sector_flags, OVERMAP_SECTOR_IN_SPACE))
+	if(!(sector_flags & OVERMAP_SECTOR_IN_SPACE))
 		GLOB.using_map.sealed_levels |= map_z
-	if(HAS_FLAGS(sector_flags, OVERMAP_SECTOR_BASE))
+	if(sector_flags & OVERMAP_SECTOR_BASE)
 		GLOB.using_map.station_levels |= map_z
 		GLOB.using_map.contact_levels |= map_z
 		GLOB.using_map.map_levels |= map_z
@@ -116,7 +85,7 @@ GLOBAL_LIST_EMPTY(known_overmap_sectors)
 	else
 		generic_waypoints -= landmark
 
-/obj/effect/overmap/visitable/proc/get_waypoints(shuttle_name)
+/obj/effect/overmap/visitable/proc/get_waypoints(var/shuttle_name)
 	. = list()
 	for(var/obj/effect/overmap/visitable/contained in src)
 		. += contained.get_waypoints(shuttle_name)
@@ -129,31 +98,18 @@ GLOBAL_LIST_EMPTY(known_overmap_sectors)
 /obj/effect/overmap/visitable/proc/generate_skybox()
 	return
 
-/obj/effect/overmap/visitable/MouseEntered(location, control, params)
-	openToolTip(user = usr, tip_src = src, params = params, title = name)
-	..()
-
-/obj/effect/overmap/visitable/MouseDown()
-	closeToolTip(usr) //No reason not to, really
-	..()
-
-/obj/effect/overmap/visitable/MouseExited()
-	closeToolTip(usr) //No reason not to, really
-	..()
-
 /obj/effect/overmap/visitable/sector
 	name = "generic sector"
 	desc = "Sector with some stuff in it."
 	icon_state = "sector"
-	requires_contact = TRUE
 	anchored = TRUE
 
 
 /obj/effect/overmap/visitable/sector/Initialize()
 	. = ..()
-	if(HAS_FLAGS(sector_flags, OVERMAP_SECTOR_KNOWN))
-		for(var/obj/machinery/computer/ship/helm/H as anything in GLOB.overmap_helm_computers)
-			update_known_connections(TRUE)
+
+	if(known)
+		update_known_connections(TRUE)
 
 
 /obj/effect/overmap/visitable/sector/update_known_connections(notify = FALSE)
@@ -166,6 +122,35 @@ GLOBAL_LIST_EMPTY(known_overmap_sectors)
 // Because of the way these are spawned, they will potentially have their invisibility adjusted by the turfs they are mapped on
 // prior to being moved to the overmap. This blocks that. Use set_invisibility to adjust invisibility as needed instead.
 /obj/effect/overmap/visitable/sector/hide()
+
+/obj/effect/overmap/visitable/proc/distress(mob/user)
+
+	log_and_message_admins(message ="Overmap panic button hit on z[z] ([scanner_name]) by '[user?.ckey || "Unknown"]'")
+
+	var/distress_message = "Это автоматический сигнал бедствия от радиомаяка, соответствующего стандарту MIL-DTL-93352, передаваемого на частоте [PUB_FREQ*0.1]кГц.  \
+	Этот маяк был запущен с  '[initial(scanner_name)]'. Местоположение передающего устройства: [get_distress_info()]. \
+	Согласно Межпланетной конвенции о космической спасательной деятельности, лица, получившие это сообщение, должны попытаться предпринять попытку спасения, \
+	или передать сообщение тем, кто может это сделать. Это сообщение повторится еще раз через 5 минут. Спасибо за вашу помощь."
+
+
+	priority_announcement.Announce(distress_message, "Automated Distress Signal", new_sound = sound('sound/AI/sos.ogg'), zlevels = GLOB.using_map.player_levels, radio_mode = TRUE)
+
+	var/image/I = image(icon, icon_state = "distress")
+	I.plane = EFFECTS_ABOVE_LIGHTING_PLANE
+	I.appearance_flags = KEEP_APART|RESET_TRANSFORM|RESET_COLOR
+	add_overlay(I)
+
+	addtimer(CALLBACK(src, .proc/distress_update), 5 MINUTES)
+	return TRUE
+
+/obj/effect/overmap/visitable/proc/get_distress_info()
+	return "\[X:[x], Y:[y]\]"
+
+/obj/effect/overmap/visitable/proc/distress_update()
+	var/message = "Это последнее сообщение с маяка бедствия, запущенного '[initial(name)]'. Местоположение передающего устройства: [get_distress_info()]. \
+	Пожалуйста, окажите помощь в соответствии с вашими обязательствами по Межпланетной конвенции о космической спасательной деятельности, или передайте это сообщение той стороне, которая может это сделать."
+
+	priority_announcement.Announce(message, new_title = "Automated Distress Signal", new_sound = 'sound/AI/sos.ogg', zlevels = GLOB.using_map.player_levels, radio_mode = TRUE)
 
 /proc/build_overmap()
 	if(!GLOB.using_map.use_overmap)

@@ -1,160 +1,148 @@
-/singleton/emote/audible
+/decl/emote/audible
 	key = "burp"
 	emote_message_3p = "USER burps."
 	message_type = AUDIBLE_MESSAGE
-	var/list/emote_sound
-
-/singleton/emote/audible/do_extra(atom/user)
+//	var/emote_sound
+/*
+/decl/emote/audible/do_extra(var/atom/user) // infinity for new sound emote system
 	if(emote_sound)
-		var/playable = emote_sound
-		if (islist(emote_sound))
-			playable = pick(emote_sound)
-		playsound(user.loc, playable, 50, 0)
-
-/singleton/emote/audible/deathgasp_alien
+		playsound(user.loc, emote_sound, 50, 0)
+*/
+/decl/emote/audible/deathgasp_alien
 	key = "deathgasp"
 	emote_message_3p = "USER lets out a waning guttural screech, green blood bubbling from its maw."
 
-/singleton/emote/audible/whimper
-	key ="whimper"
-	emote_message_3p = "USER whimpers."
-
-/singleton/emote/audible/gasp
+/decl/emote/audible/gasp
 	key ="gasp"
-	emote_message_3p = "USER gasps."
+	emote_message_3p = "USER задыхается!"
 	conscious = 0
 
-/singleton/emote/audible/scretch
+/decl/emote/audible/scretch
 	key ="scretch"
-	emote_message_3p = "USER scretches."
+	emote_message_3p = "USER чешется."
 
-/singleton/emote/audible/choke
+/decl/emote/audible/choke
 	key ="choke"
-	emote_message_3p = "USER chokes."
+	emote_message_3p = "USER давится!"
 	conscious = 0
 
-/singleton/emote/audible/gnarl
+/decl/emote/audible/gnarl
 	key ="gnarl"
 	emote_message_3p = "USER gnarls and shows its teeth.."
 
-/singleton/emote/audible/chirp
+/decl/emote/audible/chirp
 	key ="chirp"
-	emote_message_3p = "USER chirps!"
+	emote_message_3p = "USER щебечет!"
 	emote_sound = 'sound/misc/nymphchirp.ogg'
 
-/singleton/emote/audible/multichirp
+/decl/emote/audible/multichirp
 	key ="mchirp"
 	emote_message_3p = "USER chirps a chorus of notes!"
 	emote_sound = 'sound/misc/multichirp.ogg'
 
-/singleton/emote/audible/alarm
+/decl/emote/audible/alarm
 	key = "alarm"
 	emote_message_1p = "You sound an alarm."
 	emote_message_3p = "USER sounds an alarm."
 
-/singleton/emote/audible/alert
+/decl/emote/audible/alert
 	key = "alert"
 	emote_message_1p = "You let out a distressed noise."
 	emote_message_3p = "USER lets out a distressed noise."
 
-/singleton/emote/audible/notice
+/decl/emote/audible/notice
 	key = "notice"
 	emote_message_1p = "You play a loud tone."
 	emote_message_3p = "USER plays a loud tone."
 
-/singleton/emote/audible/whistle
+/decl/emote/audible/whistle
 	key = "whistle"
-	emote_message_1p = "You whistle."
-	emote_message_3p = "USER whistles."
+	emote_message_1p = "Вы свистите!"
+	emote_message_3p = "USER свистит!"
 
-/singleton/emote/audible/boop
+/decl/emote/audible/boop
 	key = "boop"
 	emote_message_1p = "You boop."
 	emote_message_3p = "USER boops."
 
-/singleton/emote/audible/sneeze
+/decl/emote/audible/sneeze
 	key = "sneeze"
-	emote_message_3p = "USER sneezes."
+	emote_message_3p = "USER чихает!"
 
-/singleton/emote/audible/sniff
+/decl/emote/audible/sniff
 	key = "sniff"
-	emote_message_3p = "USER sniffs."
+	emote_message_3p = "USER нюхает."
 
-/singleton/emote/audible/snore
+/decl/emote/audible/snore
 	key = "snore"
-	emote_message_3p = "USER snores."
+	emote_message_3p = "USER храпит."
 	conscious = 0
 
-/singleton/emote/audible/whimper
+/decl/emote/audible/whimper
 	key = "whimper"
-	emote_message_3p = "USER whimpers."
+	emote_message_3p = "USER хнычет."
 
-/singleton/emote/audible/yawn
+/decl/emote/audible/yawn
 	key = "yawn"
-	emote_message_3p = "USER yawns."
+	emote_message_3p = "USER зевает."
 
-/singleton/emote/audible/clap
+/decl/emote/audible/clap
 	key = "clap"
-	emote_message_3p = "USER claps."
+	emote_message_3p = "USER хлопает."
 
-/singleton/emote/audible/chuckle
+/decl/emote/audible/chuckle
 	key = "chuckle"
-	emote_message_3p = "USER chuckles."
+	emote_message_3p = "USER усмехается."
 
-/singleton/emote/audible/cough
+/decl/emote/audible/cough
 	key = "cough"
-	emote_message_3p = "USER coughs!"
+	emote_message_3p = "USER кашляет!"
 	conscious = 0
 
-/singleton/emote/audible/cry
+/decl/emote/audible/cry
 	key = "cry"
-	emote_message_3p = "USER cries."
+	emote_message_3p = "USER плачет..."
 
-/singleton/emote/audible/sigh
+/decl/emote/audible/sigh
 	key = "sigh"
-	emote_message_3p = "USER sighs."
+	emote_message_3p = "USER вздыхает."
 
-/singleton/emote/audible/slowclap
-	key = "slowclap"
-	emote_message_3p_target = "USER slowly claps at TARGET."
-	emote_message_3p = "USER slowly claps."
-
-/singleton/emote/audible/laugh
+/decl/emote/audible/laugh
 	key = "laugh"
-	emote_message_3p_target = "USER laughs at TARGET."
-	emote_message_3p = "USER laughs."
+	emote_message_3p = "USER смеется!"
+	emote_message_3p_target = "USER смеется над TARGET!"
 
-/singleton/emote/audible/mumble
+/decl/emote/audible/mumble
 	key = "mumble"
-	emote_message_3p = "USER mumbles!"
+	emote_message_3p = "USER бормочет."
 
-/singleton/emote/audible/grumble
+/decl/emote/audible/grumble
 	key = "grumble"
-	emote_message_3p = "USER grumbles!"
+	emote_message_3p = "USER бурчит."
 
-/singleton/emote/audible/groan
+/decl/emote/audible/groan
 	key = "groan"
-	emote_message_3p = "USER groans!"
+	emote_message_3p = "USER болезненно стонет!"
 	conscious = 0
 
-/singleton/emote/audible/moan
+/decl/emote/audible/moan
 	key = "moan"
-	emote_message_3p = "USER moans!"
+	emote_message_3p = "USER стонет!"
 	conscious = 0
 
-/singleton/emote/audible/giggle
+/decl/emote/audible/giggle
 	key = "giggle"
-	emote_message_3p = "USER giggles."
+	emote_message_3p = "USER хихикает."
 
-/singleton/emote/audible/scream
+/decl/emote/audible/scream
 	key = "scream"
-	emote_message_3p = "USER screams!"
+	emote_message_3p = "USER кричит!"
 
-/singleton/emote/audible/grunt
+/decl/emote/audible/grunt
 	key = "grunt"
-	emote_message_3p = "USER grunts."
+	emote_message_3p = "USER ворчит."
 
-/singleton/emote/audible/slap
+/decl/emote/audible/slap
 	key = "slap"
 	emote_message_1p_target = "You slap TARGET across the face!"
 	emote_message_1p = "You slap yourself across the face!"
@@ -164,50 +152,55 @@
 	check_restraints = TRUE
 	check_range = 1
 
-/singleton/emote/audible/bug_hiss
+/decl/emote/audible/bug_hiss
 	key ="hiss"
-	emote_message_3p_target = "USER hisses at TARGET."
-	emote_message_3p = "USER hisses."
+	emote_message_3p_target = "USER шипит на TARGET!"
+	emote_message_3p = "USER шипит!"
 	emote_sound = 'sound/voice/BugHiss.ogg'
 
-/singleton/emote/audible/bug_buzz
+/decl/emote/audible/bug_buzz
 	key ="buzz"
-	emote_message_3p = "USER buzzes its wings."
+	emote_message_3p = "USER жужжит."
 	emote_sound = 'sound/voice/BugBuzz.ogg'
 
-/singleton/emote/audible/bug_chitter
+/decl/emote/audible/bug_chitter
 	key ="chitter"
-	emote_message_3p = "USER chitters."
+	emote_message_3p = "USER верещит!"
 	emote_sound = 'sound/voice/Bug.ogg'
 
-/singleton/emote/audible/roar
+/decl/emote/audible/vox_shriek
+	key ="shriek"
+	emote_message_3p = "USER SHRIEKS!"
+	emote_sound = 'sound/voice/shriek1.ogg'
+
+/decl/emote/audible/roar
 	key = "roar"
 	emote_message_3p = "USER roars!"
 
-/singleton/emote/audible/bellow
+/decl/emote/audible/bellow
 	key = "bellow"
 	emote_message_3p = "USER bellows!"
 
-/singleton/emote/audible/howl
+/decl/emote/audible/howl
 	key = "howl"
 	emote_message_3p = "USER howls!"
 
-/singleton/emote/audible/wheeze
+/decl/emote/audible/wheeze
 	key = "wheeze"
 	emote_message_3p = "USER wheezes."
 
-/singleton/emote/audible/hiss
+/decl/emote/audible/hiss
 	key ="hiss_"
 	emote_message_3p_target = "USER hisses softly at TARGET."
 	emote_message_3p = "USER hisses softly."
-
-/singleton/emote/audible/lizard_bellow
+	
+/decl/emote/audible/lizard_bellow
 	key = "bellow"
 	emote_message_3p_target = "USER bellows deeply at TARGET!"
 	emote_message_3p = "USER bellows!"
 	emote_sound = 'sound/voice/LizardBellow.ogg'
 
-/singleton/emote/audible/lizard_squeal
+/decl/emote/audible/lizard_squeal
 	key = "squeal"
 	emote_message_3p = "USER squeals."
 	emote_sound = 'sound/voice/LizardSqueal.ogg'

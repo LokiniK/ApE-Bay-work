@@ -1,7 +1,7 @@
 /obj/machinery/portable_atmospherics
 	name = "atmoalter"
 	use_power = POWER_USE_OFF
-	construct_state = /singleton/machine_construction/default/panel_closed
+	construct_state = /decl/machine_construction/default/panel_closed
 
 	var/datum/gas_mixture/air_contents = new
 
@@ -26,13 +26,17 @@
 /obj/machinery/portable_atmospherics/Destroy()
 	QDEL_NULL(air_contents)
 	QDEL_NULL(holding)
+//[INF]
+	if(connected_port)
+		disconnect()
+//[/INF]
 	. = ..()
 
 /obj/machinery/portable_atmospherics/Initialize()
 	..()
 	return INITIALIZE_HINT_LATELOAD
 
-/obj/machinery/portable_atmospherics/LateInitialize(mapload)
+/obj/machinery/portable_atmospherics/LateInitialize()
 	var/obj/machinery/atmospherics/portables_connector/port = locate() in loc
 	if(port)
 		connect(port)
@@ -50,7 +54,7 @@
 		GAS_OXYGEN = O2STANDARD * MolesForPressure(),
 		GAS_NITROGEN = N2STANDARD *  MolesForPressure())
 
-/obj/machinery/portable_atmospherics/proc/MolesForPressure(target_pressure = start_pressure)
+/obj/machinery/portable_atmospherics/proc/MolesForPressure(var/target_pressure = start_pressure)
 	return (target_pressure * air_contents.volume) / (R_IDEAL_GAS_EQUATION * air_contents.temperature)
 
 /obj/machinery/portable_atmospherics/on_update_icon()
@@ -74,7 +78,7 @@
 
 	//Actually enforce the air sharing
 	var/datum/pipe_network/network = connected_port.return_network(src)
-	if(network && !network.gases.Find(air_contents))
+	if(network && !list_find(network.gases, air_contents))
 		network.gases += air_contents
 		network.update = 1
 
@@ -103,7 +107,7 @@
 	if (network)
 		network.update = 1
 
-/obj/machinery/portable_atmospherics/attackby(obj/item/W as obj, mob/user as mob)
+/obj/machinery/portable_atmospherics/attackby(var/obj/item/W as obj, var/mob/user as mob)
 	if ((istype(W, /obj/item/tank) && !( src.destroyed )))
 		if (src.holding)
 			return
@@ -116,21 +120,23 @@
 	else if(isWrench(W))
 		if(connected_port)
 			disconnect()
-			to_chat(user, SPAN_NOTICE("You disconnect \the [src] from the port."))
+			to_chat(user, "<span class='notice'>You disconnect \the [src] from the port.</span>")
+			playsound(src.loc, 'sound/items/Ratchet.ogg', 50, 1)
 			update_icon()
 			return
 		else
-			var/obj/machinery/atmospherics/portables_connector/possible_port = locate(/obj/machinery/atmospherics/portables_connector) in loc
+			var/obj/machinery/atmospherics/portables_connector/possible_port = locate(/obj/machinery/atmospherics/portables_connector/) in loc
 			if(possible_port)
 				if(connect(possible_port))
-					to_chat(user, SPAN_NOTICE("You connect \the [src] to the port."))
+					to_chat(user, "<span class='notice'>You connect \the [src] to the port.</span>")
+					playsound(src.loc, 'sound/items/Ratchet.ogg', 50, 1)
 					update_icon()
 					return
 				else
-					to_chat(user, SPAN_NOTICE("\The [src] failed to connect to the port."))
+					to_chat(user, "<span class='notice'>\The [src] failed to connect to the port.</span>")
 					return
 			else
-				to_chat(user, SPAN_NOTICE("Nothing happens."))
+				to_chat(user, "<span class='notice'>Nothing happens.</span>")
 				return ..()
 
 	else if (istype(W, /obj/item/device/scanner/gas))
@@ -151,14 +157,14 @@
 
 /obj/machinery/portable_atmospherics/powered/power_change()
 	. = ..()
-	if(. && (!is_powered()))
+	if(. && (stat & NOPOWER))
 		update_use_power(POWER_USE_IDLE)
 
 /obj/machinery/portable_atmospherics/powered/components_are_accessible(path)
 	return panel_open
 
 /obj/machinery/portable_atmospherics/proc/log_open()
-	if(length(air_contents.gas) == 0)
+	if(air_contents.gas.len == 0)
 		return
 
 	var/gases = ""

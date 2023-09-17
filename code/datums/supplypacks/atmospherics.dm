@@ -1,20 +1,20 @@
-/singleton/hierarchy/supply_pack/atmospherics
+/decl/hierarchy/supply_pack/atmospherics
 	name = "Atmospherics"
 	containertype = /obj/structure/closet/crate/internals
 
-/singleton/hierarchy/supply_pack/atmospherics/internals
+/decl/hierarchy/supply_pack/atmospherics/internals
 	name = "Gear - Internals"
 	contains = list(/obj/item/clothing/mask/gas = 3,
 					/obj/item/tank/air = 3)
 	cost = 10
 	containername = "internals crate"
 
-/singleton/hierarchy/supply_pack/atmospherics/evacuation
+/decl/hierarchy/supply_pack/atmospherics/evacuation
 	name = "Emergency equipment"
 	containertype = /obj/structure/closet/crate/large
 	contains = list(/obj/item/storage/toolbox/emergency = 2,
 					/obj/item/clothing/suit/storage/hazardvest = 2,
-					/obj/item/tank/oxygen_emergency_extended = 4,
+					/obj/item/tank/emergency/oxygen/engi = 4,
 			 		/obj/item/clothing/suit/space/emergency = 4,
 					/obj/item/clothing/head/helmet/space/emergency = 4,
 					/obj/item/clothing/mask/gas = 4,
@@ -25,14 +25,14 @@
 
 	containername = "emergency crate"
 
-/singleton/hierarchy/supply_pack/atmospherics/inflatable
+/decl/hierarchy/supply_pack/atmospherics/inflatable
 	name = "Equipment - Inflatable barriers"
 	contains = list(/obj/item/storage/briefcase/inflatable = 3)
 	cost = 20
 	containertype = /obj/structure/closet/crate
 	containername = "inflatable barrier crate"
 
-/singleton/hierarchy/supply_pack/atmospherics/rpd
+/decl/hierarchy/supply_pack/atmospherics/rpd
 	name = "Equipment - Rapid Piping Device"
 	contains = list(/obj/item/rpd = 2)
 	cost = 100
@@ -40,35 +40,35 @@
 	access = access_atmospherics
 	containername = "RPD crate"
 
-/singleton/hierarchy/supply_pack/atmospherics/canister_empty
+/decl/hierarchy/supply_pack/atmospherics/canister_empty
 	name = "Equipment - Empty gas canister"
 	contains = list(/obj/machinery/portable_atmospherics/canister)
 	cost = 7
 	containername = "empty gas canister crate"
 	containertype = /obj/structure/largecrate
 
-/singleton/hierarchy/supply_pack/atmospherics/canister_air
+/decl/hierarchy/supply_pack/atmospherics/canister_air
 	name = "Gas - Air canister"
 	contains = list(/obj/machinery/portable_atmospherics/canister/air)
 	cost = 10
 	containername = "air canister crate"
 	containertype = /obj/structure/largecrate
 
-/singleton/hierarchy/supply_pack/atmospherics/canister_oxygen
+/decl/hierarchy/supply_pack/atmospherics/canister_oxygen
 	name = "Gas - Oxygen canister"
 	contains = list(/obj/machinery/portable_atmospherics/canister/oxygen)
 	cost = 15
 	containername = "oxygen canister crate"
 	containertype = /obj/structure/largecrate
 
-/singleton/hierarchy/supply_pack/atmospherics/canister_nitrogen
+/decl/hierarchy/supply_pack/atmospherics/canister_nitrogen
 	name = "Gas - Nitrogen canister"
 	contains = list(/obj/machinery/portable_atmospherics/canister/nitrogen)
 	cost = 10
 	containername = "nitrogen canister crate"
 	containertype = /obj/structure/largecrate
 
-/singleton/hierarchy/supply_pack/atmospherics/canister_phoron
+/decl/hierarchy/supply_pack/atmospherics/canister_phoron
 	name = "Gas - Phoron gas canister"
 	contains = list(/obj/machinery/portable_atmospherics/canister/phoron)
 	cost = 70
@@ -76,7 +76,7 @@
 	containertype = /obj/structure/closet/crate/secure/large
 	access = access_atmospherics
 
-/singleton/hierarchy/supply_pack/atmospherics/canister_hydrogen
+/decl/hierarchy/supply_pack/atmospherics/canister_hydrogen
 	name = "Gas - Hydrogen canister"
 	contains = list(/obj/machinery/portable_atmospherics/canister/hydrogen)
 	cost = 25
@@ -84,7 +84,7 @@
 	containertype = /obj/structure/closet/crate/secure/large
 	access = access_atmospherics
 
-/singleton/hierarchy/supply_pack/atmospherics/canister_sleeping_agent
+/decl/hierarchy/supply_pack/atmospherics/canister_sleeping_agent
 	name = "Gas - Nitrous oxide gas canister"
 	contains = list(/obj/machinery/portable_atmospherics/canister/sleeping_agent)
 	cost = 40
@@ -92,7 +92,7 @@
 	containertype = /obj/structure/closet/crate/secure/large
 	access = access_atmospherics
 
-/singleton/hierarchy/supply_pack/atmospherics/canister_carbon_dioxide
+/decl/hierarchy/supply_pack/atmospherics/canister_carbon_dioxide
 	name = "Gas - Carbon dioxide gas canister"
 	contains = list(/obj/machinery/portable_atmospherics/canister/carbon_dioxide)
 	cost = 40
@@ -100,27 +100,19 @@
 	containertype = /obj/structure/closet/crate/secure/large
 	access = access_atmospherics
 
-/singleton/hierarchy/supply_pack/atmospherics/canister_boron
-	name = "Gas - Boron gas canister"
-	contains = list(/obj/machinery/portable_atmospherics/canister/boron)
-	cost = 40
-	containername = "\improper Boron gas canister crate"
-	containertype = /obj/structure/closet/crate/secure/large
-	access = access_atmospherics
-
-/singleton/hierarchy/supply_pack/atmospherics/fuel
+/decl/hierarchy/supply_pack/atmospherics/fuel
 	name = "Liquid - Fuel tanks"
 	contains = list(/obj/item/tank/hydrogen = 4)
 	cost = 15
 	containername = "fuel tank crate"
 
-/singleton/hierarchy/supply_pack/atmospherics/phoron
+/decl/hierarchy/supply_pack/atmospherics/phoron
 	name = "Gas - Phoron tanks"
 	contains = list(/obj/item/tank/phoron = 3)
 	cost = 30
 	containername = "phoron tank crate"
 
-/singleton/hierarchy/supply_pack/atmospherics/voidsuit
+/decl/hierarchy/supply_pack/atmospherics/voidsuit
 	name = "EVA - Atmospherics voidsuit"
 	contains = list(/obj/item/clothing/suit/space/void/atmos/alt,
 					/obj/item/clothing/head/helmet/space/void/atmos/alt,
@@ -130,7 +122,7 @@
 	containertype = /obj/structure/closet/crate/secure/large
 	access = access_atmospherics
 
-/singleton/hierarchy/supply_pack/atmospherics/scanner_module
+/decl/hierarchy/supply_pack/atmospherics/scanner_module
 	name = "Electronics - Atmospherics scanner modules"
 	contains = list(/obj/item/stock_parts/computer/scanner/atmos = 4)
 	cost = 20

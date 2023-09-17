@@ -1,6 +1,6 @@
 #define WHITELISTFILE "data/whitelist.txt"
 
-var/global/list/whitelist = list()
+var/list/whitelist = list()
 
 /hook/startup/proc/loadWhitelist()
 	if(config.usewhitelist)
@@ -9,14 +9,14 @@ var/global/list/whitelist = list()
 
 /proc/load_whitelist()
 	whitelist = file2list(WHITELISTFILE)
-	if(!length(whitelist))	whitelist = null
+	if(!whitelist.len)	whitelist = null
 
-/proc/check_whitelist(mob/M /*, rank*/)
+/proc/check_whitelist(mob/M /*, var/rank*/)
 	if(!whitelist)
 		return 0
 	return ("[M.ckey]" in whitelist)
 
-var/global/list/alien_whitelist = list()
+/var/list/alien_whitelist = list()
 
 /hook/startup/proc/loadAlienWhitelist()
 	if(config.usealienwhitelist)
@@ -35,9 +35,9 @@ var/global/list/alien_whitelist = list()
 		alien_whitelist = splittext(text, "\n")
 		return 1
 /proc/load_alienwhitelistSQL()
-	var/DBQuery/query = dbcon_old.NewQuery("SELECT * FROM whitelist")
+	var/DBQuery/query = dbcon.NewQuery("SELECT * FROM whitelist")
 	if(!query.Execute())
-		to_world_log(dbcon_old.ErrorMsg())
+		to_world_log(dbcon.ErrorMsg())
 		return 0
 	else
 		while(query.NextRow())
@@ -49,16 +49,14 @@ var/global/list/alien_whitelist = list()
 				alien_whitelist[row["ckey"]] = list(row["race"])
 	return 1
 
-/proc/is_species_whitelisted(mob/M, species_name)
+/proc/is_species_whitelisted(mob/M, var/species_name)
 	var/datum/species/S = all_species[species_name]
 	return is_alien_whitelisted(M, S)
 
 //todo: admin aliens
-/proc/is_alien_whitelisted(mob/M, species)
+/proc/is_alien_whitelisted(mob/M, var/species)
 	if(!M || !species)
 		return 0
-	if (GLOB.skip_allow_lists)
-		return TRUE
 	if(!config.usealienwhitelist)
 		return 1
 	if(check_rights(R_ADMIN, 0, M))
@@ -74,11 +72,11 @@ var/global/list/alien_whitelist = list()
 		var/datum/species/S = species
 		if(!(S.spawn_flags & (SPECIES_IS_WHITELISTED|SPECIES_IS_RESTRICTED)))
 			return 1
-		return whitelist_lookup(S.get_bodytype(S), M.ckey)
+		return whitelist_lookup(S.whitelistName(S), M.ckey)
 
 	return 0
 
-/proc/whitelist_lookup(item, ckey)
+/proc/whitelist_lookup(var/item, var/ckey)
 	if(!alien_whitelist)
 		return 0
 

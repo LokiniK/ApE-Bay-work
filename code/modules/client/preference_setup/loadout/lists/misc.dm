@@ -1,22 +1,12 @@
 /datum/gear/cane
 	display_name = "cane"
-	path = /obj/item
-
-/datum/gear/cane/New()
-	..()
-	var/canes = list()
-	canes["cane"] = /obj/item/cane
-	canes["crutch, single"] = /obj/item/cane/crutch
-	canes["crutches, box of two"] = /obj/item/storage/box/large/crutches
-	canes["telescopic cane"] = /obj/item/cane/telescopic
-	canes["white guide cane"] = /obj/item/cane/white
-	gear_tweaks += new/datum/gear_tweak/path(canes)
+	path = /obj/item/cane
 
 /datum/gear/union_card
 	display_name = "union membership"
 	path = /obj/item/card/union
 
-/datum/gear/union_card/spawn_on_mob(mob/living/carbon/human/H, metadata)
+/datum/gear/union_card/spawn_on_mob(var/mob/living/carbon/human/H, var/metadata)
 	. = ..()
 	if(.)
 		var/obj/item/card/union/card = .
@@ -100,12 +90,18 @@
 		if(!initial(lunchbox.filled))
 			lunchboxes[initial(lunchbox.name)] = lunchbox_type
 	gear_tweaks += new/datum/gear_tweak/path(lunchboxes)
-	gear_tweaks += new/datum/gear_tweak/contents(lunchables_lunches(), lunchables_snacks(), lunchables_drinks())
+//	gear_tweaks += new/datum/gear_tweak/contents(lunchables_lunches(), lunchables_snacks(), lunchables_drinks())
 
 /datum/gear/towel
 	display_name = "towel"
 	path = /obj/item/towel
 	flags = GEAR_HAS_COLOR_SELECTION
+
+/datum/gear/rolled_towel
+	display_name = "big towel"
+	description = "Collapsed big towel - looks like you can't use it as a normal one... Use it on the beach or gym."
+	path = /obj/item/rolled_towel
+	flags = GEAR_HAS_TYPE_SELECTION
 
 /datum/gear/plush_toy
 	display_name = "plush toy"
@@ -119,19 +115,11 @@
 	plushes["mouse plush"] = /obj/item/toy/plushie/mouse
 	plushes["kitten plush"] = /obj/item/toy/plushie/kitten
 	plushes["lizard plush"] = /obj/item/toy/plushie/lizard
-	plushes["crow plush"] = /obj/item/toy/plushie/crow
 	plushes["spider plush"] = /obj/item/toy/plushie/spider
 	plushes["farwa plush"] = /obj/item/toy/plushie/farwa
-	plushes["golden carp plush"] = /obj/item/toy/plushie/carp_gold
-	plushes["purple carp plush"] = /obj/item/toy/plushie/carp_purple
-	plushes["pink carp plush"] = /obj/item/toy/plushie/carp_pink
-	plushes["corgi plush"] = /obj/item/toy/plushie/corgi
-	plushes["corgi plush with bow"] = /obj/item/toy/plushie/corgi_bow
-	plushes["deer plush"] = /obj/item/toy/plushie/deer
-	plushes["blue squid plush"] = /obj/item/toy/plushie/squid_blue
-	plushes["orange squid plush"] = /obj/item/toy/plushie/squid_orange
+	plushes["resomi plush"]= /obj/item/toy/plushie/resomi
 	gear_tweaks += new /datum/gear_tweak/path(plushes)
-
+/*
 /datum/gear/workvisa
 	display_name = "work visa"
 	description = "A work visa issued by the Sol Central Government for the purpose of work."
@@ -141,7 +129,7 @@
 	display_name = "travel visa"
 	description = "A travel visa issued by the Sol Central Government for the purpose of recreation."
 	path = /obj/item/paper/travelvisa
-
+*/
 
 /datum/gear/passport
 	display_name = "passports selection"
@@ -149,12 +137,6 @@
 	path = /obj/item/passport
 	flags = GEAR_HAS_SUBTYPE_SELECTION
 	custom_setup_proc = /obj/item/passport/proc/set_info
-
-/datum/gear/foundation_civilian
-	display_name = "operant registration card"
-	description = "A registration card in a faux-leather case. It marks the named individual as a registered, law-abiding psionic."
-	path = /obj/item/card/operant_card
-	custom_setup_proc = /obj/item/card/operant_card/proc/set_info
 
 /datum/gear/mirror
 	display_name = "handheld mirror"
@@ -164,12 +146,29 @@
 /datum/gear/lipstick
 	display_name = "lipstick selection"
 	path = /obj/item/lipstick
+	sort_category = "Cosmetics"//inf
 	flags = GEAR_HAS_TYPE_SELECTION
 
 /datum/gear/comb
 	display_name = "plastic comb"
 	path = /obj/item/haircomb
+	sort_category = "Cosmetics"//inf
 	flags = GEAR_HAS_COLOR_SELECTION
+//[inf]
+/datum/gear/brush
+	display_name = "hairbrush"
+	path = /obj/item/haircomb/brush
+	sort_category = "Cosmetics"
+
+/datum/gear/deodorant
+	display_name = "deodorant"
+	path = /obj/item/reagent_containers/spray/cleaner/deodorant
+	sort_category = "Cosmetics"
+//[/inf]
+/datum/gear/mask
+	display_name = "sterile mask"
+	path = /obj/item/clothing/mask/surgical
+	cost = 2
 
 /datum/gear/smokingpipe
 	display_name = "pipe, smoking"
@@ -179,13 +178,9 @@
 	display_name = "pipe, corn"
 	path = /obj/item/clothing/mask/smokable/pipe/cobpipe
 
-/datum/gear/matchbox
-	display_name = "matchbox"
-	path = /obj/item/storage/fancy/matches/matchbox
-
 /datum/gear/matchbook
 	display_name = "matchbook"
-	path = /obj/item/storage/fancy/matches/matchbook
+	path = /obj/item/storage/box/matches
 
 /datum/gear/lighter
 	display_name = "cheap lighter"
@@ -203,7 +198,7 @@
 	gear_tweaks += new/datum/gear_tweak/path(colours)
 
 /datum/gear/zippo
-	display_name = "zippo"
+	display_name = "zippo (collored)"
 	path = /obj/item/flame/lighter/zippo
 
 /datum/gear/zippo/New()
@@ -223,12 +218,12 @@
 
 /datum/gear/cigscase
 	display_name = "fancy cigarette case"
-	path = /obj/item/storage/fancy/smokable/case
+	path = /obj/item/storage/fancy/cigarettes/case
 	cost = 2
 
 /datum/gear/cigars
 	display_name = "fancy cigar case"
-	path = /obj/item/storage/fancy/smokable/cigar
+	path = /obj/item/storage/fancy/cigar
 	cost = 2
 
 /datum/gear/cigar
@@ -249,7 +244,6 @@
 /datum/gear/ecig/deluxe
 	display_name = "electronic cigarette, deluxe"
 	path = /obj/item/clothing/mask/smokable/ecig/deluxe
-	cost = 2
 
 /datum/gear/bible
 	display_name = "holy book"
@@ -287,3 +281,20 @@
 	crosstype["cross, silver"] = /obj/item/material/cross/silver
 	crosstype["cross, gold"] = /obj/item/material/cross/gold
 	gear_tweaks += new/datum/gear_tweak/path(crosstype)
+
+/datum/gear/coin
+	display_name = "coin"
+	path = /obj/item/material/coin
+	cost = 2
+
+/datum/gear/coin/New()
+	..()
+	var/cointype = list()
+	cointype["coin, gold"] = /obj/item/material/coin/gold
+	cointype["coin, silver"] = /obj/item/material/coin/silver
+	cointype["coin, iron"] = /obj/item/material/coin/iron
+	cointype["coin, diamond"] = /obj/item/material/coin/diamond
+	cointype["coin, uranium"] = /obj/item/material/coin/uranium
+	cointype["coin, phoron"] = /obj/item/material/coin/phoron
+	cointype["coin, platinum"] = /obj/item/material/coin/platinum
+	gear_tweaks += new/datum/gear_tweak/path(cointype)

@@ -9,7 +9,6 @@
 	var/atom/selected_object
 	var/list/valid_gases = list()
 	var/mode = MODE_AREA
-	var/simmed = TRUE
 	var/help_text = {"\
 	***** Build Mode: Atmosphere ******
 	Left Click         - Open atmosphere editor
@@ -28,7 +27,7 @@
 /datum/build_mode/atmosphere/Help()
 	to_chat(user, SPAN_NOTICE(help_text))
 
-/datum/build_mode/atmosphere/ui_interact(mob/user, ui_key = "atmosphere_editor", datum/nanoui/ui = null, force_open = 1, master_ui = null, datum/topic_state/state = GLOB.default_state)
+/datum/build_mode/atmosphere/ui_interact(mob/user, ui_key = "atmosphere_editor", datum/nanoui/ui = null, force_open = 1, var/master_ui = null, var/datum/topic_state/state = GLOB.default_state)
 	. = ..()
 
 	var/data[0]
@@ -67,13 +66,10 @@
 
 	switch (mode)
 		if (MODE_AREA)
-			if (ispath(env_area.base_turf, /turf/unsimulated))
-				simmed = FALSE
-			atmospheres = get_area_turfs(env_area)
+			for (var/turf/T in get_area_turfs(env_area))
+				atmospheres += T.return_air()
 		if (MODE_SINGLE)
-			if (istype(selected_object.loc, /turf/unsimulated))
-				simmed = FALSE
-			atmospheres += selected_object
+			atmospheres += selected_object.return_air()
 
 	if (href_list["change_mode"])
 		var/new_mode = input("Change editor mode", "Change Mode") as null | anything in list(MODE_AREA, MODE_SINGLE)
@@ -86,37 +82,18 @@
 	if (href_list["temperature"])
 		var/temp = input("Set Temperature (Kelvin)", "Temperature") as num | null
 
-		if (!simmed)
-			for (var/turf/unsimulated/T in atmospheres)
-				T.temperature = temp
-				update_unsimmed_connections(T)
-			return
-
 		if (!isnull(temp))
-			for (var/turf/T in atmospheres)
-				var/datum/gas_mixture/G = T.return_air()
+			for (var/datum/gas_mixture/G in atmospheres)
 				G.temperature = temp
 				G.update_values()
-
 
 		. = TOPIC_HANDLED
 
 	if (href_list["moles_total"])
 		var/moles = input("Add/Subtract Moles", "Moles") as num | null
 
-		if (!simmed)
-			for (var/turf/unsimulated/T in atmospheres)
-				var/new_moles = length(T.initial_gas) / moles
-
-				for (var/gas in T.initial_gas)
-					T.initial_gas[gas] = new_moles
-
-				update_unsimmed_connections(T)
-			return
-
 		if (!isnull(moles))
-			for (var/turf/T in atmospheres)
-				var/datum/gas_mixture/G = T.return_air()
+			for (var/datum/gas_mixture/G in atmospheres)
 				for (var/g in G.gas)
 					G.adjust_gas(g, moles)
 
@@ -126,15 +103,8 @@
 		var/gas_id = href_list["modify_gas"]
 		var/moles = input("Set [gas_id]'s Mole Count]", "Moles") as num | null
 
-		if (!simmed)
-			for (var/turf/unsimulated/T in atmospheres)
-				T.initial_gas[gas_id] = moles
-				update_unsimmed_connections(T)
-			return
-
 		if (!isnull(moles))
-			for (var/turf/T in atmospheres)
-				var/datum/gas_mixture/G = T.return_air()
+			for (var/datum/gas_mixture/G in atmospheres)
 				var/list/gases = G.gas
 
 				gases[gas_id] = moles
@@ -148,15 +118,8 @@
 		if (gas)
 			var/moles = input("How many moles?", "Moles") as num | null
 
-			if (!simmed)
-				for (var/turf/unsimulated/T in atmospheres)
-					T.initial_gas[gas] = moles
-					update_unsimmed_connections(T)
-				return
-
 			if (moles)
-				for (var/turf/T in atmospheres)
-					var/datum/gas_mixture/G = T.return_air()
+				for (var/datum/gas_mixture/G in atmospheres)
 					G.gas[gas] = moles
 					G.update_values()
 
@@ -166,14 +129,7 @@
 		var/gas = input("Remove a gas from the mix", "Remove Gas") as null | anything in enviroment.gas
 
 		if (gas)
-			if (!simmed)
-				for (var/turf/unsimulated/T in atmospheres)
-					T.initial_gas[gas] = 0
-					update_unsimmed_connections(T)
-				return
-
-			for (var/turf/T in atmospheres)
-				var/datum/gas_mixture/G = T.return_air()
+			for (var/datum/gas_mixture/G in atmospheres)
 				G.gas[gas] = 0
 				G.update_values()
 
@@ -188,26 +144,18 @@
 			gasses = list(GAS_OXYGEN = MOLES_O2STANDARD, GAS_NITROGEN = MOLES_N2STANDARD)
 			temperature = 294
 
-		if (!simmed)
-			for (var/turf/unsimulated/T in atmospheres)
-				T.initial_gas = gasses
-				T.temperature = temperature
-				update_unsimmed_connections(T)
-			return
-
 		if (length(gasses))
-			for (var/turf/T in atmospheres)
-				var/datum/gas_mixture/G = T.return_air()
+			for (var/datum/gas_mixture/G in atmospheres)
 				for (var/gas in G.gas)
 					G.gas[gas] = 0
 
-			for (var/turf/T in atmospheres)
-				var/datum/gas_mixture/G = T.return_air()
+			for (var/datum/gas_mixture/G in atmospheres)
 				for (var/new_gas in gasses)
 					G.gas = gasses.Copy()
 					G.adjust_gas_temp(new_gas, gasses[new_gas], temperature)
 
 		. = TOPIC_HANDLED
+
 
 	if (mode == MODE_AREA && env_area.planetary_surface)
 		//exoplanets will slowly reset their atmosphere to default if we don't update it
@@ -243,31 +191,3 @@
 
 	return FALSE
 
-/datum/build_mode/atmosphere/proc/update_unsimmed_connections(turf/unsimulated/T)
-	if (T.connections)
-		var/connection_manager/manager = T.connections
-
-		if (manager.N)
-			set_zone_update(manager.N)
-
-		if (manager.S)
-			set_zone_update(manager.S)
-
-		if (manager.E)
-			set_zone_update(manager.E)
-
-		if (manager.W)
-			set_zone_update(manager.W)
-
-		if (manager.U)
-			set_zone_update(manager.U)
-
-		if (manager.D)
-			set_zone_update(manager.D)
-
-		manager.update_all()
-
-
-/datum/build_mode/atmosphere/proc/set_zone_update(connection/C)
-	C.zoneA = null
-	C.zoneB = null

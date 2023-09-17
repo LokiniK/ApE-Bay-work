@@ -1,10 +1,11 @@
 #include "derelict_areas.dm"
 
 /obj/effect/overmap/visitable/sector/derelict
-	name = "debris field"
-	desc = "A large field of miscellanious debris."
+	scanner_name = "debris field"
+	scanner_desc = @{"[i]Transponder[/i]: Various faint signals
+[b]Notice[/b]: Warning! Significant field of space debris detected. May be salvagable."}
 	icon_state = "object"
-
+	known = 0
 
 	initial_generic_waypoints = list(
 		"nav_derelict_1",
@@ -21,12 +22,12 @@
 	id = "awaysite_derelict"
 	description = "An abandoned construction project."
 	suffixes = list("derelict/derelict-station.dmm")
-	spawn_cost = 1
+	spawn_cost = 0.5 // INF, WAS 1
 	accessibility_weight = 10
-	area_usage_test_exempted_areas = list(/area/constructionsite/AIsattele)
+	area_usage_test_exempted_areas = list(/area/AIsattele)
 	area_usage_test_exempted_root_areas = list(/area/constructionsite, /area/derelict)
 	apc_test_exempt_areas = list(
-		/area/constructionsite/AIsattele = NO_SCRUBBER|NO_VENT|NO_APC,
+		/area/AIsattele = NO_SCRUBBER|NO_VENT|NO_APC,
 		/area/constructionsite = NO_SCRUBBER|NO_VENT|NO_APC,
 		/area/constructionsite/ai = NO_SCRUBBER|NO_VENT,
 		/area/constructionsite/atmospherics = NO_SCRUBBER|NO_VENT,

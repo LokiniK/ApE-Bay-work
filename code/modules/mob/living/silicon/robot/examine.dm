@@ -1,35 +1,34 @@
-/mob/living/silicon/robot/examine(mob/user, distance, is_adjacent)
+/mob/living/silicon/robot/examine(mob/user, distance)
 	var/custom_infix = custom_name ? ", [modtype] [braintype]" : ""
-	. = ..(user, distance, is_adjacent, infix = custom_infix)
+	. = ..(user, distance, infix = custom_infix)
 
 	var/msg = ""
-	var/damage_msg = ""
+	msg += "<span class='warning'>"
 	if (src.getBruteLoss())
 		if (src.getBruteLoss() < 75)
-			damage_msg += "It looks slightly dented.\n"
+			msg += "It looks slightly dented.\n"
 		else
-			damage_msg += "<B>It looks severely dented!</B>\n"
+			msg += "<B>It looks severely dented!</B>\n"
 	if (src.getFireLoss())
 		if (src.getFireLoss() < 75)
-			damage_msg += "It looks slightly charred.\n"
+			msg += "It looks slightly charred.\n"
 		else
-			damage_msg += "<B>It looks severely burnt and heat-warped!</B>\n"
-	if (damage_msg)
-		msg += SPAN_WARNING(damage_msg)
+			msg += "<B>It looks severely burnt and heat-warped!</B>\n"
+	msg += "</span>"
 
 	if(opened)
-		msg += "[SPAN_WARNING("Its cover is open and the power cell is [cell ? "installed" : "missing"].")]\n"
+		msg += "<span class='warning'>Its cover is open and the power cell is [cell ? "installed" : "missing"].</span>\n"
 	else
 		msg += "Its cover is closed.\n"
 
 	if(!has_power)
-		msg += "[SPAN_WARNING("It appears to be running on backup power.")]\n"
+		msg += "<span class='warning'>It appears to be running on backup power.</span>\n"
 
 	switch(src.stat)
 		if(CONSCIOUS)
 			if(!src.client)	msg += "It appears to be in stand-by mode.\n" //afk
-		if(UNCONSCIOUS)		msg += "[SPAN_WARNING("It doesn't seem to be responding.")]\n"
-		if(DEAD)			msg += "[SPAN_CLASS("deadsay", "It looks completely unsalvageable.")]\n"
+		if(UNCONSCIOUS)		msg += "<span class='warning'>It doesn't seem to be responding.</span>\n"
+		if(DEAD)			msg += "<span class='deadsay'>It looks completely unsalvageable.</span>\n"
 	msg += "*---------*"
 
 	if(print_flavor_text()) msg += "\n[print_flavor_text()]\n"

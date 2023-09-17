@@ -1,46 +1,37 @@
-SUBSYSTEM_DEF(graphs)
-	name = "Graphs"
+SUBSYSTEM_DEF(graphs_update)
+	name = "Graphs (Update)"
 	priority = SS_PRIORITY_GRAPH
-	flags = SS_KEEP_TIMING | SS_NO_INIT
-	runlevels = RUNLEVEL_GAME | RUNLEVEL_POSTGAME
+	flags = SS_KEEP_TIMING
+	runlevels = RUNLEVEL_GAME|RUNLEVEL_POSTGAME
 	wait = 1
 
-	/// A list of graphs pending update.
-	var/static/list/datum/graph/pending_graphs = list()
+	var/list/pending_graphs
+	var/list/current_run
 
-	/// The current run of graphs to update.
-	var/static/list/datum/graph/queue = list()
+/datum/controller/subsystem/graphs_update/Initialize()
+	pending_graphs = list()
+	. = ..()
 
-
-/datum/controller/subsystem/graphs/Recover()
-	queue.Cut()
-
-
-/datum/controller/subsystem/graphs/UpdateStat(time)
-	if (PreventUpdateStat(time))
-		return ..()
-	..("Queue: [length(queue)]")
-
-
-/datum/controller/subsystem/graphs/proc/Queue(datum/graph/graph)
+/datum/controller/subsystem/graphs_update/proc/Queue(var/datum/graph/graph)
 	pending_graphs |= graph
+	wake()
 
-
-/datum/controller/subsystem/graphs/fire(resumed, no_mc_tick)
+/datum/controller/subsystem/graphs_update/fire(resumed = 0)
 	if (!resumed)
-		if (!length(pending_graphs))
+		src.current_run = pending_graphs.Copy()
+		pending_graphs.Cut()
+
+	var/list/current_run = src.current_run
+	while(current_run.len)
+		var/datum/graph/G = current_run[current_run.len]
+		current_run.len--
+		if(!QDELETED(G))
+			G.ProcessPendingConnections()
+		if (MC_TICK_CHECK)
 			return
-		queue = pending_graphs.Copy()
-	var/cut_until = 1
-	for (var/datum/graph/graph as anything in queue)
-		++cut_until
-		pending_graphs -= graph
-		if (QDELETED(graph))
-			continue
-		graph.ProcessPendingConnections()
-		if (no_mc_tick)
-			CHECK_TICK
-		else if (MC_TICK_CHECK)
-			queue.Cut(1, cut_until)
-			return
-	queue.Cut()
+
+	if(!length(pending_graphs))
+		suspend()
+
+/datum/controller/subsystem/graphs_update/Recover(var/datum/controller/subsystem/graphs_update/GU)
+	pending_graphs = GU.pending_graphs

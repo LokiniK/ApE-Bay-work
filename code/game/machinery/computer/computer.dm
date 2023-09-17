@@ -1,20 +1,20 @@
 /obj/machinery/computer
 	name = "computer"
-	icon = 'icons/obj/machines/computer.dmi'
+	icon = 'icons/obj/computer.dmi'
 	icon_state = "computer"
 	density = TRUE
 	anchored = TRUE
 	idle_power_usage = 300
 	active_power_usage = 300
-	construct_state = /singleton/machine_construction/default/panel_closed/computer
+	construct_state = /decl/machine_construction/default/panel_closed/computer
 	uncreated_component_parts = null
 	stat_immune = 0
 	frame_type = /obj/machinery/constructable_frame/computerframe/deconstruct
+
 	var/processing = 0
 
-	health_max = 80
-	damage_hitsound = 'sound/weapons/smash.ogg'
-
+	var/max_health = 80
+	var/health
 	var/icon_keyboard = "generic_key"
 	var/icon_screen = "generic"
 	var/light_max_bright_on = 0.2
@@ -30,23 +30,64 @@
 
 /obj/machinery/computer/Initialize()
 	. = ..()
+	health = max_health
 	update_icon()
 
-/obj/machinery/computer/can_damage_health(damage, damage_type)
-	if (!can_use_tools)
-		return FALSE
-	. = ..()
-
-/obj/machinery/computer/on_death()
+/obj/machinery/computer/emp_act(severity)
 	..()
-	visible_message(SPAN_WARNING("\The [src] breaks!"))
+	if(prob(20/severity))
+		take_damage(max_health)
+
+/obj/machinery/computer/ex_act(severity)
+	switch(severity)
+		if(1.0)
+			qdel(src)
+			return
+		if(2.0)
+			if (prob(25))
+				qdel(src)
+				return
+			if (prob(50))
+				for(var/x in verbs)
+					verbs -= x
+				take_damage(max_health)
+		if(3.0)
+			if (prob(25))
+				for(var/x in verbs)
+					verbs -= x
+				take_damage(max_health)
+
+/obj/machinery/computer/bullet_act(var/obj/item/projectile/Proj)
+	take_damage(Proj.get_structure_damage())
+	..()
+
+/obj/machinery/computer/attackby(obj/item/I, mob/user)
+	if (isScrewdriver(I) || isWrench(I) || isCrowbar(I))
+		return ..() // handled by construction
+	if (user.a_intent != I_HURT)
+		return ..()
+
+	user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
+	user.do_attack_animation(src)
+	playsound(src, 'sound/weapons/smash.ogg', 25, 1)
+	take_damage(I.force)
+	..()
+
+/obj/machinery/computer/proc/take_damage(var/damage)
+	if (health <= 0)
+		return
+
+	health -= damage
+	if(health <= 0)
+		set_broken(TRUE)
+		visible_message(SPAN_WARNING("\The [src] breaks!"))
 
 /obj/machinery/computer/on_update_icon()
 	overlays.Cut()
 	icon = initial(icon)
 	icon_state = initial(icon_state)
 
-	// Connecting multiple computers in a row
+		// Connecty
 	if(initial(icon_state) == "computer")
 		var/append_string = ""
 		var/left = turn(dir, 90)
@@ -64,7 +105,7 @@
 
 	if(reason_broken & MACHINE_BROKEN_NO_PARTS)
 		set_light(0)
-		icon = 'icons/obj/machines/computer.dmi'
+		icon = 'icons/obj/computer.dmi'
 		icon_state = "wired"
 		var/screen = get_component_of_type(/obj/item/stock_parts/console_screen)
 		var/keyboard = get_component_of_type(/obj/item/stock_parts/keyboard)
@@ -74,53 +115,40 @@
 			overlays += icon_keyboard ? "[icon_keyboard]_off" : "keyboard"
 		return
 
-	if(!is_powered())
+	if(stat & NOPOWER)
+		set_light(0)
 		if(icon_keyboard)
 			overlays += image(icon,"[icon_keyboard]_off", overlay_layer)
 		return
+	else
+		set_light(light_max_bright_on, light_inner_range_on, light_outer_range_on, 2, light_color)
 
-	if(MACHINE_IS_BROKEN(src))
+	if(stat & BROKEN)
 		overlays += image(icon,"[icon_state]_broken", overlay_layer)
+
 	else
 		overlays += get_screen_overlay()
 
 	overlays += get_keyboard_overlay()
-	var/screen_is_glowing = update_glow()
-	if(screen_is_glowing)
-		overlays += emissive_appearance(icon, icon_screen)
-		if(icon_keyboard)
-			overlays += emissive_appearance(icon, "[icon_keyboard]_mask")
 
 /obj/machinery/computer/proc/get_screen_overlay()
-	return overlay_image(icon,icon_screen)
+	return overlay_image(icon,icon_screen, plane = EFFECTS_ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
 
 /obj/machinery/computer/proc/get_keyboard_overlay()
 	if(icon_keyboard)
-		return overlay_image(icon, icon_keyboard, overlay_layer)
+		overlays += image(icon, icon_keyboard, overlay_layer)
 
 /obj/machinery/computer/proc/decode(text)
 	// Adds line breaks
 	text = replacetext(text, "\n", "<BR>")
 	return text
 
-/**
- * Makes the computer emit light if the screen is on.
- * Returns TRUE if the screen is on, otherwise FALSE.
- */
-/obj/machinery/computer/proc/update_glow()
-	if (operable())
-		set_light(light_max_bright_on, light_inner_range_on, light_outer_range_on, 2, light_color)
-		return TRUE
-	else
-		set_light(0)
-		return FALSE
-
 /obj/machinery/computer/dismantle(mob/user)
-	if(MACHINE_IS_BROKEN(src))
-		to_chat(user, SPAN_NOTICE("The broken glass falls out."))
+	if(stat & BROKEN)
+		to_chat(user, "<span class='notice'>The broken glass falls out.</span>")
 		for(var/obj/item/stock_parts/console_screen/screen in component_parts)
 			qdel(screen)
 			new /obj/item/material/shard(loc)
 	else
-		to_chat(user, SPAN_NOTICE("You disconnect the monitor."))
+		to_chat(user, "<span class='notice'>You disconnect the monitor.</span>")
 	return ..()

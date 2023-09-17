@@ -2,10 +2,13 @@
 #include "../mining/mining_areas.dm"
 
 /obj/effect/overmap/visitable/sector/slavers_base
-	name = "large asteroid"
-	desc = "Sensor array is reading an artificial structure inside the asteroid."
+	scanner_name = "large asteroid"
+	scanner_desc = @{"[i]Registration[/i]: UNKNOWN
+[i]Class[/i]: Installation (Space)
+[i]Transponder[/i]: None Detected.
+[b]Notice[/b]: Sensor array is reading an artificial structure inside the asteroid"}
 	icon_state = "object"
-
+	known = 0
 
 	initial_generic_waypoints = list(
 		"nav_slavers_base_1",
@@ -22,7 +25,7 @@
 	id = "awaysite_slavers"
 	description = "Asteroid with slavers base inside."
 	suffixes = list("slavers/slavers_base.dmm")
-	spawn_cost = 1
+	spawn_cost = 0.5 // INF, WAS 1
 	generate_mining_by_z = 1
 	area_usage_test_exempted_root_areas = list(/area/slavers_base)
 	apc_test_exempt_areas = list(
@@ -57,21 +60,21 @@
 	name = "Slavers Base Navpoint #7"
 	landmark_tag = "nav_slavers_base_antag"
 
-/singleton/hierarchy/outfit/corpse
+/decl/hierarchy/outfit/corpse
 	name = "Corpse Clothing"
 
-/singleton/hierarchy/outfit/corpse/Initialize()
+/decl/hierarchy/outfit/corpse/Initialize()
 	..()
 	hierarchy_type = type
 
-/singleton/hierarchy/outfit/corpse/slavers_base
+/decl/hierarchy/outfit/corpse/slavers_base
 	name = "Basic slaver output"
 
 /obj/effect/landmark/corpse/slavers_base/slaver1
 	name = "Slaver"
-	corpse_outfits = list(/singleton/hierarchy/outfit/corpse/slavers_base/slaver1)
+	corpse_outfits = list(/decl/hierarchy/outfit/corpse/slavers_base/slaver1)
 
-/singleton/hierarchy/outfit/corpse/slavers_base/slaver1
+/decl/hierarchy/outfit/corpse/slavers_base/slaver1
 	name = "Dead Slaver 1"
 	uniform = /obj/item/clothing/under/color/brown
 	shoes = /obj/item/clothing/shoes/black
@@ -79,36 +82,36 @@
 
 /obj/effect/landmark/corpse/slavers_base/slaver2
 	name = "Slaver"
-	corpse_outfits = list(/singleton/hierarchy/outfit/corpse/slavers_base/slaver2)
+	corpse_outfits = list(/decl/hierarchy/outfit/corpse/slavers_base/slaver2)
 
-/singleton/hierarchy/outfit/corpse/slavers_base/slaver2
+/decl/hierarchy/outfit/corpse/slavers_base/slaver2
 	name = "Dead Slaver 2"
 	uniform = /obj/item/clothing/under/grayson
 	shoes = /obj/item/clothing/shoes/blue
 
 /obj/effect/landmark/corpse/slavers_base/slaver3
 	name = "Slaver"
-	corpse_outfits = list(/singleton/hierarchy/outfit/corpse/slavers_base/slaver3)
+	corpse_outfits = list(/decl/hierarchy/outfit/corpse/slavers_base/slaver3)
 
-/singleton/hierarchy/outfit/corpse/slavers_base/slaver3
+/decl/hierarchy/outfit/corpse/slavers_base/slaver3
 	name = "Dead Slaver 3"
 	uniform = /obj/item/clothing/under/pirate
 	shoes = /obj/item/clothing/shoes/brown
 
 /obj/effect/landmark/corpse/slavers_base/slaver4
 	name = "Slaver"
-	corpse_outfits = list(/singleton/hierarchy/outfit/corpse/slavers_base/slaver4)
+	corpse_outfits = list(/decl/hierarchy/outfit/corpse/slavers_base/slaver4)
 
-/singleton/hierarchy/outfit/corpse/slavers_base/slaver4
+/decl/hierarchy/outfit/corpse/slavers_base/slaver4
 	name = "Dead Slaver 4"
 	uniform = /obj/item/clothing/under/redcoat
 	shoes = /obj/item/clothing/shoes/brown
 
 /obj/effect/landmark/corpse/slavers_base/slaver5
 	name = "Slaver"
-	corpse_outfits = list(/singleton/hierarchy/outfit/corpse/slavers_base/slaver5)
+	corpse_outfits = list(/decl/hierarchy/outfit/corpse/slavers_base/slaver5)
 
-/singleton/hierarchy/outfit/corpse/slavers_base/slaver5
+/decl/hierarchy/outfit/corpse/slavers_base/slaver5
 	name = "Dead Slaver 5"
 	uniform = /obj/item/clothing/under/sterile
 	shoes = /obj/item/clothing/shoes/orange
@@ -116,18 +119,18 @@
 
 /obj/effect/landmark/corpse/slavers_base/slaver6
 	name = "Slaver"
-	corpse_outfits = list(/singleton/hierarchy/outfit/corpse/slavers_base/slaver6)
+	corpse_outfits = list(/decl/hierarchy/outfit/corpse/slavers_base/slaver6)
 
-/singleton/hierarchy/outfit/corpse/slavers_base/slaver6
+/decl/hierarchy/outfit/corpse/slavers_base/slaver6
 	name = "Dead Slaver 6"
 	uniform = /obj/item/clothing/under/frontier
 	shoes = /obj/item/clothing/shoes/orange
 
 /obj/effect/landmark/corpse/slavers_base/slave
 	name = "Slave"
-	corpse_outfits = list(/singleton/hierarchy/outfit/corpse/slavers_base/slave)
+	corpse_outfits = list(/decl/hierarchy/outfit/corpse/slavers_base/slave)
 
-/singleton/hierarchy/outfit/corpse/slavers_base/slave
+/decl/hierarchy/outfit/corpse/slavers_base/slave
 	name = "Dead Slave"
 	uniform = /obj/item/clothing/under/color/orange
 	shoes = /obj/item/clothing/shoes/tactical
@@ -151,7 +154,7 @@
 	unsuitable_atmos_damage = 15
 	var/corpse = /obj/effect/landmark/corpse/abolitionist
 	var/weapon = /obj/item/gun/energy/laser
-	projectilesound = 'sound/weapons/Laser.ogg'
+	projectilesound = 'sound/weapons/laser.ogg'
 	ranged = 1
 	projectiletype = /obj/item/projectile/beam
 	faction = "extremist abolitionists"
@@ -168,9 +171,9 @@
 
 /obj/effect/landmark/corpse/abolitionist
 	name = "abolitionist"
-	corpse_outfits = list(/singleton/hierarchy/outfit/corpse/abolitionist)
+	corpse_outfits = list(/decl/hierarchy/outfit/corpse/abolitionist)
 
-/singleton/hierarchy/outfit/corpse/abolitionist
+/decl/hierarchy/outfit/corpse/abolitionist
 	name = "Dead abolitionist"
 	uniform = /obj/item/clothing/under/abol_uniform
 	shoes = /obj/item/clothing/shoes/jackboots

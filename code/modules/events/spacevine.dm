@@ -1,4 +1,4 @@
-var/global/spacevines_spawned = 0
+/var/global/spacevines_spawned = 0
 
 /datum/event/spacevine
 	announceWhen	= 60
@@ -8,4 +8,4 @@ var/global/spacevines_spawned = 0
 	spacevines_spawned = 1
 
 /datum/event/spacevine/announce()
-	level_seven_announcement()
+	GLOB.using_map.level_x_biohazard_announcement(4)

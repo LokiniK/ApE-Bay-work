@@ -10,7 +10,7 @@
 			/obj/item/reagent_containers/chem_disp_cartridge/silicon,
 			/obj/item/reagent_containers/chem_disp_cartridge/phosphorus,
 			/obj/item/reagent_containers/chem_disp_cartridge/sulfur,
-			/obj/item/reagent_containers/chem_disp_cartridge/hydrochloric,
+			/obj/item/reagent_containers/chem_disp_cartridge/hclacid,
 			/obj/item/reagent_containers/chem_disp_cartridge/potassium,
 			/obj/item/reagent_containers/chem_disp_cartridge/iron,
 			/obj/item/reagent_containers/chem_disp_cartridge/copper,
@@ -19,7 +19,7 @@
 			/obj/item/reagent_containers/chem_disp_cartridge/water,
 			/obj/item/reagent_containers/chem_disp_cartridge/ethanol,
 			/obj/item/reagent_containers/chem_disp_cartridge/sugar,
-			/obj/item/reagent_containers/chem_disp_cartridge/acid,
+			/obj/item/reagent_containers/chem_disp_cartridge/sacid,
 			/obj/item/reagent_containers/chem_disp_cartridge/tungsten
 		)
 
@@ -146,10 +146,46 @@
 			/obj/item/reagent_containers/chem_disp_cartridge/green_tea,
 			/obj/item/reagent_containers/chem_disp_cartridge/chai_tea,
 			/obj/item/reagent_containers/chem_disp_cartridge/red_tea,
-			/obj/item/reagent_containers/chem_disp_cartridge/decaf_tea,
 			/obj/item/reagent_containers/chem_disp_cartridge/ice,
 			/obj/item/reagent_containers/chem_disp_cartridge/syrup_chocolate,
 			/obj/item/reagent_containers/chem_disp_cartridge/syrup_caramel,
 			/obj/item/reagent_containers/chem_disp_cartridge/syrup_vanilla,
 			/obj/item/reagent_containers/chem_disp_cartridge/syrup_pumpkin
 		)
+
+//[INF]
+/obj/machinery/chemical_dispenser/merc
+	name = "combat drugs dispenser"
+	spawn_cartridges = list(
+			/obj/item/reagent_containers/chem_disp_cartridge/arithrazine,
+			/obj/item/reagent_containers/chem_disp_cartridge/inaprov,
+			/obj/item/reagent_containers/chem_disp_cartridge/alkysine,
+			/obj/item/reagent_containers/chem_disp_cartridge/iron,
+			/obj/item/reagent_containers/chem_disp_cartridge/ryetalyn,
+			/obj/item/reagent_containers/chem_disp_cartridge/imidazoline,
+			/obj/item/reagent_containers/chem_disp_cartridge/rezadone,
+			/obj/item/reagent_containers/chem_disp_cartridge/peridaxon,
+			/obj/item/reagent_containers/chem_disp_cartridge/tramadol,
+			/obj/item/reagent_containers/chem_disp_cartridge/paracetamol,
+			/obj/item/reagent_containers/chem_disp_cartridge/tricord,
+			/obj/item/reagent_containers/chem_disp_cartridge/dermaline,
+			/obj/item/reagent_containers/chem_disp_cartridge/synaptizine,
+			/obj/item/reagent_containers/chem_disp_cartridge/dexalin,
+			/obj/item/reagent_containers/chem_disp_cartridge/sleeptox,
+			/obj/item/reagent_containers/chem_disp_cartridge/dexalin_p,
+			/obj/item/reagent_containers/chem_disp_cartridge/sterilizine,
+			/obj/item/reagent_containers/chem_disp_cartridge/dylovene,
+			/obj/item/reagent_containers/chem_disp_cartridge/spaceacillin,
+			/obj/item/reagent_containers/chem_disp_cartridge/hyperzine,
+			/obj/item/reagent_containers/chem_disp_cartridge/chloral,
+			/obj/item/reagent_containers/chem_disp_cartridge/hyronalin,
+			/obj/item/reagent_containers/chem_disp_cartridge/clonexadone,
+			/obj/item/reagent_containers/chem_disp_cartridge/ethylredox,
+			/obj/item/reagent_containers/chem_disp_cartridge/cryoxadone,
+			/obj/item/reagent_containers/chem_disp_cartridge/kelotane,
+			/obj/item/reagent_containers/chem_disp_cartridge/leporazine,
+			/obj/item/reagent_containers/chem_disp_cartridge/oxycodone,
+			/obj/item/reagent_containers/chem_disp_cartridge/glucose,
+			/obj/item/reagent_containers/chem_disp_cartridge/bicaridine
+		)
+//[/INF]

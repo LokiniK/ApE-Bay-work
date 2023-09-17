@@ -12,7 +12,7 @@
 /obj/item/material/knife/folding/swiss
 	name = "combi-knife"
 	desc = "A small, colourable, multi-purpose folding knife."
-	icon = 'icons/obj/tools/swiss_knife.dmi'
+	icon = 'icons/obj/swiss_knife.dmi'
 	icon_state = "swissknf_closed"
 	handle_icon = "swissknf_handle"
 	takes_colour = FALSE
@@ -25,7 +25,7 @@
 	var/sharp_tools = list(SWISSKNF_LBLADE, SWISSKNF_SBLADE, SWISSKNF_GBLADE, SWISSKNF_WBLADE)
 
 /obj/item/material/knife/folding/swiss/attack_self(mob/user)
-	var/choice
+	var/choice	
 	if(user.a_intent != I_HELP && ((SWISSKNF_LBLADE in tools) || (SWISSKNF_SBLADE in tools)) && active_tool == SWISSKNF_CLOSED)
 		open = TRUE
 		if(SWISSKNF_LBLADE in tools)
@@ -38,20 +38,20 @@
 		else
 			choice = SWISSKNF_CLOSED
 			open = FALSE
-
+	
 	if(!choice || !CanPhysicallyInteract(user))
 		return
 	if(choice == SWISSKNF_CLOSED)
 		open = FALSE
-		user.visible_message(SPAN_NOTICE("\The [user] closes the [name]."))
+		user.visible_message("<span class='notice'>\The [user] closes the [name].</span>")
 	else
 		open = TRUE
 		if(choice == SWISSKNF_LBLADE || choice == SWISSKNF_SBLADE)
-			user.visible_message(SPAN_WARNING("\The [user] opens the [lowertext(choice)]."))
+			user.visible_message("<span class='warning'>\The [user] opens the [lowertext(choice)].</span>")
 			playsound(user, 'sound/weapons/flipblade.ogg', 15, 1)
 		else
-			user.visible_message(SPAN_NOTICE("\The [user] opens the [lowertext(choice)]."))
-
+			user.visible_message("<span class='notice'>\The [user] opens the [lowertext(choice)].</span>")
+			
 	active_tool = choice
 	update_force()
 	update_icon()
@@ -90,16 +90,16 @@
 		if(blood_overlay)
 			overlays += blood_overlay
 
-/obj/item/material/knife/folding/swiss/IsCrowbar()
+/obj/item/material/knife/folding/swiss/iscrowbar()
 	return active_tool == SWISSKNF_CROWBAR && can_use_tools
 
-/obj/item/material/knife/folding/swiss/IsScrewdriver()
+/obj/item/material/knife/folding/swiss/isscrewdriver()
 	return (active_tool == SWISSKNF_CLIFTER || active_tool == SWISSKNF_COPENER) && can_use_tools
 
-/obj/item/material/knife/folding/swiss/IsWirecutter()
+/obj/item/material/knife/folding/swiss/iswirecutter()
 	return active_tool == SWISSKNF_WCUTTER && can_use_tools
 
-/obj/item/material/knife/folding/swiss/IsHatchet()
+/obj/item/material/knife/folding/swiss/ishatchet()
 	return active_tool == SWISSKNF_WBLADE
 
 /obj/item/material/knife/folding/swiss/resolve_attackby(obj/target, mob/user)
@@ -109,7 +109,7 @@
 		update_force()
 		return
 	if(istype(target, /obj/item))
-		if(target.w_class <= ITEM_SIZE_HUGE)
+		if(target.w_class <= ITEM_SIZE_NORMAL)
 			can_use_tools = TRUE
 			. = ..()
 			can_use_tools = FALSE
@@ -124,7 +124,7 @@
 	tools = list(SWISSKNF_LBLADE, SWISSKNF_CLIFTER, SWISSKNF_COPENER, SWISSKNF_CSCREW)
 
 /obj/item/material/knife/folding/swiss/sec
-	name = "master-at-arms' combi-knife"
+	name = "Master-At-Arms' combi-knife"
 	desc = "A small, red, multi-purpose folding knife. This one adds no special tools."
 	color = COLOR_NT_RED
 

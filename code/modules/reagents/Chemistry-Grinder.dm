@@ -1,7 +1,7 @@
 /obj/machinery/reagentgrinder
 	name = "reagent grinder"
 	desc = "An industrial reagent grinder with heavy carbide cutting blades."
-	icon = 'icons/obj/machines/kitchen.dmi'
+	icon = 'icons/obj/kitchen.dmi'
 	icon_state = "rgrinder"
 	layer = BELOW_OBJ_LAYER
 	density = TRUE
@@ -9,7 +9,7 @@
 	idle_power_usage = 5
 	active_power_usage = 100
 	obj_flags = OBJ_FLAG_ANCHORABLE
-	construct_state = /singleton/machine_construction/default/panel_closed
+	construct_state = /decl/machine_construction/default/panel_closed
 	machine_name = "reagent grinder"
 	machine_desc = "An industrial grinder with durable blades that shreds objects into their component reagents."
 
@@ -64,7 +64,7 @@
 	if (grinding)
 		return
 	power_change()
-	if (inoperable())
+	if (stat & (NOPOWER|BROKEN))
 		return
 	if (!container?.reagents || container.reagents.total_volume >= container.reagents.maximum_volume)
 		return
@@ -72,7 +72,7 @@
 	grinding = TRUE
 	update_icon()
 
-	addtimer(new Callback(src, .proc/reset_machine, user), grind_time)
+	addtimer(CALLBACK(src, .proc/reset_machine, user), grind_time)
 	var/skill_multiplier = CLAMP01(0.5 + (user.get_skill_value(skill) - 1) * 0.167)
 	for (var/obj/item/I in items)
 		if (container.reagents.total_volume >= container.reagents.maximum_volume)
@@ -81,7 +81,7 @@
 			I.reagents.trans_to(container, I.reagents.total_volume, skill_multiplier)
 			I.reagents.clear_reagents()
 		var/material/M = I.get_material()
-		if (length(M?.chem_products))
+		if (M?.chem_products?.len)
 			if (isstack(I))
 				var/sheet_volume = 0
 				for (var/chem in M.chem_products)
@@ -105,7 +105,7 @@
 	if (I.reagents?.total_volume)
 		return TRUE
 	var/material/M = I.get_material()
-	if (length(M?.chem_products))
+	if (M?.chem_products?.len)
 		return TRUE
 	return FALSE
 
@@ -134,9 +134,9 @@
 
 	else if (is_type_in_list(I, storage_types))
 		var/obj/item/storage/S = I
-		if (!length(S.contents))
+		if (!S.contents.len)
 			to_chat(user, SPAN_WARNING("\The [S] is empty."))
-		else if (length(items) >= max_items)
+		else if (items.len >= max_items)
 			to_chat(user, SPAN_WARNING("\The item hopper on \the [src] is full."))
 		else
 			var/list/removed = list()
@@ -148,11 +148,11 @@
 				S.remove_from_storage(G, src, 1)
 				removed += G
 				items += G
-				if (length(items) >= max_items)
+				if (items.len >= max_items)
 					break
-			if (length(removed))
+			if (removed.len)
 				S.finish_bulk_removal()
-				var/full = length(items) >= max_items
+				var/full = items.len >= max_items
 				user.visible_message(
 					"\The [user] empties things from \the [S] into \the [src].",
 					"You empty [english_list(removed)] from \the [S] into \the [src][full ? ", filling it to capacity" : ""]."
@@ -164,7 +164,7 @@
 	else if (I.w_class > max_item_size)
 		to_chat(user, SPAN_WARNING("\The [I] is too large for \the [src]."))
 
-	else if (length(items) >= max_items)
+	else if (items.len >= max_items)
 		to_chat(user, SPAN_WARNING("\The [src] is full."))
 
 	else if (is_type_in_list(I, banned_items) || !grindable(I))
@@ -191,7 +191,7 @@
 		window += "Working, please wait..."
 	else
 		window += "<b>Processing Hopper</b>"
-		if (!length(items))
+		if (!items.len)
 			window += " (empty)"
 		else
 			window += "<br><a href='?src=\ref[src];action=grind'>(grind)</a> <a href='?src=\ref[src];action=eject'>(eject)</a><br>"
@@ -204,7 +204,7 @@
 		if (!container)
 			window += " (not attached)"
 		else
-			window += " (\an [container], [Percent(container.reagents.total_volume, container.reagents.maximum_volume, 1)]% full)"
+			window += " (\an [container], [PERCENT(container.reagents.total_volume, container.reagents.maximum_volume, 1)]% full)"
 			window += "<br><a href='?src=\ref[src];action=detach'>(detach)</a><br>"
 			for (var/datum/reagent/R in container.reagents.reagent_list)
 				window += "<br>[R.volume] - [R.name]"
@@ -232,22 +232,22 @@
 /obj/machinery/reagentgrinder/AltClick(mob/user)
 	if(CanDefaultInteract(user))
 		detach(user)
-		return TRUE
-	return ..()
+	else
+		..()
 
 
 /obj/machinery/reagentgrinder/CtrlClick(mob/user)
 	if(anchored && CanDefaultInteract(user))
 		grind(user)
-		return TRUE
-	return ..()
+	else
+		..()
 
 
 /obj/machinery/reagentgrinder/CtrlAltClick(mob/user)
 	if(CanDefaultInteract(user))
 		eject(user)
-		return TRUE
-	return ..()
+	else
+		..()
 
 
 /obj/machinery/reagentgrinder/RefreshParts()
@@ -260,7 +260,6 @@
 	icon_state = "juicer"
 	density = FALSE
 	anchored = FALSE
-	obj_flags = OBJ_FLAG_ANCHORABLE | OBJ_FLAG_CAN_TABLE
 	grind_sound = 'sound/machines/juicer.ogg'
 	max_item_size = ITEM_SIZE_NORMAL
 	skill = SKILL_COOKING
@@ -277,3 +276,8 @@
 	)
 	machine_name = "blender"
 	machine_desc = "Blends or juices food placed inside it - useful for things like flour. Can't process raw material sheets."
+
+/obj/machinery/reagentgrinder/juicer/New()
+    ..()
+    container = new /obj/item/reagent_containers/glass/beaker(src)
+    update_icon()

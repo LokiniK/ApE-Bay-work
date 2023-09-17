@@ -12,26 +12,21 @@ SUBSYSTEM_DEF(character_setup)
 
 	var/list/save_queue = list()
 
-
-/datum/controller/subsystem/character_setup/UpdateStat(time)
-	return
-
-
-/datum/controller/subsystem/character_setup/Initialize(start_uptime)
-	while(length(prefs_awaiting_setup))
-		var/datum/preferences/prefs = prefs_awaiting_setup[length(prefs_awaiting_setup)]
-		LIST_DEC(prefs_awaiting_setup)
+/datum/controller/subsystem/character_setup/Initialize()
+	while(prefs_awaiting_setup.len)
+		var/datum/preferences/prefs = prefs_awaiting_setup[prefs_awaiting_setup.len]
+		prefs_awaiting_setup.len--
 		prefs.setup()
-	while(length(newplayers_requiring_init))
-		var/mob/new_player/new_player = newplayers_requiring_init[length(newplayers_requiring_init)]
-		LIST_DEC(newplayers_requiring_init)
+	while(newplayers_requiring_init.len)
+		var/mob/new_player/new_player = newplayers_requiring_init[newplayers_requiring_init.len]
+		newplayers_requiring_init.len--
 		new_player.deferred_login()
-
+	. = ..()
 
 /datum/controller/subsystem/character_setup/fire(resumed = FALSE)
-	while(length(save_queue))
-		var/datum/preferences/prefs = save_queue[length(save_queue)]
-		LIST_DEC(save_queue)
+	while(save_queue.len)
+		var/datum/preferences/prefs = save_queue[save_queue.len]
+		save_queue.len--
 
 		if(!QDELETED(prefs))
 			prefs.save_preferences()
@@ -39,5 +34,5 @@ SUBSYSTEM_DEF(character_setup)
 		if(MC_TICK_CHECK)
 			return
 
-/datum/controller/subsystem/character_setup/proc/queue_preferences_save(datum/preferences/prefs)
+/datum/controller/subsystem/character_setup/proc/queue_preferences_save(var/datum/preferences/prefs)
 	save_queue |= prefs

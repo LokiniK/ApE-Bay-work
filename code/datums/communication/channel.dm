@@ -1,6 +1,6 @@
 #define plain_key_name(A) key_name(A, highlight_special_characters = 0)
 
-/singleton/communication_channel
+/decl/communication_channel
 	var/name
 	var/config_setting
 	var/expected_communicator_type = /datum
@@ -10,7 +10,7 @@
 	var/show_preference_setting
 
 
-/singleton/communication_channel/proc/can_ignore(client/C)
+/decl/communication_channel/proc/can_ignore(client/C)
 	if (!C)
 		return TRUE
 	// Channels that cannot be toggled can never be ignored
@@ -23,13 +23,13 @@
 /*
 * Procs for handling sending communication messages
 */
-/singleton/communication_channel/proc/communicate(datum/communicator, message)
+/decl/communication_channel/proc/communicate(var/datum/communicator, var/message)
 	if(can_communicate(arglist(args)))
-		call(log_proc)("[(flags&COMMUNICATION_LOG_CHANNEL_NAME) ? "([name]) " : ""][communicator.communication_identifier()] : [message]")
+		call(log_proc)(message, communicator.get_client().mob)
 		return do_communicate(arglist(args))
 	return FALSE
 
-/singleton/communication_channel/proc/can_communicate(datum/communicator, message)
+/decl/communication_channel/proc/can_communicate(var/datum/communicator, var/message)
 
 	if(!message)
 		return FALSE
@@ -38,26 +38,26 @@
 		log_debug("[log_info_line(communicator)] attempted to communicate over the channel [src] but was of an unexpected type.")
 		return FALSE
 
-	if(config_setting && !config.vars[config_setting] && !check_rights(R_INVESTIGATE,0,communicator))
-		to_chat(communicator, SPAN_DANGER("[name] is globally muted."))
+	if(config_setting && !config.vars[config_setting] && !check_rights(R_INVESTIGATE|R_DEBUG,0,communicator))
+		to_chat(communicator, "<span class='danger'>[name] is globally muted.</span>")
 		return FALSE
 
 	var/client/C = communicator.get_client()
 
 	if(jobban_isbanned(C.mob, name))
-		to_chat(communicator, SPAN_DANGER("You cannot use [name] (banned)."))
+		to_chat(communicator, "<span class='danger'>You cannot use [name] (banned).</span>")
 		return FALSE
 
 	if(can_ignore(C))
-		to_chat(communicator, SPAN_WARNING("Couldn't send message - you have [name] muted."))
+		to_chat(communicator, "<span class='warning'>Couldn't send message - you have [name] muted.</span>")
 		return FALSE
 
 	if(C && mute_setting && (C.prefs.muted & mute_setting))
-		to_chat(communicator, SPAN_DANGER("You cannot use [name] (muted)."))
+		to_chat(communicator, "<span class='danger'>You cannot use [name] (muted).</span>")
 		return FALSE
 
 	if(C && (flags & COMMUNICATION_NO_GUESTS) && IsGuestKey(C.key))
-		to_chat(communicator, SPAN_DANGER("Guests may not use the [name] channel."))
+		to_chat(communicator, "<span class='danger'>Guests may not use the [name] channel.</span>")
 		return FALSE
 
 	if (config.forbidden_message_regex && !check_rights(R_INVESTIGATE, 0, communicator) && findtext(message, config.forbidden_message_regex))
@@ -72,13 +72,13 @@
 
 	return TRUE
 
-/singleton/communication_channel/proc/do_communicate(communicator, message)
+/decl/communication_channel/proc/do_communicate(var/communicator, var/message)
 	return
 
 /*
 * Procs for handling the reception of communication messages
 */
-/singleton/communication_channel/proc/receive_communication(datum/communicator, datum/receiver, message)
+/decl/communication_channel/proc/receive_communication(var/datum/communicator, var/datum/receiver, var/message)
 	if(can_receive_communication(receiver))
 		var/has_follow_links = FALSE
 		if((flags & COMMUNICATION_ADMIN_FOLLOW))
@@ -92,28 +92,28 @@
 				message = "[extra_links] [message]"
 		do_receive_communication(arglist(args))
 
-/singleton/communication_channel/proc/can_receive_communication(datum/receiver)
+/decl/communication_channel/proc/can_receive_communication(var/datum/receiver)
 	if(show_preference_setting)
 		var/client/C = receiver.get_client()
 		if(can_ignore(C))
 			return FALSE
 	return TRUE
 
-/singleton/communication_channel/proc/do_receive_communication(datum/communicator, datum/receiver, message)
+/decl/communication_channel/proc/do_receive_communication(var/datum/communicator, var/datum/receiver, var/message)
 	to_chat(receiver, message)
 
 
 /*
  * Procs for the handling of system broadcasts
  */
-/singleton/communication_channel/proc/broadcast(message, force = FALSE)
+/decl/communication_channel/proc/broadcast(message, force = FALSE)
 	if (!can_broadcast(message, force))
 		return FALSE
 	call(log_proc)("[(flags & COMMUNICATION_LOG_CHANNEL_NAME) ? "([name]) " : ""]SYSTEM BROADCAST : [message]")
 	return do_broadcast(message, force)
 
 
-/singleton/communication_channel/proc/can_broadcast(message, override_config = FALSE)
+/decl/communication_channel/proc/can_broadcast(message, override_config = FALSE)
 	if (!message)
 		return FALSE
 
@@ -123,17 +123,17 @@
 	return TRUE
 
 
-/singleton/communication_channel/proc/do_broadcast(message)
+/decl/communication_channel/proc/do_broadcast(message)
 	return
 
 
-/singleton/communication_channel/proc/receive_broadcast(datum/receiver, message)
+/decl/communication_channel/proc/receive_broadcast(datum/receiver, message)
 	if (!can_receive_communication(receiver))
 		return
 	do_receive_broadcast(receiver, message)
 
 
-/singleton/communication_channel/proc/do_receive_broadcast(datum/receiver, message)
+/decl/communication_channel/proc/do_receive_broadcast(datum/receiver, message)
 	to_chat(receiver, message)
 
 
@@ -149,9 +149,9 @@
 	message = sanitize(message)
 	return communicate(arglist(args))
 
-/proc/communicate(channel_type, communicator, message)
-	var/list/channels = GET_SINGLETON_SUBTYPE_MAP(/singleton/communication_channel)
-	var/singleton/communication_channel/channel = channels[channel_type]
+/proc/communicate(var/channel_type, var/communicator, var/message)
+	var/list/channels = decls_repository.get_decls_of_subtype(/decl/communication_channel)
+	var/decl/communication_channel/channel = channels[channel_type]
 
 	message = process_chat_markup(message)
 	var/list/new_args = list(communicator, message)
@@ -160,8 +160,8 @@
 	return channel.communicate(arglist(new_args))
 
 /proc/communicate_broadcast(channel_type, message, forced = FALSE)
-	var/list/channels = GET_SINGLETON_SUBTYPE_MAP(/singleton/communication_channel)
-	var/singleton/communication_channel/channel = channels[channel_type]
+	var/list/channels = decls_repository.get_decls_of_subtype(/decl/communication_channel)
+	var/decl/communication_channel/channel = channels[channel_type]
 
 	return channel.broadcast(message, forced)
 

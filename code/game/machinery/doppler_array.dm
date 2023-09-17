@@ -1,14 +1,9 @@
-var/global/list/doppler_arrays = list()
+var/list/doppler_arrays = list()
 
 /obj/machinery/doppler_array
 	name = "tachyon-doppler array"
 	desc = "A highly precise directional sensor array which measures the release of quants from decaying tachyons. The doppler shifting of the mirror-image formed by these quants can reveal the size, location and temporal affects of energetic disturbances within a large radius ahead of the array."
-	icon = 'icons/obj/machines/research/doppler_array.dmi'
-	icon_state = "tdoppler"
-	obj_flags = OBJ_FLAG_ROTATABLE
-	construct_state = /singleton/machine_construction/default/panel_closed
-	var/currentlyfacing
-	var/direct
+
 
 /obj/machinery/doppler_array/New()
 	..()
@@ -16,15 +11,16 @@ var/global/list/doppler_arrays = list()
 
 /obj/machinery/doppler_array/Destroy()
 	doppler_arrays -= src
-	..()
+	. = ..()
 
-/obj/machinery/doppler_array/proc/sense_explosion(x0,y0,z0,devastation_range,heavy_impact_range,light_impact_range,took)
-	if(!is_powered())	return
+/obj/machinery/doppler_array/proc/sense_explosion(var/x0,var/y0,var/z0,var/devastation_range,var/heavy_impact_range,var/light_impact_range,var/took)
+	if(stat & NOPOWER)	return
 	if(z != z0)			return
 
 	var/dx = abs(x0-x)
 	var/dy = abs(y0-y)
 	var/distance
+	var/direct
 
 	if(dx > dy)
 		distance = dx
@@ -38,40 +34,15 @@ var/global/list/doppler_arrays = list()
 	if(distance > 100)		return
 	if(!(direct & dir))	return
 
-	var/message = "Explosive disturbance detected - Epicenter at: grid ([x0],[y0]). Epicenter radius: [devastation_range]. Outer radius: [heavy_impact_range]. Shockwave radius: [light_impact_range]. Temporal displacement of tachyons: [took] seconds."
+	var/message = "Explosive disturbance detected - Epicenter at: grid ([x0],[y0]). Epicenter radius: [devastation_range]. Outer radius: [heavy_impact_range]. Shockwave radius: [light_impact_range]. Temporal displacement of tachyons: [took]seconds."
 
-	audible_message(SPAN_CLASS("game say", "[SPAN_CLASS("name", "\The [src]")] states coldly, \"[message]\""))
+	for(var/mob/O in hearers(src, null))
+		O.show_message("<span class='game say'><span class='name'>[src]</span> states coldly, \"[message]\"</span>",2)
 
 /obj/machinery/doppler_array/on_update_icon()
-	overlays.Cut()
-	if(MACHINE_IS_BROKEN(src))
+	if(stat & BROKEN)
 		icon_state = "[initial(icon_state)]-broken"
-	if(panel_open)
-		overlays += "[initial(icon_state)]-open"
-	if(inoperable())
+	else if( !(stat & NOPOWER) )
+		icon_state = initial(icon_state)
+	else
 		icon_state = "[initial(icon_state)]-off"
-
-/obj/machinery/doppler_array/attackby(obj/item/W, mob/user)
-	if(component_attackby(W, user))
-		return TRUE
-	else if(isWrench(W))
-		anchored = !anchored
-		to_chat(user, SPAN_NOTICE("You wrench the stabilising bolts [anchored ? "into place" : "loose"]."))
-		playsound(loc, 'sound/items/Ratchet.ogg', 40)
-		update_icon()
-
-/obj/machinery/doppler_array/proc/getcurrentdirection()
-	switch(direct)
-		if(EAST)
-			currentlyfacing = "east"
-		if(WEST)
-			currentlyfacing = "west"
-		if(NORTH)
-			currentlyfacing = "north"
-		else
-			currentlyfacing = "south"
-
-/obj/machinery/doppler_array/examine(mob/user)
-	. = ..()
-	to_chat(user, SPAN_NOTICE("The stabilizing bolts are currently [anchored ? "deployed" : "retracted"]."))
-	to_chat(user, SPAN_NOTICE("The sensor array is currently facing [currentlyfacing]."))

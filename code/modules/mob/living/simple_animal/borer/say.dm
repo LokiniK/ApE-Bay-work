@@ -1,4 +1,4 @@
-/mob/living/simple_animal/borer/say(message)
+/mob/living/simple_animal/borer/say(var/message)
 
 	message = sanitize(message)
 	message = capitalize(message)
@@ -14,15 +14,15 @@
 
 	if (src.client)
 		if(client.prefs.muted & MUTE_IC)
-			to_chat(src, SPAN_WARNING("You cannot speak in IC (muted)."))
+			to_chat(src, "<span class='warning'>You cannot speak in IC (muted).</span>")
 			return
 
-	if (copytext_char(message, 1, 2) == get_prefix_key(/singleton/prefix/custom_emote))
-		return emote(copytext_char(message, 2))
+	if (copytext(message, 1, 2) == "*")
+		return emote(copytext(message, 2))
 
 	var/datum/language/L = parse_language(message)
 	if(L && L.flags & HIVEMIND)
-		L.broadcast(src,trimtext(copytext(message,3)),src.truename)
+		L.broadcast(src,trim(copytext(message,3)),src.truename)
 		return
 
 	if(!host)

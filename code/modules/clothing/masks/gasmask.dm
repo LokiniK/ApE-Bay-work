@@ -27,20 +27,21 @@
 	var/filter_water
 	var/gas_filter_strength = 1			//For gas mask filters
 
+	tint = 2 //INF
 
 /obj/item/clothing/mask/gas/examine(mob/user)
 	. = ..()
 	if(clogged)
-		to_chat(user, SPAN_WARNING("The intakes are clogged with [clogged]!"))
+		to_chat(user, "<span class='warning'>The intakes are clogged with [clogged]!</span>")
 
 /obj/item/clothing/mask/gas/filters_water()
 	return (filter_water && !clogged)
 
-/obj/item/clothing/mask/gas/attack_self(mob/user)
+/obj/item/clothing/mask/gas/attack_self(var/mob/user)
 	if(clogged)
-		user.visible_message(SPAN_NOTICE("\The [user] begins unclogging the intakes of \the [src]."))
-		if(do_after(user, 10 SECONDS, src, DO_PUBLIC_UNIQUE) && clogged)
-			user.visible_message(SPAN_NOTICE("\The [user] has unclogged \the [src]."))
+		user.visible_message("<span class='notice'>\The [user] begins unclogging the intakes of \the [src].</span>")
+		if(do_after(user, 100) && clogged)
+			user.visible_message("<span class='notice'>\The [user] has unclogged \the [src].</span>")
 			clogged = FALSE
 		return
 	. = ..()
@@ -77,7 +78,16 @@
 		laser = ARMOR_LASER_MINOR,
 		bio = ARMOR_BIO_RESISTANT
 		)
-
+	tint = 0 //INF
+//[INF]
+	sprite_sheets = list(
+		SPECIES_VOX = 'icons/mob/species/vox/onmob_mask_vox.dmi',
+		SPECIES_VOX_ARMALIS = 'icons/mob/species/vox/onmob_mask_vox_armalis.dmi',
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_mask_resomi.dmi',
+		SPECIES_UNATHI = 'infinity/icons/mob/species/unathi/onmob_mask_unathi.dmi',
+		SPECIES_EROSAN = 'infinity/icons/mob/species/erosan/mask.dmi',
+		)
+//[/INF]
 //In scaling order of utility and seriousness
 
 /obj/item/clothing/mask/gas/radical
@@ -116,6 +126,7 @@
 		laser = ARMOR_LASER_MINOR,
 		bio = ARMOR_BIO_STRONG
 		)
+	tint = 0 //INF
 
 /obj/item/clothing/mask/gas/syndicate
 	name = "tactical mask"
@@ -129,9 +140,10 @@
 		laser = ARMOR_LASER_MINOR,
 		bio = ARMOR_BIO_STRONG
 		)
+	tint = 0 //INF
 
 /obj/item/clothing/mask/gas/death_commando
-	name = "\improper Death Commando mask"
+	name = "\improper Death Commando Mask"
 	desc = "A grim tactical mask worn by the fictional Death Commandos, elites of the also fictional Space Syndicate. Saturdays at 10!"
 	icon_state = "death"
 	item_state = "death"
@@ -159,18 +171,24 @@
 	desc = "A true prankster's facial attire. A clown is incomplete without their wig and mask."
 	icon_state = "clown"
 	item_state = "clown"
+	tint = 1 //INF
+	body_parts_covered = EYES //INF
 
 /obj/item/clothing/mask/gas/sexyclown
 	name = "sexy-clown wig and mask"
 	desc = "A feminine clown mask for the dabbling crossdressers or female entertainers."
 	icon_state = "sexyclown"
 	item_state = "sexyclown"
+	tint = 1 //INF
+	body_parts_covered = EYES //INF
 
 /obj/item/clothing/mask/gas/mime
 	name = "mime mask"
 	desc = "The traditional mime's mask. It has an eerie facial posture."
 	icon_state = "mime"
 	item_state = "mime"
+	tint = 1 //INF
+	body_parts_covered = EYES //INF
 
 /obj/item/clothing/mask/gas/monkeymask
 	name = "monkey mask"
@@ -184,6 +202,8 @@
 	desc = "A traditional female mime's mask."
 	icon_state = "sexymime"
 	item_state = "sexymime"
+	tint = 1 //INF
+	body_parts_covered = EYES //INF
 
 /obj/item/clothing/mask/gas/owl_mask
 	name = "owl mask"
@@ -196,22 +216,25 @@
 
 /obj/item/clothing/mask/gas/vox
 	name = "vox breathing mask"
-	desc = "A small oxygen filter for use by Vox."
+	desc = "A small oxygen filter for use by Vox. WARNING: DOESN'T FILTERS HOT SPRAY!"
 	icon_state = "respirator"
 	item_state = "respirator"
 	flags_inv = 0
 	body_parts_covered = 0
-	species_restricted = list(SPECIES_VOX)
-	filtered_gases = list(GAS_OXYGEN)
-	item_flags = ITEM_FLAG_BLOCK_GAS_SMOKE_EFFECT | ITEM_FLAG_AIRTIGHT | ITEM_FLAG_INVALID_FOR_CHAMELEON
+
+	species_restricted = list(SPECIES_VOX, SPECIES_VOX_ARMALIS)
+	filtered_gases = list(GAS_PHORON, GAS_N2O, GAS_OXYGEN,\
+															GAS_CHLORINE, GAS_AMMONIA, GAS_METHYL_BROMIDE, GAS_CO, GAS_CO2)//inf
+
+	tint = 0 //INF
 
 /obj/item/clothing/mask/gas/swat/vox
 	name = "alien mask"
-	desc = "Clearly not designed for a human face."
+	desc = "Clearly not designed for a human face. WARNING: DOESN'T FILTERS HOT SPRAY!"
 	icon_state = "voxswat"
 	item_state = "voxswat"
 	body_parts_covered = EYES
-	species_restricted = list(SPECIES_VOX)
+	species_restricted = list(SPECIES_VOX, SPECIES_VOX_ARMALIS)
 	filtered_gases = list(
 		GAS_OXYGEN,
 		GAS_PHORON,
@@ -222,12 +245,24 @@
 		GAS_METHYL_BROMIDE,
 		GAS_METHANE
 		)
-	item_flags = ITEM_FLAG_BLOCK_GAS_SMOKE_EFFECT | ITEM_FLAG_AIRTIGHT | ITEM_FLAG_INVALID_FOR_CHAMELEON
+	tint = 0 //INF
 
 /obj/item/clothing/mask/gas/aquabreather
 	name = "aquabreather"
 	desc = "A compact CO2 scrubber and breathing apparatus that draws oxygen from water."
 	icon_state = "halfgas"
 	filter_water = TRUE
+//[INF]
+	sprite_sheets = list(
+		SPECIES_VOX = 'icons/mob/species/vox/onmob_mask_vox.dmi',
+		SPECIES_VOX_ARMALIS = 'icons/mob/species/vox/onmob_mask_vox_armalis.dmi',
+		SPECIES_TAJARA = 'icons/mob/species/tajaran/mask.dmi',
+		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/mask.dmi',
+		SPECIES_RESOMI = 'infinity/icons/mob/species/resomi/onmob_mask_resomi.dmi',
+		SPECIES_EROSAN = 'infinity/icons/mob/species/erosan/mask.dmi',
+		)
+//[/INF]
+
 	body_parts_covered = FACE
+	tint = 0 //INF
 	w_class = 2

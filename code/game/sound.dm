@@ -55,7 +55,7 @@ GLOBAL_LIST_INIT(chop_sound,list('sound/weapons/chop1.ogg','sound/weapons/chop2.
 GLOBAL_LIST_INIT(glasscrack_sound,list('sound/effects/glass_crack1.ogg','sound/effects/glass_crack2.ogg','sound/effects/glass_crack3.ogg','sound/effects/glass_crack4.ogg'))
 GLOBAL_LIST_INIT(tray_hit_sound,list('sound/items/trayhit1.ogg', 'sound/items/trayhit2.ogg'))
 
-/proc/playsound(atom/source, soundin, vol as num, vary, extrarange as num, falloff, is_global, frequency, is_ambiance = 0)
+/proc/playsound(var/atom/source, soundin, vol as num, vary, extrarange as num, falloff, var/is_global, var/frequency, var/is_ambiance = 0)
 
 	soundin = get_sfx(soundin) // same sound for everyone
 
@@ -66,7 +66,8 @@ GLOBAL_LIST_INIT(tray_hit_sound,list('sound/items/trayhit1.ogg', 'sound/items/tr
 	var/turf/turf_source = get_turf(source)
 
  	// Looping through the player list has the added bonus of working for mobs inside containers
-	for (var/mob/M in GLOB.player_list)
+	for (var/P in GLOB.player_list)
+		var/mob/M = P
 		if(!M || !M.client)
 			continue
 		if(get_dist(M, turf_source) <= (world.view + extrarange) * 2)
@@ -74,9 +75,9 @@ GLOBAL_LIST_INIT(tray_hit_sound,list('sound/items/trayhit1.ogg', 'sound/items/tr
 			if(T && T.z == turf_source.z && (!is_ambiance || M.get_preference_value(/datum/client_preference/play_ambiance) == GLOB.PREF_YES))
 				M.playsound_local(turf_source, soundin, vol, vary, frequency, falloff, is_global, extrarange)
 
-var/global/const/FALLOFF_SOUNDS = 0.5
+var/const/FALLOFF_SOUNDS = 0.5
 
-/mob/proc/playsound_local(turf/turf_source, soundin, vol as num, vary, frequency, falloff, is_global, extrarange)
+/mob/proc/playsound_local(var/turf/turf_source, soundin, vol as num, vary, frequency, falloff, is_global, extrarange)
 	if(!src.client || ear_deaf > 0)	return
 	var/sound/S = soundin
 	if(!istype(S))
@@ -93,7 +94,7 @@ var/global/const/FALLOFF_SOUNDS = 0.5
 
 	//sound volume falloff with pressure
 	var/pressure_factor = 1.0
-
+	
 	S.volume *= get_sound_volume_multiplier()
 
 	var/turf/T = get_turf(src)
@@ -133,7 +134,7 @@ var/global/const/FALLOFF_SOUNDS = 0.5
 
 	if(!is_global)
 
-		if(istype(src,/mob/living))
+		if(istype(src,/mob/living/))
 			var/mob/living/carbon/M = src
 			if (istype(M) && M.hallucination_power > 50 && M.chem_effects[CE_MIND] < 1)
 				S.environment = PSYCHOTIC
@@ -189,9 +190,15 @@ var/global/const/FALLOFF_SOUNDS = 0.5
 			if ("button") soundin = pick(GLOB.button_sound)
 			if ("chop") soundin = pick(GLOB.chop_sound)
 			if ("glasscrack") soundin = pick(GLOB.glasscrack_sound)
+//[INF]
+			if ("smash") soundin = pick(GLOB.smash_sound)
+			if ("heavystep") soundin = pick(GLOB.heavystep_sound)
+			if ("light_strike") soundin = pick(GLOB.light_strike_sound)
+			if ("gunshot") soundin = pick(GLOB.gun_sound)
+//[/INF]
 			if ("tray_hit") soundin = pick(GLOB.tray_hit_sound)
 	return soundin
-
+	
 /client/verb/stop_sounds()
 	set name = "Stop All Sounds"
 	set desc = "Stop all sounds that are currently playing on your client."

@@ -64,7 +64,6 @@
 	icon_state = "default"
 	screen_loc = "CENTER-7,CENTER-7"
 	plane = FULLSCREEN_PLANE
-	layer = FULLSCREEN_LAYER
 	mouse_opacity = 0
 	var/severity = 0
 	var/allstate = 0 //shows if it should show up for dead people too
@@ -96,6 +95,7 @@
 	layer = BLIND_LAYER
 
 /obj/screen/fullscreen/impaired
+	icon = 'infinity/icons/mob/screen_full.dmi' //inf, was nothing
 	icon_state = "impairedoverlay"
 	layer = IMPAIRED_LAYER
 
@@ -122,12 +122,14 @@
 	icon = 'icons/effects/static.dmi'
 	icon_state = "1 light"
 	screen_loc = ui_entire_screen
+	layer = FULLSCREEN_LAYER
 	alpha = 127
 
 /obj/screen/fullscreen/fadeout
 	icon = 'icons/mob/screen1.dmi'
 	icon_state = "black"
 	screen_loc = ui_entire_screen
+	layer = FULLSCREEN_LAYER
 	alpha = 0
 	allstate = 1
 
@@ -140,6 +142,7 @@
 	icon_state = "scanlines"
 	screen_loc = ui_entire_screen
 	alpha = 50
+	layer = FULLSCREEN_LAYER
 
 /obj/screen/fullscreen/fishbed
 	icon_state = "fishbed"
@@ -148,3 +151,10 @@
 /obj/screen/fullscreen/pain
 	icon_state = "brutedamageoverlay6"
 	alpha = 0
+
+//Infinity
+/obj/screen/fullscreen/fade
+	icon = 'icons/mob/screen1.dmi'
+	icon_state = "black"
+	screen_loc = ui_entire_screen
+	layer = FULLSCREEN_LAYER

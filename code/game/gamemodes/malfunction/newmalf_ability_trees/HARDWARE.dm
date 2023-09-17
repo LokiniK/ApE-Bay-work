@@ -18,6 +18,9 @@
 	if(!user.hardware || !istype(user.hardware, /datum/malf_hardware/core_bomb))
 		return
 
+	if(user.carded)
+		return
+
 	if(user.bombing_core)
 		to_chat(user, "***** CORE SELF-DESTRUCT SEQUENCE ABORTED *****")
 		user.bombing_core = 0
@@ -41,7 +44,7 @@
 		if(!user || !user.bombing_core)
 			return
 		to_chat(user, "** [timer] **")
-	explosion(user.loc, 21)
+	explosion(user.loc, 3,6,12,24)
 	qdel(user)
 
 
@@ -119,7 +122,7 @@
 	to_chat(user, "Self-destructing in 5 minutes. Use this command again to abort.")
 	user.bombing_station = 1
 
-	var/singleton/security_state/security_state = GET_SINGLETON(GLOB.using_map.security_state)
+	var/decl/security_state/security_state = decls_repository.get_decl(GLOB.using_map.security_state)
 	security_state.set_security_level(security_state.severe_security_level, TRUE)
 	radio.autosay("Self destruct sequence has been activated. Self-destructing in 5 minutes.", "Self-Destruct Control")
 
@@ -138,4 +141,14 @@
 			to_chat(user, "** Self destructing now **")
 		timer--
 
+// [INF]
+// Compleating TODO with locating local nuke and using it instead AI
+	var/obj/machinery/nuclearbomb/station/station_nuke = locate() in SSmachines.machinery
+	if(station_nuke)
+		SetUniversalState(/datum/universal_state/nuclear_explosion/malf, arguments=list(station_nuke))
+		return
+// [/INF]
+
 	SetUniversalState(/datum/universal_state/nuclear_explosion/malf, arguments=list(user)) //TODO: find the station nuclear device and use that
+
+

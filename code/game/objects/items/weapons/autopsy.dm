@@ -1,11 +1,16 @@
+
+//moved these here from code/defines/obj/weapon.dm
+//please preference put stuff where it's easy to find - C
+
 /obj/item/autopsy_scanner
 	name = "autopsy scanner"
 	desc = "Used to gather information on wounds."
-	icon = 'icons/obj/surgery_tools.dmi'
+	icon = 'icons/obj/surgery.dmi'
 	icon_state = "autopsy_scanner"
 	obj_flags = OBJ_FLAG_CONDUCTIBLE
 	w_class = ITEM_SIZE_SMALL
 	origin_tech = list(TECH_MATERIAL = 1, TECH_BIO = 1)
+	matter = list(MATERIAL_STEEL = 2000, MATERIAL_GLASS = 350)
 	var/list/datum/autopsy_data_scanner/wdata = list()
 	var/list/chemtraces = list()
 	var/target_name = null
@@ -24,17 +29,17 @@
 	var/hits = 0
 	var/time_inflicted = 0
 
-/datum/autopsy_data/proc/copy()
-	var/datum/autopsy_data/W = new
-	W.weapon = weapon
-	W.pretend_weapon = pretend_weapon
-	W.damage = damage
-	W.hits = hits
-	W.time_inflicted = time_inflicted
-	return W
+	proc/copy()
+		var/datum/autopsy_data/W = new()
+		W.weapon = weapon
+		W.pretend_weapon = pretend_weapon
+		W.damage = damage
+		W.hits = hits
+		W.time_inflicted = time_inflicted
+		return W
 
-/obj/item/autopsy_scanner/proc/add_data(obj/item/organ/external/O)
-	if(!length(O.autopsy_data)) return
+/obj/item/autopsy_scanner/proc/add_data(var/obj/item/organ/external/O)
+	if(!O.autopsy_data.len) return
 
 	for(var/V in O.autopsy_data)
 		var/datum/autopsy_data/W = O.autopsy_data[V]
@@ -102,15 +107,15 @@
 			if(0)
 				damage_desc = "Unknown"
 			if(1 to 5)
-				damage_desc = SPAN_COLOR("green", "negligible")
+				damage_desc = "<font color='green'>negligible</font>"
 			if(5 to 15)
-				damage_desc = SPAN_COLOR("green", "light")
+				damage_desc = "<font color='green'>light</font>"
 			if(15 to 30)
-				damage_desc = SPAN_COLOR("orange", "moderate")
+				damage_desc = "<font color='orange'>moderate</font>"
 			if(30 to 1000)
-				damage_desc = SPAN_COLOR("red", "severe")
+				damage_desc = "<font color='red'>severe</font>"
 
-		if(!total_score) total_score = length(D.organs_scanned)
+		if(!total_score) total_score = D.organs_scanned.len
 
 		scan_data += "<b>Weapon #[n]</b><br>"
 		if(damaging_weapon)
@@ -126,14 +131,14 @@
 
 		n++
 
-	if(length(chemtraces))
+	if(chemtraces.len)
 		scan_data += "<b>Trace Chemicals: </b><br>"
 		for(var/chemID in chemtraces)
 			scan_data += chemID
 			scan_data += "<br>"
 
 	for(var/mob/O in viewers(usr))
-		O.show_message(SPAN_NOTICE("\The [src] rattles and prints out a sheet of paper."), 1)
+		O.show_message("<span class='notice'>\The [src] rattles and prints out a sheet of paper.</span>", 1)
 
 	sleep(10)
 
@@ -152,12 +157,12 @@
 
 	var/obj/item/organ/external/S = M.get_organ(user.zone_sel.selecting)
 	if(!S)
-		to_chat(usr, SPAN_WARNING("You can't scan this body part."))
+		to_chat(usr, "<span class='warning'>You can't scan this body part.</span>")
 		return
 	if(!S.how_open())
-		to_chat(usr, SPAN_WARNING("You have to cut [S] open first!"))
+		to_chat(usr, "<span class='warning'>You have to cut [S] open first!</span>")
 		return
-	M.visible_message(SPAN_NOTICE("\The [user] scans the wounds on [M]'s [S.name] with [src]"))
+	M.visible_message("<span class='notice'>\The [user] scans the wounds on [M]'s [S.name] with [src]</span>")
 
 	add_data(S)
 	for(var/T in M.chem_doses)
@@ -172,7 +177,7 @@
 		wdata.Cut()
 		chemtraces.Cut()
 		timeofdeath = null
-		to_chat(user, SPAN_NOTICE("A new patient has been registered. Purging data for previous patient."))
+		to_chat(user, "<span class='notice'>A new patient has been registered. Purging data for previous patient.</span>")
 
 /obj/item/autopsy_scanner/afterattack(obj/item/organ/external/target, mob/user, proximity_flag, click_parameters)
 	if(!proximity_flag)

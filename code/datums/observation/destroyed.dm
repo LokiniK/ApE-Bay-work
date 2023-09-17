@@ -6,7 +6,7 @@
 //		Arguments that the called proc should expect:
 //			/datum/destroyed_instance: The instance that was destroyed.
 
-GLOBAL_DATUM_INIT(destroyed_event, /singleton/observ/destroyed, new)
+GLOBAL_DATUM_INIT(destroyed_event, /decl/observ/destroyed, new)
 
-/singleton/observ/destroyed
+/decl/observ/destroyed
 	name = "Destroyed"

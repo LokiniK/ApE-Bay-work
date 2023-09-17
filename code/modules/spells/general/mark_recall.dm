@@ -17,6 +17,7 @@
 	cast_sound = 'sound/effects/teleport.ogg'
 	hud_state = "wiz_mark"
 	var/mark = null
+	selection_type = "special"	//INF	We don't care where our mark is. Possibly not in our VIEW
 
 /spell/mark_recall/choose_targets()
 	if(!mark)
@@ -24,8 +25,8 @@
 	else
 		return list(mark)
 
-/spell/mark_recall/cast(list/targets,mob/user)
-	if(!length(targets))
+/spell/mark_recall/cast(var/list/targets,mob/user)
+	if(!targets.len)
 		return 0
 	var/target = targets[1]
 	if(istext(target))
@@ -59,7 +60,7 @@
 
 	var/spell/mark_recall/spell
 
-/obj/effect/cleanable/wizard_mark/New(newloc,mrspell)
+/obj/effect/cleanable/wizard_mark/New(var/newloc,var/mrspell)
 	..()
 	spell = mrspell
 
@@ -68,21 +69,16 @@
 	spell = null
 	..()
 
-/obj/effect/cleanable/wizard_mark/attack_hand(mob/user)
+/obj/effect/cleanable/wizard_mark/attack_hand(var/mob/user)
 	if(user == spell.holder)
 		user.visible_message("\The [user] mutters an incantation and \the [src] disappears!")
 		qdel(src)
 	..()
 
-
-/obj/effect/cleanable/wizard_mark/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Null Rod or Spell Book - Remove mark
-	if (is_type_in_list(tool, list(/obj/item/nullrod, /obj/item/spellbook)))
-		user.visible_message(
-			SPAN_NOTICE("\The [user] waves \a [tool] over \the [src], and it fades away."),
-			SPAN_NOTICE("You wave \the [tool] over \the [src], and it fades away.")
-		)
+/obj/effect/cleanable/wizard_mark/attackby(var/obj/item/I, var/mob/user)
+	if(istype(I, /obj/item/nullrod) || istype(I, /obj/item/spellbook))
+		user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
+		src.visible_message("\The [src] fades away!")
 		qdel(src)
-		return TRUE
-
-	return ..()
+		return
+	..()

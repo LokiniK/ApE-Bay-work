@@ -1,3 +1,6 @@
+/datum/design/circuit/exosuit
+	category_items = "Exosuit Modules"
+	
 /datum/design/circuit/exosuit/AssembleDesignName()
 	name = "Exosuit software design ([name])"
 /datum/design/circuit/exosuit/AssembleDesignDesc()
@@ -20,7 +23,7 @@
 /datum/design/circuit/exosuit/medical
 	name = "medical system control"
 	id = "mech_software_medical"
-	req_tech = list(TECH_DATA = 3,TECH_BIO = 2)
+	req_tech = list(TECH_DATA = 3, TECH_BIO = 2)
 	build_path = /obj/item/circuitboard/exosystem/medical
 	sort_string = "NAABA"
 

@@ -1,7 +1,7 @@
-/singleton/hierarchy/supply_pack/science
+/decl/hierarchy/supply_pack/science
 	name = "Research - Exploration"
 
-/singleton/hierarchy/supply_pack/science/chemistry_dispenser
+/decl/hierarchy/supply_pack/science/chemistry_dispenser
 	name = "Equipment - Chemical Reagent dispenser"
 	contains = list(
 			/obj/machinery/chemical_dispenser{anchored = FALSE}
@@ -10,14 +10,14 @@
 	containertype = /obj/structure/largecrate
 	containername = "reagent dispenser crate"
 
-/singleton/hierarchy/supply_pack/science/coolanttank
+/decl/hierarchy/supply_pack/science/coolanttank
 	name = "Liquid - Coolant tank"
 	contains = list(/obj/structure/reagent_dispensers/coolanttank)
 	cost = 16
 	containertype = /obj/structure/largecrate
 	containername = "coolant tank crate"
 
-/singleton/hierarchy/supply_pack/science/robotics
+/decl/hierarchy/supply_pack/science/robotics
 	name = "Parts - Robotics"
 	contains = list(/obj/item/device/assembly/prox_sensor = 3,
 					/obj/item/storage/toolbox/electrical,
@@ -28,7 +28,7 @@
 	containername = "robotics assembly crate"
 	access = access_robotics
 
-/singleton/hierarchy/supply_pack/science/phoron
+/decl/hierarchy/supply_pack/science/phoron
 	name = "Parts - Phoron device kit"
 	contains = list(/obj/item/tank/phoron = 3,
 					/obj/item/device/assembly/igniter = 3,
@@ -39,13 +39,13 @@
 	containername = "phoron assembly crate"
 	access = access_tox_storage
 
-/singleton/hierarchy/supply_pack/science/scanner_module
+/decl/hierarchy/supply_pack/science/scanner_module
 	name = "Electronics - Reagent scanner modules"
 	contains = list(/obj/item/stock_parts/computer/scanner/reagent = 4)
 	cost = 20
 	containername = "reagent scanner module crate"
 
-/singleton/hierarchy/supply_pack/science/minergear
+/decl/hierarchy/supply_pack/science/minergear
 	name = "Shaft miner equipment"
 	contains = list(/obj/item/storage/backpack/industrial,
 					/obj/item/storage/backpack/satchel/eng,
@@ -66,24 +66,37 @@
 	containername = "shaft miner equipment crate"
 	access = access_mining
 
-/singleton/hierarchy/supply_pack/science/flamps
+/decl/hierarchy/supply_pack/science/flamps
 	num_contained = 3
 	contains = list(/obj/item/device/flashlight/lamp/floodlamp,
 					/obj/item/device/flashlight/lamp/floodlamp/green)
 	name = "Equipment - Flood lamps"
 	cost = 20
 	containername = "flood lamp crate"
-	supply_method = /singleton/supply_method/randomized
+	supply_method = /decl/supply_method/randomized
 
-/singleton/hierarchy/supply_pack/science/illuminate
+/decl/hierarchy/supply_pack/science/illuminate
 	name = "Gear - Illumination grenades"
 	contains = list(/obj/item/grenade/light = 8)
 	cost = 20
 	containername = "illumination grenade crate"
 
-/singleton/hierarchy/supply_pack/science/anomaly_crate
+/decl/hierarchy/supply_pack/science/space_bike
+	name = "Exploration - Space-bike"
+	contains = list(/obj/vehicle/bike/thermal)
+	cost = 90
+	containertype = /obj/structure/largecrate
+	containername = "space-bike crate"
+
+/decl/hierarchy/supply_pack/science/anomaly_crate
 	name = "Equipment - Anomaly Container"
 	cost = 20
-	contains = list(/obj/machinery/anomaly_container)
+	contains = list(/obj/structure/anomaly_container)
 	containertype = /obj/structure/largecrate
 	containername = "anomaly container crate"
+
+/decl/hierarchy/supply_pack/science/jetpack_crate
+	name = "Equipment - Jetpacks"
+	contains = list(/obj/item/tank/jetpack/oxygen,/obj/item/tank/jetpack/carbondioxide,/obj/item/tank/jetpack/carbondioxide)
+	cost = 75
+	containername = "Jetpacks crate"

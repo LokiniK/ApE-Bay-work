@@ -7,7 +7,7 @@
 	descriptions = list(
 		new /datum/wire_description(CAMERA_WIRE_FOCUS, "This wire runs to the camera's lens adjustment motors."),
 		new /datum/wire_description(CAMERA_WIRE_POWER, "This wire seems to be carrying a heavy current."),
-		new /datum/wire_description(CAMERA_WIRE_LIGHT, "This wire seems connected to the built-in light.", SKILL_EXPERIENCED),
+		new /datum/wire_description(CAMERA_WIRE_LIGHT, "This wire seems connected to the built-in light.", SKILL_EXPERT),
 		new /datum/wire_description(CAMERA_WIRE_ALARM, "This wire is connected to a remote signaling device of some sort.")
 	)
 
@@ -21,18 +21,18 @@
 	. += "<br>\n[(C.alarm_on ? "The alarm light is on." : "The alarm light is off.")]"
 	return .
 
-/datum/wires/camera/CanUse(mob/living/L)
+/datum/wires/camera/CanUse(var/mob/living/L)
 	var/obj/machinery/camera/C = holder
 	return C.panel_open
 
-var/global/const/CAMERA_WIRE_FOCUS = 1
-var/global/const/CAMERA_WIRE_POWER = 2
-var/global/const/CAMERA_WIRE_LIGHT = 4
-var/global/const/CAMERA_WIRE_ALARM = 8
-var/global/const/CAMERA_WIRE_NOTHING1 = 16
-var/global/const/CAMERA_WIRE_NOTHING2 = 32
+var/const/CAMERA_WIRE_FOCUS = 1
+var/const/CAMERA_WIRE_POWER = 2
+var/const/CAMERA_WIRE_LIGHT = 4
+var/const/CAMERA_WIRE_ALARM = 8
+var/const/CAMERA_WIRE_NOTHING1 = 16
+var/const/CAMERA_WIRE_NOTHING2 = 32
 
-/datum/wires/camera/UpdateCut(index, mended)
+/datum/wires/camera/UpdateCut(var/index, var/mended)
 	var/obj/machinery/camera/C = holder
 
 	switch(index)
@@ -54,7 +54,7 @@ var/global/const/CAMERA_WIRE_NOTHING2 = 32
 				C.cancelCameraAlarm()
 	return
 
-/datum/wires/camera/UpdatePulsed(index)
+/datum/wires/camera/UpdatePulsed(var/index)
 	var/obj/machinery/camera/C = holder
 	if(IsIndexCut(index))
 		return
@@ -75,3 +75,21 @@ var/global/const/CAMERA_WIRE_NOTHING2 = 32
 		return 1
 	else
 		return 0
+
+/datum/wires/camera/SolveWireFunction(var/function)
+	var/sf = ""
+	switch(function)
+		if(CAMERA_WIRE_FOCUS)
+			sf = "Port A"
+		if(CAMERA_WIRE_POWER)
+			sf = "Port B"
+		if(CAMERA_WIRE_LIGHT)
+			sf = "Port C"
+		if(CAMERA_WIRE_ALARM)
+			sf = "Port D"
+		if(CAMERA_WIRE_NOTHING1)
+			sf = "Port E"
+		if(CAMERA_WIRE_NOTHING2)
+			sf = "Port F"
+
+	return sf

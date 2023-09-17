@@ -1,4 +1,3 @@
-
 /obj/item/organ/internal/eyes
 	name = "eyeballs"
 	icon_state = "eyes"
@@ -11,10 +10,11 @@
 	var/list/eye_colour = list(0,0,0)
 	var/innate_flash_protection = FLASH_PROTECTION_NONE
 	max_damage = 45
+	var/night_vision = 0
 	var/eye_icon = 'icons/mob/human_races/species/default_eyes.dmi'
 	var/apply_eye_colour = TRUE
-	var/last_cached_eye_colour
-	var/last_eye_cache_key
+	var/tmp/last_cached_eye_colour
+	var/tmp/last_eye_cache_key
 	var/flash_mod
 	var/darksight_range
 	var/darksight_tint
@@ -51,33 +51,41 @@
 	set src in usr
 	if (!owner || owner.incapacitated())
 		return
-	var/new_eyes = input("Please select eye color.", "Eye Color", owner.eye_color) as color|null
+	var/new_eyes = input("Please select eye color.", "Eye Color", rgb(owner.r_eyes, owner.g_eyes, owner.b_eyes)) as color|null
 	if(new_eyes)
-		var/list/ergb = rgb2num(new_eyes)
-		if(do_after(owner, 1 SECOND, do_flags = DO_DEFAULT | DO_USER_UNIQUE_ACT) && owner.change_eye_color(ergb[1], ergb[2], ergb[3]))
+		var/r_eyes = hex2num(copytext(new_eyes, 2, 4))
+		var/g_eyes = hex2num(copytext(new_eyes, 4, 6))
+		var/b_eyes = hex2num(copytext(new_eyes, 6, 8))
+		if(do_after(owner, 10) && owner.change_eye_color(r_eyes, g_eyes, b_eyes))
 			update_colour()
 			// Finally, update the eye icon on the mob.
 			owner.regenerate_icons()
 			owner.visible_message(SPAN_NOTICE("\The [owner] changes their eye color."),SPAN_NOTICE("You change your eye color."),)
 
-/obj/item/organ/internal/eyes/replaced(mob/living/carbon/human/target)
+/obj/item/organ/internal/eyes/replaced(var/mob/living/carbon/human/target)
 
 	// Apply our eye colour to the target.
 	if(istype(target) && eye_colour)
-		target.eye_color = rgb(eye_colour[1], eye_colour[2], eye_colour[3])
+		target.r_eyes = eye_colour[1]
+		target.g_eyes = eye_colour[2]
+		target.b_eyes = eye_colour[3]
 		target.update_eyes()
 	..()
 
 /obj/item/organ/internal/eyes/proc/update_colour()
 	if(!owner)
 		return
-	eye_colour = rgb2num(owner.eye_color)
+	eye_colour = list(
+		owner.r_eyes ? owner.r_eyes : 0,
+		owner.g_eyes ? owner.g_eyes : 0,
+		owner.b_eyes ? owner.b_eyes : 0
+		)
 
-/obj/item/organ/internal/eyes/take_internal_damage(amount, silent=0)
+/obj/item/organ/internal/eyes/take_internal_damage(amount, var/silent=0)
 	var/oldbroken = is_broken()
 	. = ..()
 	if(is_broken() && !oldbroken && owner && !owner.stat)
-		to_chat(owner, SPAN_DANGER("You go blind!"))
+		to_chat(owner, "<span class='danger'>Вы ослепли!</span>")
 
 /obj/item/organ/internal/eyes/Process() //Eye damage replaces the old eye_stat var.
 	..()
@@ -87,6 +95,8 @@
 		owner.eye_blurry = 20
 	if(is_broken())
 		owner.eye_blind = 20
+	if(night_vision == TRUE)
+		owner.see_invisible = 15
 
 /obj/item/organ/internal/eyes/New()
 	..()
@@ -94,18 +104,18 @@
 	darksight_range = species.darksight_range
 	darksight_tint = species.darksight_tint
 
-/obj/item/organ/internal/eyes/proc/get_total_protection(flash_protection = FLASH_PROTECTION_NONE)
+/obj/item/organ/internal/eyes/proc/get_total_protection(var/flash_protection = FLASH_PROTECTION_NONE)
 	return (flash_protection + innate_flash_protection)
 
-/obj/item/organ/internal/eyes/proc/additional_flash_effects(intensity)
+/obj/item/organ/internal/eyes/proc/additional_flash_effects(var/intensity)
 	return -1
 
 /obj/item/organ/internal/eyes/robot
 	name = "optical sensor"
 	status = ORGAN_ROBOTIC
 
-/obj/item/organ/internal/eyes/robot/New()
-	..()
+/obj/item/organ/internal/eyes/robot/Initialize()
+	. = ..()
 	robotize()
 
 /obj/item/organ/internal/eyes/robotize()

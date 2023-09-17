@@ -10,7 +10,9 @@
 	fire_sound = 'sound/weapons/empty.ogg'
 	fire_sound_text = "a metallic thunk"
 	screen_shake = 0
-	throw_distance = 7
+	throw_distance = 12
+	scope_zoom = 1
+	scoped_accuracy = 8
 	release_force = 5
 	combustion = 1
 
@@ -31,7 +33,7 @@
 	playsound(M, 'sound/weapons/shotgunpump.ogg', 60, 1)
 
 	var/obj/item/grenade/next
-	if(length(grenades))
+	if(grenades.len)
 		next = grenades[1] //get this first, so that the chambered grenade can still be removed if the grenades list is empty
 	if(chambered)
 		grenades += chambered //rotate the revolving magazine
@@ -39,15 +41,15 @@
 	if(next)
 		grenades -= next //Remove grenade from loaded list.
 		chambered = next
-		to_chat(M, SPAN_WARNING("You pump [src], loading \a [next] into the chamber."))
+		to_chat(M, SPAN_WARNING("You rotate magazine and loading \a [next] into the chamber."))
 	else
-		to_chat(M, SPAN_WARNING("You pump [src], but the magazine is empty."))
+		to_chat(M, SPAN_WARNING("You rotate magazine, but the magazine is empty."))
 	update_icon()
 
 /obj/item/gun/launcher/grenade/examine(mob/user, distance)
 	. = ..()
 	if(distance <= 2)
-		var/grenade_count = length(grenades) + (chambered? 1 : 0)
+		var/grenade_count = grenades.len + (chambered? 1 : 0)
 		to_chat(user, "Has [grenade_count] grenade\s remaining.")
 		if(chambered)
 			to_chat(user, "\A [chambered] is chambered.")
@@ -56,35 +58,35 @@
 	if(!can_load_grenade_type(G, user))
 		return
 
-	if(length(grenades) >= max_grenades)
-		to_chat(user, SPAN_WARNING("\The [src] is full."))
+	if(grenades.len >= max_grenades)
+		to_chat(user, SPAN_WARNING("The [src] is full."))
 		return
 	if(!user.unEquip(G, src))
+		return
+	if(!chambered)
+		chambered = G
+		user.visible_message("\The [user] inserts \a [G] into \the [src].", SPAN_NOTICE("You insert \a [G] into \the [src]."))
 		return
 	grenades.Insert(1, G) //add to the head of the list, so that it is loaded on the next pump
 	user.visible_message("\The [user] inserts \a [G] into \the [src].", SPAN_NOTICE("You insert \a [G] into \the [src]."))
 
 /obj/item/gun/launcher/grenade/proc/unload(mob/user)
-	if(length(grenades))
-		var/obj/item/grenade/G = grenades[length(grenades)]
-		LIST_DEC(grenades)
+	if(grenades.len)
+		var/obj/item/grenade/G = grenades[grenades.len]
+		grenades.len--
 		user.put_in_hands(G)
 		user.visible_message("\The [user] removes \a [G] from [src].", SPAN_NOTICE("You remove \a [G] from \the [src]."))
 	else
-		to_chat(user, SPAN_WARNING("\The [src] is empty."))
+		to_chat(user, SPAN_NOTICE("The [src] is empty."))
 
 /obj/item/gun/launcher/grenade/attack_self(mob/user)
 	pump(user)
 
-
-/obj/item/gun/launcher/grenade/use_tool(obj/item/tool, mob/user, list/click_params)
-	// Grenade - Load ammo
-	if (istype(tool, /obj/item/grenade))
-		load(tool, user)
-		return TRUE
-
-	return ..()
-
+/obj/item/gun/launcher/grenade/attackby(obj/item/I, mob/user)
+	if((istype(I, /obj/item/grenade)))
+		load(I, user)
+	else
+		..()
 
 /obj/item/gun/launcher/grenade/attack_hand(mob/user)
 	if(user.get_inactive_hand() == src)
@@ -93,8 +95,9 @@
 		..()
 
 /obj/item/gun/launcher/grenade/consume_next_projectile()
+/obj/item/gun/launcher/grenade/consume_next_projectile()
 	if(chambered)
-		chambered.det_time = 10
+		chambered.det_time = 7
 		chambered.activate(null)
 	return chambered
 
@@ -106,7 +109,7 @@
 
 /obj/item/gun/launcher/grenade/proc/can_load_grenade_type(obj/item/grenade/G, mob/user)
 	if(is_type_in_list(G, blacklisted_grenades) && ! is_type_in_list(G, whitelisted_grenades))
-		to_chat(user, SPAN_WARNING("\The [G] doesn't seem to fit in \the [src]!"))
+		to_chat(user, SPAN_WARNING("The [G] doesn't seem to fit in \the [src]!"))
 		return FALSE
 	return TRUE
 
@@ -146,7 +149,7 @@
 		return
 
 	if(chambered)
-		to_chat(user, SPAN_WARNING("\The [src] is already loaded."))
+		to_chat(user, SPAN_WARNING("The [src] is already loaded."))
 		return
 	if(!user.unEquip(G, src))
 		return
@@ -159,4 +162,4 @@
 		user.visible_message("\The [user] removes \a [chambered] from \the[src].", SPAN_NOTICE("You remove \a [chambered] from \the [src]."))
 		chambered = null
 	else
-		to_chat(user, SPAN_WARNING("\The [src] is empty."))
+		to_chat(user, SPAN_WARNING("The [src] is empty."))

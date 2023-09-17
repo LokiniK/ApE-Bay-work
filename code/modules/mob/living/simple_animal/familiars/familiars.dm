@@ -16,13 +16,11 @@
 
 	var/list/wizardy_spells = list()
 
-
-/mob/living/simple_animal/familiar/Initialize(maplaod)
-	. = ..()
+/mob/living/simple_animal/familiar/New()
+	..()
 	add_language(LANGUAGE_HUMAN_EURO)
 	for(var/spell in wizardy_spells)
 		src.add_spell(new spell, "const_spell_ready")
-
 
 /mob/living/simple_animal/familiar/carcinus
 	name = "carcinus"
@@ -52,7 +50,7 @@
 	name = "space pike"
 	desc = "A bigger, more magical cousin of the space carp."
 
-	icon = 'icons/mob/simple_animal/space_shark.dmi'
+	icon = 'icons/mob/simple_animal/spaceshark.dmi'
 	icon_state = "shark"
 	icon_living = "shark"
 	icon_dead = "shark_dead"
@@ -69,7 +67,7 @@
 
 	wizardy_spells = list(/spell/aoe_turf/conjure/forcewall)
 
-/mob/living/simple_animal/familiar/pike/Process_Spacemove()
+/mob/living/simple_animal/familiar/pike/Allow_Spacemove(var/check_drift = 0)
 	return 1	//No drifting in space for space carp!	//original comments do not steal
 
 /mob/living/simple_animal/familiar/horror
@@ -92,7 +90,7 @@
 /obj/item/natural_weapon/horror
 	name = "foul touch"
 	force = 10
-	damtype = DAMAGE_BURN
+	damtype = BURN
 	attack_verb = list("touched")
 
 /mob/living/simple_animal/familiar/horror/death(gibbed, deathmessage, show_dead_message)
@@ -134,6 +132,8 @@
 		return
 	if(stat == UNCONSCIOUS || resting)
 		icon_state = icon_rest
+	else if(stat != DEAD)
+		icon_state = icon_living
 
 /mob/living/simple_animal/familiar/pet/mouse
 	name = "mouse"
@@ -158,12 +158,11 @@
 
 	wizardy_spells = list(/spell/aoe_turf/smoke)
 
+/mob/living/simple_animal/familiar/pet/mouse/New()
+	..()
 
-/mob/living/simple_animal/familiar/pet/mouse/Initialize(mapload)
-	. = ..()
 	verbs += /mob/living/proc/ventcrawl
 	verbs += /mob/living/proc/hide
-
 
 /mob/living/simple_animal/familiar/pet/cat
 	name = "black cat"

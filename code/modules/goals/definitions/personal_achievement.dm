@@ -1,10 +1,10 @@
-// Simple toggles. Get an input from somewhere in the code, marked
+// Simple toggles. Get an input from somewhere in the code, marked 
 // as successful/unsuccessful for the rest of the round. Nothing very special.
 /datum/goal/achievement
 	var/failable = FALSE
 	var/success = FALSE
 
-/datum/goal/achievement/update_progress(progress)
+/datum/goal/achievement/update_progress(var/progress)
 	if(!success && !failable)
 		success = progress
 		on_completion()

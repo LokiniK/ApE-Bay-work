@@ -7,21 +7,6 @@
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|ARMS
 	rolled_sleeves = -1
 
-// discreet skirts, dont cover upper/arms etc
-/obj/item/clothing/under/skirt/khaki
-	name = "khaki skirt"
-	desc = "A khaki skirt with a flare at the hem."
-	icon_state = "skirt_khaki"
-	worn_state = "skirt_khaki"
-	body_parts_covered = LOWER_TORSO
-
-/obj/item/clothing/under/skirt/swept
-	name = "swept skirt"
-	desc = "A skirt that is swept to one side."
-	icon_state = "skirt_swept"
-	worn_state = "skirt_swept"
-	body_parts_covered = LOWER_TORSO
-
 /obj/item/clothing/under/skirt/plaid_blue
 	name = "blue plaid skirt"
 	desc = "A preppy blue skirt with a white blouse."
@@ -41,6 +26,21 @@
 	icon_state = "plaid_purple"
 	item_state = "kilt"
 	worn_state = "plaid_purple"
+
+// discreet skirts, dont cover upper/arms etc
+/obj/item/clothing/under/skirt/khaki
+	name = "khaki skirt"
+	desc = "A khaki skirt with a flare at the hem."
+	icon_state = "skirt_khaki"
+	worn_state = "skirt_khaki"
+	body_parts_covered = LOWER_TORSO
+
+/obj/item/clothing/under/skirt/swept
+	name = "swept skirt"
+	desc = "A skirt that is swept to one side."
+	icon_state = "skirt_swept"
+	worn_state = "skirt_swept"
+	body_parts_covered = LOWER_TORSO
 
 // colour selection, needs to be different for loadout type selection
 

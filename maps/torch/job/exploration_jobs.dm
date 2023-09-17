@@ -10,20 +10,20 @@
 	economic_power = 10
 	minimum_character_age = list(SPECIES_HUMAN = 25)
 	ideal_character_age = 35
-	outfit_type = /singleton/hierarchy/outfit/job/torch/crew/exploration/pathfinder
+	outfit_type = /decl/hierarchy/outfit/job/torch/crew/exploration/pathfinder
 	allowed_branches = list(/datum/mil_branch/expeditionary_corps)
 	allowed_ranks = list(
 		/datum/mil_rank/ec/o1
 	)
 	min_skill = list(   SKILL_BUREAUCRACY = SKILL_BASIC,
-	                    SKILL_EVA         = SKILL_TRAINED,
-	                    SKILL_SCIENCE     = SKILL_TRAINED,
+	                    SKILL_EVA         = SKILL_ADEPT,
+	                    SKILL_SCIENCE     = SKILL_ADEPT,
 	                    SKILL_PILOT       = SKILL_BASIC)
 
 	max_skill = list(   SKILL_PILOT       = SKILL_MAX,
 	                    SKILL_SCIENCE     = SKILL_MAX,
-	                    SKILL_COMBAT      = SKILL_EXPERIENCED,
-	                    SKILL_WEAPONS     = SKILL_EXPERIENCED)
+	                    SKILL_COMBAT      = SKILL_EXPERT,
+	                    SKILL_WEAPONS     = SKILL_EXPERT)
 	skill_points = 22
 
 	access = list(
@@ -31,7 +31,7 @@
 		access_guppy_helm, access_solgov_crew, access_expedition_shuttle, access_expedition_shuttle_helm,
 		access_guppy, access_hangar, access_petrov, access_petrov_helm, access_petrov_analysis, access_petrov_phoron,
 		access_petrov_toxins, access_petrov_chemistry, access_petrov_maint, access_tox, access_tox_storage, access_research,
-		access_xenobiology, access_xenoarch, access_torch_fax, access_radio_comm, access_radio_exp, access_radio_sci, access_research_storage
+		access_xenobiology, access_xenoarch, access_torch_fax, access_radio_comm, access_radio_exp, access_radio_sci
 	)
 
 	software_on_spawn = list(/datum/computer_file/program/deck_management,
@@ -52,14 +52,14 @@
 	minimal_player_age = 0
 	minimum_character_age = list(SPECIES_HUMAN = 24)
 	ideal_character_age = 25
-	outfit_type = /singleton/hierarchy/outfit/job/torch/passenger/pilot
+	outfit_type = /decl/hierarchy/outfit/job/torch/passenger/pilot
 	allowed_branches = list(
 		/datum/mil_branch/civilian,
-		/datum/mil_branch/expeditionary_corps = /singleton/hierarchy/outfit/job/torch/crew/exploration/pilot,
-		/datum/mil_branch/fleet = /singleton/hierarchy/outfit/job/torch/crew/exploration/pilot/fleet
+		/datum/mil_branch/expeditionary_corps = /decl/hierarchy/outfit/job/torch/crew/exploration/pilot,
+		/datum/mil_branch/fleet = /decl/hierarchy/outfit/job/torch/crew/exploration/pilot/fleet
 	)
 	allowed_ranks = list(
-		/datum/mil_rank/civ/contractor = /singleton/hierarchy/outfit/job/torch/passenger/research/nt_pilot,
+		/datum/mil_rank/civ/contractor = /decl/hierarchy/outfit/job/torch/passenger/research/nt_pilot,
 		/datum/mil_rank/ec/e7,
 		/datum/mil_rank/fleet/e6,
 		/datum/mil_rank/fleet/e7
@@ -69,10 +69,10 @@
 		access_mining_office, access_petrov, access_petrov_helm, access_petrov_maint, access_mining_station,
 		access_expedition_shuttle, access_expedition_shuttle_helm, access_guppy, access_hangar, access_guppy_helm,
 		access_mining, access_pilot, access_solgov_crew, access_eva, access_explorer, access_research,
-		access_radio_exp, access_radio_sci, access_radio_sup, access_maint_tunnels, access_emergency_storage
+		access_radio_exp, access_radio_sci, access_radio_sup
 	)
 	min_skill = list(	SKILL_EVA   = SKILL_BASIC,
-						SKILL_PILOT = SKILL_TRAINED)
+						SKILL_PILOT = SKILL_ADEPT)
 
 	max_skill = list(   SKILL_PILOT       = SKILL_MAX,
 	                    SKILL_SCIENCE     = SKILL_MAX)
@@ -83,11 +83,11 @@
 	department_flag = EXP
 	total_positions = 5
 	spawn_positions = 5
-	supervisors = "the Pathfinder"
+	supervisors = "the Commanding Officer, Executive Officer, and Pathfinder"
 	selection_color = "#68099e"
 	minimum_character_age = list(SPECIES_HUMAN = 18)
 	ideal_character_age = 20
-	outfit_type = /singleton/hierarchy/outfit/job/torch/crew/exploration/explorer
+	outfit_type = /decl/hierarchy/outfit/job/torch/crew/exploration/explorer
 	allowed_branches = list(/datum/mil_branch/expeditionary_corps)
 
 	allowed_ranks = list(
@@ -98,8 +98,8 @@
 
 	max_skill = list(   SKILL_PILOT       = SKILL_MAX,
 	                    SKILL_SCIENCE     = SKILL_MAX,
-	                    SKILL_COMBAT      = SKILL_EXPERIENCED,
-	                    SKILL_WEAPONS     = SKILL_EXPERIENCED)
+	                    SKILL_COMBAT      = SKILL_EXPERT,
+	                    SKILL_WEAPONS     = SKILL_EXPERT)
 
 	access = list(
 		access_explorer, access_maint_tunnels, access_eva, access_emergency_storage,

@@ -17,8 +17,8 @@
 	var/target_organ
 	var/strength = 4 // How much damage it deals per unit
 
-/datum/reagent/toxin/affect_blood(mob/living/carbon/M, removed)
-	if(strength && !IS_METABOLICALLY_INERT(M))
+/datum/reagent/toxin/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(strength && alien != IS_DIONA)
 		M.add_chemical_effect(CE_TOXIN, strength)
 		var/dam = (strength * removed)
 		if(target_organ && ishuman(M))
@@ -59,55 +59,13 @@
 	heating_point = null
 	heating_products = null
 
-/datum/reagent/toxin/amatoxin // Delayed action poison, very dangerous but takes a while before doing anything.
+/datum/reagent/toxin/amatoxin
 	name = "Amatoxin"
 	description = "A powerful poison derived from certain species of mushroom."
 	taste_description = "mushroom"
 	reagent_state = LIQUID
-	metabolism = REM * 0.5
 	color = "#792300"
 	strength = 10
-
-/datum/reagent/toxin/amatoxin/affect_blood(mob/living/carbon/M, removed)
-	if (IS_METABOLICALLY_INERT(M))
-		return
-	M.reagents.add_reagent(/datum/reagent/toxin/amaspores, 2 * removed)
-
-/datum/reagent/toxin/amaspores
-	name = "Amaspores"
-	description = "The secondary component to amatoxin poisoning, remaining dormant for a time before causing rapid organ and tissue decay."
-	taste_description = "dusty dirt"
-	reagent_state = LIQUID
-	metabolism = REM * 4 // Extremely quick to act once the amatoxin has left the body
-	color = "#330e00"
-	strength = 30
-
-/datum/reagent/toxin/amaspores/affect_blood(mob/living/carbon/M, removed)
-	if (IS_METABOLICALLY_INERT(M))
-		return
-
-	if(M.chem_doses[/datum/reagent/toxin/amatoxin] > 0)
-		M.reagents.add_reagent(/datum/reagent/toxin/amaspores, metabolism) // The spores lay dormant for as long as any traces of amatoxin remain
-		if (prob(5))
-			to_chat(M, SPAN_DANGER("Everything itches, how uncomfortable!"))
-		if (prob(10))
-			to_chat(M, SPAN_WARNING("Your eyes are watering, it's hard to see!"))
-			M.eye_blurry = max(M.eye_blurry, 10)
-		if (prob(10))
-			to_chat(M, SPAN_DANGER("Your throat itches uncomfortably!"))
-			M.custom_emote(2, "coughs!")
-		return
-
-	M.add_chemical_effect(CE_SLOWDOWN, 1)
-
-	if (prob(15))
-		M.Weaken(5)
-		M.add_chemical_effect(CE_VOICELOSS, 5)
-	if (prob(30))
-		M.eye_blurry = max(M.eye_blurry, 10)
-
-	M.take_organ_damage(3 * removed, 0, ORGAN_DAMAGE_FLESH_ONLY)
-	M.adjustToxLoss(5 * removed, 0, ORGAN_DAMAGE_FLESH_ONLY)
 
 /datum/reagent/toxin/carpotoxin
 	name = "Carpotoxin"
@@ -115,22 +73,21 @@
 	taste_description = "fish"
 	reagent_state = LIQUID
 	color = "#003333"
-
 	target_organ = BP_BRAIN
 	strength = 10
 
-/datum/reagent/toxin/carpotoxin/affect_blood(mob/living/carbon/M, removed)
-	if (IS_METABOLICALLY_INERT(M))
-		return
+/datum/reagent/toxin/yeosvenom
+	name = "Yeosa'Unathi Venom"
+	description = "A non-lethal toxin produced by Yeosa'Unathi"
+	taste_description = "absolutely vile"
+	color = "#91d895"
+	target_organ = BP_LIVER
+	strength = 1
 
-	var/effectiveness = 1
-	var/effective_dose = 2
-
-	if(M.chem_doses[type] < effective_dose)
-		effectiveness = M.chem_doses[type]/effective_dose
-	else if(volume < effective_dose)
-		effectiveness = volume/effective_dose
-	M.add_chemical_effect(CE_BLOCKAGE, (80 * effectiveness)/100)
+/datum/reagent/toxin/yeosvenom/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(prob(volume*10))
+		M.confused = max(M.confused, 10)
+	..()
 
 /datum/reagent/toxin/venom
 	name = "Spider Venom"
@@ -140,7 +97,7 @@
 	target_organ = BP_LIVER
 	strength = 5
 
-/datum/reagent/toxin/venom/affect_blood(mob/living/carbon/M, removed)
+/datum/reagent/toxin/venom/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	if(prob(volume*2))
 		M.confused = max(M.confused, 3)
 	..()
@@ -154,11 +111,11 @@
 	metabolism = REM * 0.5
 	color = "#b31008"
 
-/datum/reagent/toxin/cryotoxin/affect_blood(mob/living/carbon/M, removed)
-	if (IS_METABOLICALLY_INERT(M))
+/datum/reagent/toxin/cryotoxin/affect_blood(mob/living/carbon/M, alien, removed)
+	if (alien == IS_DIONA)
 		return
-	M.bodytemperature = max(M.bodytemperature - 15 * TEMPERATURE_DAMAGE_COEFFICIENT, 215)
-	if (prob(15))
+	M.bodytemperature = max(M.bodytemperature - 10 * TEMPERATURE_DAMAGE_COEFFICIENT, 215)
+	if (prob(20))
 		to_chat(M, SPAN_DANGER("Your insides feel freezing cold!"))
 	if (prob(1))
 		M.emote("shiver")
@@ -171,8 +128,8 @@
 	color = "#b31008"
 	target_organ = BP_KIDNEYS
 
-/datum/reagent/toxin/irritanttoxin/affect_blood(mob/living/carbon/M, removed)
-	if (IS_METABOLICALLY_INERT(M))
+/datum/reagent/toxin/irritanttoxin/affect_blood(mob/living/carbon/M, alien, removed)
+	if (alien == IS_DIONA)
 		return
 	if (prob(50))
 		M.adjustToxLoss(0.5 * removed)
@@ -193,11 +150,11 @@
 	color = "#673910"
 	touch_met = 50
 
-/datum/reagent/toxin/pyrotoxin/affect_blood(mob/living/carbon/M, removed)
+/datum/reagent/toxin/pyrotoxin/affect_blood(mob/living/carbon/M, alien, removed)
 	M.adjustFireLoss(3 * removed)
 	if (M.fire_stacks <= 1.5)
 		M.adjust_fire_stacks(0.15)
-	if (IS_METABOLICALLY_INERT(M))
+	if (alien == IS_DIONA)
 		return
 	if (prob(10))
 		to_chat(M, SPAN_WARNING("Your veins feel like they're on fire!"))
@@ -215,8 +172,8 @@
 	taste_description = "chalky bitterness"
 	target_organ = BP_KIDNEYS
 
-/datum/reagent/toxin/serotrotium/affect_blood(mob/living/carbon/M, removed)
-	if (IS_METABOLICALLY_INERT(M))
+/datum/reagent/toxin/serotrotium/affect_blood(mob/living/carbon/M, alien, removed)
+	if(alien == IS_DIONA)
 		return
 	if(prob(30))
 		if(prob(25))
@@ -234,7 +191,7 @@
 	overdose = 8
 	strength = 3
 
-/datum/reagent/toxin/stimm/affect_blood(mob/living/carbon/M, removed)
+/datum/reagent/toxin/stimm/affect_blood(mob/living/carbon/M, alien, removed)
 	..()
 	if (prob(15))
 		M.emote(pick("twitch", "blink_r", "shiver"))
@@ -246,13 +203,14 @@
 		M.take_organ_damage(6 * removed, 0)
 	M.add_chemical_effect(CE_SPEEDBOOST, 1)
 
-/datum/reagent/toxin/stimm/overdose(mob/living/carbon/M)
+/datum/reagent/toxin/stimm/overdose(mob/living/carbon/M, alien)
 	..()
 	if (prob(10)) // 1 in 10. This thing's made with welder fuel and fertilizer, what do you expect?
 		var/mob/living/carbon/human/H = M
 		var/obj/item/organ/internal/heart/O = H.internal_organs_by_name[BP_HEART]
 		O.take_internal_damage(1)
 		to_chat(M, SPAN_WARNING("You feel a stabbing pain in your heart as it beats out of control!"))
+
 
 /datum/reagent/toxin/chlorine
 	name = "Chlorine"
@@ -264,6 +222,21 @@
 	metabolism = REM
 	heating_point = null
 	heating_products = null
+
+/datum/reagent/toxin/batrachotoxin //uses in changelings' deathstings
+	name = "Batrachotoxin"
+	description = "An extremly poisonous liquid. Smells strongly of bleach."
+	reagent_state = LIQUID
+	taste_description = "bleach"
+	color = "#707c13"
+	target_organ = BP_HEART
+	strength = 4
+	metabolism = REM
+
+/datum/reagent/toxin/batrachotoxin/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(alien == IS_RESOMI)
+		return
+	..()
 
 /datum/reagent/toxin/phoron
 	name = "Phoron"
@@ -277,21 +250,21 @@
 	heating_point = null
 	heating_products = null
 
-/datum/reagent/toxin/phoron/touch_mob(mob/living/L, amount)
+/datum/reagent/toxin/phoron/touch_mob(var/mob/living/L, var/amount)
 	if(istype(L))
 		L.adjust_fire_stacks(amount / fire_mult)
 
-/datum/reagent/toxin/phoron/affect_blood(mob/living/carbon/M, removed)
-	if (HAS_TRAIT(M, /singleton/trait/general/serpentid_adapted))
+/datum/reagent/toxin/phoron/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(alien == IS_NABBER)
 		return
 	..()
 
-/datum/reagent/toxin/phoron/affect_touch(mob/living/carbon/M, removed)
+/datum/reagent/toxin/phoron/affect_touch(var/mob/living/carbon/M, var/alien, var/removed)
 	M.take_organ_damage(0, removed * 0.1) //being splashed directly with phoron causes minor chemical burns
 	if(prob(10 * fire_mult))
 		M.pl_effects()
 
-/datum/reagent/toxin/phoron/touch_turf(turf/simulated/T)
+/datum/reagent/toxin/phoron/touch_turf(var/turf/simulated/T)
 	if(!istype(T))
 		return
 	T.assume_gas(GAS_PHORON, volume, T20C)
@@ -304,7 +277,7 @@
 	strength = 15
 	fire_mult = 15
 
-/datum/reagent/toxin/phoron/oxygen/touch_turf(turf/simulated/T)
+/datum/reagent/toxin/phoron/oxygen/touch_turf(var/turf/simulated/T)
 	if(!istype(T))
 		return
 	T.assume_gas(GAS_OXYGEN, ceil(volume/2), T20C)
@@ -323,7 +296,7 @@
 	heating_point = null
 	heating_products = null
 
-/datum/reagent/toxin/cyanide/affect_blood(mob/living/carbon/M, removed)
+/datum/reagent/toxin/cyanide/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
 	M.sleeping += 1
 
@@ -339,11 +312,11 @@
 	heating_point = null
 	heating_products = null
 
-/datum/reagent/toxin/taxine/affect_blood(mob/living/carbon/M, removed)
+/datum/reagent/toxin/taxine/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
 	M.confused += 1.5
 
-/datum/reagent/toxin/taxine/overdose(mob/living/carbon/M)
+/datum/reagent/toxin/taxine/overdose(var/mob/living/carbon/M, var/alien)
 	..()
 	if(ishuman(M))
 		var/mob/living/carbon/human/H = M
@@ -362,7 +335,7 @@
 	heating_point = null
 	heating_products = null
 
-/datum/reagent/toxin/potassium_chloride/overdose(mob/living/carbon/M)
+/datum/reagent/toxin/potassium_chloride/overdose(var/mob/living/carbon/M, var/alien)
 	..()
 	if(ishuman(M))
 		var/mob/living/carbon/human/H = M
@@ -385,7 +358,7 @@
 	heating_point = null
 	heating_products = null
 
-/datum/reagent/toxin/potassium_chlorophoride/affect_blood(mob/living/carbon/M, removed)
+/datum/reagent/toxin/potassium_chlorophoride/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
 	if(ishuman(M))
 		var/mob/living/carbon/human/H = M
@@ -403,17 +376,17 @@
 	reagent_state = SOLID
 	color = "#669900"
 	metabolism = REM
-	strength = 0.1
+	strength = 3
 	target_organ = BP_BRAIN
 	heating_message = "melts into a liquid slurry."
 	heating_products = list(/datum/reagent/toxin/carpotoxin, /datum/reagent/soporific, /datum/reagent/copper)
 
-/datum/reagent/toxin/zombiepowder/affect_blood(mob/living/carbon/M, removed)
+/datum/reagent/toxin/zombiepowder/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
-	if (IS_METABOLICALLY_INERT(M))
+	if(alien == IS_DIONA)
 		return
 	M.status_flags |= FAKEDEATH
-	M.adjustOxyLoss(-5 * removed)
+	M.adjustOxyLoss(3 * removed)
 	M.Weaken(10)
 	M.silent = max(M.silent, 10)
 	if(M.chem_doses[type] <= removed) //half-assed attempt to make timeofdeath update only at the onset
@@ -424,7 +397,6 @@
 	if(holder && holder.my_atom && ismob(holder.my_atom))
 		var/mob/M = holder.my_atom
 		M.status_flags &= ~FAKEDEATH
-		M.reagents.add_reagent(/datum/reagent/adrenaline, 5)
 	. = ..()
 
 /datum/reagent/toxin/fertilizer //Reagents used for plant fertilizers.
@@ -456,26 +428,26 @@
 	strength = 4
 	heating_products = list(/datum/reagent/toxin, /datum/reagent/water)
 
-/datum/reagent/toxin/plantbgone/touch_turf(turf/T)
+/datum/reagent/toxin/plantbgone/touch_turf(var/turf/T)
 	if(istype(T, /turf/simulated/wall))
 		var/turf/simulated/wall/W = T
 		if(locate(/obj/effect/overlay/wallrot) in W)
 			for(var/obj/effect/overlay/wallrot/E in W)
 				qdel(E)
-			W.visible_message(SPAN_NOTICE("The fungi are completely dissolved by the solution!"))
+			W.visible_message("<span class='notice'>The fungi are completely dissolved by the solution!</span>")
 
-/datum/reagent/toxin/plantbgone/touch_obj(obj/O, volume)
+/datum/reagent/toxin/plantbgone/touch_obj(var/obj/O, var/volume)
 	if(istype(O, /obj/effect/vine))
 		qdel(O)
 
-/datum/reagent/toxin/plantbgone/affect_blood(mob/living/carbon/M, removed)
+/datum/reagent/toxin/plantbgone/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
-	if (M.species.species_flags & SPECIES_FLAG_IS_PLANT)
+	if(alien == IS_DIONA)
 		M.adjustToxLoss(50 * removed)
 
-/datum/reagent/toxin/plantbgone/affect_touch(mob/living/carbon/M, removed)
+/datum/reagent/toxin/plantbgone/affect_touch(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
-	if (HAS_TRAIT(M, /singleton/trait/general/permeable_skin))
+	if(alien == IS_DIONA)
 		M.adjustToxLoss(50 * removed)
 
 /datum/reagent/acid/polyacid
@@ -500,39 +472,20 @@
 	taste_description = "acid"
 	reagent_state = LIQUID
 	color = "#c8a5dc"
-	metabolism = REM * 0.5
 	overdose = REAGENTS_OVERDOSE
 	value = 2.4
 
-/datum/reagent/lexorin/affect_blood(mob/living/carbon/M, removed)
-	if (M.species.breath_type != GAS_OXYGEN || IS_METABOLICALLY_INERT(M))
+/datum/reagent/lexorin/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(alien == IS_DIONA)
 		return
-
-	var/permeability = GET_TRAIT_LEVEL(carbon, /singleton/trait/general/permeable_skin)
-	M.take_organ_damage((10 - (2 * permeability)) * removed, 0, ORGAN_DAMAGE_FLESH_ONLY)
-	if (prob(10))
-		M.visible_message(
-			SPAN_WARNING("\The [M]'s skin fizzles and flakes away!"),
-			SPAN_DANGER("Your skin fizzles and flakes away!")
-		)
-	if(M.losebreath < (30 + (15 * permeability)))
-		M.losebreath++
-	M.adjustOxyLoss(15 * removed)
-
-/datum/reagent/lexorin/affect_touch(mob/living/carbon/M, removed)
-	if (M.species.breath_type != GAS_OXYGEN || HAS_TRAIT(M, /singleton/trait/general/nonpermeable_skin))
-		return
-
-	touch_met = volume // immediately permiates the skin, also avoids bugs with chemical duplication.
-
-	// The warning messages should only display once per splash, all of the chemicals upon the skin should be absorbed in one tick.
-	M.visible_message(
-		SPAN_WARNING("\The [M]'s skin fizzles and flakes on contact with the liquid!"),
-		SPAN_DANGER("You feel a painful fizzling and your skin begins to flake!.")
-	)
-
-	var/permeability = GET_TRAIT_LEVEL(carbon, /singleton/trait/general/permeable_skin)
-	M.reagents.add_reagent(/datum/reagent/lexorin, (0.5 + (2.5 * permeability)) * removed)
+	if(alien == IS_SKRELL)
+		M.take_organ_damage(2.4 * removed, 0, ORGAN_DAMAGE_FLESH_ONLY)
+		if(M.losebreath < 22.5)
+			M.losebreath++
+	else
+		M.take_organ_damage(3 * removed, 0, ORGAN_DAMAGE_FLESH_ONLY)
+		if(M.losebreath < 15)
+			M.losebreath++
 
 /datum/reagent/mutagen
 	name = "Unstable mutagen"
@@ -543,15 +496,15 @@
 	color = "#13bc5e"
 	value = 3.1
 
-/datum/reagent/mutagen/affect_touch(mob/living/carbon/M, removed)
+/datum/reagent/mutagen/affect_touch(var/mob/living/carbon/M, var/alien, var/removed)
 	if(prob(33))
-		affect_blood(M, removed)
+		affect_blood(M, alien, removed)
 
-/datum/reagent/mutagen/affect_ingest(mob/living/carbon/M, removed)
+/datum/reagent/mutagen/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
 	if(prob(67))
-		affect_blood(M, removed)
+		affect_blood(M, alien, removed)
 
-/datum/reagent/mutagen/affect_blood(mob/living/carbon/M, removed)
+/datum/reagent/mutagen/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 
 	if(M.isSynthetic())
 		return
@@ -569,7 +522,7 @@
 				randmutg(M)
 			domutcheck(M, null)
 			M.UpdateAppearance()
-	M.apply_damage(10 * removed, DAMAGE_RADIATION, armor_pen = 100)
+	M.apply_damage(10 * removed, IRRADIATE, armor_pen = 100)
 
 /datum/reagent/slimejelly
 	name = "Slime Jelly"
@@ -581,11 +534,11 @@
 	value = 1.2
 	should_admin_log = TRUE
 
-/datum/reagent/slimejelly/affect_blood(mob/living/carbon/M, removed)
-	if (IS_METABOLICALLY_INERT(M))
+/datum/reagent/slimejelly/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(alien == IS_DIONA)
 		return
 	if(prob(10))
-		to_chat(M, SPAN_DANGER("Your insides are burning!"))
+		to_chat(M, "<span class='danger'>Your insides are burning!</span>")
 		M.adjustToxLoss(rand(100, 300) * removed)
 	else if(prob(40))
 		M.heal_organ_damage(25 * removed, 0)
@@ -602,11 +555,13 @@
 	scannable = TRUE
 	should_admin_log = TRUE
 
-/datum/reagent/soporific/affect_blood(mob/living/carbon/M, removed)
-	if (IS_METABOLICALLY_INERT(M))
+/datum/reagent/soporific/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(alien == IS_DIONA)
 		return
 
-	var/threshold = 1 + (0.2 * GET_TRAIT_LEVEL(M, /singleton/trait/boon/clear_mind))
+	var/threshold = 1
+	if(alien == IS_SKRELL)
+		threshold = 1.2
 
 	if(M.chem_doses[type] < 1 * threshold)
 		if(M.chem_doses[type] == metabolism * 2 || prob(5))
@@ -635,11 +590,13 @@
 	value = 2.6
 	should_admin_log = TRUE
 
-/datum/reagent/chloralhydrate/affect_blood(mob/living/carbon/M, removed)
-	if (IS_METABOLICALLY_INERT(M))
+/datum/reagent/chloralhydrate/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(alien == IS_DIONA)
 		return
 
-	var/threshold = 1 + (0.2 * GET_TRAIT_LEVEL(M, /singleton/trait/boon/clear_mind))
+	var/threshold = 1
+	if(alien == IS_SKRELL)
+		threshold = 1.2
 	M.add_chemical_effect(CE_SEDATE, 1)
 
 	if(M.chem_doses[type] <= metabolism * threshold)
@@ -676,11 +633,13 @@
 	value = 2.6
 	should_admin_log = TRUE
 
-/datum/reagent/vecuronium_bromide/affect_blood(mob/living/carbon/M, removed)
-	if (IS_METABOLICALLY_INERT(M))
+/datum/reagent/vecuronium_bromide/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(alien == IS_DIONA)
 		return
 
-	var/threshold = 2 + (0.4 * GET_TRAIT_LEVEL(M, /singleton/trait/boon/clear_mind))
+	var/threshold = 2
+	if(alien == IS_SKRELL)
+		threshold = 2.4
 
 	if(M.chem_doses[type] >= metabolism * threshold * 0.5)
 		M.confused = max(M.confused, 2)
@@ -697,7 +656,75 @@
 	if(M.chem_doses[type] > 1 * threshold)
 		M.adjustToxLoss(removed)
 
-/datum/reagent/impedrezene // Impairs mental function correctly, takes an overwhelming dose to kill.
+/* Drugs */
+
+/datum/reagent/space_drugs
+	name = "Space drugs"
+	description = "An illegal chemical compound used as drug."
+	taste_description = "bitterness"
+	taste_mult = 0.4
+	reagent_state = LIQUID
+	color = "#60a584"
+	metabolism = REM * 0.5
+	overdose = REAGENTS_OVERDOSE
+	value = 2.8
+	should_admin_log = TRUE
+
+/datum/reagent/space_drugs/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(alien == IS_DIONA)
+		return
+
+	var/drug_strength = 15
+	if(alien == IS_SKRELL)
+		drug_strength = drug_strength * 0.8
+
+	M.druggy = max(M.druggy, drug_strength)
+	if (alien != IS_SKRELL)
+		if (prob(10))
+			M.SelfMove(pick(GLOB.cardinal))
+		if(prob(7))
+			M.emote(pick("twitch", "drool", "moan", "giggle"))
+	M.add_chemical_effect(CE_PULSE, -1)
+
+/datum/reagent/serotrotium
+	name = "Serotrotium"
+	description = "A chemical compound that promotes concentrated production of the serotonin neurotransmitter in humans."
+	taste_description = "bitterness"
+	reagent_state = LIQUID
+	color = "#202040"
+	metabolism = REM * 0.25
+	overdose = REAGENTS_OVERDOSE
+	value = 2.5
+
+/datum/reagent/serotrotium/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(alien == IS_DIONA)
+		return
+	if(prob(7))
+		M.emote(pick("twitch", "drool", "moan", "gasp"))
+	return
+
+/datum/reagent/cryptobiolin
+	name = "Cryptobiolin"
+	description = "Cryptobiolin causes confusion and dizzyness."
+	taste_description = "sourness"
+	reagent_state = LIQUID
+	color = "#000055"
+	metabolism = REM * 0.5
+	overdose = REAGENTS_OVERDOSE
+	heating_point = 61 CELSIUS
+	heating_products = list(/datum/reagent/potassium, /datum/reagent/acetone, /datum/reagent/sugar)
+	value = 2
+
+/datum/reagent/cryptobiolin/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(alien == IS_DIONA)
+		return
+	var/drug_strength = 4
+	if(alien == IS_SKRELL)
+		drug_strength = drug_strength * 0.8
+	M.make_dizzy(drug_strength)
+	M.confused = max(M.confused, drug_strength * 5)
+
+/datum/reagent/impedrezene
 	name = "Impedrezene"
 	description = "Impedrezene is a narcotic that impedes one's ability by slowing down the higher brain cell functions."
 	taste_description = "numbness"
@@ -706,225 +733,81 @@
 	overdose = REAGENTS_OVERDOSE
 	value = 1.8
 
-/datum/reagent/impedrezene/affect_blood(mob/living/carbon/M, removed)
-	if (IS_METABOLICALLY_INERT(M))
+/datum/reagent/impedrezene/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(alien == IS_DIONA)
 		return
-
 	M.jitteriness = max(M.jitteriness - 5, 0)
-	M.add_chemical_effect(M.add_chemical_effect(CE_SLOWDOWN, 1))
-
 	if(prob(80))
-		M.confused = max(M.confused, 10)
+		M.adjustBrainLoss(5.25 * removed)
 	if(prob(50))
 		M.drowsyness = max(M.drowsyness, 3)
 	if(prob(10))
 		M.emote("drool")
-		M.apply_effect(EFFECT_STUTTER, 3)
 
-	if (M.getBrainLoss() < 60)
-		M.adjustBrainLoss(14 * removed)
-	else
-		M.adjustBrainLoss(7 * removed)
-
-/* Drugs */
-
-/datum/reagent/drugs
-	name = "Parent drug reagent"
-	description = "The parent reagent for all illegal drugs."
-	taste_description = "something you should report to coders"
-	taste_mult = 1.2
-	color = "#f2f2f2"
-	var/high_messages = TRUE
-	var/list/high_message_list = list("You feel great! For now...", "You feel a wave of happiness!")
-	var/list/sober_message_list = list("You feel like garbage...", "Your head aches.")
-	var/last_message_time
-
-	var/prob_proc = FALSE
-
-	reagent_state = LIQUID
-	metabolism = REM * 0.5
-	ingest_met = REM * 1.5
-	overdose = REAGENTS_OVERDOSE
-
-/datum/reagent/drugs/affect_blood(mob/living/carbon/M, removed)
-	if (IS_METABOLICALLY_INERT(M))
-		return
-
-	if(high_messages == TRUE)
-		if(world.time > last_message_time + 30 SECONDS && volume > 0.5) /// Spam prevention.
-			last_message_time = world.time
-			var/msg = pick(high_message_list)
-			to_chat(M, SPAN_DANGER("[msg]"))
-		else if(volume <= 0.2 && data != -1)
-			data = -1
-			var/msg = pick(sober_message_list)
-			to_chat(M, SPAN_DANGER("[msg]"))
-	if(prob(5) && prob_proc == FALSE) /// Enables procs to activate, remains true until THAT PROC sets it to false again.
-		prob_proc = TRUE
-
-
-/datum/reagent/drugs/hextro
-	name = "Hextromycosalinate"
-	description = "Coloquially known as 'Hector', or by the name of 'Hex', This concoction is a \
-	dizzying mix of psychedelics, hallucinogens and other reagents of both synthetic and organic sources. \
-	With such broad and hardly traceable origins, its a common saying that each dose is unique in nature. \
-	Its hazardous and erratic origin usually entails a great deal of mixed adverse side effects, but  \
-	its cheap cost and potent hallucinations make it enticing for anyone willing to escape the real world \
-	briefly, at the cost of severe addiction."
-	taste_description = "bittersweetness"
-	taste_mult = 0.4
-	reagent_state = LIQUID
-	color = "#60a584"
-	metabolism = REM * 0.5
-	value = 2.8
-	should_admin_log = TRUE
-	high_message_list = list("You feel so much more relaxed.",
-	"You can't quite focus on anything.",
-	"Colors around you seem much more intense.",
-	"You could snack on something right now...",
-	"You feel lightheaded and giggly.",
-	"Everything seems so hilarious.",
-	"You really could go for some takeout right now.",
-	"You momentarily forget where you are.",
-	"You have a mild urge to look over your shoulder.")
-	sober_message_list = list("You feel the urge to just sit there and do nothing.",
-	"Reality seems like a real pain in the ass to deal with right now.",
-	"Things feel really colourless to you all of a sudden.",
-	"You feel the urge to lie down and nap.")
-
-/datum/reagent/drugs/hextro/affect_blood(mob/living/carbon/M, removed)
-	if (IS_METABOLICALLY_INERT(M))
-		return
-
-	if(prob(5) && prob_proc == TRUE)
-		M.apply_effect(3, EFFECT_STUTTER)
-		M.emote("giggle")
-		prob_proc = FALSE
-	if(prob(10) && prob_proc == TRUE)
-		M.adjust_nutrition(-10)
-		prob_proc = FALSE
-
-	M.add_chemical_effect(CE_PULSE, -1)
-
-	..()
-
-/datum/reagent/drugs/serotrotium
-	name = "Serotrotium"
-	description = "A chemical compound that promotes concentrated production of the serotonin neurotransmitter in humans."
-	taste_description = "bitterness"
-	reagent_state = LIQUID
-	color = "#202040"
-	metabolism = REM * 0.25
-	value = 2.5
-	high_message_list = list("Everything feels good, stable.", "You feel grounded.")
-	sober_message_list = list("The stability is gone...", "Everything is much less stable.")
-
-/datum/reagent/drugs/serotrotium/affect_blood(mob/living/carbon/M, removed)
-	if (IS_METABOLICALLY_INERT(M))
-		return FALSE
-	if(prob(7))
-		M.emote(pick("giggle", "laugh", "smile"))
-	return ..()
-
-/datum/reagent/drugs/cryptobiolin
-	name = "Cryptobiolin"
-	description = "A narcotic known to cause confusion and dizzyness."
-	taste_description = "sourness"
-	reagent_state = LIQUID
-	color = "#000055"
-	metabolism = REM * 0.5
-	heating_point = 61 CELSIUS
-	heating_products = list(/datum/reagent/potassium, /datum/reagent/acetone, /datum/reagent/sugar)
-	value = 2
-	high_message_list = list("The world distorts around you...!",
-	"The walls look like they're moving...",
-	"Nothing really makes sense right now.",
-	"It feels like you've melded with the world around you...")
-	sober_message_list = list("Everything feels... flat.", "You feel almost TOO grounded in your surroundings.")
-
-/datum/reagent/drugs/cryptobiolin/affect_blood(mob/living/carbon/M, removed)
-	if (IS_METABOLICALLY_INERT(M))
-		return FALSE
-	var/drug_strength = 4 - (0.8 * GET_TRAIT_LEVEL(M, /singleton/trait/boon/clear_mind))
-
-	M.make_dizzy(drug_strength)
-	M.confused = max(M.confused, drug_strength * 5)
-	..()
-
-/datum/reagent/drugs/mindbreaker
+/datum/reagent/mindbreaker
 	name = "Mindbreaker Toxin"
 	description = "A powerful hallucinogen, it can cause fatal effects in users."
 	taste_description = "sourness"
 	reagent_state = LIQUID
 	color = "#b31008"
 	metabolism = REM * 0.25
+	overdose = REAGENTS_OVERDOSE
 	value = 0.6
 	should_admin_log = TRUE
-	high_message_list = list("You don't quite know what up or down is anymore...",
-	"Colors just seem much more amazing.",
-	"You feel incredibly confident. No one can stop you.",
-	"You clench your jaw involuntarily.",
-	"You feel... unsteady.",
-	"You really feel like talking about your feelings!")
-	sober_message_list = list("Everything feels a little more grounded.",
-	"Colors seem... flatter.",
-	"Everything feels a little dull, now.")
 
-/datum/reagent/drugs/mindbreaker/affect_blood(mob/living/carbon/M, removed)
-	if (IS_METABOLICALLY_INERT(M))
+/datum/reagent/mindbreaker/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(alien == IS_DIONA)
 		return
 	M.add_chemical_effect(CE_MIND, -2)
+	if(alien == IS_SKRELL)
+		M.hallucination(25, 30)
+	else
+		M.hallucination(50, 50)
 
-	var/hallucination_duration = 50 - (25 * GET_TRAIT_LEVEL(M, /singleton/trait/boon/clear_mind))
-	var/hallucination_power = 50 - (20 * GET_TRAIT_LEVEL(M, /singleton/trait/boon/clear_mind))
-
-	if (hallucination_duration && hallucination_power)
-		M.hallucination(hallucination_duration, hallucination_power)
-	..()
-
-/datum/reagent/drugs/psilocybin
+/datum/reagent/psilocybin
 	name = "Psilocybin"
 	description = "A strong psycotropic derived from certain species of mushroom."
 	taste_description = "mushroom"
 	color = "#e700e7"
+	overdose = REAGENTS_OVERDOSE
 	metabolism = REM * 0.5
 	value = 0.7
-	high_message_list = list("The world distorts around you...!",
-	"The walls look like they're moving...",
-	"Nothing really makes sense right now.",
-	"It feels like you've melded with the world around you..."
-	)
-	sober_message_list = list("Everything feels... flat.", "You feel almost TOO grounded in your surroundings.")
 
-/datum/reagent/drugs/psilocybin/affect_blood(mob/living/carbon/M, removed)
-	if (IS_METABOLICALLY_INERT(M))
+/datum/reagent/psilocybin/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(alien == IS_DIONA)
 		return
 
-	var/threshold = 1 + (0.2 * GET_TRAIT_LEVEL(M, /singleton/trait/boon/clear_mind))
+	var/threshold = 1
+	if(alien == IS_SKRELL)
+		threshold = 1.2
+
 	M.druggy = max(M.druggy, 30)
 
 	if(M.chem_doses[type] < 1 * threshold)
+		M.apply_effect(3, STUTTER)
 		M.make_dizzy(5)
+		if(prob(5))
+			M.emote(pick("twitch", "giggle"))
 	else if(M.chem_doses[type] < 2 * threshold)
-		M.apply_effect(3, EFFECT_STUTTER)
+		M.apply_effect(3, STUTTER)
 		M.make_jittery(5)
 		M.make_dizzy(5)
 		M.druggy = max(M.druggy, 35)
 		if(prob(10))
-			M.emote("giggle")
+			M.emote(pick("twitch", "giggle"))
 	else
 		M.add_chemical_effect(CE_MIND, -1)
-		M.apply_effect(3, EFFECT_STUTTER)
+		M.apply_effect(3, STUTTER)
 		M.make_jittery(10)
 		M.make_dizzy(10)
 		M.druggy = max(M.druggy, 40)
 		if(prob(15))
 			M.emote(pick("twitch", "giggle"))
-	..()
 
 
-/datum/reagent/drugs/three_eye
+/datum/reagent/three_eye
 	name = "Three Eye"
+	taste_description = "liquid starlight"
 	description = "Out on the edge of human space, at the limits of scientific understanding and \
 	cultural taboo, people develop and dose themselves with substances that would curl the hair on \
 	a brinker's vatgrown second head. Three Eye is one of the most notorious narcotics to ever come \
@@ -932,13 +815,14 @@
 	Stok does with an Unathi strike trooper. It is equally effective on humans, Skrell, dionaea and \
 	probably the Captain's cat, and distributing it will get you guaranteed jail time in every \
 	human territory."
-	taste_description = "liquid starlight"
 	reagent_state = LIQUID
 	color = "#ccccff"
 	metabolism = REM
 	overdose = 25
 	should_admin_log = TRUE
-	high_message_list = list(
+
+	// M A X I M U M C H E E S E
+	var/global/list/dose_messages = list(
 		"Your name is called. It is your time.",
 		"You are dissolving. Your hands are wax...",
 		"It all runs together. It all mixes.",
@@ -958,7 +842,8 @@
 		"We miss you. Where are you?",
 		"Come back from there. Please."
 	)
-	var/static/list/overdose_messages = list(
+
+	var/global/list/overdose_messages = list(
 		"THE SIGNAL THE SIGNAL THE SIGNAL THE SIGNAL",
 		"IT CRIES IT CRIES IT WAITS IT CRIES",
 		"NOT YOURS NOT YOURS NOT YOURS NOT YOURS",
@@ -968,7 +853,7 @@
 		"THE LIGHT THE DARK A STAR IN CHAINS"
 	)
 
-/datum/reagent/drugs/three_eye/affect_blood(mob/living/carbon/M, removed)
+/datum/reagent/three_eye/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	M.add_client_color(/datum/client_color/thirdeye)
 	M.add_chemical_effect(CE_THIRDEYE, 1)
 	M.add_chemical_effect(CE_MIND, -2)
@@ -979,19 +864,20 @@
 		var/mob/living/carbon/human/H = M
 		H.seizure()
 		H.adjustBrainLoss(rand(8, 12))
-	..()
+	if(prob(5))
+		to_chat(M, SPAN_WARNING("<font size = [rand(1,3)]>[pick(dose_messages)]</font>"))
 
-/datum/reagent/drugs/three_eye/on_leaving_metabolism(mob/parent, metabolism_class)
+/datum/reagent/three_eye/on_leaving_metabolism(var/mob/parent, var/metabolism_class)
 	parent.remove_client_color(/datum/client_color/thirdeye)
 
-/datum/reagent/drugs/three_eye/overdose(mob/living/carbon/M)
+/datum/reagent/three_eye/overdose(var/mob/living/carbon/M, var/alien)
 	..()
 	M.adjustBrainLoss(rand(1, 5))
 	if(ishuman(M) && prob(10))
 		var/mob/living/carbon/human/H = M
 		H.seizure()
 	if(prob(10))
-		to_chat(M, SPAN_DANGER(SPAN_SIZE(rand(2,4), pick(overdose_messages))))
+		to_chat(M, SPAN_DANGER("<font size = [rand(2,4)]>[pick(overdose_messages)]</font>"))
 	if(M.psi)
 		M.psi.check_latency_trigger(30, "a Three Eye overdose")
 
@@ -1006,7 +892,7 @@
 	value = 2
 	should_admin_log = TRUE
 
-/datum/reagent/slimetoxin/affect_blood(mob/living/carbon/human/H, removed)
+/datum/reagent/slimetoxin/affect_blood(var/mob/living/carbon/human/H, var/alien, var/removed)
 	if(!istype(H))
 		return
 	if(H.species.name == SPECIES_PROMETHEAN)
@@ -1020,21 +906,21 @@
 		var/obj/item/organ/external/E = H.get_organ(limb_tag)
 		if(E && !E.is_stump() && !BP_IS_ROBOTIC(E) && E.species.name != SPECIES_PROMETHEAN)
 			meatchunks += E
-	if(!length(meatchunks))
+	if(!meatchunks.len)
 		if(prob(10))
-			to_chat(H, SPAN_DANGER("Your flesh rapidly mutates!"))
+			to_chat(H, "<span class='danger'>Your flesh rapidly mutates!</span>")
 			H.set_species(SPECIES_PROMETHEAN)
 			H.shapeshifter_set_colour("#05ff9b")
 			H.verbs -= /mob/living/carbon/human/proc/shapeshifter_select_colour
 		return
 	var/obj/item/organ/external/O = pick(meatchunks)
-	to_chat(H, SPAN_DANGER("Your [O.name]'s flesh mutates rapidly!"))
+	to_chat(H, "<span class='danger'>Your [O.name]'s flesh mutates rapidly!</span>")
 	if(!wrapped_species_by_ref["\ref[H]"])
 		wrapped_species_by_ref["\ref[H]"] = H.species.name
 	meatchunks = list(O) | O.children
 	for(var/obj/item/organ/external/E in meatchunks)
 		E.species = all_species[SPECIES_PROMETHEAN]
-		E.skin_tone = null
+		E.s_tone = null
 		E.s_col = ReadRGB("#05ff9b")
 		E.s_col_blend = ICON_ADD
 		E.status &= ~ORGAN_BROKEN
@@ -1045,7 +931,7 @@
 		E.update_icon(1)
 	O.max_damage = 15
 	if(prob(10))
-		to_chat(H, SPAN_DANGER("Your slimy [O.name] plops off!"))
+		to_chat(H, "<span class='danger'>Your slimy [O.name] plops off!</span>")
 		O.droplimb()
 	H.update_body()
 
@@ -1056,14 +942,14 @@
 	reagent_state = LIQUID
 	color = "#13bc5e"
 
-/datum/reagent/aslimetoxin/affect_blood(mob/living/carbon/M, removed) // TODO: check if there's similar code anywhere else
+/datum/reagent/aslimetoxin/affect_blood(var/mob/living/carbon/M, var/alien, var/removed) // TODO: check if there's similar code anywhere else
 	if(HAS_TRANSFORMATION_MOVEMENT_HANDLER(M))
 		return
-	to_chat(M, SPAN_DANGER("Your flesh rapidly mutates!"))
+	to_chat(M, "<span class='danger'>Your flesh rapidly mutates!</span>")
 	ADD_TRANSFORMATION_MOVEMENT_HANDLER(M)
 	M.icon = null
 	M.overlays.Cut()
-	M.set_invisibility(INVISIBILITY_ABSTRACT)
+	M.set_invisibility(101)
 	for(var/obj/item/W in M)
 		if(istype(W, /obj/item/implant)) //TODO: Carn. give implants a dropped() or something
 			qdel(W)
@@ -1108,11 +994,11 @@
 	heating_products = null
 	heating_point = null
 
-/datum/reagent/toxin/hair_remover/affect_touch(mob/living/carbon/human/M, removed)
-	if (!(M.species.appearance_flags & SPECIES_APPEARANCE_HAS_STATIC_HAIR))
+/datum/reagent/toxin/hair_remover/affect_touch(var/mob/living/carbon/human/M, var/alien, var/removed)
+	if(alien == IS_SKRELL)	//skrell can't have hair unless you hack it in, also to prevent tentacles from falling off
 		return
 	M.species.set_default_hair(M)
-	to_chat(M, SPAN_WARNING("You feel a chill and your skin feels lighter.."))
+	to_chat(M, "<span class='warning'>You feel a chill and your skin feels lighter..</span>")
 	remove_self(volume)
 
 /datum/reagent/toxin/bromide
@@ -1125,6 +1011,20 @@
 	heating_products = null
 	heating_point = null
 
+/datum/reagent/toxin/bromide/affect_touch(var/mob/living/carbon/M, var/alien, var/removed)
+	if(alien != IS_MANTID)
+		. = ..()
+
+/datum/reagent/toxin/bromide/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(alien == IS_MANTID)
+		M.add_chemical_effect(CE_OXYGENATED, 1)
+	else
+		..()
+
+/datum/reagent/toxin/bromide/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
+	if(alien != IS_MANTID)
+		. = ..()
+
 /datum/reagent/toxin/methyl_bromide
 	name = "Methyl Bromide"
 	description = "A fumigant derived from bromide."
@@ -1135,29 +1035,26 @@
 	heating_products = null
 	heating_point = null
 
-/datum/reagent/toxin/methyl_bromide/affect_touch(mob/living/carbon/M, removed)
-	if (!HAS_TRAIT(M, /singleton/trait/general/serpentid_adapted))
-		return ..()
+/datum/reagent/toxin/methyl_bromide/affect_touch(var/mob/living/carbon/M, var/alien, var/removed)
+	. = (alien != IS_MANTID && alien != IS_NABBER && ..())
 
-/datum/reagent/toxin/methyl_bromide/affect_ingest(mob/living/carbon/M, removed)
-	if (!HAS_TRAIT(M, /singleton/trait/general/serpentid_adapted))
-		return ..()
+/datum/reagent/toxin/methyl_bromide/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
+	. = (alien != IS_MANTID && alien != IS_NABBER && ..())
 
-/datum/reagent/toxin/methyl_bromide/touch_turf(turf/simulated/T)
+/datum/reagent/toxin/methyl_bromide/touch_turf(var/turf/simulated/T)
 	if(istype(T))
 		T.assume_gas(GAS_METHYL_BROMIDE, volume, T20C)
 		remove_self(volume)
 
-/datum/reagent/toxin/methyl_bromide/affect_blood(mob/living/carbon/M, removed)
-	if (!HAS_TRAIT(M, /singleton/trait/general/serpentid_adapted))
-		. = ..()
+/datum/reagent/toxin/methyl_bromide/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	. = (alien != IS_MANTID && alien != IS_NABBER && ..())
 	if(istype(M))
 		for(var/obj/item/organ/external/E in M.organs)
 			if(LAZYLEN(E.implants))
 				for(var/obj/effect/spider/spider in E.implants)
 					if(prob(25))
 						E.implants -= spider
-						M.visible_message(SPAN_NOTICE("The dying form of \a [spider] emerges from inside \the [M]'s [E.name]."))
+						M.visible_message("<span class='notice'>The dying form of \a [spider] emerges from inside \the [M]'s [E.name].</span>")
 						qdel(spider)
 						break
 

@@ -9,11 +9,10 @@
 	extended_desc = "This program connects to life signs monitoring system to provide basic information on crew health."
 	required_access = access_medical
 	requires_ntnet = TRUE
-	network_destination = "crew life signs monitoring system"
+	network_destination = "crew lifesigns monitoring system"
 	size = 11
 	category = PROG_MONITOR
 	var/has_alert = FALSE
-	var/beeping = FALSE
 
 /datum/computer_file/program/suit_sensors/process_tick()
 	..()
@@ -23,14 +22,9 @@
 		if(!has_alert)
 			program_icon_state = "crew-red"
 			ui_header = "crew_red.gif"
-			if(!beeping)
-				computer.visible_notification(SPAN_WARNING("Warning: vital signs beyond acceptable parameters."))
-				computer.audible_notification("sound/machines/twobeep.ogg")
-				beeping = TRUE //For medical sanity purposes, it'll only beep once per emergency.
 		else
 			program_icon_state = "crew"
 			ui_header = "crew_green.gif"
-			beeping = FALSE
 		update_computer_icon()
 		has_alert = !has_alert
 
@@ -56,7 +50,7 @@
 				AI.ai_actual_track(H)
 		return 1
 
-/datum/nano_module/crew_monitor/ui_interact(mob/user, ui_key = "main", datum/nanoui/ui = null, force_open = 1, datum/topic_state/state = GLOB.default_state)
+/datum/nano_module/crew_monitor/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1, var/datum/topic_state/state = GLOB.default_state)
 	var/list/data = host.initial_data()
 
 	data["isAI"] = isAI(user)

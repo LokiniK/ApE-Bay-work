@@ -2,7 +2,6 @@
 	name = "\improper Abandoned supply station"
 	icon_state = "lost_supply_base"
 	icon = 'maps/away/lost_supply_base/lost_supply_base_sprites.dmi'
-	turfs_airless = TRUE
 
 /area/lost_supply_base/solar
 	name = "\improper Abandoned supply station solars control room"

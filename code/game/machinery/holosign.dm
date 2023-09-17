@@ -2,7 +2,7 @@
 /obj/machinery/holosign
 	name = "holosign"
 	desc = "Small wall-mounted holographic projector."
-	icon = 'icons/obj/machines/holosign.dmi'
+	icon = 'icons/obj/holosign.dmi'
 	icon_state = "sign_off"
 	layer = ABOVE_DOOR_LAYER
 	idle_power_usage = 2
@@ -16,12 +16,12 @@
 		/obj/item/stock_parts/power/apc
 	)
 	public_variables = list(
-		/singleton/public_access/public_variable/holosign_on
+		/decl/public_access/public_variable/holosign_on
 	)
 	public_methods = list(
-		/singleton/public_access/public_method/holosign_toggle
+		/decl/public_access/public_method/holosign_toggle
 	)
-	stock_part_presets = list(/singleton/stock_part_preset/radio/receiver/holosign = 1)
+	stock_part_presets = list(/decl/stock_part_preset/radio/receiver/holosign = 1)
 
 /obj/machinery/holosign/proc/toggle()
 	if (inoperable())
@@ -38,29 +38,30 @@
 		icon_state = on_icon
 		set_light(0.5, 0.5, 1, l_color = COLOR_CYAN_BLUE)
 
-/singleton/public_access/public_variable/holosign_on
+/decl/public_access/public_variable/holosign_on
 	expected_type = /obj/machinery/holosign
 	name = "holosign active"
 	desc = "Whether or not the holosign is active."
 	can_write = FALSE
 	has_updates = FALSE
 
-/singleton/public_access/public_variable/holosign_on/access_var(obj/machinery/holosign/sign)
+/decl/public_access/public_variable/holosign_on/access_var(obj/machinery/holosign/sign)
 	return sign.lit
 
-/singleton/public_access/public_method/holosign_toggle
+/decl/public_access/public_method/holosign_toggle
 	name = "holosign toggle"
 	desc = "Toggle the holosign's active state."
 	call_proc = /obj/machinery/holosign/proc/toggle
 
-/singleton/stock_part_preset/radio/receiver/holosign
+/decl/stock_part_preset/radio/receiver/holosign
 	frequency = BUTTON_FREQ
-	receive_and_call = list("button_active" = /singleton/public_access/public_method/holosign_toggle)
+	receive_and_call = list("button_active" = /decl/public_access/public_method/holosign_toggle)
 
 /obj/machinery/holosign/surgery
 	name = "surgery holosign"
 	desc = "Small wall-mounted holographic projector. This one reads SURGERY."
 	on_icon = "surgery"
+	layer = 5.1
 
 /obj/machinery/holosign/chapel
 	name = "chapel holosign"
@@ -71,7 +72,7 @@
 /obj/machinery/button/holosign
 	name = "holosign switch"
 	desc = "A remote control switch for holosign."
-	icon = 'icons/obj/structures/buttons.dmi'
+	icon = 'icons/obj/power.dmi'
 	icon_state = "crema_switch"
 
 /obj/machinery/button/holosign/on_update_icon()

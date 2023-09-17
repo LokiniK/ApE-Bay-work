@@ -38,6 +38,7 @@ They sell generic supplies and ask for generic supplies.
 	possible_trading_items = list(/obj/item/storage/bag                       = TRADER_SUBTYPES_ONLY,
 								/obj/item/storage/bag/cash/infinite           = TRADER_BLACKLIST,
 								/obj/item/storage/backpack                    = TRADER_ALL,
+								/obj/item/storage/backpack/baul               = TRADER_ALL, //inf custom item,
 								/obj/item/storage/backpack/cultpack           = TRADER_BLACKLIST,
 								/obj/item/storage/backpack/holding            = TRADER_BLACKLIST,
 								/obj/item/storage/backpack/satchel/grey/withwallet = TRADER_BLACKLIST,
@@ -107,6 +108,7 @@ They sell generic supplies and ask for generic supplies.
 								/obj/item/beehive_assembly          = TRADER_THIS_TYPE,
 								/obj/item/glass_jar                 = TRADER_THIS_TYPE,
 								/obj/item/honey_frame               = TRADER_THIS_TYPE,
+								/obj/item/target                    = TRADER_ALL,
 								/obj/structure/dispenser            = TRADER_SUBTYPES_ONLY,
 								/obj/structure/filingcabinet        = TRADER_THIS_TYPE,
 								/obj/structure/safe                 = TRADER_THIS_TYPE,
@@ -116,3 +118,8 @@ They sell generic supplies and ask for generic supplies.
 								/obj/structure/sign/goldenplaque    = TRADER_BLACKLIST_ALL,
 								/obj/structure/sign/poster          = TRADER_BLACKLIST
 								)
+//[INF]
+/datum/trader/trading_beacon/New()
+	..()
+	speech[TRADER_HAIL_START + SPECIES_RESOMI] = "Greetings, I am MERCHANT, Artifical Intelligence onboard ORIGIN. We wish to trade with you, no more."
+//[/INF]

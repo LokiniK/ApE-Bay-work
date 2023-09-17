@@ -24,8 +24,8 @@
 	return 0
 
 
-/obj/item/device/assembly/timer/set_secure(make_secure)
-	..()
+/obj/item/device/assembly/timer/toggle_secure()
+	secured = !secured
 	if(secured)
 		START_PROCESSING(SSobj, src)
 	else
@@ -70,7 +70,7 @@
 
 /obj/item/device/assembly/timer/interact(mob/user as mob)//TODO: Have this use the wires
 	if(!secured)
-		user.show_message(SPAN_WARNING("\The [name] is unsecured!"))
+		user.show_message("<span class='warning'>\The [name] is unsecured!</span>")
 		return 0
 	var/second = time % 60
 	var/minute = (time - second) / 60

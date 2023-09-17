@@ -1,48 +1,48 @@
 // Base type, do not use.
 /obj/structure/lift
 	name = "turbolift control component"
-	icon = 'icons/obj/structures/turbolift.dmi'
+	icon = 'icons/obj/turbolift.dmi'
 	anchored = TRUE
 	density = FALSE
 	layer = ABOVE_OBJ_LAYER
 
 	var/datum/turbolift/lift
 
-/obj/structure/lift/set_dir(newdir)
+/obj/structure/lift/set_dir(var/newdir)
 	. = ..()
 	pixel_x = 0
 	pixel_y = 0
 	if(dir & NORTH)
 		pixel_y = -32
 	else if(dir & SOUTH)
-		pixel_y = 32
+		pixel_y = 37
 	else if(dir & EAST)
 		pixel_x = -32
 	else if(dir & WEST)
 		pixel_x = 32
 
-/obj/structure/lift/proc/pressed(mob/user)
+/obj/structure/lift/proc/pressed(var/mob/user)
 	if(!istype(user, /mob/living/silicon))
 		if(user.a_intent == I_HURT)
-			user.visible_message(SPAN_DANGER("\The [user] hammers on the lift button!"))
+			user.visible_message("<span class='danger'>\The [user] hammers on the lift button!</span>")
 		else
-			user.visible_message(SPAN_NOTICE("\The [user] presses the lift button."))
+			user.visible_message("<span class='notice'>\The [user] presses the lift button.</span>")
 
 
-/obj/structure/lift/New(newloc, datum/turbolift/_lift)
+/obj/structure/lift/New(var/newloc, var/datum/turbolift/_lift)
 	lift = _lift
 	return ..(newloc)
 
-/obj/structure/lift/attack_ai(mob/user)
+/obj/structure/lift/attack_ai(var/mob/user)
 	return attack_hand(user)
 
-/obj/structure/lift/attack_generic(mob/user)
-	attack_hand(user)
+/obj/structure/lift/attack_generic(var/mob/user)
+	return attack_hand(user)
 
-/obj/structure/lift/attack_hand(mob/user)
+/obj/structure/lift/attack_hand(var/mob/user)
 	return interact(user)
 
-/obj/structure/lift/interact(mob/user)
+/obj/structure/lift/interact(var/mob/user)
 	if(!lift.is_functional())
 		return 0
 	return 1
@@ -67,9 +67,10 @@
 	light_up = FALSE
 	update_icon()
 
-/obj/structure/lift/button/interact(mob/user)
+/obj/structure/lift/button/interact(var/mob/user)
 	if(!..())
 		return
+	playsound(src, 'infinity/sound/SS2/effects/buttons/butelev.wav', 50)//inf
 	light_up()
 	pressed(user)
 	if(floor == lift.current_floor)
@@ -98,10 +99,10 @@
 	mouse_opacity = 2 //No more eyestrain aiming at tiny pixels
 
 
-/obj/structure/lift/panel/attack_ghost(mob/user)
+/obj/structure/lift/panel/attack_ghost(var/mob/user)
 	return interact(user)
 
-/obj/structure/lift/panel/interact(mob/user)
+/obj/structure/lift/panel/interact(var/mob/user)
 	if(!..())
 		return
 
@@ -111,10 +112,11 @@
 	//the floors list stores levels in order of increasing Z
 	//therefore, to display upper levels at the top of the menu and
 	//lower levels at the bottom, we need to go through the list in reverse
-	for(var/i in length(lift.floors) to 1 step -1)
+	for(var/i in lift.floors.len to 1 step -1)
 		var/datum/turbolift_floor/floor = lift.floors[i]
 		var/label = floor.label? floor.label : "Level #[i]"
-		dat += "[SPAN_COLOR((floor in lift.queued_floors) ? COLOR_YELLOW : COLOR_WHITE, "<a href='?src=\ref[src];move_to_floor=["\ref[floor]"]'>[label]</a>: [floor.name]")]<br>"
+		dat += "<font color = '[(floor in lift.queued_floors) ? COLOR_YELLOW : COLOR_WHITE]'>"
+		dat += "<a href='?src=\ref[src];move_to_floor=["\ref[floor]"]'>[label]</a>: [floor.name]</font><br>"
 
 	dat += "<hr>"
 	if(lift.doors_are_open())
@@ -132,6 +134,7 @@
 /obj/structure/lift/panel/OnTopic(user, href_list)
 	if(href_list["move_to_floor"])
 		lift.queue_move_to(locate(href_list["move_to_floor"]))
+		playsound(src, 'infinity/sound/SS2/effects/buttons/butelev.wav', 50)//inf
 		. = TOPIC_REFRESH
 	if(href_list["open_doors"])
 		lift.open_doors()

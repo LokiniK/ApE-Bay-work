@@ -17,6 +17,7 @@
 		update_items()
 	if (src.stat != DEAD) //still using power
 		use_power()
+		process_queued_alarms()
 	UpdateLyingBuckledAndVerbStatus()
 
 /mob/living/silicon/robot/proc/clamp_values()
@@ -37,8 +38,12 @@
 		C.update_power_state()
 
 	if ( cell && is_component_functioning("power cell") && src.cell.charge > 0 )
-		for (var/obj/item as anything in GetAllHeld())
+		if(src.module_state_1)
 			cell_use_power(50) // 50W load for every enabled tool TODO: tool-specific loads
+		if(src.module_state_2)
+			cell_use_power(50)
+		if(src.module_state_3)
+			cell_use_power(50)
 
 		if(lights_on)
 			if(intenselight)
@@ -61,14 +66,20 @@
 
 /mob/living/silicon/robot/handle_regular_status_updates()
 
+	if(src.camera && !scrambledcodes)
+		if(src.stat == 2 || wires.IsIndexCut(BORG_WIRE_CAMERA))
+			src.camera.set_status(0)
+		else
+			src.camera.set_status(1)
+
 	updatehealth()
 
 	if(src.sleeping)
 		Paralyse(3)
 		src.sleeping--
 
-	if (resting) // Just in case. This breaks things so never allow robots to rest.
-		resting = FALSE
+	if(src.resting)
+		Weaken(5)
 
 	if(health < config.health_threshold_dead && src.stat != 2) //die only once
 		death()
@@ -140,37 +151,53 @@
 
 /mob/living/silicon/robot/handle_regular_hud_updates()
 	..()
+
 	var/obj/item/borg/sight/hud/hud = (locate(/obj/item/borg/sight/hud) in src)
-	if (hud?.hud)
+	if(hud && hud.hud)
 		hud.hud.process_hud(src)
 	else
-		switch (sensor_mode)
+		switch(src.sensor_mode)
 			if (SEC_HUD)
-				process_sec_hud(src, FALSE)
+				process_sec_hud(src,0)
 			if (MED_HUD)
-				process_med_hud(src, FALSE)
-	if (healths)
-		if (stat != DEAD)
-			var/health_fraction = health / maxHealth
-			if (health_fraction < 0 && !istype(src, /mob/living/silicon/robot/drone))
-				health_fraction = health / -config.health_threshold_dead
-			switch (health_fraction)
-				if (1 to POSITIVE_INFINITY)
-					healths.icon_state = "health0"
-				if (0.75 to 1)
-					healths.icon_state = "health1"
-				if (0.5 to 0.75)
-					healths.icon_state = "health2"
-				if (0.25 to 0.5)
-					healths.icon_state = "health3"
-				if (0 to 0.25)
-					healths.icon_state = "health4"
-				if (-1 to 0)
-					healths.icon_state = "health5"
-				else
-					healths.icon_state = "health6"
+				process_med_hud(src,0)
+
+	if (src.healths)
+		if (src.stat != 2)
+			if(istype(src,/mob/living/silicon/robot/drone))
+				switch(health)
+					if(35 to INFINITY)
+						src.healths.icon_state = "health0"
+					if(25 to 34)
+						src.healths.icon_state = "health1"
+					if(15 to 24)
+						src.healths.icon_state = "health2"
+					if(5 to 14)
+						src.healths.icon_state = "health3"
+					if(0 to 4)
+						src.healths.icon_state = "health4"
+					if(-35 to 0)
+						src.healths.icon_state = "health5"
+					else
+						src.healths.icon_state = "health6"
+			else
+				switch(health)
+					if(200 to INFINITY)
+						src.healths.icon_state = "health0"
+					if(150 to 200)
+						src.healths.icon_state = "health1"
+					if(100 to 150)
+						src.healths.icon_state = "health2"
+					if(50 to 100)
+						src.healths.icon_state = "health3"
+					if(0 to 50)
+						src.healths.icon_state = "health4"
+					if(config.health_threshold_dead to 0)
+						src.healths.icon_state = "health5"
+					else
+						src.healths.icon_state = "health6"
 		else
-			healths.icon_state = "health7"
+			src.healths.icon_state = "health7"
 
 	if (src.syndicate && src.client)
 		for(var/datum/mind/tra in GLOB.traitors.current_antagonists)
@@ -187,7 +214,7 @@
 
 	if (src.cells)
 		if (src.cell)
-			var/chargeNum = clamp(ceil(cell.percent()/25), 0, 4)	//0-100 maps to 0-4, but give it a paranoid clamp just in case.
+			var/chargeNum = Clamp(ceil(cell.percent()/25), 0, 4)	//0-100 maps to 0-4, but give it a paranoid clamp just in case.
 			src.cells.icon_state = "charge[chargeNum]"
 		else
 			src.cells.icon_state = "charge-empty"
@@ -290,7 +317,5 @@
 		overlays += image("icon"='icons/mob/OnFire.dmi', "icon_state"="Standing")
 
 /mob/living/silicon/robot/fire_act(datum/gas_mixture/air, exposed_temperature, exposed_volume)
-	if (status_flags & GODMODE)
-		return
 	if(!on_fire) //Silicons don't gain stacks from hotspots, but hotspots can ignite them
 		IgniteMob()

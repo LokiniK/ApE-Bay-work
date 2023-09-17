@@ -1,7 +1,7 @@
 /obj/item/camera_assembly
 	name = "camera assembly"
 	desc = "A pre-fabricated security camera kit, ready to be assembled and mounted to a surface."
-	icon = 'icons/obj/structures/cameras.dmi'
+	icon = 'icons/obj/monitors.dmi'
 	icon_state = "cameracase"
 	w_class = ITEM_SIZE_SMALL
 	anchored = FALSE
@@ -60,10 +60,10 @@
 			if(isCoil(W))
 				var/obj/item/stack/cable_coil/C = W
 				if(C.use(2))
-					to_chat(user, SPAN_NOTICE("You add wires to the assembly."))
+					to_chat(user, "<span class='notice'>You add wires to the assembly.</span>")
 					state = 3
 				else
-					to_chat(user, SPAN_WARNING("You need 2 coils of wire to wire the assembly."))
+					to_chat(user, "<span class='warning'>You need 2 coils of wire to wire the assembly.</span>")
 				return
 
 			else if(isWelder(W))
@@ -86,7 +86,7 @@
 					return
 
 				var/list/tempnetwork = splittext(input, ",")
-				if(length(tempnetwork) < 1)
+				if(tempnetwork.len < 1)
 					to_chat(usr, "No network found please hang up and try your call again.")
 					return
 
@@ -131,7 +131,7 @@
 		return
 
 	// Taking out upgrades
-	else if(isCrowbar(W) && length(upgrades))
+	else if(isCrowbar(W) && upgrades.len)
 		var/obj/U = locate(/obj) in upgrades
 		if(U)
 			to_chat(user, "You unattach an upgrade from the assembly.")
@@ -152,16 +152,16 @@
 	if(!anchored)
 		..()
 
-/obj/item/camera_assembly/proc/weld(obj/item/weldingtool/WT, mob/user)
+/obj/item/camera_assembly/proc/weld(var/obj/item/weldingtool/WT, var/mob/user)
 
 	if(busy)
 		return 0
 
 	if(WT.remove_fuel(0, user))
-		to_chat(user, SPAN_NOTICE("You start to weld \the [src].."))
+		to_chat(user, "<span class='notice'>You start to weld \the [src]..</span>")
 		playsound(src.loc, 'sound/items/Welder.ogg', 50, 1)
 		busy = 1
-		if(do_after(user, 2 SECONDS, src, DO_REPAIR_CONSTRUCT) && WT.isOn())
+		if(do_after(user, 20, src) && WT.isOn())
 			playsound(src.loc, 'sound/items/Welder.ogg', 50, 1)
 			busy = 0
 			return 1

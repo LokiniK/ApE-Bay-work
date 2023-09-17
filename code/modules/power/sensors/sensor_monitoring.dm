@@ -4,9 +4,9 @@
 
 
 /obj/machinery/computer/power_monitor
-	name = "power monitoring console"
+	name = "Power Monitoring Console"
 	desc = "Computer designed to remotely monitor power levels."
-	icon = 'icons/obj/machines/computer.dmi'
+	icon = 'icons/obj/computer.dmi'
 	icon_keyboard = "power_key"
 	icon_screen = "power"
 	light_color = "#ffcc33"
@@ -30,10 +30,10 @@
 
 // Updates icon of this computer according to current status.
 /obj/machinery/computer/power_monitor/on_update_icon()
-	if(MACHINE_IS_BROKEN(src))
+	if(stat & BROKEN)
 		icon_state = "powerb"
 		return
-	if(!is_powered())
+	if(stat & NOPOWER)
 		icon_state = "power0"
 		return
 	if(alerting)
@@ -52,7 +52,7 @@
 	return TRUE
 
 // Uses dark magic to operate the NanoUI of this computer.
-/obj/machinery/computer/power_monitor/ui_interact(mob/user, ui_key = "main", datum/nanoui/ui = null, force_open = 1)
+/obj/machinery/computer/power_monitor/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1)
 	power_monitor.ui_interact(user, ui_key, ui, force_open)
 
 

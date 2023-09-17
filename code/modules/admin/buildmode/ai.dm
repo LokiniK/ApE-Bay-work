@@ -34,7 +34,7 @@
 
 /datum/build_mode/ai/Configurate()
 	. = ..()
-	ai_type = select_subpath(ai_type || /datum/ai_holder, /datum/ai_holder)
+	ai_type = select_subpath(ai_type || /datum/ai_holder/, /datum/ai_holder)
 	to_chat(user, SPAN_NOTICE("AI Type selected: [ai_type]" ))
 
 /datum/build_mode/ai/Unselected()
@@ -43,7 +43,7 @@
 	for (var/mob/M in selected_mobs)
 		deselect_AI_mob(M)
 
-	for (var/mob/living/M in GLOB.alive_mobs)
+	for (var/mob/living/M in GLOB.living_mob_list_)
 		user.remove_client_image(M.ai_status_image)
 
 /datum/build_mode/ai/TimerEvent()
@@ -52,7 +52,7 @@
 	if (!user)
 		return
 
-	for (var/mob/living/M in GLOB.alive_mobs)
+	for (var/mob/living/M in GLOB.living_mob_list_)
 		if (M.ai_status_image)
 			user.add_client_image(M.ai_status_image)
 
@@ -126,6 +126,7 @@
 				if (!isnull(L.ai_holder))
 					GLOB.stat_set_event.unregister(L, L.ai_holder, /datum/ai_holder/proc/holder_stat_change)
 					qdel(L.ai_holder)
+
 				L.ai_holder = new ai_type (L)
 				to_chat(user, SPAN_NOTICE("\The [L]'s AI type has been changed to [ai_type]"))
 				return
@@ -246,7 +247,7 @@
 		unit.ai_status_image = image('icons/misc/buildmode.dmi', unit, "ai_1")
 		user.add_client_image(unit.ai_status_image)
 
-/proc/build_drag(client/user, buildmode, atom/fromatom, atom/toatom, atom/fromloc, atom/toloc, fromcontrol, tocontrol, params)
+/proc/build_drag(var/client/user, buildmode, var/atom/fromatom, var/atom/toatom, var/atom/fromloc, var/atom/toloc, var/fromcontrol, var/tocontrol, params)
 	if (!istype(buildmode, /datum/build_mode/ai))
 		return
 
@@ -274,7 +275,7 @@
 		var/hi_y = max(c1.y,c2.y)
 		var/z = c1.z
 
-		for(var/mob/living/L in GLOB.alive_mobs)
+		for(var/mob/living/L in GLOB.living_mob_list_)
 			if(L.z != z || L.client)
 				continue
 			if(L.x >= low_x && L.x <= hi_x && L.y >= low_y && L.y <= hi_y)

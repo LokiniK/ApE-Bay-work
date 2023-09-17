@@ -7,7 +7,7 @@
 	round_description = "You are about to enter an asteroid belt!"
 	extended_round_description = "We are on an unavoidable collision course with an asteroid field. You have only a moment to prepare before you are barraged by dust and meteors. As if it was not enough, all kinds of negative events seem to happen more frequently. Good Luck."
 	config_tag = "meteor"
-	required_players = 1				// GET ON JUX'S WILD RIDE
+	required_players = 15				// Definitely not good for low-pop
 	votable = 1
 	shuttle_delay = 2
 	var/next_wave = INFINITY			// Set in post_setup() correctly to take into account potential longer pre-start times.
@@ -17,18 +17,20 @@
 	var/alert_title
 	var/alert_text
 	var/start_text
+
 	var/maximal_severity = 40
 	var/meteor_wave_delay = 30 SECONDS //minimum wait between waves in tenths of seconds
 	var/meteor_grace_period = 15 MINUTES //waves will not arrive until this far into round
 
 	// Moved these from defines to variables, to allow for in-round tweaking via varedit:
-	var/escalation_probability = 45
-	var/send_admin_broadcasts = TRUE	// Enables debugging/information mode, sending admin messages when waves occur and when severity escalates.
+	var/time_between_waves_minutes = 2
+	var/escalation_probability = 90
+	var/send_admin_broadcasts = FALSE	// Enables debugging/information mode, sending admin messages when waves occur and when severity escalates.
 
 	event_delay_mod_moderate = 0.5		// As a bonus, more frequent events.
 	event_delay_mod_major = 0.3
 
-/singleton/vv_set_handler/meteor_severity_handler
+/decl/vv_set_handler/meteor_severity_handler
 	handled_type = /datum/game_mode/meteor
 	handled_vars = list(
 		"meteor_severity" = /datum/game_mode/meteor/proc/set_meteor_severity,
@@ -36,7 +38,7 @@
 	)
 
 /datum/game_mode/meteor/proc/set_meteor_severity(value)
-	meteor_severity = clamp(value, 0, maximal_severity)
+	meteor_severity = Clamp(value, 0, maximal_severity)
 
 /datum/game_mode/meteor/proc/set_meteor_wave_delay(value)
 	meteor_wave_delay = max(10 SECONDS, value)

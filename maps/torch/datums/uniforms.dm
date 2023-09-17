@@ -1,6 +1,6 @@
-/singleton/hierarchy/mil_uniform
+/decl/hierarchy/mil_uniform
 	name = "Master outfit hierarchy"
-	hierarchy_type = /singleton/hierarchy/mil_uniform
+	hierarchy_type = /decl/hierarchy/mil_uniform
 	var/list/branches = null
 	var/departments = 0
 	var/min_rank = 0
@@ -17,7 +17,6 @@
 	var/service_skirt = null
 	var/service_over = null
 	var/service_shoes = null
-	var/service_heels = null
 	var/service_hat = null
 	var/service_gloves = null
 	var/service_extra = null
@@ -26,14 +25,13 @@
 	var/dress_skirt = null
 	var/dress_over = null
 	var/dress_shoes = null
-	var/dress_heels = null
 	var/dress_hat = null
 	var/dress_gloves = null
 	var/dress_extra = null
 
-/singleton/hierarchy/mil_uniform/ec
+/decl/hierarchy/mil_uniform/ec
 	name = "Master EC outfit"
-	hierarchy_type = /singleton/hierarchy/mil_uniform/ec
+	hierarchy_type = /decl/hierarchy/mil_uniform/ec
 	branches = list(/datum/mil_branch/expeditionary_corps)
 
 	pt_under = /obj/item/clothing/under/solgov/pt/expeditionary
@@ -45,6 +43,7 @@
 	utility_extra = list(/obj/item/clothing/head/beret/solgov/expedition, /obj/item/clothing/head/ushanka/solgov, /obj/item/clothing/suit/storage/hooded/wintercoat/solgov, /obj/item/clothing/shoes/jackboots/unathi)
 
 	service_over = /obj/item/clothing/suit/storage/solgov/service/expeditionary
+	service_shoes = /obj/item/clothing/shoes/dress
 	service_hat = /obj/item/clothing/head/solgov/service/expedition
 
 	dress_under = /obj/item/clothing/under/solgov/dress/expeditionary
@@ -56,9 +55,9 @@
 
 	dress_extra = list(/obj/item/clothing/accessory/solgov/ec_scarf)
 
-/singleton/hierarchy/mil_uniform/fleet
+/decl/hierarchy/mil_uniform/fleet
 	name = "Master fleet outfit"
-	hierarchy_type = /singleton/hierarchy/mil_uniform/fleet
+	hierarchy_type = /decl/hierarchy/mil_uniform/fleet
 	branches = list(/datum/mil_branch/fleet)
 
 	pt_under = /obj/item/clothing/under/solgov/pt/fleet
@@ -67,32 +66,24 @@
 	utility_under = /obj/item/clothing/under/solgov/utility/fleet
 	utility_shoes = /obj/item/clothing/shoes/dutyboots
 	utility_hat = /obj/item/clothing/head/solgov/utility/fleet
-	utility_extra = list(
-		/obj/item/clothing/head/beret/solgov/fleet,
-		/obj/item/clothing/head/ushanka/solgov/fleet,
-		/obj/item/clothing/suit/storage/hooded/wintercoat/solgov/fleet,
-		/obj/item/clothing/head/soft/solgov/fleet
-	)
+	utility_extra = list(/obj/item/clothing/head/beret/solgov/fleet, /obj/item/clothing/head/ushanka/solgov/fleet, /obj/item/clothing/suit/storage/hooded/wintercoat/solgov/fleet,/obj/item/clothing/head/soft/solgov/fleet)
 
 	service_under = /obj/item/clothing/under/solgov/service/fleet
 	service_skirt = /obj/item/clothing/under/solgov/service/fleet/skirt
-	service_over = /obj/item/clothing/suit/storage/solgov/service/fleet
+	service_over = null
 	service_shoes = /obj/item/clothing/shoes/dress
-	service_heels = /obj/item/clothing/shoes/dressheels
 	service_hat = /obj/item/clothing/head/solgov/dress/fleet/garrison
-	service_extra = list(/obj/item/clothing/suit/solgov/fleet_sweater)
 
 	dress_under = /obj/item/clothing/under/solgov/service/fleet
 	dress_skirt = /obj/item/clothing/under/solgov/service/fleet/skirt
 	dress_over = /obj/item/clothing/suit/dress/solgov/fleet/sailor
 	dress_shoes = /obj/item/clothing/shoes/dress
-	dress_heels = /obj/item/clothing/shoes/dressheels
 	dress_hat = /obj/item/clothing/head/solgov/dress/fleet/garrison
 	dress_gloves = /obj/item/clothing/gloves/white
 
-/singleton/hierarchy/mil_uniform/civilian
+/decl/hierarchy/mil_uniform/civilian
 	name = "Master civilian outfit"		//Basically just here for the rent-a-tux, ahem, I mean... dress uniform.
-	hierarchy_type = /singleton/hierarchy/mil_uniform/civilian
+	hierarchy_type = /decl/hierarchy/mil_uniform/civilian
 	branches = list(/datum/mil_branch/civilian,/datum/mil_branch/solgov)
 
 	service_under = /obj/item/clothing/under/suit_jacket/really_black
@@ -104,4 +95,4 @@
 	dress_skirt = /obj/item/clothing/under/skirt_c/dress/long/black
 	dress_over = /obj/item/clothing/suit/storage/toggle/suit/black
 	dress_shoes = /obj/item/clothing/shoes/dress
-	dress_extra = list(/obj/item/clothing/accessory/waistcoat/black, /obj/item/clothing/under/skirt_c/dress/long/eggshell, /obj/item/clothing/shoes/flats/black)
+	dress_extra = list(/obj/item/clothing/accessory/wcoat/black, /obj/item/clothing/under/skirt_c/dress/long/eggshell, /obj/item/clothing/shoes/flats/black)

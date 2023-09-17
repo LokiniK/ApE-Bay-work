@@ -6,32 +6,98 @@ GLOBAL_DATUM_INIT(changelings, /datum/antagonist/changeling, new)
 	role_text_plural = "Changelings"
 	feedback_tag = "changeling_objective"
 	blacklisted_jobs = list(/datum/job/ai, /datum/job/cyborg, /datum/job/submap)
-	protected_jobs = list(/datum/job/officer, /datum/job/warden, /datum/job/detective, /datum/job/captain, /datum/job/hos)
-	welcome_text = "Use say \"%LANGUAGE_PREFIX%g message\" to communicate with your fellow changelings. Remember: you get all of their absorbed DNA if you absorb them."
+	protected_jobs = list(/datum/job/officer, /datum/job/warden, /datum/job/detective, /datum/job/captain, /datum/job/hos, /datum/job/lawyer)
+	welcome_text = "Используйте say \"%LANGUAGE_PREFIX%g (сообщение)\", чтобы связаться с другими генокрадами.<br>\
+	Мы являемся частью общности - одним из сородичей, что трудится на её благо и ставить её интересы \
+	выше собственных, в том числе и жизни. Вместе, члены общности должны ассимилировать полезный генетический материал \
+	и украсть определенные вещи, которые облегчат охоту в будущем. \
+	Наше тело требует новые геномы, чтобы жить и развиваться. Не стоит поглощать или убивать сородичей \
+	- мы все практически родственники.<br>\
+	Избегайте поглощения существ, чей геном бесполезен для нас. Кровожадность - это не лучшая черта высшей формы жизни... \
+	Не говоря уже о том, что это привлечёт лишнее внимание от Центрального Командования. Например, сил быстрого реагирования.<br>\
+	Удачной охоты."
+/* old
+	welcome_text = "Используйте say \",g (сообщение)\", чтобы связаться с сородичами.<br>\
+	Вы - генокрад. Существо, чьим призванием является поглощение разумных и использование их генома для \
+	улучшения собственного. Вы можете общаться с такими же как и вы посредством феромонов, однако, вы \
+	ничем не обязаны друг другу и можете охотиться и на сородичей, если захотите - их гены станут вашими генами.<br>\
+	Вы не можете поглощать кого попало. Используйте кнопку OOC > Get Objectives, чтобы узнать о жертвах с полезными \
+	генами. <b><u>Поглощение без цели считается за убийство без причины</u></b> (если это не была самооборона, конечно).<br>\
+	Удачной охоты."
+*/
 	flags = ANTAG_SUSPICIOUS | ANTAG_RANDSPAWN | ANTAG_VOTABLE
 	antaghud_indicator = "hudchangeling"
+	skill_setter = /datum/antag_skill_setter/station
 
 	faction = "changeling"
 
+/datum/antagonist/changeling/create_objectives(var/datum/mind/changeling)
+	if(!..())
+		return
+	var/objectives_count = round(count_living()/config.traitor_objectives_scaling) + 1
+	var/datum/objective/objective = null
+	for (var/count in 2 to objectives_count)
+		switch(rand(1,100))
+			if(1 to 30)
+				objective = new /datum/objective/harm()
+			if(31 to 50)
+				objective = new /datum/objective/assassinate()
+			if(51 to 61)
+				objective = new /datum/objective/debrain()
+			else
+				objective = new /datum/objective/steal()
+
+		objective.owner = changeling
+
+		if(istype(objective, /datum/objective/steal))
+			objective.find_target(changeling.objectives)
+		else if (!objective.find_target())
+			qdel(objective)
+			objective = new /datum/objective/steal()
+			objective.owner = changeling
+			objective.find_target(changeling.objectives)
+		changeling.objectives += objective
+
+	objective = new /datum/objective/absorb_pointly()
+	objective.owner = changeling
+	if(objective.find_target())
+		changeling.objectives += objective
+	else
+		qdel(objective)
+		to_chat(changeling.current, SPAN_LING("Мы не чувствуем жертв с полезными геномами. Стоит заняться чем-то ещё \
+		- например, создать условия, чтобы было проще охотиться."))
+
+	return
+
+/datum/antagonist/changeling/create_global_objectives(override = 1)
+	if(!..())
+		return 0
+	global_objectives = list()
+	global_objectives += new /datum/objective/changeling
+	global_objectives += new /datum/objective/changeling/evacuate
+	global_objectives += new /datum/objective/changeling/stealth
+
+	return 1
+
 /datum/antagonist/changeling/get_welcome_text(mob/recipient)
-	return replacetext(welcome_text, "%LANGUAGE_PREFIX%", recipient?.get_prefix_key(/singleton/prefix/language) || ",")
+	return replacetext(welcome_text, "%LANGUAGE_PREFIX%", recipient?.get_prefix_key(/decl/prefix/language) || ",")
 
-/datum/antagonist/changeling/get_special_objective_text(datum/mind/player)
-	return "<br><b>Changeling ID:</b> [player.changeling.changelingID].<br><b>Genomes Absorbed:</b> [player.changeling.absorbedcount]"
+/datum/antagonist/changeling/get_special_objective_text(var/datum/mind/player)
+	return "<br><b>Позывной:</b> [player.changeling.changelingID].<br><b>Поглощено Геномов:</b> [player.changeling.absorbedcount]"
 
-/datum/antagonist/changeling/update_antag_mob(datum/mind/player)
+/datum/antagonist/changeling/update_antag_mob(var/datum/mind/player)
 	..()
 	player.current.make_changeling()
 
-/datum/antagonist/changeling/remove_antagonist(datum/mind/player, show_message, implanted)
+/datum/antagonist/changeling/remove_antagonist(var/datum/mind/player, var/show_message, var/implanted)
 	. = ..()
 	if(. && player && player.current)
 		player.current.remove_changeling_powers()
 		player.current.verbs -= /datum/changeling/proc/EvolutionMenu
-		player.current.remove_language(LANGUAGE_CHANGELING_GLOBAL)
 		QDEL_NULL(player.changeling)
 
-/datum/antagonist/changeling/create_objectives(datum/mind/changeling)
+/* [ORIGINAL]
+/datum/antagonist/changeling/create_objectives(var/datum/mind/changeling)
 	if(!..())
 		return
 
@@ -55,8 +121,8 @@ GLOBAL_DATUM_INIT(changelings, /datum/antagonist/changeling, new)
 	steal_objective.find_target()
 	changeling.objectives += steal_objective
 
-	switch(rand(1,100))
-		if(1 to 80)
+	switch(rand(1,10))
+		if(1)
 			if (!(locate(/datum/objective/escape) in changeling.objectives))
 				var/datum/objective/escape/escape_objective = new
 				escape_objective.owner = changeling
@@ -67,13 +133,14 @@ GLOBAL_DATUM_INIT(changelings, /datum/antagonist/changeling, new)
 				survive_objective.owner = changeling
 				changeling.objectives += survive_objective
 	return
+[/ORIGINAL] */
 
-/datum/antagonist/changeling/can_become_antag(datum/mind/player, ignore_role)
+/datum/antagonist/changeling/can_become_antag(var/datum/mind/player, var/ignore_role)
 	if(..())
 		if(player.current)
 			if(ishuman(player.current))
 				var/mob/living/carbon/human/H = player.current
-				if(H.isSynthetic() || H.isFBP())
+				if(H.isSynthetic())
 					return 0
 				if(H.species.species_flags & SPECIES_FLAG_NO_SCAN)
 					return 0

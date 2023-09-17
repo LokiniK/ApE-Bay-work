@@ -3,9 +3,9 @@
 	lore_text = "A generic polymeric material. Probably the most flexible and useful substance ever created by human science; mostly used to make disposable cutlery."
 	stack_type = /obj/item/stack/material/plastic
 	flags = MATERIAL_BRITTLE
-	wall_icon_base = "solid"
+	icon_base = "solid"
 	door_icon_base = "plastic"
-	wall_icon_reinf = "reinf_over"
+	icon_reinf = "reinf_over"
 	icon_colour = COLOR_WHITE
 	hardness = MATERIAL_FLEXIBLE
 	weight = 5
@@ -33,9 +33,8 @@
 	stack_type = /obj/item/stack/material/cardboard
 	flags = MATERIAL_BRITTLE
 	integrity = 10
-	sheet_icon_base = "sheet-card"
-	wall_icon_base = "solid"
-	wall_icon_reinf = "reinf_over"
+	icon_base = "solid"
+	icon_reinf = "reinf_over"
 	icon_colour = "#aaaaaa"
 	hardness = MATERIAL_SOFT
 	brute_armor = 1
@@ -50,76 +49,85 @@
 
 /material/cloth //todo
 	name = MATERIAL_CLOTH
-	display_name ="cotton"
-	use_name = "cotton"
+	display_name ="white"
+	use_name = "cloth roll"
 	icon_colour = "#ffffff"
-	sheet_icon_base = "skin"
 	stack_origin_tech = list(TECH_MATERIAL = 2)
 	door_icon_base = "wood"
+	stack_type = /obj/item/stack/material/cloth
 	ignition_point = T0C+232
 	melting_point = T0C+300
 	flags = MATERIAL_PADDING
+	hardness = MATERIAL_SOFT
+	weight = 1
 	brute_armor = 1
 	conductive = 0
 	stack_type = null
 	hidden_from_codex = TRUE
 	construction_difficulty = MATERIAL_NORMAL_DIY
 
-/material/cloth/carpet
-	name = "carpet"
+/material/cloth/red
+	name = MATERIAL_RED_CLOTH
 	display_name = "red"
-	use_name = "red upholstery"
-	icon_colour = "#9d2300"
-	sheet_singular_name = "tile"
-	sheet_plural_name = "tiles"
+	use_name = "red cloth roll"
+	icon_colour = COLOR_NT_RED
+	stack_type = /obj/item/stack/material/cloth/red
 
 /material/cloth/yellow
-	name = "yellow"
+	name = MATERIAL_YELLOW_CLOTH
 	display_name ="yellow"
-	use_name = "yellow cloth"
-	icon_colour = "#ffbf00"
+	use_name = "yellow cloth roll"
+	icon_colour = COLOR_AMBER
+	stack_type = /obj/item/stack/material/cloth/yellow
 
 /material/cloth/teal
-	name = "teal"
+	name = MATERIAL_TEAL_CLOTH
 	display_name = "teal"
-	use_name = "teal cloth"
-	icon_colour = "#00e1ff"
+	use_name = "teal cloth roll"
+	icon_colour = COLOR_TEAL
+	stack_type = /obj/item/stack/material/cloth/teal
 
 /material/cloth/black
-	name = "black"
+	name = MATERIAL_BLACK_CLOTH
 	display_name = "black"
-	use_name = "black cloth"
+	use_name = "black cloth roll"
 	icon_colour = "#505050"
+	stack_type = /obj/item/stack/material/cloth/black
 
 /material/cloth/green
-	name = "green"
+	name = MATERIAL_GREEN_CLOTH
 	display_name = "green"
-	use_name = "green cloth"
-	icon_colour = "#b7f27d"
+	use_name = "green cloth roll"
+	icon_colour = COLOR_CIVIE_GREEN
+	stack_type = /obj/item/stack/material/cloth/green
 
-/material/cloth/puple
-	name = "purple"
+/material/cloth/purple
+	name = MATERIAL_PURPLE_CLOTH
 	display_name = "purple"
-	use_name = "purple cloth"
-	icon_colour = "#9933ff"
+	use_name = "purple cloth roll"
+	icon_colour = COLOR_VIOLET
+	stack_type = /obj/item/stack/material/cloth/purple
 
 /material/cloth/blue
-	name = "blue"
+	name = MATERIAL_BLUE_CLOTH
 	display_name = "blue"
-	use_name = "blue cloth"
-	icon_colour = "#46698c"
+	use_name = "blue cloth roll"
+	icon_colour = COLOR_COMMAND_BLUE
+	stack_type = /obj/item/stack/material/cloth/blue
 
 /material/cloth/beige
-	name = "beige"
+	name = MATERIAL_BEIGE_CLOTH
 	display_name = "beige"
-	use_name = "beige cloth"
-	icon_colour = "#ceb689"
+	use_name = "beige cloth roll"
+	icon_colour = COLOR_BEIGE
+	stack_type = /obj/item/stack/material/cloth/beige
 
 /material/cloth/lime
-	name = "lime"
+	name = MATERIAL_LIME_CLOTH
 	display_name = "lime"
-	use_name = "lime cloth"
+	use_name = "lime cloth roll"
 	icon_colour = "#62e36c"
+	stack_type = /obj/item/stack/material/cloth/lime
 
 /material/carpet
 	name = MATERIAL_CARPET
@@ -129,7 +137,6 @@
 	flags = MATERIAL_PADDING
 	ignition_point = T0C+232
 	melting_point = T0C+300
-	sheet_icon_base = "skin"
 	sheet_singular_name = "tile"
 	sheet_plural_name = "tiles"
 	conductive = 0
@@ -140,7 +147,6 @@
 	name = MATERIAL_SKIN_GENERIC
 	stack_type = /obj/item/stack/material/generic/skin
 	icon_colour = "#9e8c72"
-	sheet_icon_base = "skin"
 	flags = MATERIAL_PADDING
 	ignition_point = T0C+300
 	melting_point = T0C+300
@@ -243,7 +249,6 @@
 
 /material/bone
 	name = MATERIAL_BONE_GENERIC
-	sheet_icon_base = "bone"
 	sheet_singular_name = "length"
 	sheet_plural_name = "lengths"
 	icon_colour = "#f0edc7"
@@ -272,14 +277,12 @@
 /material/leather
 	name = MATERIAL_LEATHER_GENERIC
 	icon_colour = "#5c4831"
-	sheet_icon_base = "sheet-leather"
-	sheet_has_plural_icon = FALSE
 	stack_origin_tech = list(TECH_MATERIAL = 2)
 	flags = MATERIAL_PADDING
 	ignition_point = T0C+300
 	melting_point = T0C+300
 	conductive = 0
-	stack_type = /obj/item/stack/material/generic/skin
+	stack_type = /obj/item/stack/material/leather
 	hidden_from_codex = TRUE
 	construction_difficulty = MATERIAL_NORMAL_DIY
 	value = 3
@@ -306,11 +309,10 @@
 /material/growth
 	name = MATERIAL_GROWTH
 	display_name = "organic material"
-	sheet_icon_base = "skin"
-	wall_icon_base = "cult"
+	icon_base = "cult"
 	door_icon_base = "cult"
 	table_icon_base = "cult"
-	wall_icon_reinf = "reinf_cult"
+	icon_reinf = "reinf_cult"
 	icon_colour = "#281744"
 	hardness = 80
 	brute_armor = 4
@@ -320,7 +322,7 @@
 	construction_difficulty = 10
 	hidden_from_codex = TRUE
 
-/material/growth/place_dismantled_girder(turf/target)
+/material/growth/place_dismantled_girder(var/turf/target)
 	for(var/i = 0; i < 4; i++)
 		var/obj/item/reagent_containers/food/snacks/meat/M = new(target)
 		M.reagents.add_reagent(/datum/reagent/toxin/fertilizer, 5)

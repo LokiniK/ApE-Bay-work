@@ -2,7 +2,8 @@
 	the_default = TRUE
 	name = "Build Mode"
 	icon_state = "mode_build"
-	var/static/help_text = {"\
+	var/build_type
+	var/help_text = {"\
 	***********Build Mode***********
 	Left Click = Create Atom
 	Right Click = Delete Atom
@@ -12,7 +13,6 @@
 	Directional Arrow Button = Direction On Creation
 	********************************
 	"}
-	var/build_type
 
 /datum/build_mode/build/Help()
 	to_chat(user, help_text)
@@ -52,9 +52,6 @@
 			return
 		else if (ispath(build_type, /turf))
 			location.ChangeTurf(build_type)
-		else if (ispath(build_type, /area))
-			to_chat(user, SPAN_WARNING("Do not use this to create or modify areas. Use the Area build mode category instead."))
-			return
 		else
 			var/atom/instance = new build_type (location)
 			instance.set_dir(host.dir)

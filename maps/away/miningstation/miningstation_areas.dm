@@ -108,7 +108,6 @@
 	always_unpowered = 1
 	area_flags = AREA_FLAG_EXTERNAL
 	has_gravity = 0
-	turfs_airless = TRUE
 
 /area/miningstation/cryo
 	name = "Cryogenic Storage"

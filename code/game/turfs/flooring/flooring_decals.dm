@@ -1,18 +1,18 @@
 // These are objects that destroy themselves and add themselves to the
 // decal list of the floor under them. Use them rather than distinct icon_states
 // when mapping in interesting floor designs.
-var/global/list/floor_decals = list()
+var/list/floor_decals = list()
 
 /obj/effect/floor_decal
 	name = "floor decal"
 	icon = 'icons/turf/flooring/decals.dmi'
 	layer = DECAL_LAYER
-	appearance_flags = DEFAULT_APPEARANCE_FLAGS | RESET_COLOR
+	appearance_flags = RESET_COLOR
 	var/supplied_dir
 	var/detail_overlay
 	var/detail_color
 
-/obj/effect/floor_decal/New(newloc, newdir, newcolour, newappearance)
+/obj/effect/floor_decal/New(var/newloc, var/newdir, var/newcolour, var/newappearance)
 	supplied_dir = newdir
 	if(newappearance) appearance = newappearance
 	if(newcolour) color = newcolour
@@ -28,7 +28,7 @@ var/global/list/floor_decals = list()
 		if(!floor_decals[cache_key])
 			var/image/I = image(icon = src.icon, icon_state = src.icon_state, dir = src.dir)
 			I.layer = layer
-			I.appearance_flags = DEFAULT_APPEARANCE_FLAGS | appearance_flags
+			I.appearance_flags = appearance_flags
 			I.color = src.color
 			I.alpha = src.alpha
 			if(detail_overlay)
@@ -36,8 +36,9 @@ var/global/list/floor_decals = list()
 				B.color = detail_color
 				I.overlays |= B
 			floor_decals[cache_key] = I
-		LAZYADD(T.decals, floor_decals[cache_key])
-		T.queue_icon_update()
+		if(!T.decals) T.decals = list()
+		T.decals |= floor_decals[cache_key]
+		T.overlays |= floor_decals[cache_key]
 	atom_flags |= ATOM_FLAG_INITIALIZED
 	return INITIALIZE_HINT_QDEL
 
@@ -980,7 +981,7 @@ var/global/list/floor_decals = list()
 
 /obj/effect/floor_decal/industrial/outline/blue
 	name = "blue outline"
-	color = "#00b8b2"
+	color = COLOR_BLUE_GRAY //INF, WAS"#00b8b2"
 
 /obj/effect/floor_decal/industrial/outline/yellow
 	name = "yellow outline"
@@ -1148,9 +1149,9 @@ var/global/list/floor_decals = list()
 	layer = TURF_DETAIL_LAYER
 	color = COLOR_GUNMETAL
 	icon_state = "manydot"
-	appearance_flags = DEFAULT_APPEARANCE_FLAGS
+	appearance_flags = 0
 
-/obj/effect/floor_decal/floordetail/New(newloc, newdir, newcolour)
+/obj/effect/floor_decal/floordetail/New(var/newloc, var/newdir, var/newcolour)
 	color = null //color is here just for map preview, if left it applies both our and tile colors.
 	..()
 

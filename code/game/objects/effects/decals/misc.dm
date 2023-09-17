@@ -9,7 +9,7 @@
 
 /obj/effect/decal/point/Initialize()
 	. = ..()
-	QDEL_IN(src, 2 SECONDS)
+	addtimer(CALLBACK(null, /proc/qdel, src), 2 SECONDS)
 
 // Used for spray that you spray at walls, tables, hydrovats etc
 /obj/effect/decal/spraystill

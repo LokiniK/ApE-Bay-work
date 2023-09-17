@@ -1,10 +1,10 @@
 /obj/item/stock_parts/circuitboard/mineral_processing
-	name = "circuit board (mineral processing console)"
+	name = T_BOARD("mineral processing console")
 	build_path = /obj/machinery/computer/mining
 	origin_tech = list(TECH_DATA = 2, TECH_ENGINEERING = 2)
 
 /obj/item/stock_parts/circuitboard/mining_processor
-	name = "circuit board (ore processor)"
+	name = T_BOARD("ore processor")
 	build_path = /obj/machinery/mineral/processing_unit
 	board_type = "machine"
 	origin_tech = list(TECH_DATA = 2, TECH_ENGINEERING = 2)
@@ -19,7 +19,7 @@
 	)
 
 /obj/item/stock_parts/circuitboard/mining_unloader
-	name = "circuit board (unloading machine)"
+	name = T_BOARD("unloading machine")
 	build_path = /obj/machinery/mineral/unloading_machine
 	board_type = "machine"
 	origin_tech = list(TECH_DATA = 2, TECH_ENGINEERING = 2)
@@ -33,7 +33,7 @@
 	)
 
 /obj/item/stock_parts/circuitboard/mining_stacker
-	name = "circuit board (stacking machine)"
+	name = T_BOARD("stacking machine")
 	build_path = /obj/machinery/mineral/stacking_machine
 	board_type = "machine"
 	origin_tech = list(TECH_DATA = 2, TECH_ENGINEERING = 2)

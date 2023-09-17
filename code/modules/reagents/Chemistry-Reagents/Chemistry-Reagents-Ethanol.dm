@@ -69,15 +69,15 @@
 
 	taste_description = "beer"
 
-/datum/reagent/ethanol/beer/affect_ingest(mob/living/carbon/M, removed)
+/datum/reagent/ethanol/beer/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
-	if (METABOLIC_INERTNESS(M) > TRAIT_LEVEL_MINOR)
+	if(alien == IS_DIONA)
 		return
 	M.jitteriness = max(M.jitteriness - 3, 0)
 
 /datum/reagent/ethanol/blackstrap
 	name = "Blackstrap"
-	description = "A classic mix of rum and molasses, favorite of frontiersmen everywhere."
+	description = "A classic mix of rum and molasses, typically consumed by Tersteners."
 	taste_description = "sweet and strong alcohol"
 	color = "#161612"
 	strength = 30
@@ -157,9 +157,9 @@
 	glass_name = "rum"
 	glass_desc = "Now you want to Pray for a pirate suit, don't you?"
 
-/datum/reagent/ethanol/deadrum/affect_ingest(mob/living/carbon/M, removed)
+/datum/reagent/ethanol/deadrum/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
-	if (METABOLIC_INERTNESS(M) > TRAIT_LEVEL_MINOR)
+	if(alien == IS_DIONA)
 		return
 	M.dizziness +=5
 
@@ -188,8 +188,8 @@
 /datum/reagent/ethanol/coffee
 	overdose = 45
 
-/datum/reagent/ethanol/coffee/affect_ingest(mob/living/carbon/M, removed)
-	if (METABOLIC_INERTNESS(M) > TRAIT_LEVEL_MINOR)
+/datum/reagent/ethanol/coffee/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
+	if(alien == IS_DIONA)
 		return
 	..()
 	M.dizziness = max(0, M.dizziness - 5)
@@ -198,8 +198,8 @@
 	if(M.bodytemperature > 310)
 		M.bodytemperature = max(310, M.bodytemperature - (5 * TEMPERATURE_DAMAGE_COEFFICIENT))
 
-/datum/reagent/ethanol/coffee/overdose(mob/living/carbon/M)
-	if (IS_METABOLICALLY_INERT(M))
+/datum/reagent/ethanol/coffee/overdose(var/mob/living/carbon/M, var/alien)
+	if(alien == IS_DIONA)
 		return
 	M.make_jittery(5)
 
@@ -307,9 +307,9 @@
 	glass_name = "Thirteen Loko"
 	glass_desc = "This is a glass of Thirteen Loko, it appears to be of the highest quality. The drink, not the glass."
 
-/datum/reagent/ethanol/thirteenloko/affect_ingest(mob/living/carbon/M, removed)
+/datum/reagent/ethanol/thirteenloko/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
-	if (METABOLIC_INERTNESS(M) > TRAIT_LEVEL_MINOR)
+	if(alien == IS_DIONA)
 		return
 	M.drowsyness = max(0, M.drowsyness - 7)
 	if (M.bodytemperature > 310)
@@ -555,26 +555,28 @@
 	glass_name = "Beepsky Smash"
 	glass_desc = "Heavy, hot and strong. Just like the Iron fist of the LAW."
 
-/datum/reagent/ethanol/beepsky_smash/affect_ingest(mob/living/carbon/M, removed)
+/datum/reagent/ethanol/beepsky_smash/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
 	M.Stun(2)
 
-/datum/reagent/ethanol/drifter
-	name = "Drifter"
-	description = "Because you'll be drifting off to sleep pretty soon."
-	taste_description = "heavy, sticky booze and a hint of citrus"
+/datum/reagent/ethanol/between_the_sheets
+	name = "Between the Sheets"
+	description = "The classic drink of Hypnos."
+	taste_description = "sleeping citruses"
 	color = "#e7d534"
 	strength = 12
 
-	glass_name = "Drifter"
-	glass_desc = "A heavy duty nightcap. The taste might wake you up, though."
+	glass_name = "Between the Sheets"
+	glass_desc = "Make sure to set it down after drinking."
 
-/datum/reagent/ethanol/drifter/affect_ingest(mob/living/carbon/M, removed)
+/datum/reagent/ethanol/between_the_sheets/affect_ingest(mob/living/carbon/M, alien, removed)
 	. = ..()
-	if (METABOLIC_INERTNESS(M) > TRAIT_LEVEL_MINOR)
+	var/strength_mod = 1
+	if(alien == IS_DIONA)
 		return
-	var/sleep_chance = M.GetTraitLevel(/singleton/trait/malus/ethanol) || 1
-	if (prob(sleep_chance))
+	if(alien == IS_SKRELL)
+		strength_mod *= 2
+	if(prob(1*strength_mod))
 		M.sleeping = max(M.sleeping, 1)
 
 /datum/reagent/ethanol/bilk
@@ -755,7 +757,7 @@
 /datum/reagent/ethanol/forget_me_shot
 	name = "Forget Me Shot"
 	description = "If you haven't heard of it, that means it worked."
-	taste_description = "mind-numbing venom"
+	taste_description = "mind-numbing venom, alcohol is so strong that your face involuntarily scrunches up. Maybe you just forgot something. What does this shot do in your hand?"
 	color = "#a8934b"
 	strength = 5
 
@@ -943,15 +945,6 @@
 	glass_name = "Kamikaze"
 	glass_desc = "This must have started as a joke, right? No one is supposed to drink this..."
 
-/datum/reagent/ethanol/kvass
-	name = "Kvass"
-	description = "An alcoholic drink commonly made from bread."
-	taste_description = "vkusnyy kvas, ypa!"
-	color = "#362f22"
-	strength = 30
-
-	glass_name = "kvass"
-	glass_desc = "An alcoholic drink commonly made from bread."
 
 /datum/reagent/ethanol/lager
 	name = "Lager"
@@ -1111,20 +1104,20 @@
 	glass_icon = DRINK_ICON_NOISY
 	glass_special = list("neuroright")
 
-/datum/reagent/ethanol/neurotoxin/affect_ingest(mob/living/carbon/M, removed)
+/datum/reagent/ethanol/neurotoxin/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
 	M.Weaken(3)
 	M.add_chemical_effect(CE_PULSE, -1)
 
 /datum/reagent/ethanol/nevadan_gold
 	name = "Nevadan Gold Whiskey"
-	description = "A warm blend of 98 spices. Made on the homeworld."
+	description = "A warm blend of 98 spices. Made in the heartlands of Tersten."
 	taste_description = "strong, creamy whiskey"
 	color = "#ce1900"
 	strength = 10
 
 	glass_name = "Nevadan gold whiskey"
-	glass_desc = "A warm blend of 98 spices, brewed on Earth. A delicious mix."
+	glass_desc = "A warm blend of 98 spices, brewed on Tersten. A delicious mix."
 
 /datum/reagent/ethanol/patron
 	name = "Patron"
@@ -1158,7 +1151,7 @@
 	glass_name = "???"
 	glass_desc = "A black ichor with an oily purple sheer on top. Are you sure you should drink this?"
 
-/datum/reagent/ethanol/pwine/affect_ingest(mob/living/carbon/M, removed)
+/datum/reagent/ethanol/pwine/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
 	if(M.chem_doses[type] > 30)
 		M.adjustToxLoss(2 * removed)
@@ -1481,15 +1474,15 @@
 	glass_name = "lonestar mule"
 	glass_desc = "A blend of whiskey, ginger beer, and lime juice."
 
-/datum/reagent/ethanol/tadmorwine
-	name = "Tadmoran Wine"
-	description = "An earthy type of wine distilled from grapes on Tadmor."
-	taste_description = "an acquired taste and holier-than-thou vibes"
+/datum/reagent/ethanol/lordaniawine
+	name = "Lordanian Wine"
+	description = "An earthy type of wine distilled from grapes on Lordania."
+	taste_description = "an acquired taste and elitism"
 	color = "#362f22"
 	strength = 10
 
-	glass_name = "Tadmor wine"
-	glass_desc = "An earthy type of wine distilled from grapes on Tadmor."
+	glass_name = "Lordanian wine"
+	glass_desc = "An earthy type of wine distilled from grapes on Lordania."
 
 /datum/reagent/ethanol/lunabrandy
 	name = "Lunar Brandy"
@@ -1521,9 +1514,11 @@
 	glass_name = "qokk'loa"
 	glass_desc = "An unrefined hallucigenic substance, potent to humans and harmless to Skrell."
 
-/datum/reagent/ethanol/alien/qokkloa/affect_ingest(mob/living/carbon/M, removed)
+/datum/reagent/ethanol/alien/qokkloa/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
-	if(M.HasTrait(/singleton/trait/boon/clear_mind))
+	if(alien == IS_SKRELL)
+		return
+	if(alien == IS_DIONA)
 		return
 
 	if(M.chem_doses[type] < 5)

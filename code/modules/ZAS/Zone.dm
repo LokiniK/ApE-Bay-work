@@ -45,12 +45,14 @@ Class Procs:
 	var/invalid = 0
 	var/list/contents = list()
 	var/list/fire_tiles = list()
+	var/list/fuel_objs = list()
 	var/needs_update = 0
 	var/list/edges = list()
 	var/datum/gas_mixture/air = new
 	var/list/graphic_add = list()
 	var/list/graphic_remove = list()
 	var/last_air_temperature = TCMB
+	var/firelevel = 0
 
 /zone/New()
 	SSair.add_zone(src)
@@ -69,9 +71,11 @@ Class Procs:
 	add_tile_air(turf_air)
 	T.zone = src
 	contents.Add(T)
-	if(T.hotspot)
+	if(T.fire)
+		var/obj/effect/decal/cleanable/liquid_fuel/fuel = locate() in T
 		fire_tiles.Add(T)
 		SSair.active_fire_zones |= src
+		if(fuel) fuel_objs += fuel
 	T.update_graphic(air.graphic)
 
 /zone/proc/remove(turf/simulated/T)
@@ -83,10 +87,13 @@ Class Procs:
 #endif
 	contents.Remove(T)
 	fire_tiles.Remove(T)
+	if(T.fire)
+		var/obj/effect/decal/cleanable/liquid_fuel/fuel = locate() in T
+		fuel_objs -= fuel
 	T.zone = null
 	T.update_graphic(graphic_remove = air.graphic)
-	if(length(contents))
-		air.group_multiplier = length(contents)
+	if(contents.len)
+		air.group_multiplier = contents.len
 	else
 		c_invalidate()
 
@@ -132,15 +139,15 @@ Class Procs:
 /zone/proc/add_tile_air(datum/gas_mixture/tile_air)
 	//air.volume += CELL_VOLUME
 	air.group_multiplier = 1
-	air.multiply(length(contents))
+	air.multiply(contents.len)
 	air.merge(tile_air)
-	air.divide(length(contents)+1)
-	air.group_multiplier = length(contents)+1
+	air.divide(contents.len+1)
+	air.group_multiplier = contents.len+1
 
 /zone/proc/tick()
 
 	// Update fires.
-	if(air.temperature >= PHORON_FLASHPOINT && !(src in SSair.active_fire_zones) && air.check_combustability() && length(contents))
+	if(air.temperature >= PHORON_FLASHPOINT && !(src in SSair.active_fire_zones) && length(contents) && air.check_combustability())
 		var/turf/T = pick(contents)
 		if(istype(T))
 			T.create_fire(vsc.fire_firelevel_multiplier)
@@ -149,8 +156,8 @@ Class Procs:
 	if(air.check_tile_graphic(graphic_add, graphic_remove))
 		for(var/turf/simulated/T in contents)
 			T.update_graphic(graphic_add, graphic_remove)
-		graphic_add.Cut()
-		graphic_remove.Cut()
+		graphic_add.len = 0
+		graphic_remove.len = 0
 
 	// Update connected edges.
 	for(var/connection_edge/E in edges)
@@ -187,9 +194,9 @@ Class Procs:
 		to_chat(M, "[gas_data.name[g]]: [air.gas[g]]")
 	to_chat(M, "P: [air.return_pressure()] kPa V: [air.volume]L T: [air.temperature]°K ([air.temperature - T0C]°C)")
 	to_chat(M, "O2 per N2: [(air.gas[GAS_NITROGEN] ? air.gas[GAS_OXYGEN]/air.gas[GAS_NITROGEN] : "N/A")] Moles: [air.total_moles]")
-	to_chat(M, "Simulated: [length(contents)] ([air.group_multiplier])")
-//	to_chat(M, "Unsimulated: [length(unsimulated_contents)]")
-//	to_chat(M, "Edges: [length(edges)]")
+	to_chat(M, "Simulated: [contents.len] ([air.group_multiplier])")
+//	to_chat(M, "Unsimulated: [unsimulated_contents.len]")
+//	to_chat(M, "Edges: [edges.len]")
 	if(invalid) to_chat(M, "Invalid!")
 	var/zone_edges = 0
 	var/space_edges = 0

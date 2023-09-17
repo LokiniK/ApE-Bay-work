@@ -2,10 +2,10 @@
 
 //All devices that link into the R&D console fall into thise type for easy identification and some shared procs.
 
-var/global/list/default_material_composition = list(MATERIAL_STEEL = 0, MATERIAL_ALUMINIUM = 0, MATERIAL_PLASTIC = 0, MATERIAL_GLASS = 0, MATERIAL_GOLD = 0, MATERIAL_SILVER = 0, MATERIAL_PHORON = 0, MATERIAL_URANIUM = 0, MATERIAL_DIAMOND = 0)
+var/list/default_material_composition = list(MATERIAL_STEEL = 0, MATERIAL_ALUMINIUM = 0, MATERIAL_PLASTIC = 0, MATERIAL_GLASS = 0, MATERIAL_GOLD = 0, MATERIAL_SILVER = 0, MATERIAL_PHORON = 0, MATERIAL_URANIUM = 0, MATERIAL_DIAMOND = 0)
 /obj/machinery/r_n_d
 	name = "R&D Device"
-	icon = 'icons/obj/machines/research/protolathe.dmi'
+	icon = 'icons/obj/machines/research_infinity.dmi'
 	density = TRUE
 	anchored = TRUE
 	uncreated_component_parts = null
@@ -25,11 +25,11 @@ var/global/list/default_material_composition = list(MATERIAL_STEEL = 0, MATERIAL
 	return ..()
 
 
-/obj/machinery/r_n_d/proc/eject(material, amount)
+/obj/machinery/r_n_d/proc/eject(var/material, var/amount)
 	if(!(material in materials))
 		return
 	var/material/mat = SSmaterials.get_material_by_name(material)
-	var/eject = clamp(round(materials[material] / mat.units_per_sheet), 0, amount)
+	var/eject = Clamp(round(materials[material] / mat.units_per_sheet), 0, amount)
 	if(eject > 0)
 		mat.place_sheet(loc, eject)
 		materials[material] -= eject * mat.units_per_sheet
@@ -38,12 +38,12 @@ var/global/list/default_material_composition = list(MATERIAL_STEEL = 0, MATERIAL
 	for(var/f in materials)
 		. += materials[f]
 
-/obj/machinery/r_n_d/proc/getLackingMaterials(datum/design/design)
+/obj/machinery/r_n_d/proc/getLackingMaterials(var/datum/design/D)
 	var/list/ret = list()
-	for(var/material_needed in design.materials)
-		if(materials[material_needed] < design.materials[material_needed])
-			ret += "[design.materials[material_needed] - materials[material_needed]] [material_needed]"
-	for(var/datum/reagent/chemical_needed as anything in design.chemicals)
-		if(!reagents.has_reagent(chemical_needed, design.chemicals[chemical_needed]))
-			ret += "[design.chemicals[chemical_needed] - reagents.get_reagent_amount(chemical_needed)]u [initial(chemical_needed.name)]"
+	for(var/M in D.materials)
+		if(materials[M] < D.materials[M])
+			ret += "[D.materials[M] - materials[M]] [M]"
+	for(var/C in D.chemicals)
+		if(!reagents.has_reagent(C, D.chemicals[C]))
+			ret += C
 	return english_list(ret)

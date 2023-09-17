@@ -6,7 +6,6 @@
 /datum/gear/suit/poncho
 	display_name = "poncho selection"
 	path = /obj/item/clothing/suit/poncho/colored
-	cost = 1
 	flags = GEAR_HAS_TYPE_SELECTION
 
 /datum/gear/suit/security_poncho
@@ -50,27 +49,10 @@
 	path = /obj/item/clothing/suit/storage/toggle/suit
 	flags = GEAR_HAS_COLOR_SELECTION
 
-/datum/gear/suit/custom_suit_jacket_double
-	display_name = "suit jacket (double-breasted), colour select"
-	path = /obj/item/clothing/suit/storage/toggle/suit_double
-	flags = GEAR_HAS_COLOR_SELECTION
-
 /datum/gear/suit/hazard
 	display_name = "hazard vests"
 	path = /obj/item/clothing/suit/storage/hazardvest
 	flags = GEAR_HAS_TYPE_SELECTION
-
-/datum/gear/suit/chest_rig
-	display_name = "chest rig"
-	path = /obj/item/clothing/suit/storage
-
-/datum/gear/suit/chest_rig/New()
-	..()
-	var/chest_rigs = list()
-	chest_rigs += /obj/item/clothing/suit/storage/engineering_chest_rig
-	chest_rigs += /obj/item/clothing/suit/storage/security_chest_rig
-	chest_rigs += /obj/item/clothing/suit/storage/medical_chest_rig
-	gear_tweaks += new/datum/gear_tweak/path/specified_types_list(chest_rigs)
 
 /datum/gear/suit/highvis
 	display_name = "high-visibility jacket"
@@ -88,6 +70,7 @@
 /datum/gear/suit/hoodie_sel/New()
 	..()
 	var/hoodies = list()
+	hoodies += /obj/item/clothing/suit/storage/toggle/hoodie/black //INF. It can be generated with hoodie_sel, but this one the way easier
 	hoodies += /obj/item/clothing/suit/storage/toggle/hoodie/cti
 	hoodies += /obj/item/clothing/suit/storage/toggle/hoodie/mu
 	hoodies += /obj/item/clothing/suit/storage/toggle/hoodie/nt
@@ -108,6 +91,11 @@
 	path = /obj/item/clothing/suit/storage/toggle/labcoat/science
 	flags = GEAR_HAS_TYPE_SELECTION
 
+/datum/gear/suit/labcoat_corp_rd
+	display_name = "labcoat, research director, corporate colors"
+	path = /obj/item/clothing/suit/storage/toggle/labcoat/rd
+	flags = GEAR_HAS_TYPE_SELECTION
+
 /datum/gear/suit/coat
 	display_name = "coat, colour select"
 	path = /obj/item/clothing/suit/storage/toggle/labcoat/coat
@@ -120,13 +108,14 @@
 /datum/gear/suit/leather/New()
 	..()
 	var/jackets = list()
+	jackets += /obj/item/clothing/suit/storage/tgbomber
 	jackets += /obj/item/clothing/suit/storage/toggle/bomber
 	jackets += /obj/item/clothing/suit/storage/leather_jacket/nanotrasen
 	jackets += /obj/item/clothing/suit/storage/toggle/brown_jacket/nanotrasen
 	jackets += /obj/item/clothing/suit/storage/leather_jacket
+	jackets += /obj/item/clothing/suit/storage/toggle/longjacket
 	jackets += /obj/item/clothing/suit/storage/toggle/brown_jacket
 	jackets += /obj/item/clothing/suit/storage/mbill
-	jackets += /obj/item/clothing/suit/storage/toggle/leather_hoodie
 	gear_tweaks += new/datum/gear_tweak/path/specified_types_list(jackets)
 
 /datum/gear/suit/wintercoat
@@ -145,17 +134,14 @@
 /datum/gear/suit/blueapron
 	display_name = "apron, blue"
 	path = /obj/item/clothing/suit/apron
-	cost = 1
 
 /datum/gear/suit/overalls
 	display_name = "apron, overalls"
 	path = /obj/item/clothing/suit/apron/overalls
-	cost = 1
 
 /datum/gear/suit/medcoat
 	display_name = "medical suit selection"
 	path = /obj/item/clothing/suit
-	flags = GEAR_HAS_NO_CUSTOMIZATION
 
 /datum/gear/suit/medcoat/New()
 	..()
@@ -164,22 +150,92 @@
 /datum/gear/suit/trenchcoat
 	display_name = "trenchcoat selection"
 	path = /obj/item/clothing/suit
-	cost = 3
 
 /datum/gear/suit/trenchcoat/New()
 	..()
 	var/trenchcoats = list()
-	trenchcoats += /obj/item/clothing/suit/storage/det_trench
-	trenchcoats += /obj/item/clothing/suit/storage/det_trench/grey
+	trenchcoats += /obj/item/clothing/suit/storage/det_trench/ft
+	trenchcoats += /obj/item/clothing/suit/storage/det_trench/ft/grey
 	trenchcoats += /obj/item/clothing/suit/leathercoat
 	gear_tweaks += new/datum/gear_tweak/path/specified_types_list(trenchcoats)
-
 
 /datum/gear/suit/pullover
 	display_name = "sweater, pullover"
 	path = /obj/item/clothing/suit/storage/pullover
 
-
 /datum/gear/suit/zipper
 	display_name = "sweater, zip up"
 	path = /obj/item/clothing/suit/storage/toggle/zipper
+
+/datum/gear/suit/kimono
+	display_name = "kimono selection"
+	path = /obj/item/clothing/suit/storage/inf
+
+/datum/gear/suit/kimono/New()
+	..()
+	var/kim = list()
+	kim += /obj/item/clothing/suit/storage/inf
+	kim += /obj/item/clothing/suit/storage/inf/blue_kimono
+	kim += /obj/item/clothing/suit/storage/inf/red_short_kimono
+	kim += /obj/item/clothing/suit/storage/inf/black_kimono
+	gear_tweaks += new/datum/gear_tweak/path/specified_types_list(kim)
+
+/datum/gear/suit/brand_jacket
+	display_name = "brand jacket selection"
+	path = /obj/item/clothing/suit/storage/inf/brand_jacket
+
+/datum/gear/suit/brand_jacket/New()
+	..()
+	var/jack = list()
+	jack += /obj/item/clothing/suit/storage/inf/brand_jacket
+	jack += /obj/item/clothing/suit/storage/inf/brand_orange_jacket
+	jack += /obj/item/clothing/suit/storage/inf/brand_rjacket
+	gear_tweaks += new/datum/gear_tweak/path/specified_types_list(jack)
+
+/datum/gear/suit/long_coat
+	display_name = "long coat"
+	path = /obj/item/clothing/suit/storage/inf/long_coat
+
+/datum/gear/suit/old_pullover
+	display_name = "old pullover sweater"
+	path = /obj/item/clothing/suit/storage/inf/old_pullover
+
+/datum/gear/suit/jensencoat
+	display_name = "short trenchcoat"
+	path = /obj/item/clothing/suit/storage/inf/jensencoat
+
+/datum/gear/suit/leon_jacket
+	display_name = "patterned leather jacket"
+	path = /obj/item/clothing/suit/storage/inf/leon_jacket
+
+/datum/gear/suit/gentlecoat
+	display_name = "gentlecoat"
+	path = /obj/item/clothing/suit/storage/inf/gentlecoat
+
+
+/datum/gear/suit/tailcoat
+	display_name = "tailcoat"
+	path = /obj/item/clothing/suit/storage/inf/tailcoat
+
+/datum/gear/suit/faln_jacket
+	display_name = "faln jacket"
+	path = /obj/item/clothing/suit/storage/hooded/faln_jacket
+
+/datum/gear/suit/drive_jacket
+	display_name = "drive jacket"
+	path = /obj/item/clothing/suit/storage/inf/drive_jacket
+
+/datum/gear/suit/the_jacket
+	display_name = "the jacket"
+	path = /obj/item/clothing/suit/storage/toggle/inf/the_jacket
+
+/datum/gear/suit/fiery_jacket
+	display_name = "fiery jacket selection"
+	path = /obj/item/clothing/suit/storage/toggle/inf
+
+/datum/gear/suit/fiery_jacket/New()
+	..()
+	var/fjack = list()
+	fjack += /obj/item/clothing/suit/storage/toggle/inf
+	fjack += /obj/item/clothing/suit/storage/toggle/inf/white_fiery_jacket
+	gear_tweaks += new/datum/gear_tweak/path/specified_types_list(fjack)

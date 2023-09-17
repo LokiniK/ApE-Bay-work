@@ -11,7 +11,7 @@
 	unacidable = TRUE
 
 /obj/item/reagent_containers/food/drinks/jar/on_reagent_change()
-	if (length(reagents.reagent_list) > 0)
+	if (reagents.reagent_list.len > 0)
 		icon_state ="jar_what"
 		SetName("jar of something")
 		desc = "You can't really tell what this is."

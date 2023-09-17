@@ -61,20 +61,15 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 	var/obj/machinery/r_n_d/circuit_imprinter/linked_imprinter = null	//Linked Circuit Imprinter
 
 	var/screen = 1.0	//Which screen is currently showing.
+	var/category_lathe = null // Which item category is chosen on Protolathe
+	var/category_imprinter = null // Which item category is chosen on Circuit Imprinter
 	var/id = 0			//ID of the computer (for server restrictions).
 	var/sync = 1		//If sync = 0, it doesn't show up on Server Control Console
 	var/can_analyze = TRUE //If the console is allowed to use destructive analyzers
 
-	var/list/saved_origins = list()
-	var/protolathe_show_tech = TRUE
-	var/protolathe_search = ""
-	var/imprinter_show_tech = TRUE
-	var/imprinter_search = ""
-	var/quick_deconstruct = FALSE
-
 	req_access = list(access_research)	//Data and setting manipulation requires scientist access.
 
-/obj/machinery/computer/rdconsole/proc/CallMaterialName(ID)
+/obj/machinery/computer/rdconsole/proc/CallMaterialName(var/ID)
 	var/return_name = ID
 	switch(return_name)
 		if(MATERIAL_STEEL)
@@ -97,7 +92,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			return_name = "Diamond"
 	return return_name
 
-/obj/machinery/computer/rdconsole/proc/CallReagentName(reagent_type)
+/obj/machinery/computer/rdconsole/proc/CallReagentName(var/reagent_type)
 	var/datum/reagent/R = reagent_type
 	return ispath(reagent_type, /datum/reagent) ? initial(R.name) : "Unknown"
 
@@ -121,7 +116,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 
 /obj/machinery/computer/rdconsole/New()
 	..()
-	files = new
+	files = new /datum/research(src) //Setup the research data holder.
 	if(!id)
 		for(var/obj/machinery/r_n_d/server/centcom/S in SSmachines.machinery)
 			S.update_connections()
@@ -131,7 +126,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 	SyncRDevices()
 	. = ..()
 
-/obj/machinery/computer/rdconsole/attackby(obj/item/D as obj, mob/user as mob)
+/obj/machinery/computer/rdconsole/attackby(var/obj/item/D as obj, var/mob/user as mob)
 	//Loading a disk into it.
 	if(istype(D, /obj/item/disk))
 		if(t_disk || d_disk)
@@ -144,10 +139,10 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		else if (istype(D, /obj/item/disk/design_disk))
 			d_disk = D
 		else
-			to_chat(user, SPAN_NOTICE("Machine cannot accept disks in that format."))
+			to_chat(user, "<span class='notice'>Machine cannot accept disks in that format.</span>")
 			return
 		user.drop_from_inventory(D, src)
-		to_chat(user, SPAN_NOTICE("You add \the [D] to the machine."))
+		to_chat(user, "<span class='notice'>You add \the [D] to the machine.</span>")
 	else
 		//The construction/deconstruction of the console code.
 		..()
@@ -155,15 +150,15 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 	src.updateUsrDialog()
 	return
 
-/obj/machinery/computer/rdconsole/emag_act(remaining_charges, mob/user)
+/obj/machinery/computer/rdconsole/emag_act(var/remaining_charges, var/mob/user)
 	if(!emagged)
 		playsound(src.loc, 'sound/effects/sparks4.ogg', 75, 1)
 		emagged = TRUE
 		req_access.Cut()
-		to_chat(user, SPAN_NOTICE("You disable the security protocols."))
+		to_chat(user, "<span class='notice'>You you disable the security protocols.</span>")
 		return 1
 
-/obj/machinery/computer/rdconsole/CanUseTopic(mob/user, datum/topic_state/state, href_list)
+/obj/machinery/computer/rdconsole/CanUseTopic(var/mob/user, var/datum/topic_state/state, var/href_list)
 	if(href_list && href_list["menu"])
 		var/temp_screen = text2num(href_list["menu"])
 		if(!((temp_screen <= 1.1) || (3 <= temp_screen && 4.9 >= temp_screen) || allowed(user)))
@@ -171,10 +166,13 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			return STATUS_CLOSE
 	return ..()
 
-/obj/machinery/computer/rdconsole/OnTopic(user, href_list)
+/obj/machinery/computer/rdconsole/OnTopic(mob/user, href_list)
 	if(href_list["menu"]) //Switches menu screens. Converts a sent text string into a number. Saves a LOT of code.
 		screen = text2num(href_list["menu"])
 		. = TOPIC_REFRESH
+
+		category_lathe = href_list["category_lathe"]
+		category_imprinter = href_list["category_imprinter"]
 
 	else if(href_list["updt_tech"]) //Update the research holder with information from the technology disk.
 		. = TOPIC_REFRESH
@@ -257,7 +255,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		. = TOPIC_REFRESH
 		CHECK_DESTROY
 		if(linked_destroy.busy)
-			to_chat(usr, SPAN_NOTICE("The destructive analyzer is busy at the moment."))
+			to_chat(usr, "<span class='notice'>The destructive analyzer is busy at the moment.</span>")
 
 		else if(linked_destroy.loaded_item)
 			linked_destroy.loaded_item.dropInto(linked_destroy.loc)
@@ -269,12 +267,15 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		. = TOPIC_REFRESH
 		CHECK_DESTROY
 		if(linked_destroy.busy)
-			to_chat(usr, SPAN_NOTICE("The destructive analyzer is busy at the moment."))
+			to_chat(usr, "<span class='notice'>The destructive analyzer is busy at the moment.</span>")
 			return TOPIC_HANDLED
 		if(alert("Proceeding will destroy loaded item. Continue?", "Destructive analyzer confirmation", "Yes", "No") == "No")
 			return TOPIC_HANDLED
 		CHECK_DESTROY
-		deconstruct(weakref(usr))
+		linked_destroy.busy = 1
+		screen = 0.1
+		flick("d_analyzer_process", linked_destroy)
+		addtimer(CALLBACK(src, .proc/finish_deconstruct, weakref(user)), 24)
 
 	else if(href_list["lock"]) //Lock the console from use by anyone without tox access.
 		if(allowed(usr))
@@ -286,7 +287,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 	else if(href_list["sync"]) //Sync the research holder with all the R&D consoles in the game that aren't sync protected.
 		screen = 0.0
 		if(!sync)
-			to_chat(usr, SPAN_NOTICE("You must connect to the network first."))
+			to_chat(usr, "<span class='notice'>You must connect to the network first.</span>")
 		else
 			. = TOPIC_HANDLED
 			spawn(30)
@@ -320,9 +321,19 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		. = TOPIC_REFRESH
 		CHECK_LATHE
 		var/datum/design/being_built = null
+		var/operator_device_skill = user.get_skill_value(SKILL_DEVICES)
 		for(var/datum/design/D in files.known_designs)
 			if(D.id == href_list["build"])
-				being_built = D
+				var/datum/design/N = new /datum/design
+				N.name = D.name
+				N.build_path = D.build_path
+				N.time = D.time + list(5, 3, 0, -1, -2)[operator_device_skill]
+				N.skill_fail_chance = list(50, 30, 0, 0, 0)[operator_device_skill]
+				for(var/M in D.materials)
+					N.materials[M] = round(D.materials[M] * list(2, 1.5, 1, 0.9, 0.8)[operator_device_skill])
+				for(var/C in D.chemicals)
+					N.chemicals[C] = round(D.chemicals[C] * list(2, 1.5, 1, 0.9, 0.8)[operator_device_skill])
+				being_built = N
 				break
 		if(being_built)
 			linked_lathe.addToQueue(being_built)
@@ -332,9 +343,19 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		. = TOPIC_REFRESH
 		CHECK_IMPRINTER
 		var/datum/design/being_built = null
+		var/operator_device_skill = user.get_skill_value(SKILL_DEVICES)
 		for(var/datum/design/D in files.known_designs)
 			if(D.id == href_list["imprint"])
-				being_built = D
+				var/datum/design/N = new /datum/design
+				N.name = D.name
+				N.build_path = D.build_path
+				N.time = D.time + list(3, 0, -1, -2, -3)[operator_device_skill]
+				N.skill_fail_chance = list(30, 0, 0, 0, 0)[operator_device_skill]
+				for(var/M in D.materials)
+					N.materials[M] = round(D.materials[M] * list(1.5, 1, 0.9, 0.8, 0.75)[operator_device_skill])
+				for(var/C in D.chemicals)
+					N.chemicals[C] = round(D.chemicals[C] * list(1.5, 1, 0.9, 0.8, 0.75)[operator_device_skill])
+				being_built = N
 				break
 		if(being_built)
 			linked_imprinter.addToQueue(being_built)
@@ -416,7 +437,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		if(choice == "Continue")
 			screen = 0.0
 			qdel(files)
-			files = new
+			files = new /datum/research(src)
 			spawn(20)
 				screen = 1.6
 				interact(user)
@@ -440,56 +461,13 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			spawn(10)
 				screen = ((text2num(href_list["print"]) == 2) ? 5.0 : 1.1)
 				interact(user)
-	else if (href_list["protolathe_search"])
-		var/protolathe_search = input("Search for a recipe:", "Search")
-
-		if (!protolathe_search)
-			return
-
-		src.protolathe_search = lowertext(protolathe_search)
-		interact(user)
-
-	else if (href_list["protolathe_reset_search"])
-		protolathe_search = ""
-		interact(user)
-
-	else if (href_list["protolathe_show_tech"])
-		protolathe_show_tech = !protolathe_show_tech
-		interact(user)
-
-	else if (href_list["imprinter_search"])
-		var/imprinter_search = input("Search for a recipe:", "Search")
-
-		if (!imprinter_search)
-			return
-
-		src.imprinter_search = lowertext(imprinter_search)
-		interact(user)
-
-	else if (href_list["imprinter_reset_search"])
-		imprinter_search = ""
-		interact(user)
-
-	else if (href_list["imprinter_show_tech"])
-		imprinter_show_tech = !imprinter_show_tech
-		interact(user)
-	else if (href_list["decon_mode"])
-		quick_deconstruct = !quick_deconstruct
-		interact(user)
-
-/obj/machinery/computer/rdconsole/proc/deconstruct(weakref/W)
-	linked_destroy.busy = TRUE
-	if (!quick_deconstruct)
-		screen = 0.1
-	linked_destroy.icon_state = "d_analyzer_process"
-	addtimer(new Callback(src, .proc/finish_deconstruct, W), 24)
 
 /obj/machinery/computer/rdconsole/proc/finish_deconstruct(weakref/W)
 	CHECK_DESTROY
 	var/mob/user = W.resolve()
 	linked_destroy.busy = 0
 	if(!linked_destroy.loaded_item)
-		to_chat(user, SPAN_NOTICE("The destructive analyzer appears to be empty."))
+		to_chat(user, "<span class='notice'>The destructive analyzer appears to be empty.</span>")
 		screen = 1.0
 		return
 	for(var/T in linked_destroy.loaded_item.origin_tech)
@@ -498,10 +476,6 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		for(var/t in linked_destroy.loaded_item.matter)
 			if(t in linked_lathe.materials)
 				linked_lathe.materials[t] += min(linked_lathe.max_material_storage - linked_lathe.TotalMaterials(), linked_destroy.loaded_item.matter[t] * linked_destroy.decon_mod)
-		for (var/obj/I in linked_destroy.loaded_item.contents)
-			for (var/matter in I.matter)
-				if (matter in linked_lathe.materials)
-					linked_lathe.materials[matter] += min(linked_lathe.max_material_storage - linked_lathe.TotalMaterials(), I.matter[matter] * linked_destroy.decon_mod)
 
 	linked_destroy.loaded_item = null
 	for(var/obj/I in linked_destroy.contents)
@@ -521,8 +495,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 				linked_destroy.icon_state = "d_analyzer"
 
 	use_power_oneoff(linked_destroy.active_power_usage)
-	if (!quick_deconstruct)
-		screen = 1.0
+	screen = 1.0
 	if(CanInteract(user, DefaultTopicState()))
 		interact(user)
 
@@ -556,6 +529,10 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 /obj/machinery/computer/rdconsole/interact(mob/user)
 	user.set_machine(src)
 	var/dat = list()
+	var/final_dat = list()
+	var/category_items_list_lathe = list()
+	var/category_items_list_imprinter = list()
+	var/operator_device_skill = user.get_skill_value(SKILL_DEVICES)
 	files.RefreshResearch()
 	switch(screen) //A quick check to make sure you get the right screen when a device is disconnected.
 		if(2 to 2.9)
@@ -729,19 +706,16 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			dat += "</UL>"
 
 		////////////////////DESTRUCTIVE ANALYZER SCREENS////////////////////////////
-
 		if(2.0)
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A><HR>"
 			dat += "NO DESTRUCTIVE ANALYZER LINKED TO CONSOLE<BR><BR>"
 
 		if(2.1)
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A><HR>"
-			dat += "<A href='?src=\ref[src];decon_mode=1'>Automatic Deconstruction: [quick_deconstruct ? "ON" : "OFF"]</A><HR>"
 			dat += "No Item Loaded. Standing-by...<BR><HR>"
 
 		if(2.2)
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A><HR>"
-			dat += "<A href='?src=\ref[src];decon_mode=1'>Automatic Deconstruction: [quick_deconstruct ? "ON" : "OFF"]</A><HR>"
 			dat += "Deconstruction Menu<HR>"
 			dat += "Name: [linked_destroy.loaded_item.name]<BR>"
 
@@ -769,54 +743,60 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			dat += "<A href='?src=\ref[src];menu=3.2'>Material Storage</A> || "
 			dat += "<A href='?src=\ref[src];menu=3.3'>Chemical Storage</A><HR>"
 			dat += "Protolathe Menu:<BR><BR>"
-			dat += "<A href='?src=\ref[src];protolathe_show_tech=1'>Show Recipe Tech Levels: [protolathe_show_tech ? "YES" : "NO"]</A>"
-			dat += "<A href='?src=\ref[src];protolathe_search=1'>Search</A>"
-			dat += "<A href='?src=\ref[src];protolathe_reset_search=1'>Reset Search</A><BR>"
-			dat += "[SPAN_COLOR(COLOR_GREEN, "Green")] = Tech level higher than current<HR>"
 			dat += "<B>Material Amount:</B> [linked_lathe.TotalMaterials()] cm<sup>3</sup> (MAX: [linked_lathe.max_material_storage])<BR>"
 			dat += "<B>Chemical Volume:</B> [linked_lathe.reagents.total_volume] (MAX: [linked_lathe.reagents.maximum_volume])<HR>"
-			dat += "<UL>"
-
+			dat += "Categories:"
+			var/protolathe_bonus = list(2, 1.5, 1, 0.9, 0.8)[operator_device_skill]
+			var/cat_dat = list()
+			if(category_lathe != null)
+				cat_dat += " <A href='?src=\ref[src];menu=3.1'>\[All\]</A> "
+			else
+				cat_dat += " <B>\[All\]</B> "
 			for(var/datum/design/D in files.known_designs)
 				if(!D.build_path || !(D.build_type & PROTOLATHE))
 					continue
+				if(D.category_items == null)
+					D.category_items = "Unsorted"
+				if(!(D.category_items in category_items_list_lathe))
+					category_items_list_lathe += D.category_items
+					var/category_items_name = D.category_items
+					if(!(user.skill_check(SKILL_DEVICES, SKILL_BASIC)))
+						category_items_name = corrupt_text(category_items_name)
 
-				if (protolathe_search != "")
-					if (!findtext(D.name, protolathe_search))
-						continue
-
+					if(category_lathe != D.category_items)
+						cat_dat += " <A href='?src=\ref[src];menu=3.1;category_lathe=[D.category_items]'>\[[category_items_name]\]</A> "
+					else
+						cat_dat += " <B>\[[category_items_name]\]</B> "
 				var/temp_dat
-				for(var/M in D.materials)
-					temp_dat += ", [D.materials[M]*(linked_lathe ? linked_lathe.mat_efficiency : 1)] [CallMaterialName(M)]"
-				for(var/T in D.chemicals)
-					temp_dat += ", [D.chemicals[T]*(linked_imprinter ? linked_imprinter.mat_efficiency : 1)] [CallReagentName(T)]"
-				if(temp_dat)
-					temp_dat = " \[[copytext(temp_dat, 3)]\]"
-				if(linked_lathe.canBuild(D))
-					dat += "<LI><B><A href='?src=\ref[src];build=[D.id]'>[D.name]</A></B>[temp_dat]"
-				else
-					dat += "<LI><B>[D.name]</B>[temp_dat]"
+				if(category_lathe == D.category_items || category_lathe == null)
+					var/name_dat = D.name
+					for(var/M in D.materials)
+						temp_dat += ", [round(D.materials[M]*linked_lathe.mat_efficiency * protolathe_bonus)] [CallMaterialName(M)]"
+					for(var/T in D.chemicals)
+						temp_dat += ", [round(D.chemicals[T]*linked_lathe.mat_efficiency * protolathe_bonus)] [CallReagentName(T)]"
+					if(temp_dat)
+						temp_dat = " \[[copytext(temp_dat, 3)]\]"
+					if(!(user.skill_check(SKILL_DEVICES, SKILL_BASIC)))
+						temp_dat = corrupt_text(temp_dat)
+						name_dat = corrupt_text(name_dat)
+					if(linked_lathe.canBuild(D, protolathe_bonus))
+						final_dat += "<LI><B><A href='?src=\ref[src];build=[D.id]'>[name_dat]</A></B>[temp_dat]"
+					else
+						final_dat += "<LI><B>[name_dat]</B>[temp_dat]"
 
-				if (protolathe_show_tech)
-					var/list/origin_tech
-
-					if (saved_origins[D.build_path])
-						origin_tech = saved_origins[D.build_path]
-
-					if (!origin_tech)
-						var/obj/item/I = new D.build_path
-						origin_tech = I.origin_tech
-						saved_origins[D.build_path] = origin_tech
-						qdel(I)
-
-					for (var/T in origin_tech)
-						for (var/datum/tech/F in files.known_tech)
-							if (F.name == CallTechName(T))
-								if (F.level <= origin_tech[T])
-									dat += SPAN_COLOR(COLOR_GREEN, " [F.name] = [origin_tech[T]] ")
-								else
-									dat += " [F.name] = [origin_tech[T]] "
-								break
+			var/category_lathe_temp = category_lathe
+			if(!user.skill_check(SKILL_DEVICES, SKILL_ADEPT))
+				cat_dat = shuffle(cat_dat)
+				final_dat = shuffle(final_dat)
+				category_lathe_temp = corrupt_text(category_lathe)
+			dat += cat_dat
+			dat += "<HR>"
+			if(category_lathe != null)
+				dat += "<center><h4>[category_lathe_temp]</h4></center>"
+			else
+				dat += "<center><h4>All</h4></center>"
+			dat += "<UL>"
+			dat += final_dat
 			dat += "</UL>"
 
 		if(3.2) //Protolathe Material Storage Sub-menu
@@ -854,18 +834,30 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A> || "
 			dat += "<A href='?src=\ref[src];menu=3.1'>Protolathe Menu</A><HR>"
 			dat += "Queue<BR><HR>"
-			if(!length(linked_lathe.queue))
+			if(!linked_lathe.queue.len)
 				dat += "Empty"
 			else
 				var/tmp = 1
 				for(var/datum/design/D in linked_lathe.queue)
+					var/temp_dat
+					var/name_dat = D.name
+					for(var/M in D.materials)
+						temp_dat += ", [D.materials[M]*linked_lathe.mat_efficiency] [CallMaterialName(M)]"
+					for(var/T in D.chemicals)
+						temp_dat += ", [D.chemicals[T]*linked_lathe.mat_efficiency] [CallReagentName(T)]"
+					if(temp_dat)
+						temp_dat = " \[[copytext(temp_dat, 3)]\]"
+					if(!(user.skill_check(SKILL_DEVICES, SKILL_BASIC)))
+						temp_dat = corrupt_text(temp_dat)
+						name_dat = corrupt_text(name_dat)
+
 					if(tmp == 1)
 						if(linked_lathe.busy)
-							dat += "<B>1: [D.name]</B><BR>"
+							dat += "<B>1: [name_dat]</B> [temp_dat]<BR>"
 						else
-							dat += "<B>1: [D.name]</B> (Awaiting materials) <A href='?src=\ref[src];removeP=[tmp]'>(Remove)</A><BR>"
+							dat += "<B>1: [name_dat]</B> (Awaiting materials - [temp_dat]) <A href='?src=\ref[src];removeP=[tmp]'>(Remove)</A><BR>"
 					else
-						dat += "[tmp]: [D.name] <A href='?src=\ref[src];removeP=[tmp]'>(Remove)</A><BR>"
+						dat += "[tmp]: [name_dat] [temp_dat] <A href='?src=\ref[src];removeP=[tmp]'>(Remove)</A><BR>"
 					++tmp
 
 		///////////////////CIRCUIT IMPRINTER SCREENS////////////////////
@@ -880,52 +872,60 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			dat += "<A href='?src=\ref[src];menu=4.3'>Material Storage</A> || "
 			dat += "<A href='?src=\ref[src];menu=4.2'>Chemical Storage</A><HR>"
 			dat += "Circuit Imprinter Menu:<BR><BR>"
-			dat += "<A href='?src=\ref[src];imprinter_show_tech=1'>Show Recipe Tech Levels: [imprinter_show_tech ? "YES" : "NO"]</A>"
-			dat += "<A href='?src=\ref[src];imprinter_search=1'>Search</A>"
-			dat += "<A href='?src=\ref[src];imprinter_reset_search=1'>Reset Search</A><BR>"
-			dat += "[SPAN_COLOR(COLOR_GREEN, "Green")] = Tech level higher than current<HR>"
 			dat += "Material Amount: [linked_imprinter.TotalMaterials()] cm<sup>3</sup><BR>"
 			dat += "Chemical Volume: [linked_imprinter.reagents.total_volume]<HR>"
-			dat += "<UL>"
+			dat += "Categories:"
+			var/circuit_imprinter_bonus = list(1.5, 1, 0.9, 0.8, 0.75)[operator_device_skill]
+			var/cat_dat = list()
+			if(category_imprinter != null)
+				cat_dat += " <A href='?src=\ref[src];menu=4.1'>\[All\]</A> "
+			else
+				cat_dat += " <B>\[All\]</B> "
 			for(var/datum/design/D in files.known_designs)
 				if(!D.build_path || !(D.build_type & IMPRINTER))
 					continue
+				if(D.category_items == null)
+					D.category_items = "Unsorted"
+				if(!(D.category_items in category_items_list_imprinter))
+					category_items_list_imprinter += D.category_items
+					var/category_items_name = D.category_items
+					if(!(user.skill_check(SKILL_DEVICES, SKILL_BASIC)))
+						category_items_name = corrupt_text(category_items_name)
 
-				if (imprinter_search != "" && !findtext(D.name, imprinter_search))
-					continue
-
+					if(category_imprinter != D.category_items)
+						cat_dat += " <A href='?src=\ref[src];menu=4.1;category_imprinter=[D.category_items]'>\[[category_items_name]\]</A> "
+					else
+						cat_dat += " <B>\[[category_items_name]\]</B> "
 				var/temp_dat
-				for(var/M in D.materials)
-					temp_dat += ", [D.materials[M]*linked_imprinter.mat_efficiency] [CallMaterialName(M)]"
-				for(var/T in D.chemicals)
-					temp_dat += ", [D.chemicals[T]*linked_imprinter.mat_efficiency] [CallReagentName(T)]"
-				if(temp_dat)
-					temp_dat = " \[[copytext(temp_dat,3)]\]"
-				if(linked_imprinter.canBuild(D))
-					dat += "<LI><B><A href='?src=\ref[src];imprint=[D.id]'>[D.name]</A></B>[temp_dat]"
-				else
-					dat += "<LI><B>[D.name]</B>[temp_dat]"
+				if(category_imprinter == D.category_items || category_imprinter == null)
+					var/name_dat = D.name
+					for(var/M in D.materials)
+						temp_dat += ", [round(D.materials[M]*linked_imprinter.mat_efficiency * circuit_imprinter_bonus)] [CallMaterialName(M)]"
+					for(var/T in D.chemicals)
+						temp_dat += ", [round(D.chemicals[T]*linked_imprinter.mat_efficiency * circuit_imprinter_bonus)] [CallReagentName(T)]"
+					if(temp_dat)
+						temp_dat = " \[[copytext(temp_dat,3)]\]"
+					if(!(user.skill_check(SKILL_DEVICES, SKILL_BASIC)))
+						temp_dat = corrupt_text(temp_dat)
+						name_dat = corrupt_text(name_dat)
+					if(linked_imprinter.canBuild(D, circuit_imprinter_bonus))
+						final_dat += "<LI><B><A href='?src=\ref[src];imprint=[D.id]'>[name_dat]</A></B>[temp_dat]"
+					else
+						final_dat += "<LI><B>[name_dat]</B>[temp_dat]"
 
-				if (imprinter_show_tech)
-					var/list/origin_tech
-
-					if (saved_origins[D.build_path])
-						origin_tech = saved_origins[D.build_path]
-
-					if (!origin_tech)
-						var/obj/item/I = new D.build_path
-						origin_tech = I.origin_tech
-						saved_origins[D.build_path] = origin_tech
-						qdel(I)
-
-					for (var/T in origin_tech)
-						for (var/datum/tech/F in files.known_tech)
-							if (F.name == CallTechName(T))
-								if (F.level <= origin_tech[T] )
-									dat += SPAN_COLOR(COLOR_GREEN, " [F.name] = [origin_tech[T]] ")
-								else
-									dat += " [F.name] = [origin_tech[T]] "
-								break
+			var/category_imprinter_temp = category_imprinter
+			if(!user.skill_check(SKILL_DEVICES, SKILL_BASIC))
+				cat_dat = shuffle(cat_dat)
+				final_dat = shuffle(final_dat)
+				category_imprinter_temp = corrupt_text(category_imprinter)
+			dat += cat_dat
+			dat += "<HR>"
+			if(category_imprinter != null)
+				dat += "<center><h4>[category_imprinter_temp]</h4></center>"
+			else
+				dat += "<center><h4>All</h4></center>"
+			dat += "<UL>"
+			dat += final_dat
 			dat += "</UL>"
 
 		if(4.2)
@@ -963,15 +963,23 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A> || "
 			dat += "<A href='?src=\ref[src];menu=4.1'>Circuit Imprinter Menu</A><HR>"
 			dat += "Queue<BR><HR>"
-			if(length(linked_imprinter.queue) == 0)
+			if(linked_imprinter.queue.len == 0)
 				dat += "Empty"
 			else
 				var/tmp = 1
 				for(var/datum/design/D in linked_imprinter.queue)
+					var/temp_dat
+					for(var/M in D.materials)
+						temp_dat += ", [D.materials[M]*linked_imprinter.mat_efficiency] [CallMaterialName(M)]"
+					for(var/T in D.chemicals)
+						temp_dat += ", [D.chemicals[T]*linked_imprinter.mat_efficiency] [CallReagentName(T)]"
+					if(temp_dat)
+						temp_dat = " \[[copytext(temp_dat, 3)]\]"
+
 					if(tmp == 1)
-						dat += "<B>1: [D.name]</B><BR>"
+						dat += "<B>1: [D.name] [temp_dat]</B><BR>"
 					else
-						dat += "[tmp]: [D.name] <A href='?src=\ref[src];removeI=[tmp]'>(Remove)</A><BR>"
+						dat += "[tmp]: [D.name] [temp_dat]<A href='?src=\ref[src];removeI=[tmp]'>(Remove)</A><BR>"
 					++tmp
 
 		///////////////////Research Information Browser////////////////////
