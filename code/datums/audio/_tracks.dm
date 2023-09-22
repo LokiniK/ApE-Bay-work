@@ -303,3 +303,8 @@
 	author = "A Drop A Day"
 	license = /decl/license/cc_by_sa_4_0
 	url = "https://ghyti.bandcamp.com/"
+
+/decl/audio/track/chaostrophy
+	source = 'sound/music/chaostrophy.mp3'
+	title = "Original Chaostrophy"
+	author = "Coil"

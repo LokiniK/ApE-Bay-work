@@ -1,10 +1,10 @@
-/datum/map/example
-	name = "Example"
-	full_name = "The Example"
-	path = "example"
+/datum/map/orbiter
+	name = "Orbiter"
+	full_name = "SMV Orbiter"
+	path = "orbiter"
 
-	lobby_screens = list('maps/example/lobby.png')
-	lobby_tracks = list(/decl/audio/track/absconditus)
+	lobby_screens = list('maps/orbiter/orbiter.png')
+	lobby_tracks = list(/decl/audio/track/chaostophy)
 
 	station_levels = list(1, 2, 3)
 	contact_levels = list(1, 2, 3)
